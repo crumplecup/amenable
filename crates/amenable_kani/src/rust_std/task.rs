@@ -23,6 +23,7 @@ impl KaniWitness for RustStdStandard<Context<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_context_from_waker_exposes_the_same_waker".to_owned(),
@@ -59,6 +60,7 @@ impl KaniWitness for WillWakeReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_context_from_waker_exposes_the_same_waker".to_owned(),
@@ -112,6 +114,7 @@ impl KaniWitness for RustStdStandard<Poll<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poll_ready_and_pending_are_disjoint".to_owned(),
@@ -155,6 +158,7 @@ impl KaniWitness for PollIsReadyReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poll_ready_and_pending_are_disjoint".to_owned(),
@@ -196,6 +200,7 @@ impl KaniWitness for PollIsPendingReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poll_ready_and_pending_are_disjoint".to_owned(),

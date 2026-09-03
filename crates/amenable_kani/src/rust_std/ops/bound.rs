@@ -16,6 +16,7 @@ impl KaniWitness for RustStdStandard<Bound<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_bound_round_trips_its_endpoint".to_owned(),

@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<[i32; 3]> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_array_indexing_and_length".to_owned(),
@@ -69,6 +70,7 @@ impl KaniWitness for RustStdStandard<[i32]> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_slice_indexing_and_length".to_owned(),

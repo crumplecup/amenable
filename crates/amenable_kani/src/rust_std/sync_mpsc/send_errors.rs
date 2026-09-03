@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<SendError<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_send_error_recovers_the_unsent_value".to_owned(),
@@ -74,6 +75,7 @@ impl ProofToken for RustStdSendErrorToken {
 impl Establish<KaniChannelSendErrorToken, KaniVerifier> for RustStdStandard<SendError<i32>> {
     type Token = RustStdSendErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelSendErrorToken) -> Self::Token {
         RustStdSendErrorToken(())
     }
@@ -107,6 +109,7 @@ impl KaniWitness for RustStdStandard<TrySendError<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_send_error_full_recovers_the_unsent_value".to_owned(),
@@ -168,6 +171,7 @@ impl ProofToken for RustStdTrySendErrorToken {
 impl Establish<KaniChannelTrySendFullToken, KaniVerifier> for RustStdStandard<TrySendError<i32>> {
     type Token = RustStdTrySendErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelTrySendFullToken) -> Self::Token {
         RustStdTrySendErrorToken(())
     }

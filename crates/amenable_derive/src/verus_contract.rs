@@ -58,6 +58,7 @@ struct VerusWitnessArgs {
 }
 
 impl Parse for VerusWitnessArgs {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(input)))]
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let ty: Type = input.parse()?;
         input.parse::<Token![,]>()?;

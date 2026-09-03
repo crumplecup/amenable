@@ -23,6 +23,7 @@ impl VerusWitness for AsciiByte {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_str_matches_model_yields_every_non_overlapping_occurrence".to_owned(),
@@ -43,6 +44,7 @@ impl VerusWitness for RustStdStandard<std::str::MatchIndices<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_str_match_indices_model_pairs_each_match_with_its_byte_offset".to_owned(),
@@ -73,6 +75,7 @@ impl VerusWitness for RustStdStandard<std::str::RMatchIndices<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_str_rmatch_indices_model_pairs_each_match_with_its_byte_offset_from_the_back"
@@ -104,6 +107,7 @@ impl VerusWitness for RustStdStandard<std::io::BufReader<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_buf_reader_model_reads_the_underlying_bytes".to_owned(),
@@ -133,6 +137,7 @@ impl VerusWitness for RustStdStandard<std::io::BufWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_buf_writer_model_flushes_to_the_underlying_writer".to_owned(),
@@ -161,6 +166,7 @@ impl VerusWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_bytes_model_yields_one_byte_at_a_time".to_owned(),
@@ -189,6 +195,7 @@ impl VerusWitness for RustStdStandard<std::io::IntoInnerError<std::io::BufWriter
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_into_inner_error_model_recovers_the_writer_and_the_flush_error".to_owned(),
@@ -218,6 +225,7 @@ impl VerusWitness for RustStdStandard<std::io::LineWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_line_writer_model_flushes_on_a_newline_but_not_before_one".to_owned(),

@@ -121,6 +121,7 @@ impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_string_drain_removes_and_yields_the_content".to_owned(),
@@ -179,6 +180,7 @@ impl KaniWitness for RustStdStandard<FromUtf16Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),

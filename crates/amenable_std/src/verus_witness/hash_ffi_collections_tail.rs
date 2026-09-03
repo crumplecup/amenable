@@ -15,6 +15,7 @@ impl VerusWitness for RustStdStandard<std::hash::DefaultHasher> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_default_hasher_model_is_deterministic_across_fresh_instances".to_owned(),
@@ -52,6 +53,7 @@ impl VerusWitness for RustStdStandard<std::hash::RandomState> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_random_state_model_gives_the_same_hasher_seed_across_calls".to_owned(),
@@ -80,6 +82,7 @@ impl VerusWitness for RustStdStandard<std::ffi::OsStr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_os_str_model_valid_utf8_content_round_trips_through_to_str".to_owned(),
@@ -112,6 +115,7 @@ impl VerusWitness for RustStdStandard<std::ffi::OsString> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_os_string_model_push_appends_to_the_existing_content".to_owned(),
@@ -140,6 +144,7 @@ impl VerusWitness for RustStdStandard<std::ffi::os_str::Display<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_os_str_display_model_renders_valid_utf8_content_unchanged".to_owned(),
@@ -169,6 +174,7 @@ impl VerusWitness for RustStdStandard<std::collections::HashMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_hash_map_model_insert_then_get_recovers_the_value".to_owned(),
@@ -198,6 +204,7 @@ impl VerusWitness for RustStdStandard<std::collections::HashSet<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_hash_set_model_insert_then_contains_reports_membership".to_owned(),
@@ -226,6 +233,7 @@ impl VerusWitness for RustStdStandard<std::pin::Pin<Box<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_pin_model_derefs_and_get_mut_round_trip".to_owned(),
@@ -254,6 +262,7 @@ impl VerusWitness for RustStdStandard<std::ptr::NonNull<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_non_null_model_rejects_the_null_pointer".to_owned(),
@@ -282,6 +291,7 @@ impl VerusWitness for RustStdStandard<std::alloc::System> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_system_model_allocates_and_deallocates_a_layout".to_owned(),
@@ -308,6 +318,7 @@ impl VerusWitness for RustStdStandard<std::backtrace::Backtrace> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
@@ -333,6 +344,7 @@ impl VerusWitness for RustStdStandard<std::backtrace::BacktraceStatus> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_backtrace_model_force_capture_always_actually_captures".to_owned(),
@@ -361,6 +373,7 @@ impl VerusWitness for RustStdStandard<std::panic::PanicHookInfo<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_panic_hook_info_model_reports_the_panics_own_message".to_owned(),

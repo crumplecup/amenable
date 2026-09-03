@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<MatchIndices<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_match_indices_pairs_each_match_with_its_byte_offset".to_owned(),

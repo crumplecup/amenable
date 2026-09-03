@@ -21,6 +21,7 @@ impl KaniWitness for RustStdStandard<Option<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_option_some_and_none_are_disjoint".to_owned(),
@@ -55,6 +56,7 @@ impl KaniWitness for OptionIsSomeReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_option_some_and_none_are_disjoint".to_owned(),
@@ -95,6 +97,7 @@ impl KaniWitness for OptionIsNoneReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_option_some_and_none_are_disjoint".to_owned(),
@@ -149,6 +152,7 @@ impl KaniWitness for RustStdStandard<core::option::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_option_into_iter_yields_zero_or_one_owned_value".to_owned(),
@@ -199,6 +203,7 @@ impl KaniWitness for RustStdStandard<core::option::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_option_iter_yields_zero_or_one_reference".to_owned(),

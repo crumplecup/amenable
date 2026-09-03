@@ -9,6 +9,7 @@ impl VerusWitness for RustStdStandard<std::path::Ancestors<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ancestors_model_yields_self_then_each_parent_up_to_root".to_owned(),
@@ -37,6 +38,7 @@ impl VerusWitness for RustStdStandard<std::path::Component<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_component_model_distinguishes_root_from_normal_segments".to_owned(),
@@ -65,6 +67,7 @@ impl VerusWitness for RustStdStandard<std::path::Components<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_components_model_yields_root_then_named_segments_in_order".to_owned(),
@@ -93,6 +96,7 @@ impl VerusWitness for RustStdStandard<std::path::Iter<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_iter_model_yields_the_named_segments".to_owned(),
@@ -129,6 +133,7 @@ impl VerusWitness for RustStdStandard<std::path::Display<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_display_model_renders_a_valid_utf8_path_verbatim".to_owned(),
@@ -157,6 +162,7 @@ impl VerusWitness for RustStdStandard<std::path::Path> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_path_model_derives_extension_file_name_and_parent".to_owned(),
@@ -185,6 +191,7 @@ impl VerusWitness for RustStdStandard<std::path::PathBuf> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_path_buf_model_push_pop_and_join_build_the_expected_path".to_owned(),
@@ -213,6 +220,7 @@ impl VerusWitness for RustStdStandard<std::path::Prefix<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_prefix_model_disk_identifies_the_drive_letter".to_owned(),
@@ -241,6 +249,7 @@ impl VerusWitness for RustStdStandard<std::path::PrefixComponent<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_prefix_component_model_pairs_raw_text_with_parsed_prefix".to_owned(),

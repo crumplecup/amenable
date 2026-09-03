@@ -18,6 +18,7 @@ impl KaniWitness for RustStdStandard<TakeWhile<Range<i32>, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_take_while_yields_items_while_the_predicate_holds".to_owned(),
@@ -76,6 +77,7 @@ impl KaniWitness for RustStdStandard<MapWhile<Range<i32>, fn(i32) -> Option<i32>
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_map_while_maps_items_while_the_closure_returns_some".to_owned(),
@@ -132,6 +134,7 @@ impl KaniWitness for RustStdStandard<std::iter::Once<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_yields_exactly_one_value".to_owned(),
@@ -181,6 +184,7 @@ impl KaniWitness for RustStdStandard<OnceWith<fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_with_calls_its_closure_exactly_once".to_owned(),

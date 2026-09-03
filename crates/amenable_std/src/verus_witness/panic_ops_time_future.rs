@@ -12,6 +12,7 @@ impl VerusWitness for RustStdStandard<std::panic::AssertUnwindSafe<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_assert_unwind_safe_model_derefs_transparently".to_owned(),
@@ -41,6 +42,7 @@ impl VerusWitness for RustStdStandard<core::panic::Location<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_location_model_caller_reflects_the_immediate_call_site".to_owned(),
@@ -75,6 +77,7 @@ impl VerusWitness for RustStdStandard<std::ops::RangeTo<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_range_to_model_contains_matches_bound".to_owned(),
@@ -103,6 +106,7 @@ impl VerusWitness for RustStdStandard<std::ops::RangeFull> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_range_full_model_contains_everything".to_owned(),
@@ -131,6 +135,7 @@ impl VerusWitness for RustStdStandard<std::ops::Bound<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_bound_model_round_trips_its_endpoint".to_owned(),
@@ -159,6 +164,7 @@ impl VerusWitness for RustStdStandard<std::ops::ControlFlow<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_control_flow_model_continue_and_break_are_disjoint".to_owned(),
@@ -291,6 +297,7 @@ impl VerusWitness for RustStdStandard<std::future::Pending<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_pending_model_never_resolves".to_owned(),
@@ -319,6 +326,7 @@ impl VerusWitness for RustStdStandard<std::future::Ready<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ready_model_resolves_immediately_with_its_value".to_owned(),

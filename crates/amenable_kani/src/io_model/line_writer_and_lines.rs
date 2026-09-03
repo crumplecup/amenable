@@ -9,6 +9,7 @@ pub struct KaniLineWriterWindow;
 impl Provenance for KaniLineWriterWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -60,10 +61,12 @@ impl Evidence for KaniLineWriterObservation {
     type Basis = KaniLineWriterWindow;
     type Audit = [u8; 3];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniLineWriterWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [self.line_byte, b'\n', self.trailing_byte]
     }

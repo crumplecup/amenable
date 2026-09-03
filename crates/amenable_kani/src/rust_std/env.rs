@@ -27,6 +27,7 @@ impl KaniWitness for RustStdStandard<Args> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_args_reports_at_least_the_program_path".to_owned(),
@@ -69,6 +70,7 @@ impl KaniWitness for RustStdStandard<ArgsOs> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_args_os_reports_at_least_the_program_path".to_owned(),
@@ -107,6 +109,7 @@ impl KaniWitness for RustStdStandard<JoinPathsError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_join_paths_error_reports_an_unjoinable_path".to_owned(),

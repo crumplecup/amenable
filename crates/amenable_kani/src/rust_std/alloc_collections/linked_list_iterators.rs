@@ -32,6 +32,7 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::Iter<'static
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_linked_list_iter_yields_references_in_order".to_owned(),
@@ -89,6 +90,7 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IterMut<'sta
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_linked_list_iter_mut_writes_through".to_owned(),
@@ -148,6 +150,7 @@ impl KaniWitness for RustStdStandard<std::collections::linked_list::IntoIter<i32
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_linked_list_into_iter_yields_owned_values_in_order".to_owned(),

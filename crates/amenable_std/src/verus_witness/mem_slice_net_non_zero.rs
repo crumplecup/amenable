@@ -11,6 +11,7 @@ impl VerusWitness for RustStdStandard<std::mem::Discriminant<Option<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_discriminant_model_identifies_variant_not_payload".to_owned(),
@@ -86,6 +87,7 @@ impl VerusWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_iter_model_yields_shared_references_in_order".to_owned(),
@@ -114,6 +116,7 @@ impl VerusWitness for RustStdStandard<std::slice::IterMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_iter_mut_model_yields_mutable_references_that_write_through".to_owned(),
@@ -143,6 +146,7 @@ impl VerusWitness for RustStdStandard<std::net::Ipv4Addr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ipv4_addr_model_octets_round_trip".to_owned(),
@@ -171,6 +175,7 @@ impl VerusWitness for RustStdStandard<std::net::Ipv6Addr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ipv6_addr_model_segments_round_trip".to_owned(),
@@ -199,6 +204,7 @@ impl VerusWitness for RustStdStandard<std::net::IpAddr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ip_addr_model_variant_matches_its_kind".to_owned(),
@@ -235,6 +241,7 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV4> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_socket_addr_v4_model_round_trips_ip_and_port".to_owned(),
@@ -263,6 +270,7 @@ impl VerusWitness for RustStdStandard<std::net::SocketAddrV6> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_socket_addr_v6_model_round_trips_all_fields".to_owned(),

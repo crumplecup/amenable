@@ -28,14 +28,17 @@ impl_rust_std_type_generic1!(
 );
 
 impl<W: Write> crate::RustStdType for BufWriter<W> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("std", "std::io")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/std/io/struct.BufWriter.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The BufWriter carrier wraps a Write implementor, adding a buffer to reduce the number of small writes made against it."
     }

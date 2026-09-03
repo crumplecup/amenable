@@ -19,6 +19,7 @@ impl VerusWitness for RustStdStandard<std::cell::Cell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cell_model_get_set_replace_round_trip".to_owned(),
@@ -80,6 +81,7 @@ impl VerusWitness for WriteStoresNewValue {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cell_model_get_set_replace_round_trip".to_owned(),
@@ -116,6 +118,7 @@ impl VerusWitness for ArrayIntoIterStartsAtFirstPosition {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
@@ -140,6 +143,7 @@ impl VerusWitness for ArrayIntoIterAdvanceMatchesPosition {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
@@ -164,6 +168,7 @@ impl VerusWitness for YieldsThreeValuesInOrderThenEnds {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
@@ -185,6 +190,7 @@ impl VerusWitness for RustStdStandard<std::array::IntoIter<i32, 3>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_array_into_iter_model_yields_elements_in_order".to_owned(),
@@ -229,6 +235,7 @@ impl VerusWitness for RustStdStandard<std::cell::RefCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
@@ -277,6 +284,7 @@ impl VerusWitness for RustStdStandard<std::cell::OnceCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_cell_model_initializes_exactly_once".to_owned(),
@@ -324,6 +332,7 @@ impl VerusWitness for RustStdStandard<std::cell::UnsafeCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_unsafe_cell_model_get_mut_and_into_inner_round_trip".to_owned(),
@@ -358,6 +367,7 @@ impl VerusWitness for RustStdStandard<std::cell::LazyCell<i32, fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),
@@ -394,6 +404,7 @@ impl VerusWitness for RustStdStandard<std::sync::LazyLock<i32, fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_lazy_cell_model_caches_its_initializer_result".to_owned(),

@@ -35,6 +35,7 @@ impl KaniWitness for RustStdStandard<Wrapping<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_wrapping_add_matches_the_inner_wrapping_add".to_owned(),
@@ -75,6 +76,7 @@ impl KaniWitness for RustStdStandard<Saturating<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_saturating_add_matches_the_inner_saturating_add".to_owned(),
@@ -115,6 +117,7 @@ impl KaniWitness for RustStdStandard<TryFromIntError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
@@ -162,6 +165,7 @@ impl KaniWitness for RustStdStandard<IntErrorKind> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_int_error_kind_classifies_parse_failures".to_owned(),
@@ -237,6 +241,7 @@ impl KaniWitness for RustStdStandard<ParseIntError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_parse_int_error_reports_the_kind_of_the_failure".to_owned(),
@@ -275,6 +280,7 @@ impl KaniWitness for RustStdStandard<ParseFloatError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),

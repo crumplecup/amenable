@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<CharTryFromError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),
@@ -80,6 +81,7 @@ impl KaniWitness for ValidUnicodeScalar {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),

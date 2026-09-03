@@ -34,6 +34,7 @@ impl KaniWitness for RustStdStandard<CString> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
@@ -103,6 +104,7 @@ impl KaniWitness for RustStdStandard<FromVecWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),
@@ -157,6 +159,7 @@ impl KaniWitness for RustStdStandard<IntoStringError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_into_string_error_recovers_the_original_cstring".to_owned(),

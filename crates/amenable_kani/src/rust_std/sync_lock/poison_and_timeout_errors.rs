@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<PoisonError<MutexGuard<'static, i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poison_error_still_recovers_the_guards_value".to_owned(),
@@ -76,6 +77,7 @@ impl Establish<KaniMutexPoisonedRecoveryWitnessToken, KaniVerifier>
 {
     type Token = RustStdPoisonErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniMutexPoisonedRecoveryWitnessToken) -> Self::Token {
         RustStdPoisonErrorToken(())
     }
@@ -111,6 +113,7 @@ impl KaniWitness for RustStdStandard<std::sync::TryLockError<MutexGuard<'static,
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_lock_error_distinguishes_poisoned_from_would_block".to_owned(),
@@ -190,6 +193,7 @@ impl Establish<KaniMutexFailureClassesWitnessToken, KaniVerifier>
 {
     type Token = RustStdTryLockErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniMutexFailureClassesWitnessToken) -> Self::Token {
         RustStdTryLockErrorToken(())
     }

@@ -19,6 +19,7 @@ impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_map_applies_its_closure_to_each_item".to_owned(),
@@ -72,6 +73,7 @@ impl KaniWitness for RustStdStandard<Filter<std::array::IntoIter<i32, 1>, fn(&i3
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_filter_yields_only_items_matching_the_predicate".to_owned(),
@@ -139,6 +141,7 @@ impl KaniWitness
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_filter_map_applies_and_filters_in_one_step".to_owned(),
@@ -200,6 +203,7 @@ impl KaniWitness
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_flat_map_flattens_each_generated_iterator".to_owned(),
@@ -321,6 +325,7 @@ impl<T> KaniWitness for IteratorMatchesReferenceStepByStep<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_flat_map_flattens_each_generated_iterator".to_owned(),

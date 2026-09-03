@@ -37,6 +37,7 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IterMut<'st
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),
@@ -66,6 +67,7 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Drain<'stat
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_unordered_pair_model_yields_every_element_once".to_owned(),
@@ -98,6 +100,7 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i3
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_unordered_pair_model_yields_every_element_once".to_owned(),
@@ -124,6 +127,7 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::Iter<'stati
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_unordered_pair_model_yields_every_element_once".to_owned(),
@@ -150,6 +154,7 @@ impl VerusWitness for RustStdStandard<std::collections::binary_heap::PeekMut<'st
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_max_heap_pair_pops_the_maximum_first".to_owned(),
@@ -179,6 +184,7 @@ impl VerusWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ref_model_derefs_to_the_borrowed_value".to_owned(),

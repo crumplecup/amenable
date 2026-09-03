@@ -10,6 +10,7 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_btree_map_insert_get_remove_round_trips".to_owned(),
@@ -51,6 +52,7 @@ impl VerusWitness for RustStdStandard<std::collections::BTreeSet<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_btree_set_insert_contains_remove_round_trips".to_owned(),
@@ -91,6 +93,7 @@ impl VerusWitness for RustStdStandard<std::collections::VecDeque<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),
@@ -119,6 +122,7 @@ impl VerusWitness for RustStdStandard<std::collections::TryReserveError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_reserve_preserves_vec_contents_regardless_of_outcome".to_owned(),
@@ -147,6 +151,7 @@ impl VerusWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_into_iter_round_trips_via_collect".to_owned(),
@@ -175,6 +180,7 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::Iter<'static,
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_deque_iter_round_trips_via_collect".to_owned(),
@@ -204,6 +210,7 @@ impl VerusWitness for RustStdStandard<std::str::Chars<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_chars_yields_characters_in_order".to_owned(),
@@ -262,6 +269,7 @@ impl VerusWitness for RustStdStandard<std::collections::BinaryHeap<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_max_heap_pair_pops_the_maximum_first".to_owned(),

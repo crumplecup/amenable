@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<Command> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_command_env_override_is_visible_to_the_spawned_process".to_owned(),
@@ -66,6 +67,7 @@ impl ProofToken for RustStdCommandToken {
 impl Establish<KaniCommandEnvWitnessToken, KaniVerifier> for RustStdStandard<Command> {
     type Token = RustStdCommandToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCommandEnvWitnessToken) -> Self::Token {
         RustStdCommandToken(())
     }
@@ -99,6 +101,7 @@ impl KaniWitness for RustStdStandard<CommandArgs<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_command_args_reports_the_configured_arguments".to_owned(),
@@ -156,6 +159,7 @@ impl Establish<KaniCommandArgsWitnessToken, KaniVerifier>
 {
     type Token = RustStdCommandArgsToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCommandArgsWitnessToken) -> Self::Token {
         RustStdCommandArgsToken(())
     }

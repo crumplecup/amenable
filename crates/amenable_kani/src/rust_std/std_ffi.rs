@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<OsStr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_os_str_valid_utf8_content_round_trips_through_to_str".to_owned(),
@@ -134,6 +135,7 @@ impl KaniWitness for RustStdStandard<OsString> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_os_string_push_appends_to_the_existing_content".to_owned(),

@@ -15,6 +15,7 @@ impl KaniWitness for RustStdStandard<PipeReader> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_pipe_reader_reads_what_the_paired_writer_wrote".to_owned(),
@@ -72,6 +73,7 @@ impl KaniWitness for RustStdStandard<PipeWriter> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_pipe_writer_writes_arrive_at_the_paired_reader".to_owned(),

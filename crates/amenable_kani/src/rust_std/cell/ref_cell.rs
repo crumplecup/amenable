@@ -21,6 +21,7 @@ impl KaniWitness for RustStdStandard<RefCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ref_cell_dynamic_borrow_rules".to_owned(),
@@ -94,6 +95,7 @@ impl KaniWitness for RustStdStandard<std::cell::Ref<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ref_derefs_to_the_borrowed_value".to_owned(),

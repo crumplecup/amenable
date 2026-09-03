@@ -10,6 +10,7 @@ impl VerusWitness for RustStdStandard<std::iter::Successors<i32, fn(&i32) -> Opt
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_successors_model_generates_from_the_previous_item".to_owned(),
@@ -68,6 +69,7 @@ impl VerusWitness for RustStdStandard<std::fmt::Alignment> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_alignment_model_reaches_the_formatter_from_the_format_spec".to_owned(),
@@ -96,6 +98,7 @@ impl VerusWitness for RustStdStandard<std::fmt::Formatter<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_formatter_model_exposes_the_parsed_width_and_precision".to_owned(),
@@ -166,6 +169,7 @@ impl VerusWitness for RustStdStandard<std::fmt::Arguments<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_arguments_model_renders_the_same_as_the_value_itself".to_owned(),
@@ -205,6 +209,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_fn_model_forwards_display_to_the_supplied_closure".to_owned(),
@@ -245,6 +250,7 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugStruct<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_debug_struct_model_renders_named_fields".to_owned(),
@@ -283,6 +289,7 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugTuple<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_debug_tuple_model_renders_positional_fields".to_owned(),
@@ -321,6 +328,7 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugList<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_debug_list_model_renders_entries_in_brackets".to_owned(),
@@ -359,6 +367,7 @@ impl VerusWitness for RustStdStandard<std::fmt::DebugSet<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_debug_set_model_renders_entries_in_braces".to_owned(),

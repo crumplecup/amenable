@@ -34,6 +34,7 @@ impl KaniWitness for RustStdStandard<Copied<Iter<'static, i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_copied_copies_each_referenced_item".to_owned(),
@@ -86,6 +87,7 @@ impl KaniWitness for RustStdStandard<Cycle<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cycle_repeats_its_sequence_forever".to_owned(),
@@ -136,6 +138,7 @@ impl KaniWitness for RustStdStandard<Fuse<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_fuse_keeps_returning_none_once_exhausted".to_owned(),
@@ -185,6 +188,7 @@ impl KaniWitness for RustStdStandard<Inspect<Range<i32>, fn(&i32)>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_inspect_calls_once_per_item_without_changing_values".to_owned(),

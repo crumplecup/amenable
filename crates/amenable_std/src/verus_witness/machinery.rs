@@ -208,12 +208,14 @@ impl_verus_witness_trusted!(
 );
 
 impl VerusProofArtifactSupport for RustStdProvenance {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::trusted_leaf()
     }
 }
 
 impl WitnessArtifact for RustStdProvenance {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn witness_artifact(&self) -> WitnessArtifactNode {
         WitnessArtifactNode::leaf_with_metadata(
             WitnessSupportKind::Trusted,

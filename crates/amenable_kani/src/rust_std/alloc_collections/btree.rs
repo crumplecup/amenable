@@ -41,6 +41,7 @@ impl KaniWitness for FirstValueIsLessThanTheSecond {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_btree_map_iterates_in_key_order".to_owned(),
@@ -71,6 +72,7 @@ impl KaniWitness for RustStdStandard<BTreeMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_btree_map_iterates_in_key_order".to_owned(),
@@ -157,6 +159,7 @@ impl KaniWitness for EmptiedContainerReportsEmpty {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_btree_map_iterates_in_key_order".to_owned(),
@@ -187,6 +190,7 @@ impl KaniWitness for RustStdStandard<BTreeSet<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_btree_set_iterates_in_sorted_order".to_owned(),

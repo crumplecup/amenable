@@ -36,6 +36,7 @@ pub struct KaniSplitWindow;
 impl Provenance for KaniSplitWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -110,10 +111,12 @@ impl<T: Copy> Evidence for KaniSplitObservation<T> {
     type Basis = KaniSplitWindow;
     type Audit = [T; 3];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniSplitWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         self.data()
     }
@@ -133,6 +136,7 @@ pub struct KaniSplitNWindow;
 impl Provenance for KaniSplitNWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -188,10 +192,12 @@ impl<T: Copy> Evidence for KaniSplitNObservation<T> {
     type Basis = KaniSplitNWindow;
     type Audit = [T; 5];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniSplitNWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [
             self.first,

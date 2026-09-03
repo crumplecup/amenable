@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<LineWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
@@ -76,6 +77,7 @@ impl ProofToken for RustStdLineWriterToken {
 impl Establish<KaniLineWriterWitnessToken, KaniVerifier> for RustStdStandard<LineWriter<Vec<u8>>> {
     type Token = RustStdLineWriterToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniLineWriterWitnessToken) -> Self::Token {
         RustStdLineWriterToken(())
     }
@@ -107,6 +109,7 @@ impl KaniWitness for ByteIsDistinctFromTheMarker {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_line_writer_flushes_on_a_newline_but_not_before_one".to_owned(),
@@ -163,6 +166,7 @@ impl KaniWitness for RustStdStandard<std::io::Lines<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_lines_splits_on_newlines_and_drops_the_terminator".to_owned(),

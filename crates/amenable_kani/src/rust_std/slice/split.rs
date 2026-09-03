@@ -32,6 +32,7 @@ pub struct SplitOperandsAreDistinctFromThePattern<T>(std::marker::PhantomData<T>
 impl<T> amenable_core::Standard for SplitOperandsAreDistinctFromThePattern<T> {
     type Provenance = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         <i32 as amenable_std::RustStdType>::provenance()
     }
@@ -41,14 +42,17 @@ impl<T> Evidence for SplitOperandsAreDistinctFromThePattern<T> {
     type Basis = RustStdStandard<i32>;
     type Audit = amenable_std::RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         RustStdStandard::<i32>::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         <i32 as amenable_std::RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         false
     }
@@ -58,6 +62,7 @@ impl<T> KaniWitness for SplitOperandsAreDistinctFromThePattern<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_yields_subslices_between_matches".to_owned(),
@@ -71,6 +76,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for SplitOperandsAreDistinct
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }
@@ -151,6 +157,7 @@ impl<T> KaniWitness for ThreeSplitOperandsAreDistinctFromThePattern<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_n_caps_the_number_of_pieces".to_owned(),
@@ -205,6 +212,7 @@ impl KaniWitness for RustStdStandard<std::slice::Split<'static, i32, fn(&i32) ->
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_yields_subslices_between_matches".to_owned(),
@@ -263,6 +271,7 @@ impl Establish<KaniSplitWitnessToken, KaniVerifier>
 {
     type Token = RustStdSplitToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniSplitWitnessToken) -> Self::Token {
         RustStdSplitToken(())
     }

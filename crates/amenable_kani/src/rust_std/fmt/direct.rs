@@ -15,6 +15,7 @@ impl KaniWitness for RustStdStandard<std::fmt::Alignment> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_alignment_reaches_the_formatter_from_the_format_spec".to_owned(),

@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<ParseCharError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_parse_char_error_occurs_for_empty_or_multi_character_strings".to_owned(),
@@ -63,6 +64,7 @@ impl KaniWitness for RustStdStandard<ToLowercase> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_to_lowercase_maps_an_uppercase_ascii_letter".to_owned(),
@@ -108,6 +110,7 @@ impl KaniWitness for RustStdStandard<ToUppercase> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_to_uppercase_maps_a_lowercase_ascii_letter".to_owned(),
@@ -153,6 +156,7 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDebug> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_escape_debug_escapes_a_newline".to_owned(),
@@ -198,6 +202,7 @@ impl KaniWitness for RustStdStandard<core::char::EscapeDefault> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_escape_default_escapes_a_newline".to_owned(),

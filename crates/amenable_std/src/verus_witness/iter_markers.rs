@@ -27,6 +27,7 @@ impl VerusWitness for IncrementHeadroom {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_enumerate_model_pairs_each_item_with_its_index".to_owned(),
@@ -76,6 +77,7 @@ impl VerusWitness for ValueUnchanged {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ref_cell_model_dynamic_borrow_rules".to_owned(),
@@ -101,6 +103,7 @@ impl VerusWitness for ObservedValueMatchesInput {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),
@@ -137,6 +140,7 @@ impl VerusWitness for ObservedOptionMatchesInput {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_model_yields_exactly_one_value".to_owned(),

@@ -47,14 +47,17 @@ impl_rust_std_type_generic1!(
 // in heap order), unlike BTreeMap/BTreeSet whose Ord bound lives only on
 // their trait impls.
 impl<T: Ord> crate::RustStdType for BinaryHeap<T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::collections::binary_heap")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/collections/binary_heap/struct.BinaryHeap.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The BinaryHeap carrier is a priority queue backed by a binary heap, ordered by Ord."
     }
@@ -85,56 +88,68 @@ impl_rust_std_type!(
 );
 
 impl<T: Ord> crate::RustStdType for BinaryHeapDrain<'_, T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::collections::binary_heap")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/collections/binary_heap/struct.Drain.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Drain carrier removes and yields every element of a BinaryHeap in arbitrary order."
     }
 }
 
 impl<T: Ord> crate::RustStdType for BinaryHeapIntoIter<T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::collections::binary_heap")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/collections/binary_heap/struct.IntoIter.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The IntoIter carrier consumes a BinaryHeap, yielding its elements in arbitrary order."
     }
 }
 
 impl<T: Ord> crate::RustStdType for BinaryHeapIter<'_, T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::collections::binary_heap")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/collections/binary_heap/struct.Iter.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Iter carrier lazily yields shared references to a BinaryHeap's elements in arbitrary order."
     }
 }
 
 impl<T: Ord> crate::RustStdType for BinaryHeapPeekMut<'_, T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::collections::binary_heap")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/collections/binary_heap/struct.PeekMut.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The PeekMut carrier is a mutable borrow of a BinaryHeap's greatest element, which re-heapifies the heap when dropped if the value was modified."
     }

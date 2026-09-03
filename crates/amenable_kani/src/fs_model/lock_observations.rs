@@ -83,6 +83,7 @@ impl KaniAlreadyLocked {
 
 impl Default for KaniAlreadyLocked {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }

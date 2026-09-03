@@ -47,6 +47,7 @@ mod windows_witnesses {
         type SupportingEvidence = Self;
         type ProofArtifact = VerusCheckedProof;
 
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
         fn proof() -> Self::ProofArtifact {
             VerusCheckedProof::new(
                 "<EncodeWide<'_> as Iterator>::next".to_owned(),
@@ -79,6 +80,7 @@ mod windows_witnesses {
         type SupportingEvidence = Self;
         type ProofArtifact = VerusCheckedProof;
 
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
         fn proof() -> Self::ProofArtifact {
             VerusCheckedProof::new(
                 "<BorrowedHandle<'_> as AsRawHandle>::as_raw_handle".to_owned(),
@@ -111,6 +113,7 @@ mod windows_witnesses {
         type SupportingEvidence = Self;
         type ProofArtifact = VerusCheckedProof;
 
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
         fn proof() -> Self::ProofArtifact {
             VerusCheckedProof::new(
                 "<BorrowedSocket<'_> as AsRawSocket>::as_raw_socket".to_owned(),
@@ -143,6 +146,7 @@ mod windows_witnesses {
         type SupportingEvidence = Self;
         type ProofArtifact = VerusCheckedProof;
 
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
         fn proof() -> Self::ProofArtifact {
             VerusCheckedProof::new(
                 "<OwnedHandle as TryFrom<HandleOrInvalid>>::try_from".to_owned(),
@@ -175,6 +179,7 @@ mod windows_witnesses {
         type SupportingEvidence = Self;
         type ProofArtifact = VerusCheckedProof;
 
+        #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
         fn proof() -> Self::ProofArtifact {
             VerusCheckedProof::new(
                 "<OwnedHandle as AsRawHandle>::as_raw_handle".to_owned(),

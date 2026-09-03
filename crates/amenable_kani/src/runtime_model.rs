@@ -40,6 +40,7 @@ impl KaniCurrentThreadObservation {
 impl Provenance for KaniCurrentThreadObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

@@ -16,6 +16,7 @@ impl KaniWitness for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_inclusive_keeps_the_match_at_the_end_of_each_piece".to_owned(),
@@ -82,6 +83,7 @@ impl Establish<KaniSplitInclusiveWitnessToken, KaniVerifier>
 {
     type Token = RustStdSplitInclusiveToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniSplitInclusiveWitnessToken) -> Self::Token {
         RustStdSplitInclusiveToken(())
     }

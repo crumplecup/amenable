@@ -19,6 +19,7 @@ impl KaniWitness for RustStdStandard<Layout> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_layout_new_reports_the_types_size_and_alignment".to_owned(),

@@ -75,12 +75,16 @@ fn symbolic_ascii_char() -> char {
 }
 
 impl KaniCompose for () {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {}
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {}
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {}
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {}
 }
 
@@ -126,6 +130,7 @@ impl KaniCompose for String {
         s
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         let len: usize = symbolic_any();
         kani_assume(len <= 4);
@@ -153,6 +158,7 @@ where
         vec![T::kani_depth0(), T::kani_depth0()]
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         T::kani_vec_closure(1, 3)
     }
@@ -162,18 +168,22 @@ impl<T, const N: usize> KaniCompose for [T; N]
 where
     T: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         std::array::from_fn(|_| T::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         std::array::from_fn(|_| T::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         std::array::from_fn(|_| T::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         std::array::from_fn(|_| T::kani_any())
     }
@@ -183,18 +193,22 @@ impl<T> KaniCompose for Option<T>
 where
     T: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         None
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Some(T::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Some(T::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         let present: bool = symbolic_any();
         if present { Some(T::kani_any()) } else { None }
@@ -206,18 +220,22 @@ where
     K: KaniCompose + Ord,
     V: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         std::collections::BTreeMap::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         std::collections::BTreeMap::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         std::collections::BTreeMap::new()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         std::collections::BTreeMap::new()
     }
@@ -229,18 +247,22 @@ where
     V: KaniCompose,
     S: Default + std::hash::BuildHasher,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         std::collections::HashMap::with_hasher(S::default())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         std::collections::HashMap::with_hasher(S::default())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         std::collections::HashMap::with_hasher(S::default())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         std::collections::HashMap::with_hasher(S::default())
     }
@@ -250,18 +272,22 @@ impl<T> KaniCompose for Box<T>
 where
     T: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Box::new(T::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Box::new(T::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Box::new(T::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Box::new(T::kani_any())
     }
@@ -272,18 +298,22 @@ where
     A: KaniCompose,
     B: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         (A::kani_depth0(), B::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         (A::kani_depth1(), B::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         (A::kani_depth2(), B::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         (A::kani_any(), B::kani_any())
     }
@@ -295,18 +325,22 @@ where
     B: KaniCompose,
     C: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         (A::kani_depth0(), B::kani_depth0(), C::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         (A::kani_depth1(), B::kani_depth1(), C::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         (A::kani_depth2(), B::kani_depth2(), C::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         (A::kani_any(), B::kani_any(), C::kani_any())
     }
@@ -319,6 +353,7 @@ where
     C: KaniCompose,
     D: KaniCompose,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         (
             A::kani_depth0(),
@@ -328,6 +363,7 @@ where
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         (
             A::kani_depth1(),
@@ -337,6 +373,7 @@ where
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         (
             A::kani_depth2(),
@@ -346,6 +383,7 @@ where
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         (A::kani_any(), B::kani_any(), C::kani_any(), D::kani_any())
     }

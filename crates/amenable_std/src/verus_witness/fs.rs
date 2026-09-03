@@ -12,6 +12,7 @@ impl VerusWitness for RustStdStandard<std::fs::DirBuilder> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_dir_builder_model_creates_nested_directories_recursively".to_owned(),
@@ -58,6 +59,7 @@ impl VerusWitness for RustStdStandard<std::fs::DirEntry> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_dir_entry_model_reports_the_created_files_name_and_path".to_owned(),
@@ -105,6 +107,7 @@ impl VerusWitness for RustStdStandard<std::fs::ReadDir> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_read_dir_model_iterates_every_entry_in_the_directory".to_owned(),
@@ -152,6 +155,7 @@ impl VerusWitness for RustStdStandard<std::fs::File> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_file_model_write_then_read_round_trips_the_bytes".to_owned(),
@@ -194,6 +198,7 @@ impl VerusWitness for RustStdStandard<std::fs::FileTimes> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_file_times_model_sets_the_recorded_modification_time".to_owned(),
@@ -239,6 +244,7 @@ impl VerusWitness for RustStdStandard<std::fs::Metadata> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_metadata_model_reports_the_written_length".to_owned(),
@@ -276,6 +282,7 @@ impl VerusWitness for RustStdStandard<std::fs::FileType> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_file_type_model_distinguishes_files_from_directories".to_owned(),
@@ -304,6 +311,7 @@ impl VerusWitness for RustStdStandard<std::fs::OpenOptions> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_open_options_model_create_new_rejects_an_existing_file".to_owned(),
@@ -332,6 +340,7 @@ impl VerusWitness for RustStdStandard<std::fs::Permissions> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_permissions_model_readonly_round_trips_through_set_permissions".to_owned(),

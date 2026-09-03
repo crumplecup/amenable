@@ -32,6 +32,7 @@ impl KaniWitness for RustStdStandard<LinkedList<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_linked_list_is_fifo_through_back_and_front".to_owned(),
@@ -124,6 +125,7 @@ impl KaniWitness for RustStdStandard<VecDeque<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_deque_pushes_and_pops_from_both_ends".to_owned(),

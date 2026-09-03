@@ -38,6 +38,7 @@ impl KaniWitness for RenderedKindMatchesTheBuildingOperation {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
@@ -68,6 +69,7 @@ impl KaniWitness for RustStdStandard<Arguments<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_arguments_renders_the_same_as_the_value_itself".to_owned(),
@@ -115,6 +117,7 @@ impl KaniWitness for RustStdStandard<DebugStruct<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_debug_struct_renders_named_fields".to_owned(),
@@ -173,6 +176,7 @@ impl KaniWitness for RustStdStandard<DebugTuple<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_debug_tuple_renders_positional_fields".to_owned(),
@@ -222,6 +226,7 @@ impl KaniWitness for RustStdStandard<DebugList<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_debug_list_renders_entries_in_brackets".to_owned(),
@@ -271,6 +276,7 @@ impl KaniWitness for RustStdStandard<DebugSet<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_debug_set_renders_entries_in_braces".to_owned(),
@@ -321,6 +327,7 @@ impl KaniWitness for RustStdStandard<DebugMap<'static, 'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_debug_map_renders_key_value_pairs".to_owned(),

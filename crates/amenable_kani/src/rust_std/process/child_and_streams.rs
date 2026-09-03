@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<Child> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_child_has_a_process_id_and_can_be_waited_on".to_owned(),
@@ -67,6 +68,7 @@ impl ProofToken for RustStdChildToken {
 impl Establish<KaniChildWitnessToken, KaniVerifier> for RustStdStandard<Child> {
     type Token = RustStdChildToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChildWitnessToken) -> Self::Token {
         RustStdChildToken(())
     }
@@ -96,6 +98,7 @@ impl KaniWitness for RustStdStandard<ChildStderr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_child_stderr_captures_what_the_child_wrote_to_stderr".to_owned(),
@@ -148,6 +151,7 @@ impl ProofToken for RustStdChildStderrToken {
 impl Establish<KaniChildStderrWitnessToken, KaniVerifier> for RustStdStandard<ChildStderr> {
     type Token = RustStdChildStderrToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChildStderrWitnessToken) -> Self::Token {
         RustStdChildStderrToken(())
     }
@@ -177,6 +181,7 @@ impl KaniWitness for RustStdStandard<ChildStdin> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_child_stdin_is_readable_by_the_child_process".to_owned(),
@@ -228,6 +233,7 @@ impl ProofToken for RustStdChildStdinToken {
 impl Establish<KaniChildStdinWitnessToken, KaniVerifier> for RustStdStandard<ChildStdin> {
     type Token = RustStdChildStdinToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChildStdinWitnessToken) -> Self::Token {
         RustStdChildStdinToken(())
     }

@@ -15,6 +15,7 @@ impl KaniWitness for RustStdStandard<DefaultHasher> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_default_hasher_is_deterministic_across_fresh_instances".to_owned(),

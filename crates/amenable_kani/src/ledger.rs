@@ -256,6 +256,7 @@ impl Witness<KaniVerifier> for Pending {
     type SupportingEvidence = Self;
     type ProofArtifact = ();
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {}
 }
 
@@ -289,6 +290,7 @@ impl Witness<KaniVerifier> for AmountPositive {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_check_amount_positive".to_owned(),
@@ -308,6 +310,7 @@ impl Witness<KaniVerifier> for SufficientFunds {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_check_sufficient_funds".to_owned(),
@@ -327,6 +330,7 @@ impl Witness<KaniVerifier> for AccountsDistinct {
     type SupportingEvidence = Self;
     type ProofArtifact = ();
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {}
 }
 
@@ -347,6 +351,7 @@ impl Witness<KaniVerifier> for BalancedEntries {
     type SupportingEvidence = Self;
     type ProofArtifact = ();
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {}
 }
 
@@ -414,6 +419,7 @@ impl Witness<KaniVerifier> for Validated {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_validate_accepts_a_lawful_transfer".to_owned(),
@@ -441,6 +447,7 @@ impl Witness<KaniVerifier> for Committed {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_commit_always_balances".to_owned(),
@@ -465,6 +472,7 @@ impl Witness<KaniVerifier> for Rejected<Pending> {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "gaap_ledger::verify_gaap_reject_always_succeeds".to_owned(),

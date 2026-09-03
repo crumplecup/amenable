@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<DirBuilder> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_dir_builder_creates_nested_directories_recursively".to_owned(),
@@ -89,6 +90,7 @@ impl ProofToken for RustStdDirBuilderRecursiveToken {
 impl Establish<KaniRecursiveDirWitnessToken, KaniVerifier> for RustStdStandard<DirBuilder> {
     type Token = RustStdDirBuilderRecursiveToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniRecursiveDirWitnessToken) -> Self::Token {
         RustStdDirBuilderRecursiveToken(())
     }

@@ -21,6 +21,7 @@ impl KaniWitness for RustStdStandard<TryFromSliceError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),

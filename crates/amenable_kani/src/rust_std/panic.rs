@@ -25,6 +25,7 @@ impl KaniWitness for RustStdStandard<AssertUnwindSafe<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_assert_unwind_safe_derefs_transparently".to_owned(),

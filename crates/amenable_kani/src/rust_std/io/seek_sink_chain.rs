@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<SeekFrom> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_seek_from_round_trips_each_variants_offset".to_owned(),
@@ -86,6 +87,7 @@ impl KaniWitness for RustStdStandard<std::io::Sink> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_sink_write_reports_full_length_and_discards_content".to_owned(),

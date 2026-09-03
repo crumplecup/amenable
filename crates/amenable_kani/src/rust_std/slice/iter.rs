@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<std::slice::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_iter_yields_shared_references_in_order".to_owned(),

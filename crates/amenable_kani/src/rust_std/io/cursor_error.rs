@@ -18,6 +18,7 @@ impl KaniWitness for RustStdStandard<Cursor<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cursor_read_advances_position_and_seek_repositions_it".to_owned(),

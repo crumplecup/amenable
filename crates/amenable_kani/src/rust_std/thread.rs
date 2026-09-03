@@ -28,6 +28,7 @@ impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_local_key_with_reads_the_initialized_value".to_owned(),
@@ -86,6 +87,7 @@ impl KaniWitness for RustStdStandard<Thread> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_thread_current_is_stable_across_repeated_calls".to_owned(),
@@ -142,6 +144,7 @@ impl ProofToken for RustStdThreadToken {
 impl Establish<KaniCurrentThreadHandleWitnessToken, KaniVerifier> for RustStdStandard<Thread> {
     type Token = RustStdThreadToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCurrentThreadHandleWitnessToken) -> Self::Token {
         RustStdThreadToken(())
     }

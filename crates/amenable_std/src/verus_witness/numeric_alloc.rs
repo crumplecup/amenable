@@ -15,6 +15,7 @@ impl VerusWitness for RustStdStandard<core::num::FpCategory> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_fp_category_matches_the_value_it_classifies".to_owned(),
@@ -70,6 +71,7 @@ impl VerusWitness for RustStdStandard<core::num::IntErrorKind> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_int_error_kind_classifies_parse_failures".to_owned(),
@@ -107,6 +109,7 @@ impl VerusWitness for RustStdStandard<core::num::ParseIntError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_parse_int_error_model_reports_the_kind_of_the_failure".to_owned(),
@@ -158,6 +161,7 @@ impl VerusWitness for RustStdStandard<core::num::ParseFloatError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_parse_float_error_occurs_only_for_unparseable_input".to_owned(),
@@ -193,6 +197,7 @@ impl VerusWitness for RustStdStandard<core::num::TryFromIntError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_from_int_error_occurs_exactly_when_out_of_range".to_owned(),
@@ -221,6 +226,7 @@ impl VerusWitness for RustStdStandard<Box<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_box_derefs_and_writes_through".to_owned(),
@@ -253,6 +259,7 @@ impl VerusWitness for RustStdStandard<core::alloc::Layout> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),
@@ -282,6 +289,7 @@ impl VerusWitness for RustStdStandard<core::alloc::LayoutError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_layout_from_size_align_rejects_a_non_power_of_two_alignment".to_owned(),

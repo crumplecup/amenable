@@ -31,6 +31,7 @@ impl<T> KaniWitness for PeekRevealsTheStoredReference<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_peek_mut_exposes_the_maximum".to_owned(),
@@ -44,6 +45,7 @@ impl<T> amenable_core::Witness<crate::KaniVerifier> for PeekRevealsTheStoredRefe
     type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
     type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <Self as KaniWitness>::proof()
     }

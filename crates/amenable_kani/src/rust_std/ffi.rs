@@ -37,6 +37,7 @@ impl KaniWitness for RustStdStandard<CStr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
@@ -63,6 +64,7 @@ impl KaniWitness for NonNulByte {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
@@ -120,6 +122,7 @@ impl KaniWitness for RustStdStandard<FromBytesUntilNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_owned(),

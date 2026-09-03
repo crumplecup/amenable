@@ -33,6 +33,7 @@ impl KaniWitness for ErrorKindMatchesExpected {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_error_from_error_kind_preserves_the_kind".to_owned(),
@@ -93,6 +94,7 @@ impl KaniWitness for RustStdStandard<IoSlice<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_io_slice_derefs_to_the_wrapped_bytes".to_owned(),
@@ -132,6 +134,7 @@ impl KaniWitness for RustStdStandard<IoSliceMut<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_io_slice_mut_derefs_to_and_permits_mutating_the_wrapped_bytes".to_owned(),

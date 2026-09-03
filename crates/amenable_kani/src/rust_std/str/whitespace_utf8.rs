@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<SplitAsciiWhitespace<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_ascii_whitespace_collapses_runs_of_whitespace".to_owned(),
@@ -57,6 +58,7 @@ impl KaniWitness for RustStdStandard<SplitWhitespace<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_whitespace_collapses_runs_of_whitespace".to_owned(),

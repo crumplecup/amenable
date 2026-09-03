@@ -41,6 +41,7 @@ pub struct KaniStrRSplitWindow;
 impl Provenance for KaniStrRSplitWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -87,10 +88,12 @@ impl Evidence for KaniStrRSplitObservation {
     type Basis = KaniStrRSplitWindow;
     type Audit = [char; 3];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniStrRSplitWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         self.data()
     }
@@ -108,6 +111,7 @@ pub struct KaniStrRSplitNWindow;
 impl Provenance for KaniStrRSplitNWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -155,10 +159,12 @@ impl Evidence for KaniStrRSplitNObservation {
     type Basis = KaniStrRSplitNWindow;
     type Audit = [char; 4];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniStrRSplitNWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [self.a, self.pattern, self.b, self.c]
     }
@@ -177,6 +183,7 @@ pub struct KaniStrSplitTerminatorWindow;
 impl Provenance for KaniStrSplitTerminatorWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -225,10 +232,12 @@ impl Evidence for KaniStrSplitTerminatorObservation {
     type Basis = KaniStrSplitTerminatorWindow;
     type Audit = [char; 3];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniStrSplitTerminatorWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         [self.a, self.pattern, self.b]
     }

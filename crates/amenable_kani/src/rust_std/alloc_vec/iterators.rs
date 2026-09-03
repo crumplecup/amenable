@@ -22,6 +22,7 @@ impl KaniWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_drain_removes_and_yields_in_order".to_owned(),
@@ -102,6 +103,7 @@ impl KaniWitness for RustStdStandard<std::vec::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_into_iter_yields_owned_values_in_order".to_owned(),
@@ -185,6 +187,7 @@ impl KaniWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut i
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_extract_if_partitions_by_the_predicate".to_owned(),

@@ -24,6 +24,7 @@ impl KaniWitness for RustStdStandard<Ancestors<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ancestors_yields_self_then_each_parent_up_to_root".to_owned(),
@@ -71,6 +72,7 @@ impl KaniWitness for RustStdStandard<Component<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_component_distinguishes_root_from_normal_segments".to_owned(),
@@ -114,6 +116,7 @@ impl KaniWitness for RustStdStandard<Components<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_components_yields_root_then_named_segments_in_order".to_owned(),

@@ -17,6 +17,7 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16<std::array::IntoIte
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
@@ -85,6 +86,7 @@ impl VerusWitness for RustStdStandard<std::char::DecodeUtf16Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_decode_utf16_model_round_trips_and_reports_lone_surrogates".to_owned(),
@@ -155,6 +157,7 @@ impl VerusWitness for RustStdStandard<std::char::ToLowercase> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_to_lowercase_model_maps_an_uppercase_ascii_letter".to_owned(),
@@ -183,6 +186,7 @@ impl VerusWitness for RustStdStandard<std::char::ToUppercase> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_to_uppercase_model_maps_a_lowercase_ascii_letter".to_owned(),
@@ -211,6 +215,7 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDebug> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_escape_debug_model_escapes_a_newline".to_owned(),
@@ -239,6 +244,7 @@ impl VerusWitness for RustStdStandard<std::char::EscapeDefault> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_escape_default_model_escapes_a_newline".to_owned(),

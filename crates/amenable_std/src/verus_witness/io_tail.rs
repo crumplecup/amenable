@@ -44,6 +44,7 @@ impl VerusWitness for RustStdStandard<std::io::Split<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_split_model_segments_on_the_given_byte_and_drops_it".to_owned(),
@@ -81,6 +82,7 @@ impl VerusWitness for RustStdStandard<std::io::WriterPanicked> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_writer_panicked_model_recovers_the_buffered_data".to_owned(),
@@ -172,6 +174,7 @@ impl VerusWitness for RustStdStandard<std::io::SeekFrom> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_seek_from_model_round_trips_each_variants_offset".to_owned(),
@@ -200,6 +203,7 @@ impl VerusWitness for RustStdStandard<std::io::Chain<&'static [u8], &'static [u8
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_chain_model_reads_the_first_source_then_the_second".to_owned(),
@@ -229,6 +233,7 @@ impl VerusWitness for RustStdStandard<std::io::Cursor<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cursor_model_read_advances_position_and_seek_repositions_it".to_owned(),
@@ -266,6 +271,7 @@ impl VerusWitness for RustStdStandard<std::io::Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_error_model_from_error_kind_preserves_the_kind".to_owned(),
@@ -302,6 +308,7 @@ impl VerusWitness for RustStdStandard<std::io::IoSlice<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_io_slice_model_derefs_to_the_wrapped_bytes".to_owned(),
@@ -330,6 +337,7 @@ impl VerusWitness for RustStdStandard<std::io::IoSliceMut<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_io_slice_mut_model_derefs_to_and_permits_mutating_the_wrapped_bytes".to_owned(),

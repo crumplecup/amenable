@@ -24,6 +24,7 @@ impl KaniWitness for RustStdStandard<Instant> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_instant_is_monotonically_nondecreasing".to_owned(),
@@ -112,6 +113,7 @@ impl KaniWitness for RustStdStandard<SystemTime> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_system_time_duration_since_computes_the_elapsed_span".to_owned(),

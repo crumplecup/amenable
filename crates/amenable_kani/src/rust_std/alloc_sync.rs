@@ -34,6 +34,7 @@ impl KaniWitness for RustStdStandard<Arc<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_arc_strong_count_tracks_clones".to_owned(),

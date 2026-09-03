@@ -28,6 +28,7 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Drain<'stati
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_drain_yields_every_pushed_element_once".to_owned(),
@@ -145,6 +146,7 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::IntoIter<i32
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_into_iter_yields_every_pushed_element_once".to_owned(),
@@ -255,6 +257,7 @@ impl KaniWitness for RustStdStandard<std::collections::binary_heap::Iter<'static
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_binary_heap_iter_yields_every_pushed_element_once".to_owned(),

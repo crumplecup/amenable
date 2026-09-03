@@ -14,6 +14,7 @@ impl VerusWitness for RustStdStandard<core::char::CharTryFromError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_try_from_fails_exactly_for_surrogates_and_out_of_range".to_owned(),
@@ -87,6 +88,7 @@ impl VerusWitness for RustStdStandard<core::char::TryFromCharError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_from_char_error_occurs_exactly_when_out_of_range".to_owned(),
@@ -142,6 +144,7 @@ impl VerusWitness for RustStdStandard<core::any::TypeId> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_type_id_is_reflexive_and_distinguishes_distinct_types".to_owned(),
@@ -178,6 +181,7 @@ impl VerusWitness for RustStdStandard<std::array::TryFromSliceError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_try_from_slice_rejects_a_length_mismatch".to_owned(),
@@ -243,6 +247,7 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf16Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_utf16_rejects_a_lone_surrogate".to_owned(),
@@ -311,6 +316,7 @@ impl VerusWitness for RustStdStandard<std::ffi::CString> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
@@ -358,6 +364,7 @@ impl VerusWitness for RustStdStandard<std::ffi::NulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cstring_excludes_the_terminator_and_rejects_interior_nul".to_owned(),
@@ -419,6 +426,7 @@ impl VerusWitness for RustStdStandard<std::ffi::FromVecWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_vec_with_nul_requires_the_nul_only_at_the_end".to_owned(),

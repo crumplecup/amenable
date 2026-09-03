@@ -9,6 +9,7 @@ pub struct KaniBufferedReadWindow;
 impl Provenance for KaniBufferedReadWindow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -45,10 +46,12 @@ impl Evidence for KaniBufferedReadObservation {
     type Basis = KaniBufferedReadWindow;
     type Audit = [u8; 2];
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         KaniBufferedReadWindow
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         self.bytes
     }

@@ -9,6 +9,7 @@ impl VerusWitness for RustStdStandard<std::iter::Map<std::ops::Range<i32>, fn(i3
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_map_model_applies_its_closure_to_each_item".to_owned(),
@@ -40,6 +41,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_filter_model_yields_only_items_matching_the_predicate".to_owned(),
@@ -81,6 +83,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_filter_map_model_applies_and_filters_in_one_step".to_owned(),
@@ -114,6 +117,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_map_while_model_maps_items_while_the_closure_returns_some".to_owned(),
@@ -157,6 +161,7 @@ impl VerusWitness for RustStdStandard<std::iter::Cloned<std::slice::Iter<'static
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cloned_model_clones_each_referenced_item".to_owned(),
@@ -186,6 +191,7 @@ impl VerusWitness for RustStdStandard<std::iter::Copied<std::slice::Iter<'static
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_copied_model_copies_each_referenced_item".to_owned(),
@@ -217,6 +223,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_chain_model_sequences_two_iterators_end_to_end".to_owned(),
@@ -248,6 +255,7 @@ impl VerusWitness for RustStdStandard<std::iter::Zip<std::ops::Range<i32>, std::
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_zip_model_pairs_items_from_two_iterators".to_owned(),

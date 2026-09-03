@@ -34,6 +34,7 @@ impl KaniWitness for RustStdStandard<std::sync::Once> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_runs_its_closure_exactly_once".to_owned(),
@@ -82,6 +83,7 @@ impl KaniWitness for RustStdStandard<OnceState> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_state_reports_not_poisoned_on_a_clean_run".to_owned(),
@@ -118,6 +120,7 @@ impl KaniWitness for OnceStateIsPoisonedReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_state_reports_not_poisoned_on_a_clean_run".to_owned(),
@@ -166,6 +169,7 @@ impl KaniWitness for RustStdStandard<OnceLock<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_lock_initializes_exactly_once".to_owned(),

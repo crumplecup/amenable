@@ -13,6 +13,7 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::AtomicPtr<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_atomic_ptr_model_load_store_swap_and_compare_exchange".to_owned(),
@@ -62,6 +63,7 @@ impl VerusWitness for RustStdStandard<std::sync::atomic::Ordering> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_atomic_ordering_model_relaxed_store_is_observable".to_owned(),
@@ -90,6 +92,7 @@ impl VerusWitness for RustStdStandard<std::process::Child> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_child_model_has_a_process_id_and_can_be_waited_on".to_owned(),
@@ -134,6 +137,7 @@ impl VerusWitness for RustStdStandard<std::process::ChildStderr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_child_stderr_model_captures_what_the_child_wrote_to_stderr".to_owned(),
@@ -162,6 +166,7 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdin> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_child_stdin_model_is_readable_by_the_child_process".to_owned(),
@@ -190,6 +195,7 @@ impl VerusWitness for RustStdStandard<std::process::ChildStdout> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_child_stdout_model_captures_what_the_child_wrote_to_stdout".to_owned(),
@@ -218,6 +224,7 @@ impl VerusWitness for RustStdStandard<std::process::Command> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_command_model_env_override_is_visible_to_the_spawned_process".to_owned(),
@@ -246,6 +253,7 @@ impl VerusWitness for RustStdStandard<std::process::CommandArgs<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_command_args_model_reports_the_configured_arguments".to_owned(),
@@ -275,6 +283,7 @@ impl VerusWitness for RustStdStandard<std::process::CommandEnvs<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_command_envs_model_reports_the_configured_overrides".to_owned(),
@@ -304,6 +313,7 @@ impl VerusWitness for RustStdStandard<std::process::ExitStatus> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_exit_status_model_reports_a_nonzero_exit_code".to_owned(),
@@ -338,6 +348,7 @@ impl VerusWitness for RustStdStandard<std::process::Output> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_output_model_captures_stdout_and_the_exit_status".to_owned(),

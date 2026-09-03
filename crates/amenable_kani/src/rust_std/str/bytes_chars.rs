@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<std::str::Bytes<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_bytes_yields_the_utf8_encoding".to_owned(),
@@ -67,6 +68,7 @@ impl KaniWitness for RustStdStandard<CharIndices<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_indices_pairs_each_char_with_its_byte_offset".to_owned(),
@@ -117,6 +119,7 @@ impl KaniWitness for RustStdStandard<Chars<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chars_yields_the_str_characters".to_owned(),
@@ -171,6 +174,7 @@ impl KaniWitness for RustStdStandard<EncodeUtf16<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_encode_utf16_yields_utf16_code_units".to_owned(),
@@ -214,6 +218,7 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDebug<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_escape_debug_escapes_control_characters".to_owned(),
@@ -260,6 +265,7 @@ impl KaniWitness for RustStdStandard<std::str::EscapeDefault<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_escape_default_escapes_control_characters".to_owned(),

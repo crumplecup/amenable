@@ -40,6 +40,7 @@ impl KaniMutexExclusionObservation {
 impl Provenance for KaniMutexExclusionObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -81,6 +82,7 @@ impl KaniBarrierLeaderObservation {
 impl Provenance for KaniBarrierLeaderObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![
@@ -122,6 +124,7 @@ impl KaniWaitTimeoutObservation {
 impl Provenance for KaniWaitTimeoutObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

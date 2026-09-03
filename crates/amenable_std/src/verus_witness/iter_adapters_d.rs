@@ -13,6 +13,7 @@ impl VerusWitness for RustStdStandard<std::iter::Cycle<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cycle_model_repeats_its_sequence_forever".to_owned(),
@@ -42,6 +43,7 @@ impl VerusWitness for RustStdStandard<std::iter::Fuse<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_fuse_model_keeps_returning_none_once_exhausted".to_owned(),
@@ -71,6 +73,7 @@ impl VerusWitness for RustStdStandard<std::iter::Inspect<std::ops::Range<i32>, f
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_inspect_model_calls_once_per_item_without_changing_values".to_owned(),
@@ -100,6 +103,7 @@ impl VerusWitness for RustStdStandard<std::iter::Peekable<std::ops::Range<i32>>>
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_peekable_model_peek_does_not_consume".to_owned(),
@@ -133,6 +137,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_scan_model_threads_state_through_its_closure".to_owned(),
@@ -178,6 +183,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_flat_map_model_flattens_each_generated_iterator".to_owned(),

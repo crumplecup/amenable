@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<std::slice::RSplitN<'static, i32, fn(&i32) 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplit_n_caps_the_number_of_pieces_from_the_back".to_owned(),
@@ -91,6 +92,7 @@ impl Establish<KaniRSplitNWitnessToken, KaniVerifier>
 {
     type Token = RustStdRSplitNToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniRSplitNWitnessToken) -> Self::Token {
         RustStdRSplitNToken(())
     }

@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<Prefix<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_prefix_disk_identifies_the_drive_letter".to_owned(),
@@ -75,6 +76,7 @@ impl Establish<KaniWindowsPrefixDriveLetterWitnessToken, KaniVerifier>
 {
     type Token = RustStdPrefixToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniWindowsPrefixDriveLetterWitnessToken) -> Self::Token {
         RustStdPrefixToken(())
     }

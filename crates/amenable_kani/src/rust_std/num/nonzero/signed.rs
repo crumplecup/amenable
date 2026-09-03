@@ -25,6 +25,7 @@ impl KaniWitness for RustStdStandard<NonZero<i8>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i8".to_owned(),
@@ -80,6 +81,7 @@ impl KaniWitness for RustStdStandard<NonZero<i16>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i16".to_owned(),
@@ -135,6 +137,7 @@ impl KaniWitness for RustStdStandard<NonZero<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i32".to_owned(),
@@ -190,6 +193,7 @@ impl KaniWitness for RustStdStandard<NonZero<i64>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i64".to_owned(),
@@ -245,6 +249,7 @@ impl KaniWitness for RustStdStandard<NonZero<i128>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_nonzero_i128".to_owned(),

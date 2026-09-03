@@ -31,6 +31,7 @@ impl VerusWitness for RustStdStandard<std::string::FromUtf8Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_utf8_error_model_recovers_the_original_bytes".to_owned(),
@@ -86,6 +87,7 @@ impl VerusWitness for RustStdStandard<core::ascii::EscapeDefault> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_escape_default_model_escapes_a_control_byte".to_owned(),
@@ -118,6 +120,7 @@ impl VerusWitness for RustStdStandard<core::ffi::CStr> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
@@ -155,6 +158,7 @@ impl VerusWitness for NonNulByte {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_cstr_excludes_the_terminating_nul_from_to_bytes".to_owned(),
@@ -179,6 +183,7 @@ impl VerusWitness for RustStdStandard<std::vec::Drain<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
@@ -248,6 +253,7 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::IntoIter<i3
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
@@ -280,6 +286,7 @@ impl VerusWitness for RustStdStandard<std::collections::linked_list::Iter<'stati
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
@@ -312,6 +319,7 @@ impl VerusWitness for RustStdStandard<std::string::Drain<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
@@ -382,6 +390,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),

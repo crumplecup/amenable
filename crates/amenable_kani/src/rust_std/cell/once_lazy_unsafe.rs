@@ -68,6 +68,7 @@ impl<T> KaniWitness for GetterRecoversTheStoredReference<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_cell_initializes_exactly_once".to_owned(),
@@ -119,6 +120,7 @@ impl KaniWitness for RustStdStandard<OnceCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_once_cell_initializes_exactly_once".to_owned(),
@@ -179,6 +181,7 @@ impl KaniWitness for RustStdStandard<UnsafeCell<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_unsafe_cell_get_mut_and_into_inner_round_trip".to_owned(),

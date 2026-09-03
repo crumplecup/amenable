@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<RecvError> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_recv_error_on_an_empty_disconnected_channel".to_owned(),
@@ -66,6 +67,7 @@ impl ProofToken for RustStdRecvErrorToken {
 impl Establish<KaniChannelRecvDisconnectedToken, KaniVerifier> for RustStdStandard<RecvError> {
     type Token = RustStdRecvErrorToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelRecvDisconnectedToken) -> Self::Token {
         RustStdRecvErrorToken(())
     }

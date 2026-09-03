@@ -15,6 +15,7 @@ impl VerusWitness for RustStdStandard<std::iter::Rev<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_rev_model_reverses_iteration_order".to_owned(),
@@ -44,6 +45,7 @@ impl VerusWitness for RustStdStandard<std::iter::Skip<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_skip_model_discards_the_first_n_items".to_owned(),
@@ -75,6 +77,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_skip_while_model_discards_items_while_the_predicate_holds".to_owned(),
@@ -106,6 +109,7 @@ impl VerusWitness for RustStdStandard<std::iter::StepBy<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_step_by_model_yields_every_nth_item".to_owned(),
@@ -135,6 +139,7 @@ impl VerusWitness for RustStdStandard<std::iter::Take<std::ops::Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_take_model_yields_at_most_n_items".to_owned(),
@@ -166,6 +171,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_take_while_model_yields_items_while_the_predicate_holds".to_owned(),
@@ -199,6 +205,7 @@ impl VerusWitness for RustStdStandard<std::iter::Once<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_model_yields_exactly_one_value".to_owned(),
@@ -227,6 +234,7 @@ impl VerusWitness for RustStdStandard<std::iter::OnceWith<fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_with_model_calls_its_closure_exactly_once".to_owned(),
@@ -255,6 +263,7 @@ impl VerusWitness for RustStdStandard<std::iter::Repeat<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_repeat_model_yields_the_same_value_forever".to_owned(),
@@ -283,6 +292,7 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatWith<fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_repeat_with_model_calls_its_closure_once_per_item".to_owned(),
@@ -311,6 +321,7 @@ impl VerusWitness for RustStdStandard<std::iter::RepeatN<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_repeat_n_model_yields_the_value_exactly_n_times".to_owned(),

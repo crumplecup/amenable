@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_buf_reader_reads_the_underlying_bytes".to_owned(),
@@ -73,6 +74,7 @@ impl Establish<KaniBufferedReadWitnessToken, KaniVerifier>
 {
     type Token = RustStdBufReaderToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniBufferedReadWitnessToken) -> Self::Token {
         RustStdBufReaderToken(())
     }
@@ -103,6 +105,7 @@ impl KaniWitness for RustStdStandard<BufWriter<Vec<u8>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_buf_writer_flushes_to_the_underlying_writer".to_owned(),
@@ -148,6 +151,7 @@ impl KaniWitness for RustStdStandard<std::io::Bytes<&'static [u8]>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_bytes_yields_one_byte_at_a_time".to_owned(),

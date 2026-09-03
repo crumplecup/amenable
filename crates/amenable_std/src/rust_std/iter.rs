@@ -70,14 +70,17 @@ iter_adapter2!(
 );
 
 impl<I, U: IntoIterator, F> crate::RustStdType for FlatMap<I, U, F> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::iter")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/iter/struct.FlatMap.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The FlatMap carrier lazily maps each item to an iterator and flattens the results into one sequence."
     }
@@ -87,14 +90,17 @@ impl<I: Iterator> crate::RustStdType for Flatten<I>
 where
     I::Item: IntoIterator,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("core", "core::iter")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/core/iter/struct.Flatten.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Flatten carrier lazily flattens an iterator of iterators into one sequence."
     }

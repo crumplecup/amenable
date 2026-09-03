@@ -30,6 +30,7 @@ impl KaniWitness for FallibleOperationReportsFailure {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_result_ok_and_err_are_disjoint".to_owned(),
@@ -70,6 +71,7 @@ impl KaniWitness for FallibleOperationReportsSuccess {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_result_ok_and_err_are_disjoint".to_owned(),
@@ -100,6 +102,7 @@ impl KaniWitness for RustStdStandard<Result<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_result_ok_and_err_are_disjoint".to_owned(),
@@ -155,6 +158,7 @@ impl KaniWitness for RustStdStandard<core::result::IntoIter<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_result_into_iter_yields_the_ok_value_only".to_owned(),
@@ -206,6 +210,7 @@ impl KaniWitness for RustStdStandard<core::result::Iter<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_result_iter_yields_a_reference_to_the_ok_value".to_owned(),

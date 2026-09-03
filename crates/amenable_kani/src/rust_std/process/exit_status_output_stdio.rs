@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<ExitStatus> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_exit_status_reports_a_nonzero_exit_code".to_owned(),
@@ -66,6 +67,7 @@ impl ProofToken for RustStdExitStatusToken {
 impl Establish<KaniExitStatusWitnessToken, KaniVerifier> for RustStdStandard<ExitStatus> {
     type Token = RustStdExitStatusToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniExitStatusWitnessToken) -> Self::Token {
         RustStdExitStatusToken(())
     }
@@ -96,6 +98,7 @@ impl KaniWitness for RustStdStandard<Output> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_output_captures_stdout_and_the_exit_status".to_owned(),
@@ -149,6 +152,7 @@ impl ProofToken for RustStdOutputToken {
 impl Establish<KaniOutputWitnessToken, KaniVerifier> for RustStdStandard<Output> {
     type Token = RustStdOutputToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniOutputWitnessToken) -> Self::Token {
         RustStdOutputToken(())
     }

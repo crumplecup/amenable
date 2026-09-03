@@ -16,6 +16,7 @@ impl<T> KaniWitness for AccessorRecoversTheExpectedValue<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
@@ -67,6 +68,7 @@ impl KaniWitness for RustStdStandard<Utf8Chunk<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_utf8_chunk_separates_the_valid_prefix_from_invalid_bytes".to_owned(),
@@ -112,6 +114,7 @@ impl KaniWitness for RustStdStandard<Utf8Error> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_utf8_error_reports_the_valid_prefix_length_and_error_span".to_owned(),

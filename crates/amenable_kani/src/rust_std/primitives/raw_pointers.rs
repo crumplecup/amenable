@@ -11,6 +11,7 @@ impl KaniWitness for RustStdStandard<*const i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_const_pointer_cast_is_reproducible".to_owned(),

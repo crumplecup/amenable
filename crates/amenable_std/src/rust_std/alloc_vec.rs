@@ -17,14 +17,17 @@ impl_rust_std_type_generic1!(
 );
 
 impl<T> crate::RustStdType for VecDrain<'_, T> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::vec")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/vec/struct.Drain.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The Drain carrier removes and yields a range of a Vec's elements in order."
     }
@@ -39,14 +42,17 @@ impl_rust_std_type_generic1!(
 );
 
 impl<T, F: FnMut(&mut T) -> bool> crate::RustStdType for VecExtractIf<'_, T, F> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_language_provenance() -> crate::RustLanguageProvenance {
         crate::RustLanguageProvenance::for_source("alloc", "alloc::vec")
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn rust_doc_url() -> &'static str {
         "https://doc.rust-lang.org/alloc/vec/struct.ExtractIf.html"
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn rust_semantics_summary() -> &'static str {
         "The ExtractIf carrier lazily removes and yields a Vec's elements matching a predicate."
     }

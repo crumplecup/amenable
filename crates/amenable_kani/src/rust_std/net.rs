@@ -23,6 +23,7 @@ impl KaniWitness for RustStdStandard<Ipv4Addr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ipv4_addr_octets_round_trip".to_owned(),
@@ -64,6 +65,7 @@ impl KaniWitness for RustStdStandard<Ipv6Addr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ipv6_addr_segments_round_trip".to_owned(),
@@ -113,6 +115,7 @@ impl KaniWitness for RustStdStandard<IpAddr> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ip_addr_variant_matches_its_kind".to_owned(),
@@ -169,6 +172,7 @@ impl KaniWitness for IsIpv4KindReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ip_addr_variant_matches_its_kind".to_owned(),
@@ -209,6 +213,7 @@ impl KaniWitness for IsIpv6KindReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ip_addr_variant_matches_its_kind".to_owned(),
@@ -283,6 +288,7 @@ impl KaniWitness for RustStdStandard<SocketAddrV4> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_socket_addr_v4_round_trips_ip_and_port".to_owned(),
@@ -332,6 +338,7 @@ impl KaniWitness for RustStdStandard<SocketAddrV6> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_socket_addr_v6_round_trips_all_fields".to_owned(),

@@ -25,6 +25,7 @@ impl KaniWitness for RustStdStandard<AtomicI8> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_i8".to_owned(),
@@ -77,6 +78,7 @@ impl KaniWitness for RustStdStandard<AtomicI16> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_i16".to_owned(),
@@ -129,6 +131,7 @@ impl KaniWitness for RustStdStandard<AtomicI32> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_i32".to_owned(),
@@ -181,6 +184,7 @@ impl KaniWitness for RustStdStandard<AtomicI64> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_atomic_i64".to_owned(),

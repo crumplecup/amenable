@@ -12,6 +12,7 @@ impl VerusWitness for RustStdStandard<std::time::Instant> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_instant_model_is_monotonically_nondecreasing".to_owned(),
@@ -40,6 +41,7 @@ impl VerusWitness for RustStdStandard<std::time::SystemTime> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_system_time_model_duration_since_computes_the_elapsed_span".to_owned(),
@@ -68,6 +70,7 @@ impl VerusWitness for RustStdStandard<std::time::SystemTimeError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_system_time_error_model_recovers_how_far_backward_it_went".to_owned(),

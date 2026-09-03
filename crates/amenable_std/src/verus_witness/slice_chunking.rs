@@ -252,6 +252,7 @@ impl VerusWitness for RustStdStandard<std::slice::EscapeAscii<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_escape_ascii_model_leaves_printable_bytes_unescaped".to_owned(),

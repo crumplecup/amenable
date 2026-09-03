@@ -158,6 +158,7 @@ pub struct Pending;
 impl Provenance for Pending {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",
@@ -180,6 +181,7 @@ pub struct Validated;
 impl Provenance for Validated {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",
@@ -197,6 +199,7 @@ pub struct Committed;
 impl Provenance for Committed {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",
@@ -255,6 +258,7 @@ pub struct Rejected<T>(std::marker::PhantomData<T>);
 impl Provenance for Rejected<Pending> {
     type MetadataIter = std::vec::IntoIter<MetadataEntry>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         vec![MetadataEntry::new(
             "asserted",

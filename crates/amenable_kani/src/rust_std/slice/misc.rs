@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<EscapeAscii<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_escape_ascii_leaves_printable_bytes_unescaped".to_owned(),

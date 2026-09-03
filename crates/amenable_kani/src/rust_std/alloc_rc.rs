@@ -41,6 +41,7 @@ impl KaniWitness for StrongCountTracksLiveReferences {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rc_strong_count_tracks_clones".to_owned(),
@@ -71,6 +72,7 @@ impl KaniWitness for RustStdStandard<Rc<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rc_strong_count_tracks_clones".to_owned(),
@@ -181,6 +183,7 @@ impl KaniWitness for WeakUpgradeReturnsNone {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rc_weak_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),

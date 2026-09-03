@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<SplitTerminator<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_terminator_suppresses_a_trailing_empty_substring".to_owned(),
@@ -81,6 +82,7 @@ impl KaniWitness for RustStdStandard<RSplitTerminator<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplit_terminator_suppresses_a_trailing_empty_substring_from_the_back"
@@ -137,6 +139,7 @@ impl KaniWitness for RustStdStandard<Matches<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_matches_yields_every_non_overlapping_occurrence".to_owned(),

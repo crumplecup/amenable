@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> boo
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunk_by_groups_adjacent_elements_matching_the_predicate".to_owned(),

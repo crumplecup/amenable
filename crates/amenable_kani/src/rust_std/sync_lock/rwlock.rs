@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<std::sync::RwLock<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rwlock_allows_concurrent_reads_but_not_a_write".to_owned(),
@@ -70,6 +71,7 @@ impl KaniWitness for RustStdStandard<std::sync::RwLockReadGuard<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rwlock_read_guard_derefs_to_the_value".to_owned(),

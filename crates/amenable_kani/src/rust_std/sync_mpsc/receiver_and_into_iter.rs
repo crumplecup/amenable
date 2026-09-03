@@ -10,6 +10,7 @@ impl KaniWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_receiver_fails_once_every_sender_is_dropped".to_owned(),
@@ -69,6 +70,7 @@ impl Establish<KaniChannelDisconnectedRecvToken, KaniVerifier>
 {
     type Token = RustStdReceiverToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniChannelDisconnectedRecvToken) -> Self::Token {
         RustStdReceiverToken(())
     }

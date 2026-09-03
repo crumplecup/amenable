@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_mutex_excludes_a_second_lock_while_held".to_owned(),

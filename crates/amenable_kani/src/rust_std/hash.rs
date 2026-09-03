@@ -16,6 +16,7 @@ impl KaniWitness for RustStdStandard<BuildHasherDefault<DefaultHasher>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_build_hasher_default_produces_consistent_hashers".to_owned(),

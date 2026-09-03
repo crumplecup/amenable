@@ -27,10 +27,12 @@ impl Witness<VerusVerifier> for CheckedVerusExportLeaf {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <RustStdStandard<char> as Witness<VerusVerifier>>::proof()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
     }
@@ -57,10 +59,12 @@ impl Witness<VerusVerifier> for TrustedVerusExportLeaf {
     type SupportingEvidence = Self;
     type ProofArtifact = RustStdProvenance;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <bool as RustStdType>::provenance()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::trusted_leaf()
     }
@@ -87,10 +91,12 @@ impl Witness<VerusVerifier> for RequiresVerusExportLeaf {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         <RustStdStandard<std::slice::EscapeAscii<'static>> as Witness<VerusVerifier>>::proof()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
     }

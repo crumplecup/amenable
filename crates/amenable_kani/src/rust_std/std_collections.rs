@@ -25,6 +25,7 @@ impl KaniWitness for RustStdStandard<HashMap<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_hash_map_insert_then_get_recovers_the_value".to_owned(),

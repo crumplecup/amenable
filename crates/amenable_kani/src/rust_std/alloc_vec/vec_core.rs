@@ -26,6 +26,7 @@ impl KaniWitness for RustStdStandard<Vec<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_push_pop_round_trips".to_owned(),
@@ -88,6 +89,7 @@ impl KaniWitness for VecLengthTracksPushesAndPops {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_push_pop_round_trips".to_owned(),

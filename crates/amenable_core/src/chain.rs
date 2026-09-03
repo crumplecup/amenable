@@ -65,6 +65,7 @@ pub struct ProofChainReport {
 }
 
 impl Display for ProofChainReport {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.verifiers.is_empty() {
             writeln!(
@@ -132,6 +133,7 @@ pub struct ChainGap {
 }
 
 impl Display for ChainGap {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,

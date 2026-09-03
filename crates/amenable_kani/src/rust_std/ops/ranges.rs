@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<std::ops::Range<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_contains_matches_bounds".to_owned(),
@@ -75,6 +76,7 @@ impl KaniWitness for RustStdStandard<std::ops::RangeFrom<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_from_contains_matches_bound".to_owned(),
@@ -123,6 +125,7 @@ impl KaniWitness for RustStdStandard<RangeTo<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_to_contains_matches_bound".to_owned(),
@@ -171,6 +174,7 @@ impl KaniWitness for RustStdStandard<std::ops::RangeToInclusive<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_to_inclusive_contains_matches_bound".to_owned(),
@@ -222,6 +226,7 @@ impl KaniWitness for RustStdStandard<std::ops::RangeInclusive<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_range_inclusive_contains_and_emptiness".to_owned(),

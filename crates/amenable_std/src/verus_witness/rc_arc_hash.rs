@@ -23,6 +23,7 @@ impl VerusWitness for RustStdStandard<std::rc::Rc<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_rc_derefs_to_the_wrapped_value".to_owned(),
@@ -49,6 +50,7 @@ impl VerusWitness for RustStdStandard<std::sync::Arc<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_arc_derefs_to_the_wrapped_value".to_owned(),
@@ -75,6 +77,7 @@ impl VerusWitness for RustStdStandard<std::ffi::IntoStringError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_into_string_error_recovers_the_original_cstring".to_owned(),
@@ -131,6 +134,7 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesUntilNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_bytes_until_nul_requires_a_nul_byte_somewhere".to_owned(),
@@ -185,6 +189,7 @@ impl VerusWitness for RustStdStandard<core::ffi::FromBytesWithNulError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_bytes_with_nul_requires_the_nul_only_at_the_end".to_owned(),
@@ -224,6 +229,7 @@ impl VerusWitness
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_build_hasher_default_produces_consistent_hashers".to_owned(),
@@ -257,6 +263,7 @@ impl VerusWitness for RustStdStandard<std::hash::SipHasher> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_sip_hasher_produces_consistent_hashes".to_owned(),

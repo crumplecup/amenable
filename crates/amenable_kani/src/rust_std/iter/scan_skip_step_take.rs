@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<Scan<Range<i32>, i32, fn(&mut i32, i32) -> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_scan_threads_state_through_its_closure".to_owned(),
@@ -84,6 +85,7 @@ impl KaniWitness for RustStdStandard<Skip<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_skip_discards_the_first_n_items".to_owned(),
@@ -130,6 +132,7 @@ impl KaniWitness for RustStdStandard<SkipWhile<Range<i32>, fn(&i32) -> bool>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_skip_while_discards_items_while_the_predicate_holds".to_owned(),
@@ -184,6 +187,7 @@ impl KaniWitness for RustStdStandard<StepBy<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_step_by_yields_every_nth_item".to_owned(),

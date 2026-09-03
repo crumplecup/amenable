@@ -11,6 +11,7 @@ impl KaniWitness for RustStdStandard<Barrier> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_barrier_of_one_is_its_own_leader".to_owned(),
@@ -65,6 +66,7 @@ impl ProofToken for RustStdBarrierToken {
 impl Establish<KaniBarrierLeaderWitnessToken, KaniVerifier> for RustStdStandard<Barrier> {
     type Token = RustStdBarrierToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniBarrierLeaderWitnessToken) -> Self::Token {
         RustStdBarrierToken(())
     }

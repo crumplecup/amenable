@@ -13,6 +13,7 @@ impl KaniWitness for AsciiByte {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_str_byte_length_and_content".to_owned(),
@@ -53,6 +54,7 @@ impl KaniWitness for FourBytesAreEachAscii {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_str_byte_length_and_content".to_owned(),

@@ -26,6 +26,7 @@ impl KaniWitness for RustStdStandard<BorrowedFd<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),
@@ -78,6 +79,7 @@ impl KaniWitness for NonNegativeFd {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_borrowed_fd_reports_the_same_raw_value_as_the_owner".to_owned(),

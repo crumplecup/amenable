@@ -19,6 +19,7 @@ impl KaniWitness for RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_decode_utf16_round_trips_a_bmp_code_unit".to_owned(),

@@ -20,6 +20,7 @@ impl VerusWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_roundtrip".to_owned(),
@@ -52,6 +53,7 @@ impl VerusWitness for ValidUnicodeScalar {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_char_roundtrip".to_owned(),
@@ -87,6 +89,7 @@ impl VerusWitness for RustStdStandard<String> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_string_roundtrip".to_owned(),
@@ -119,6 +122,7 @@ impl VerusWitness for RustStdStandard<std::cmp::Ordering> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordering_reverse_swaps_less_and_greater".to_owned(),
@@ -156,6 +160,7 @@ impl VerusWitness for RustStdStandard<Option<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_option_unwrap_returns_the_wrapped_value".to_owned(),
@@ -188,6 +193,7 @@ impl VerusWitness for RustStdStandard<Result<i32, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_result_unwrap_returns_the_ok_value".to_owned(),
@@ -225,6 +231,7 @@ impl VerusWitness for RustStdStandard<std::num::Wrapping<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_wrapping_field_roundtrips_the_constructed_value".to_owned(),
@@ -253,6 +260,7 @@ impl VerusWitness for RustStdStandard<std::num::Saturating<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_saturating_field_roundtrips_the_constructed_value".to_owned(),
@@ -281,6 +289,7 @@ impl VerusWitness for RustStdStandard<std::cmp::Reverse<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_reverse_field_roundtrips_the_constructed_value".to_owned(),

@@ -27,6 +27,7 @@ impl KaniWitness for RustStdStandard<Pending<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_pending_never_resolves".to_owned(),
@@ -67,6 +68,7 @@ impl KaniWitness for PollResultMatchesExpected {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_pending_never_resolves".to_owned(),
@@ -111,6 +113,7 @@ impl KaniWitness for CallbackWasInvoked {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_poll_fn_dispatches_through_to_its_closure".to_owned(),
@@ -171,6 +174,7 @@ impl KaniWitness for RustStdStandard<Ready<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_ready_resolves_immediately_with_its_value".to_owned(),

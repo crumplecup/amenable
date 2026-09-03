@@ -53,6 +53,7 @@ pub struct Green;
 impl Provenance for Green {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new(
             vec![MetadataEntry::new(
@@ -67,6 +68,7 @@ impl Provenance for Green {
 impl Standard for Green {
     type Provenance = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         *self
     }
@@ -76,14 +78,17 @@ impl Evidence for Green {
     type Basis = Self;
     type Audit = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         Self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         *self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         true
     }
@@ -99,6 +104,7 @@ pub struct Yellow;
 impl Provenance for Yellow {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new(
             vec![MetadataEntry::new(
@@ -113,6 +119,7 @@ impl Provenance for Yellow {
 impl Standard for Yellow {
     type Provenance = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn provenance(&self) -> Self::Provenance {
         *self
     }
@@ -122,14 +129,17 @@ impl Evidence for Yellow {
     type Basis = Self;
     type Audit = Self;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn basis() -> Self::Basis {
         Self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn audit(&self) -> Self::Audit {
         *self
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
     fn is_root() -> bool {
         true
     }

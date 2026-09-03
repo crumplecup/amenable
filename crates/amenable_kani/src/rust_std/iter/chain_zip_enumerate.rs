@@ -19,6 +19,7 @@ impl KaniWitness for RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chain_sequences_two_iterators_end_to_end".to_owned(),
@@ -83,6 +84,7 @@ impl KaniWitness for RustStdStandard<Zip<Range<i32>, Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_zip_pairs_items_from_two_iterators".to_owned(),
@@ -137,6 +139,7 @@ impl KaniWitness for RustStdStandard<Enumerate<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_enumerate_pairs_each_item_with_its_index".to_owned(),
@@ -192,6 +195,7 @@ impl KaniWitness for RustStdStandard<Rev<Range<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rev_reverses_iteration_order".to_owned(),

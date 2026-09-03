@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<FileType> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_file_type_distinguishes_files_from_directories".to_owned(),
@@ -69,6 +70,7 @@ impl ProofToken for RustStdFileTypeToken {
 impl Establish<KaniFileTypeWitnessToken, KaniVerifier> for RustStdStandard<FileType> {
     type Token = RustStdFileTypeToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniFileTypeWitnessToken) -> Self::Token {
         RustStdFileTypeToken(())
     }

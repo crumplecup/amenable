@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<File> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_file_write_then_read_round_trips_the_bytes".to_owned(),
@@ -69,6 +70,7 @@ impl ProofToken for RustStdFileContentToken {
 impl Establish<KaniFileContentWitnessToken, KaniVerifier> for RustStdStandard<File> {
     type Token = RustStdFileContentToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniFileContentWitnessToken) -> Self::Token {
         RustStdFileContentToken(())
     }

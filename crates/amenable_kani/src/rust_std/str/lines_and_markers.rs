@@ -14,6 +14,7 @@ impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_lines_splits_on_line_endings".to_owned(),

@@ -42,6 +42,7 @@ impl Debit {
 impl Provenance for Debit {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
     }
@@ -65,6 +66,7 @@ impl Witness<KaniVerifier> for Debit {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "verify_debit_access_preserves_value".to_owned(),
@@ -134,6 +136,7 @@ impl Witness<KaniVerifier> for Credit {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "verify_credit_access_preserves_value".to_owned(),

@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<Path> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_path_derives_extension_file_name_and_parent".to_owned(),
@@ -56,6 +57,7 @@ impl KaniWitness for PathHasRootReportsTrue {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_path_derives_extension_file_name_and_parent".to_owned(),
@@ -113,6 +115,7 @@ impl KaniWitness for RustStdStandard<PathBuf> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_path_buf_push_pop_and_join_build_the_expected_path".to_owned(),
@@ -158,6 +161,7 @@ impl KaniWitness for PopRemovedASegment {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_path_buf_push_pop_and_join_build_the_expected_path".to_owned(),

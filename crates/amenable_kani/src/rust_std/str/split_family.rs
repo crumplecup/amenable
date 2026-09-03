@@ -20,6 +20,7 @@ impl KaniWitness for RustStdStandard<Split<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_yields_substrings_between_pattern_matches".to_owned(),
@@ -58,6 +59,7 @@ impl KaniWitness for RustStdStandard<SplitN<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_splitn_limits_to_n_substrings".to_owned(),
@@ -96,6 +98,7 @@ impl KaniWitness for RustStdStandard<SplitInclusive<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_split_inclusive_keeps_the_delimiter_attached".to_owned(),
@@ -135,6 +138,7 @@ impl KaniWitness for RustStdStandard<RSplit<'static, char>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rsplit_yields_substrings_from_the_back".to_owned(),

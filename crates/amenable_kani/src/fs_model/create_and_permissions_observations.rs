@@ -23,6 +23,7 @@ pub struct KaniCreateNewObservation {
 impl Provenance for KaniCreateNewObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             let prior_kind = match self.kind {
@@ -91,6 +92,7 @@ impl KaniAlreadyExists {
 
 impl Default for KaniAlreadyExists {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }
@@ -171,6 +173,7 @@ pub struct KaniPermissionsObservation {
 impl Provenance for KaniPermissionsObservation {
     type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn metadata(&self) -> Self::MetadataIter {
         Box::new({
             vec![

@@ -30,6 +30,7 @@ impl KaniWitness for RustStdStandard<EncodeWide<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_encode_wide_maps_ascii_to_matching_utf16_units".to_owned(),
@@ -67,6 +68,7 @@ impl KaniWitness for RustStdStandard<BorrowedHandle<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_borrowed_handle_reports_the_same_raw_value_as_the_owner".to_owned(),
@@ -117,6 +119,7 @@ impl KaniWitness for RustStdStandard<BorrowedSocket<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_borrowed_socket_reports_the_same_raw_value_as_the_owner".to_owned(),
@@ -159,6 +162,7 @@ impl KaniWitness for RustStdStandard<HandleOrInvalid> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_handle_or_invalid_distinguishes_a_real_handle_from_the_sentinel".to_owned(),
@@ -212,6 +216,7 @@ impl KaniWitness for RustStdStandard<OwnedHandle> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_owned_handle_preserves_the_raw_value_across_conversion".to_owned(),

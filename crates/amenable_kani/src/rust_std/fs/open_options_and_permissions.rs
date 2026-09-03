@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<OpenOptions> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_open_options_create_new_rejects_an_existing_file".to_owned(),
@@ -90,6 +91,7 @@ impl ProofToken for RustStdOpenOptionsCreateNewToken {
 impl Establish<KaniCreateNewWitnessToken, KaniVerifier> for RustStdStandard<OpenOptions> {
     type Token = RustStdOpenOptionsCreateNewToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniCreateNewWitnessToken) -> Self::Token {
         RustStdOpenOptionsCreateNewToken(())
     }

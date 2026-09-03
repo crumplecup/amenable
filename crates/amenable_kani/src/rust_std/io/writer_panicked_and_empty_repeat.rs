@@ -13,6 +13,7 @@ impl KaniWitness for RustStdStandard<WriterPanicked> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_writer_panicked_recovers_the_buffered_data".to_owned(),
@@ -99,6 +100,7 @@ impl KaniWitness for RustStdStandard<std::io::Empty> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_empty_read_reports_end_of_file".to_owned(),

@@ -10,6 +10,7 @@ impl VerusWitness for RustStdStandard<std::thread::LocalKey<std::cell::Cell<i32>
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_local_key_model_with_reads_the_initialized_value".to_owned(),
@@ -47,6 +48,7 @@ impl VerusWitness for RustStdStandard<std::thread::Thread> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
@@ -72,6 +74,7 @@ impl VerusWitness for RustStdStandard<std::thread::ThreadId> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_thread_current_model_is_stable_across_repeated_calls".to_owned(),
@@ -149,6 +152,7 @@ impl VerusWitness for RustStdStandard<std::env::JoinPathsError> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_join_paths_error_model_reports_an_unjoinable_path".to_owned(),
@@ -177,6 +181,7 @@ impl VerusWitness for RustStdStandard<std::env::SplitPaths<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_split_paths_model_recovers_paths_joined_by_join_paths".to_owned(),
@@ -238,6 +243,7 @@ impl VerusWitness for RustStdStandard<std::sync::mpsc::Receiver<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_receiver_model_fails_once_every_sender_is_dropped".to_owned(),

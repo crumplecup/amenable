@@ -14,6 +14,7 @@ impl VerusWitness for RustStdStandard<[i32; 3]> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_array_model_indexing_and_length".to_owned(),
@@ -40,6 +41,7 @@ impl VerusWitness for RustStdStandard<[i32]> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_slice_model_indexing_and_length".to_owned(),
@@ -66,6 +68,7 @@ impl VerusWitness for RustStdStandard<str> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_str_model_byte_length_and_content".to_owned(),
@@ -101,6 +104,7 @@ impl VerusWitness for RustStdStandard<(i32, i32)> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_tuple_model_field_access".to_owned(),
@@ -127,6 +131,7 @@ impl VerusWitness for RustStdStandard<fn(i32) -> i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_fn_pointer_model_calls_the_underlying_function".to_owned(),
@@ -153,6 +158,7 @@ impl VerusWitness for RustStdStandard<*const i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_const_pointer_model_cast_is_reproducible".to_owned(),
@@ -179,6 +185,7 @@ impl VerusWitness for RustStdStandard<*mut i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_mut_pointer_model_cast_is_reproducible".to_owned(),
@@ -202,6 +209,7 @@ impl VerusWitness for RustStdStandard<&'static i32> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_shared_reference_model_dereferences_to_the_referent".to_owned(),

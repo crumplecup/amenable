@@ -10,6 +10,7 @@ impl VerusWitness for RustStdStandard<std::sync::Once> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_model_runs_its_closure_exactly_once".to_owned(),
@@ -44,6 +45,7 @@ impl VerusWitness for RustStdStandard<std::sync::OnceState> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_state_model_reports_not_poisoned_on_a_clean_run".to_owned(),
@@ -72,6 +74,7 @@ impl VerusWitness for RustStdStandard<std::sync::OnceLock<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_once_lock_model_initializes_exactly_once".to_owned(),
@@ -100,6 +103,7 @@ impl VerusWitness for RustStdStandard<std::sync::Barrier> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
@@ -125,6 +129,7 @@ impl VerusWitness for RustStdStandard<std::sync::BarrierWaitResult> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_barrier_model_of_one_is_its_own_leader".to_owned(),
@@ -153,6 +158,7 @@ impl VerusWitness for RustStdStandard<std::sync::WaitTimeoutResult> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_wait_timeout_result_model_reports_timed_out".to_owned(),
@@ -181,6 +187,7 @@ impl VerusWitness for RustStdStandard<std::net::Incoming<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_incoming_model_yields_an_already_queued_connection".to_owned(),
@@ -209,6 +216,7 @@ impl VerusWitness for RustStdStandard<std::net::Shutdown> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_shutdown_model_write_prevents_further_writes".to_owned(),
@@ -237,6 +245,7 @@ impl VerusWitness for RustStdStandard<std::net::TcpListener> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_tcp_listener_model_accepts_a_connecting_stream".to_owned(),
@@ -265,6 +274,7 @@ impl VerusWitness for RustStdStandard<std::net::TcpStream> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_tcp_stream_model_delivers_written_bytes_to_the_accepted_peer".to_owned(),
@@ -293,6 +303,7 @@ impl VerusWitness for RustStdStandard<std::net::UdpSocket> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_udp_socket_model_send_to_recv_from_round_trips_a_datagram".to_owned(),
@@ -321,6 +332,7 @@ impl VerusWitness for RustStdStandard<std::task::Context<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_context_model_from_waker_exposes_the_same_waker".to_owned(),
@@ -349,6 +361,7 @@ impl VerusWitness for RustStdStandard<std::task::Poll<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_poll_model_ready_and_pending_are_disjoint".to_owned(),

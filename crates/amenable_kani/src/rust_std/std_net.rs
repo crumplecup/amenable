@@ -31,6 +31,7 @@ impl KaniWitness for RustStdStandard<Incoming<'static>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_incoming_yields_an_already_queued_connection".to_owned(),
@@ -78,6 +79,7 @@ impl KaniWitness for RustStdStandard<Shutdown> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_shutdown_write_prevents_further_writes".to_owned(),
@@ -127,6 +129,7 @@ impl KaniWitness for RustStdStandard<TcpListener> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_tcp_listener_accepts_a_connecting_stream".to_owned(),
@@ -172,6 +175,7 @@ impl KaniWitness for RustStdStandard<TcpStream> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_tcp_stream_delivers_written_bytes_to_the_accepted_peer".to_owned(),

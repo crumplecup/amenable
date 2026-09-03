@@ -16,6 +16,7 @@ impl KaniWitness for RustStdStandard<char> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_char_unicode_scalar".to_owned(),
@@ -75,6 +76,7 @@ impl KaniWitness for RustStdStandard<String> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_string_utf8_valid".to_owned(),

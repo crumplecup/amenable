@@ -35,6 +35,7 @@ impl KaniWitness for RustStdStandard<Chunks<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk".to_owned(),
@@ -79,6 +80,7 @@ impl KaniWitness for RustStdStandard<ChunksExact<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunks_exact_discards_a_short_remainder".to_owned(),
@@ -128,6 +130,7 @@ impl KaniWitness for RustStdStandard<ChunksMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunks_mut_writes_through_every_chunk".to_owned(),
@@ -173,6 +176,7 @@ impl KaniWitness for RustStdStandard<ChunksExactMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_chunks_exact_mut_leaves_the_remainder_untouched".to_owned(),
@@ -224,6 +228,7 @@ impl KaniWitness for RustStdStandard<RChunks<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rchunks_groups_from_the_back".to_owned(),
@@ -269,6 +274,7 @@ impl KaniWitness for RustStdStandard<RChunksExact<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rchunks_exact_discards_a_short_remainder_at_the_front".to_owned(),
@@ -315,6 +321,7 @@ impl KaniWitness for RustStdStandard<RChunksExactMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rchunks_exact_mut_leaves_the_front_remainder_untouched".to_owned(),
@@ -367,6 +374,7 @@ impl KaniWitness for RustStdStandard<RChunksMut<'static, i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_rchunks_mut_writes_through_every_chunk".to_owned(),

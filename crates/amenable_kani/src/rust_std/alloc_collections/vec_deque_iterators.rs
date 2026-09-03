@@ -32,6 +32,7 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Drain<'static,
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_deque_drain_removes_and_yields_in_order".to_owned(),
@@ -118,6 +119,7 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::Iter<'static, 
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_deque_iter_yields_references_in_order".to_owned(),
@@ -175,6 +177,7 @@ impl KaniWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stati
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_vec_deque_iter_mut_writes_through".to_owned(),

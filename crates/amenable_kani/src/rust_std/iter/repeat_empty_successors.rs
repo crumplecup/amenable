@@ -17,6 +17,7 @@ impl KaniWitness for RustStdStandard<std::iter::Repeat<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_repeat_yields_the_same_value_forever".to_owned(),
@@ -65,6 +66,7 @@ impl KaniWitness for RustStdStandard<RepeatWith<fn() -> i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_repeat_with_calls_its_closure_once_per_item".to_owned(),
@@ -116,6 +118,7 @@ impl KaniWitness for RustStdStandard<RepeatN<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_repeat_n_yields_the_value_exactly_n_times".to_owned(),
@@ -164,6 +167,7 @@ impl KaniWitness for RustStdStandard<std::iter::Empty<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_empty_yields_nothing".to_owned(),
@@ -261,6 +265,7 @@ impl<T> KaniWitness for IteratorYieldsNoneWhenExhausted<T> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_empty_yields_nothing".to_owned(),
@@ -310,6 +315,7 @@ impl KaniWitness for RustStdStandard<Successors<i32, fn(&i32) -> Option<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_successors_generates_from_the_previous_item".to_owned(),

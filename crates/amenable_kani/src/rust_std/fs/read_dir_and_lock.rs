@@ -12,6 +12,7 @@ impl KaniWitness for RustStdStandard<ReadDir> {
     type SupportingEvidence = Self;
     type ProofArtifact = CheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CheckedProof::new(
             "verify_read_dir_iterates_every_entry_in_the_directory".to_owned(),
@@ -79,6 +80,7 @@ impl ProofToken for RustStdReadDirToken {
 impl Establish<KaniReadDirWitnessToken, KaniVerifier> for RustStdStandard<ReadDir> {
     type Token = RustStdReadDirToken;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(_credential)))]
     fn establish(_credential: KaniReadDirWitnessToken) -> Self::Token {
         RustStdReadDirToken(())
     }
