@@ -121,6 +121,11 @@ enabled = false
 # floor is honest here (cordial now counts real pub items inside
 # verus! {} via verus_syn) but still not met by design -- consolidating
 # files to clear it would fight the convention for no real benefit.
-# Every other visibility rule still applies to this subtree normally.
+# derived_witness/ is a different case with the same conclusion: its
+# module path is a codegen destination, read from a
+# `#[witness(verus(module = "..."))]` string attribute in amenable_std,
+# not chosen for API shape -- moving/merging destinations isn't
+# feasible without touching that derive's own contract. Every other
+# visibility rule still applies to both subtrees normally.
 [visibility]
-mod_thin_skip = { amenable_verus = ["gallery"] }
+mod_thin_skip = { amenable_verus = ["gallery", "derived_witness"] }
