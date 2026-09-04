@@ -48,10 +48,11 @@
 mod ascii_and_drain;
 mod call_shape;
 mod cell;
+mod char_conversion;
 mod char_decode;
-mod char_ffi_errors;
 mod collections;
 mod collections_iter_cell_ref;
+mod cstring_ffi;
 mod fs;
 mod hash_ffi_collections_tail;
 mod io_tail;

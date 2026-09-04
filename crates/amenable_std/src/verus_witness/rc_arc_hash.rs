@@ -14,10 +14,12 @@
     reason = "SipHasher itself is stable (only deprecated as a recommendation to use DefaultHasher instead); covering it is a coverage-completeness question, not a call to use it"
 )]
 
-use super::char_ffi_errors::VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC;
 use super::machinery::{VerusCheckedProof, VerusWitness, bridge_verus_witness};
 use crate::RustStdStandard;
 use amenable_core::Evidence;
+
+const VERIFY_RC_DEREFS_TO_THE_WRAPPED_VALUE_SRC: &str =
+    include_str!("../../../amenable_verus/src/rust_std/sync/rc_carrier.rs");
 
 impl VerusWitness for RustStdStandard<std::rc::Rc<i32>> {
     type SupportingEvidence = Self;
