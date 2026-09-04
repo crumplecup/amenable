@@ -159,7 +159,12 @@ these again)
 remaining is `amenable_verus::rust_std` "Rebalance" — 11353 lines, 80% of the
 crate's sibling mass; a directory already subdivided into 12 thematic groups,
 flagged because `rust_std` is genuinely the crate's bulk — a judgment call, not
-one of the 20 files here).
+one of the 20 files here). The tracing-attr apply below briefly regressed this
+to 3 → 1 (pushed `amenable_kani::ledger` and
+`amenable_std::verus_witness::char_ffi_errors` from 494 to 502 lines each, +8
+instrument lines); both re-split in `346e014` (`ledger` → `ledger/{mod,mirror}.rs`;
+`char_ffi_errors` → `char_conversion.rs` + `cstring_ffi.rs`, also relocating a
+stray `Rc`-witness const to its actual sole consumer) — confirmed back to 1.
 
 ### Follow-on findings the splits surfaced
 
