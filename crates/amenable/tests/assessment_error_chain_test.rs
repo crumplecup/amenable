@@ -21,7 +21,7 @@ fn temporary_path(name: &str) -> PathBuf {
 fn load_on_a_missing_artifact_returns_an_empty_list() -> miette::Result<()> {
     amenable::init_tracing();
     let path = temporary_path("missing");
-    let assessments = support::library(amenable::assessment::load(&path))?;
+    let assessments = support::library(amenable::load(&path))?;
     assert!(assessments.is_empty());
     Ok(())
 }
@@ -32,7 +32,7 @@ fn load_on_malformed_json_preserves_the_real_serde_error_in_the_chain() -> miett
     let path = temporary_path("malformed");
     std::fs::write(&path, "{not valid json\n").into_diagnostic()?;
 
-    let error = amenable::assessment::load(&path).expect_err("malformed JSON must fail");
+    let error = amenable::load(&path).expect_err("malformed JSON must fail");
 
     // The top-level Display names the file and 1-indexed line.
     let rendered = error.to_string();

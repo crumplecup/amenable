@@ -1,4 +1,4 @@
-use amenable::cli::Cli;
+use amenable::Cli;
 use clap::Parser;
 use clap::error::ErrorKind;
 

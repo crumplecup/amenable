@@ -27,7 +27,7 @@ impl Parse for Items {
 
 /// Root directory real carrier files live under, resolved relative to
 /// this crate's own manifest -- the same relative depth
-/// `amenable::paths::verus_source_directory` already uses for the
+/// `amenable::verus_source_directory` already uses for the
 /// sibling crate (`amenable_core`, like `amenable`, sits directly under
 /// `crates/`).
 #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]

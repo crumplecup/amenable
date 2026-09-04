@@ -1,12 +1,13 @@
-//! Unit-level coverage for `amenable::kani`'s CLI-support internals:
+//! Unit-level coverage for `amenable`'s Kani CLI-support internals:
 //! command construction, result-ledger persistence, and diagnostics
 //! parsing. Deliberately not exercised through the real `amenable verify
 //! kani` CLI (unlike `gallery_cli_test.rs`'s ledger) -- that would mean
 //! actually running Kani, which this workspace treats as an expensive,
 //! serialized operation, not something a fast unit test should trigger.
 
-use amenable::KaniProof;
-use amenable::kani::{Ledger, ProofStatus, first_diagnostic_line, is_kani_timeout, kani_command};
+use amenable::{
+    KaniProof, Ledger, ProofStatus, first_diagnostic_line, is_kani_timeout, kani_command,
+};
 use miette::{IntoDiagnostic, WrapErr};
 
 #[test]

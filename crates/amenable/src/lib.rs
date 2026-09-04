@@ -22,11 +22,15 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod assessment;
+mod cli;
 mod cli_output;
 #[cfg(feature = "creusot")]
 mod creusot_export;
 mod error;
-pub mod paths;
+mod gallery;
+mod kani;
+mod paths;
 mod registry_dump;
 #[cfg(feature = "verus")]
 mod verus_exchange_export;
@@ -35,17 +39,23 @@ mod verus_export;
 #[cfg(feature = "verus")]
 mod verus_gaap_tokens_export;
 
-pub mod assessment;
-pub mod cli;
-pub mod gallery;
-pub mod kani;
-
+pub use assessment::{AssessArgs, load};
+pub use cli::{Cli, install_hook};
 pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
 #[cfg(feature = "creusot")]
 pub use creusot_export::write_creusot_exchange_companions;
 pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
+};
+pub use gallery::GalleryArgs;
+pub use kani::{
+    Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
+    verify,
+};
+pub use paths::{
+    artifacts_directory, creusot_generated_directory, verus_exchange_generated_directory,
+    verus_gaap_ledger_tokens_path, verus_source_directory,
 };
 #[cfg(feature = "verus")]
 pub use verus_exchange_export::write_verus_exchange_companions;

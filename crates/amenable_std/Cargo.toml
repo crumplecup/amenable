@@ -55,7 +55,7 @@ miette = { workspace = true }
 # `syn`/`verus_syn`/`quote` back
 # `verus_call_shape_derive`, which reads those same real source files at
 # runtime (relative to `CARGO_MANIFEST_DIR`, the same resolution
-# `amenable::paths::verus_source_directory` already uses) and parses them
+# `amenable::verus_source_directory` already uses) and parses them
 # with Verus's own real parser, rather than a human hand-typing a second
 # copy of each harness's real `requires`/`ensures` clauses.
 verus = [
