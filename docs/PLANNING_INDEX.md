@@ -9,10 +9,11 @@ This file tracks all planning documents for the amenable project.
 **Document:** [MODULARITY_500_LOC_PLAN.md](MODULARITY_500_LOC_PLAN.md)
 
 **Status:** ✅ Started 2026-09-03. All 5 phases done — zero modules ≥ 500
-lines; cordial modularity checklist 13 → 1. Follow-on: tracing instrumentation
+lines; cordial modularity checklist 13 → 1. Follow-on (both DONE): tracing instrumentation
 0 → 24 → 704 → 0 (the "24" was a cordial collapse-bug undercount, fixed in
 cordial `d2d8a10`; corrected sweep found 704 real gaps, all applied +
-verified). Derive-patterns 0 → 4 still open.
+verified); derive-patterns 0 → 4 → 0 (`f15dd31`, private fields +
+derive_getters on the 4 macro-internal option structs).
 
 **Description:** Continuation of cordial's `modularity.checklist.md` work.
 Earlier rounds cleared every file cordial's z-score gate flags; this round
