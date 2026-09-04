@@ -125,7 +125,16 @@ enabled = false
 # module path is a codegen destination, read from a
 # `#[witness(verus(module = "..."))]` string attribute in amenable_std,
 # not chosen for API shape -- moving/merging destinations isn't
-# feasible without touching that derive's own contract. Every other
-# visibility rule still applies to both subtrees normally.
+# feasible without touching that derive's own contract. rust_std/ is
+# different again: its own mod.rs is a pure directory index over 12
+# thematic subdirectories (11k+ lines), built specifically to avoid one
+# giant flat re-export list after the same subtree used to be 133 files
+# flat -- "0 names" here is the index doing its job, not an
+# under-documented module (its actual leaf modules re-export their own
+# real names one level down, per that file's own doc comment; a thin
+# leaf gets flattened into it directly instead of exempted here --
+# rust_std::task_and_thread was the one real case, already fixed).
+# Every other visibility rule still applies to all three subtrees
+# normally.
 [visibility]
-mod_thin_skip = { amenable_verus = ["gallery", "derived_witness"] }
+mod_thin_skip = { amenable_verus = ["gallery", "derived_witness", "rust_std"] }
