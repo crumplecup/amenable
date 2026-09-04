@@ -134,7 +134,25 @@ enabled = false
 # real names one level down, per that file's own doc comment; a thin
 # leaf gets flattened into it directly instead of exempted here --
 # rust_std::task_and_thread was the one real case, already fixed).
-# Every other visibility rule still applies to all three subtrees
+# exchange_support is a fourth case, confirmed empirically rather than
+# assumed: flattening it (`mod exchange_support;` instead of `pub mod`)
+# compiles fine -- its 11 real consumers (4 hand-written under
+# gallery/, 7 generated) all use crate-internal paths that stay valid,
+# and this crate's own doc comment already establishes Verus never
+# resolves Cargo.toml, so it has no external consumer to break -- but
+# it introduces 4 new `dead_code` warnings on `ExVerifier`/`ExEvidence`/
+# `ExProofToken`/`ExWitness<V>`. Those four are
+# `#[verifier::external_trait_specification]` traits: Verus's own
+# attribute-based crate scan is their only real "caller", never a
+# Rust `use`/call site, so rustc's dead_code analysis can never see
+# them as used no matter how the module tree is shaped. `rust_std/
+# mod.rs`'s own doc comment names this exact mechanism (`pub` here
+# isn't over-promising to an external consumer; it's what keeps
+# `cargo build`'s dead_code lint honest for Verus-only-reached items) --
+# flattening exchange_support would trade one lint violation for
+# another CLAUDE.md forbids suppressing via #[allow], so it stays
+# `pub mod` and is skipped here instead.
+# Every other visibility rule still applies to all four subtrees
 # normally.
 [visibility]
-mod_thin_skip = { amenable_verus = ["gallery", "derived_witness", "rust_std"] }
+mod_thin_skip = { amenable_verus = ["gallery", "derived_witness", "rust_std", "exchange_support"] }
