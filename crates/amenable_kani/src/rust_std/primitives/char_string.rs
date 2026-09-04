@@ -9,7 +9,7 @@ use amenable_std::ValidUnicodeScalar;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<char> {

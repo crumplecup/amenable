@@ -9,7 +9,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::SplitOperandsAreDistinctFromThePattern;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniSplitObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::slice::SplitInclusive<'static, i32, fn(&i32) -> bool>> {

@@ -1,6 +1,6 @@
 use amenable_core::{Establish, Evidence, ProofToken, Witness};
 
-use crate::rust_std::macros::{kani_ensures, kani_requires};
+use crate::rust_std::{kani_ensures, kani_requires};
 use crate::{CalculationProof, KaniVerifier};
 
 // `Ensures`/`Requires`/`EmptinessTracksZeroLength`/`IndexRecoversTheStoredElement`

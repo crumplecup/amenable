@@ -30,7 +30,7 @@ pub(crate) use model::{kani_assume, symbolic_any};
 // disposition (chain-derived provenance only, no dedicated harness of its
 // own) rather than pointing at one of the three self-test harnesses that
 // use it, since those harnesses aren't nameable from unconditional code.
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 macro_rules! impl_compose_claim_witness {
     ($ty:ty) => {

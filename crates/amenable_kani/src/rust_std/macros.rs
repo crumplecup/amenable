@@ -51,7 +51,7 @@ macro_rules! impl_kani_witness_trusted {
                 }
             }
 
-            crate::rust_std::macros::bridge_kani_witness!(amenable_std::RustStdStandard<$ty>);
+            crate::rust_std::bridge_kani_witness!(amenable_std::RustStdStandard<$ty>);
 
             ::inventory::submit! {
                 ::amenable_core::ProofRecord::new(

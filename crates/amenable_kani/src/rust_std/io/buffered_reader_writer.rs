@@ -10,7 +10,7 @@ use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::EmptiedContainerReportsEmpty;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniBufferedReadObservation, KaniFlushErrorObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<BufReader<&'static [u8]>> {

@@ -21,7 +21,7 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 use crate::{KaniCurrentThreadObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<LocalKey<std::cell::Cell<i32>>> {

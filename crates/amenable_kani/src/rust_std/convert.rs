@@ -7,6 +7,6 @@
 
 use std::convert::Infallible;
 
-use crate::rust_std::macros::impl_kani_witness_trusted;
+use crate::rust_std::impl_kani_witness_trusted;
 
 impl_kani_witness_trusted!(Infallible);

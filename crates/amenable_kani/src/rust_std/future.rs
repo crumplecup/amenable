@@ -21,7 +21,7 @@ use amenable_std::RustStdStandard;
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Pending<i32>> {
     type SupportingEvidence = Self;

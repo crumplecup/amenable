@@ -12,7 +12,7 @@ use std::cell::Cell;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 #[cfg(kani)]
 use crate::{
     CollectedSequenceMatchesExpected, EmptiedContainerReportsEmpty, IteratorYieldsNoneWhenExhausted,

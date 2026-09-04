@@ -8,7 +8,7 @@ use crate::CheckedProof;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::str::Lines<'static>> {
     type SupportingEvidence = Self;

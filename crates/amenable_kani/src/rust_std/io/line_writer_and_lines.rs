@@ -6,7 +6,7 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, kani_requires};
+use crate::rust_std::{bridge_kani_witness, kani_requires};
 use crate::{KaniLineWriterObservation, KaniLinesObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<LineWriter<Vec<u8>>> {

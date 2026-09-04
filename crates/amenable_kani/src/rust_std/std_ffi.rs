@@ -13,7 +13,7 @@ use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
 use crate::IndexRecoversTheStoredElement;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniUtf8Buffer, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<OsStr> {

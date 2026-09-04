@@ -36,7 +36,7 @@ mod future;
 mod hash;
 mod io;
 mod iter;
-pub(crate) mod macros;
+mod macros;
 mod marker;
 mod mem;
 mod net;
@@ -77,6 +77,9 @@ pub use cell::GetterRecoversTheStoredReference;
 pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
+pub(crate) use macros::{
+    bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
+};
 pub use num::NonZeroGetRoundTrips;
 pub use option_result::{
     FallibleOperationReportsFailure, FallibleOperationReportsSuccess, OptionIsNoneReportsTrue,

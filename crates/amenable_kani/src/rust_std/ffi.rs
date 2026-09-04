@@ -11,7 +11,7 @@ use amenable_std::{NonNulByte, RustStdStandard};
 
 use super::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted, kani_requires};
 
 /// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
 /// on this `mod` instead of one per item -- see

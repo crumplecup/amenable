@@ -7,7 +7,7 @@ use amenable_std::RustStdStandard;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 use crate::{KaniChunkByObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<ChunkBy<'static, i32, fn(&i32, &i32) -> bool>> {

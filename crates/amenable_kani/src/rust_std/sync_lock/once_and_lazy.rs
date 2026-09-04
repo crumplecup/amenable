@@ -5,7 +5,7 @@ use amenable_std::RustStdStandard;
 
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 /// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
 /// on this `mod` instead of one per item -- see

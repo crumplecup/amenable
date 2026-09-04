@@ -13,7 +13,7 @@ use crate::AccessorRecoversTheExpectedValue;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Cow<'static, i32>> {
     type SupportingEvidence = Self;

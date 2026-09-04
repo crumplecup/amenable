@@ -7,7 +7,7 @@ use super::array_slice_str::VERIFY_ARRAY_INDEXING_AND_LENGTH_SRC;
 use super::tuple_fn_ptr::VERIFY_TUPLE_FIELD_ACCESS_SRC;
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<&'static i32> {
     type SupportingEvidence = Self;

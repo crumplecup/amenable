@@ -35,7 +35,7 @@ use amenable_gaap::{
 use crate::gaap_ledger::{
     VERIFY_GAAP_CHECK_AMOUNT_POSITIVE_SRC, VERIFY_GAAP_CHECK_SUFFICIENT_FUNDS_SRC,
 };
-use crate::rust_std::macros::{kani_ensures, kani_requires};
+use crate::rust_std::{kani_ensures, kani_requires};
 use crate::{CalculationProof, KaniVerifier};
 
 #[cfg(kani)]

@@ -12,7 +12,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::PopRecoversTheStoredValue;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures, kani_requires};
+use crate::rust_std::{bridge_kani_witness, kani_ensures, kani_requires};
 
 /// A `(first, second)` pair known to satisfy `first < second`.
 ///

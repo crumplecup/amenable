@@ -11,7 +11,7 @@ use crate::CollectedSequenceMatchesExpected;
 #[cfg(kani)]
 use crate::FallibleOperationReportsFailure;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<ParseCharError> {
     type SupportingEvidence = Self;

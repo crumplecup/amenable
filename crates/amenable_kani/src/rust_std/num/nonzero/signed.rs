@@ -19,7 +19,7 @@ use crate::KaniWitness;
 #[cfg(kani)]
 use crate::NonZeroGetRoundTrips;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<NonZero<i8>> {
     type SupportingEvidence = Self;

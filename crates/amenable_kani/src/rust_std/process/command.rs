@@ -4,7 +4,7 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{
     KaniCommandArgsObservation, KaniCommandEnvObservation, KaniCommandEnvsObservation,
     KaniVerifier, KaniWitness,

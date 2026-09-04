@@ -9,7 +9,7 @@ use super::split_n_and_rsplit::VERIFY_SPLIT_N_CAPS_THE_NUMBER_OF_PIECES_SRC;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniSplitObservation, KaniVerifier};
 
 /// A `(before, pattern, after)` triple known to satisfy the precondition

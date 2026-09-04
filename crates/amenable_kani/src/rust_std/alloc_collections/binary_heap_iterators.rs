@@ -4,7 +4,7 @@ use amenable_std::RustStdStandard;
 use super::shared_markers::VERIFY_BINARY_HEAP_PEEK_MUT_EXPOSES_THE_MAXIMUM_SRC;
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 /// The `#[cfg(kani)]` imports this file needs, consolidated into one gate
 /// on this `mod` instead of one per item -- see

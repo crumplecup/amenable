@@ -10,7 +10,7 @@ use amenable_std::RustStdStandard;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Bound<i32>> {
     type SupportingEvidence = Self;

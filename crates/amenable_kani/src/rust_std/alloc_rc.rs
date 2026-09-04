@@ -13,7 +13,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 /// A live-strong-reference count known to match `strong_count()`'s
 /// report: `Rc`/`Arc` start at 1, increment on `clone`, and decrement

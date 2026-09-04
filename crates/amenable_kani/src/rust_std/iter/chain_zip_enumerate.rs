@@ -13,7 +13,7 @@ use crate::FirstValueIsLessThanTheSecond;
 #[cfg(kani)]
 use crate::IteratorYieldsNoneWhenExhausted;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<std::iter::Chain<Range<i32>, Range<i32>>> {
     type SupportingEvidence = Self;

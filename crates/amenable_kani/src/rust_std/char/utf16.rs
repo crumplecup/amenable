@@ -13,7 +13,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::ValueIsOutsideInclusiveRange;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<DecodeUtf16<std::array::IntoIter<u16, 1>>> {
     type SupportingEvidence = Self;

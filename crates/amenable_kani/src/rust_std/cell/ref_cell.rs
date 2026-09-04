@@ -11,7 +11,7 @@ use amenable_std::RustStdStandard;
 
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted};
 #[cfg(kani)]
 use crate::{
     DerefReflectsTheStoredValue, FallibleOperationReportsFailure, FallibleOperationReportsSuccess,

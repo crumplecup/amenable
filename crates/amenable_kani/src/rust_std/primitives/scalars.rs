@@ -1,6 +1,6 @@
 use amenable_std::RustStdStandard;
 
-use crate::rust_std::macros::{impl_kani_witness_trusted, kani_ensures, kani_requires};
+use crate::rust_std::{impl_kani_witness_trusted, kani_ensures, kani_requires};
 
 impl_kani_witness_trusted!(
     bool,

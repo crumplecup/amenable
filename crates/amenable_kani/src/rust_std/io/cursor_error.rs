@@ -12,7 +12,7 @@ use super::error_kind_and_io_slice::VERIFY_ERROR_FROM_ERROR_KIND_PRESERVES_THE_K
 use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<Cursor<&'static [u8]>> {
     type SupportingEvidence = Self;

@@ -5,7 +5,7 @@ use amenable_std::RustStdStandard;
 
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniChannel, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::sync::mpsc::Sender<i32>> {

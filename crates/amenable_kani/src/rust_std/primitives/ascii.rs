@@ -4,7 +4,7 @@ use amenable_std::{AsciiByte, RustStdStandard};
 use super::array_slice_str::VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC;
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, kani_requires};
+use crate::rust_std::{bridge_kani_witness, kani_requires};
 
 /// [`AsciiByte`] reuses `verify_str_byte_length_and_content` rather than
 /// adding a new Kani harness — it names the precondition the harness

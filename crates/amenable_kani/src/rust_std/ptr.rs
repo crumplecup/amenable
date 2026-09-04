@@ -15,7 +15,7 @@ use crate::KaniWitness;
 use crate::OptionIsNoneReportsTrue;
 #[cfg(kani)]
 use crate::OptionIsSomeReportsTrue;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<NonNull<i32>> {
     type SupportingEvidence = Self;

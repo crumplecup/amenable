@@ -10,7 +10,7 @@ use amenable_core::{Establish, Evidence, ProofToken};
 use amenable_std::RustStdStandard;
 
 use crate::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniVerifier, KaniWindowsPrefixObservation, KaniWitness};
 
 impl KaniWitness for RustStdStandard<Prefix<'static>> {

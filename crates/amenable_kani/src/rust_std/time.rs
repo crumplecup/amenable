@@ -13,7 +13,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted};
 
 impl KaniWitness for RustStdStandard<Duration> {
     type SupportingEvidence = Self;

@@ -6,7 +6,7 @@ use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use crate::DerefReflectsTheStoredValue;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniMutexExclusionObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<std::sync::Mutex<i32>> {

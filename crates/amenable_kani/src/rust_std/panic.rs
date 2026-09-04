@@ -18,7 +18,7 @@ use super::CheckedProof;
 use crate::DerefReflectsTheStoredValue;
 #[cfg(kani)]
 use crate::FieldAccessRecoversTheStoredValue;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted};
 use crate::{KaniCallerLocationObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<AssertUnwindSafe<i32>> {

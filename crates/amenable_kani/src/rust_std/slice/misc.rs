@@ -13,7 +13,7 @@ use crate::FallibleOperationReportsSuccess;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::ValueIsWithinInclusiveRange;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniEscapeAsciiObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<EscapeAscii<'static>> {

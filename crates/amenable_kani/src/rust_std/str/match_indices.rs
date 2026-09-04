@@ -9,7 +9,7 @@ use amenable_std::RustStdStandard;
 use super::lines_and_markers::CollectedSequenceMatchesExpected;
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 #[cfg(kani)]
 use crate::{FourBytesAreEachAscii, ThreeSplitOperandsAreDistinctFromThePattern};
 

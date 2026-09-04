@@ -7,7 +7,7 @@ use super::condvar::KaniWaitTimeoutWitnessToken;
 #[cfg(kani)]
 use crate::KaniWaitTimeoutObservation;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniMutexFailureObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<PoisonError<MutexGuard<'static, i32>>> {

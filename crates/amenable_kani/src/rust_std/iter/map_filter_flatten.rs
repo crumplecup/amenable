@@ -13,7 +13,7 @@ use crate::FirstValueIsLessThanTheSecond;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::ValueIsWithinInclusiveRange;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<Map<Range<i32>, fn(i32) -> i32>> {
     type SupportingEvidence = Self;

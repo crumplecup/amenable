@@ -4,7 +4,7 @@ use amenable_std::RustStdStandard;
 use super::receiver_and_into_iter::KaniChannelYieldThenStopToken;
 use crate::KaniWitness;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniChannel, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::sync::mpsc::Iter<'static, i32>> {

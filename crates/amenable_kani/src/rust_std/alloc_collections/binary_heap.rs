@@ -11,7 +11,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::PopRecoversTheStoredValue;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 
 impl KaniWitness for RustStdStandard<BinaryHeap<i32>> {
     type SupportingEvidence = Self;

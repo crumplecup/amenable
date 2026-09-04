@@ -8,7 +8,7 @@ use amenable_std::RustStdStandard;
 #[cfg(kani)]
 use super::line_writer_and_lines::ByteIsDistinctFromTheMarker;
 use crate::rust_std::CheckedProof;
-use crate::rust_std::macros::{bridge_kani_witness, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, kani_ensures};
 use crate::{KaniBufReadSplitObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<PipeReader> {

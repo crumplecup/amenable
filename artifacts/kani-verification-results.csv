@@ -115,7 +115,7 @@ amenable_kani::rust_std::env::verify_args_os_reports_at_least_the_program_path,1
 amenable_kani::rust_std::env::verify_args_reports_at_least_the_program_path,1788384447,passed
 amenable_kani::rust_std::env::verify_join_paths_error_reports_an_unjoinable_path,1788384467,passed
 amenable_kani::rust_std::env::verify_split_paths_recovers_paths_joined_by_join_paths,1788384488,passed
-amenable_kani::rust_std::ffi::verify_cstr_excludes_the_terminating_nul_from_to_bytes,1788384502,passed
+amenable_kani::rust_std::ffi::verify_cstr_excludes_the_terminating_nul_from_to_bytes,1788535725,passed
 amenable_kani::rust_std::ffi::verify_from_bytes_until_nul_requires_a_nul_byte_somewhere,1788384515,passed
 amenable_kani::rust_std::ffi::verify_from_bytes_with_nul_requires_the_nul_only_at_the_end,1788384528,passed
 amenable_kani::rust_std::fmt::builders::verify_arguments_renders_the_same_as_the_value_itself,1788384539,passed
@@ -598,5 +598,5 @@ amenable_kani::stoplight::verify_full_cycle_composes,1788480454,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788480463,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788388151,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788388161,passed
-amenable_kani::utf8_model::buffer::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788388173,passed
+amenable_kani::utf8_model::buffer::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788535736,passed
 amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788027332,passed

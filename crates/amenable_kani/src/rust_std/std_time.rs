@@ -17,7 +17,7 @@ use amenable_std::RustStdStandard;
 use super::CheckedProof;
 #[cfg(kani)]
 use crate::AccessorRecoversTheExpectedValue;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniInstantObservation, KaniVerifier, KaniWitness};
 
 impl KaniWitness for RustStdStandard<Instant> {

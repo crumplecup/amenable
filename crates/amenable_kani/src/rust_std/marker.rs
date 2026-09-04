@@ -8,6 +8,6 @@
 
 use std::marker::{PhantomData, PhantomPinned};
 
-use crate::rust_std::macros::impl_kani_witness_trusted;
+use crate::rust_std::impl_kani_witness_trusted;
 
 impl_kani_witness_trusted!(PhantomData<i32>, PhantomPinned);

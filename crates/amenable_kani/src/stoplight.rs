@@ -36,7 +36,7 @@
 
 use amenable_core::{Establish, Green, Red, Sidecar, Yellow};
 
-use crate::rust_std::macros::kani_ensures;
+use crate::rust_std::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
 
 /// A three-state traffic light: `Green -> Yellow -> Red -> Green`, and

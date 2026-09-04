@@ -16,7 +16,7 @@ use super::CheckedProof;
 #[cfg(kani)]
 use crate::CollectedSequenceMatchesExpected;
 use crate::KaniWitness;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 
 impl KaniWitness for RustStdStandard<Backtrace> {
     type SupportingEvidence = Self;

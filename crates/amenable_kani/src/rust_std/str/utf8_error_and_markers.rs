@@ -8,7 +8,7 @@ use amenable_std::RustStdStandard;
 use super::whitespace_utf8::AccessorRecoversTheExpectedValue;
 use crate::CheckedProof;
 use crate::KaniWitness;
-use crate::rust_std::macros::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
+use crate::rust_std::{bridge_kani_witness, impl_kani_witness_trusted, kani_ensures};
 #[cfg(kani)]
 use crate::{IteratorYieldsNoneWhenExhausted, ValueIsAtLeast};
 

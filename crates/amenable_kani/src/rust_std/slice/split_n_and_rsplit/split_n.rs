@@ -13,7 +13,7 @@ use crate::CheckedProof;
 use crate::KaniWitness;
 #[cfg(kani)]
 use crate::ThreeSplitOperandsAreDistinctFromThePattern;
-use crate::rust_std::macros::bridge_kani_witness;
+use crate::rust_std::bridge_kani_witness;
 use crate::{KaniSplitNObservation, KaniVerifier};
 
 impl KaniWitness for RustStdStandard<std::slice::SplitN<'static, i32, fn(&i32) -> bool>> {
