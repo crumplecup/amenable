@@ -16,7 +16,7 @@ use crate::attr_options::{
 pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_provenance_container_options(&input.attrs)?;
     let name = &input.ident;
-    let crate_path = &options.crate_path;
+    let crate_path = options.crate_path();
     let field_types = collect_field_types(&input.data)?;
     let mut generics = input.generics.clone();
     let where_clause = generics.make_where_clause();
@@ -70,7 +70,7 @@ fn expand_enum_metadata(
     data: &DataEnum,
     options: &ProvenanceContainerOptions,
 ) -> syn::Result<proc_macro2::TokenStream> {
-    let tag = &options.tag;
+    let tag = options.tag();
     let arms = data
         .variants
         .iter()
@@ -91,7 +91,10 @@ fn expand_variant_arm(
     tag: &str,
 ) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_member_options(&variant.attrs)?;
-    let variant_name = options.rename.unwrap_or_else(|| variant.ident.to_string());
+    let variant_name = options
+        .rename()
+        .clone()
+        .unwrap_or_else(|| variant.ident.to_string());
     let ident = &variant.ident;
 
     match &variant.fields {
@@ -110,7 +113,7 @@ fn expand_variant_arm(
                 .iter()
                 .map(|field| {
                     let field_options = parse_member_options(&field.attrs)?;
-                    if field_options.skip {
+                    if *field_options.skip() {
                         return Ok(None);
                     }
 
@@ -118,7 +121,8 @@ fn expand_variant_arm(
                         Error::new_spanned(field, "named enum-field expansion requires identifiers")
                     })?;
                     let field_name = field_options
-                        .rename
+                        .rename()
+                        .clone()
                         .unwrap_or_else(|| field_ident.to_string());
 
                     Ok(Some(quote! {
@@ -163,11 +167,14 @@ fn expand_variant_arm(
                 .enumerate()
                 .map(|(index, field)| {
                     let field_options = parse_member_options(&field.attrs)?;
-                    if field_options.skip {
+                    if *field_options.skip() {
                         return Ok(None);
                     }
 
-                    let field_name = field_options.rename.unwrap_or_else(|| index.to_string());
+                    let field_name = field_options
+                        .rename()
+                        .clone()
+                        .unwrap_or_else(|| index.to_string());
                     let field_binding = &field_bindings[index];
 
                     Ok(Some(expand_field_entries(
@@ -240,7 +247,7 @@ fn expand_struct_field_push(
     field_access: proc_macro2::TokenStream,
 ) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_member_options(&field.attrs)?;
-    if options.skip {
+    if *options.skip() {
         return Ok(quote! {});
     }
 

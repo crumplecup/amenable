@@ -1,6 +1,7 @@
 //! Shared field-expansion, generic-bounds, and generics-marker helpers for
 //! `#[derive(Witness)]`'s product and sum expansions.
 
+use derive_getters::Getters;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{Data, Error, Fields, GenericParam, Generics, Type, parse_quote};
@@ -38,7 +39,7 @@ pub(super) fn expand_proof_field(
     position: Option<usize>,
     ident: syn::Ident,
 ) -> syn::Result<Option<ProofField>> {
-    if parse_member_options(&field.attrs)?.skip {
+    if *parse_member_options(&field.attrs)?.skip() {
         return Ok(None);
     }
 
@@ -242,9 +243,10 @@ fn to_snake_case(name: &str) -> String {
     snake
 }
 
+#[derive(Getters)]
 pub(super) struct ProofField {
-    pub(super) ident: syn::Ident,
-    pub(super) label: String,
-    pub(super) ty: Type,
-    pub(super) component_type: Type,
+    ident: syn::Ident,
+    label: String,
+    ty: Type,
+    component_type: Type,
 }

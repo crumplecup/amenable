@@ -86,6 +86,7 @@ name = "amenable_derive"
 version = "0.1.0"
 dependencies = [
  "amenable_core",
+ "derive-getters",
  "inventory",
  "miette",
  "proc-macro2",

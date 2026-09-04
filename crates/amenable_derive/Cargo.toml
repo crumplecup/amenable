@@ -18,6 +18,7 @@ proc-macro = true
 
 [dependencies]
 amenable_core = { workspace = true, optional = true }
+derive-getters = { workspace = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
 syn = { workspace = true }

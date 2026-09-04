@@ -30,7 +30,8 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     let options = parse_provenance_container_options(&input.attrs)?;
     let witness_options = parse_witness_container_options(&input.attrs)?;
     let verus_module_path = witness_options
-        .verus_module
+        .verus_module()
+        .clone()
         .unwrap_or_else(|| default_verus_module_path(evidence_ident));
     let (_, evidence_ty_generics, _) = input.generics.split_for_impl();
 
@@ -66,7 +67,7 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
     let proof_definition = match &input.data {
         Data::Struct(data) => expand_struct_proof_type(&proof_type_context, data)?,
         Data::Enum(data) => {
-            expand_enum_proof_types(&proof_type_context, &variant_prefix, data, &options.tag)?
+            expand_enum_proof_types(&proof_type_context, &variant_prefix, data, options.tag())?
         }
         Data::Union(data) => {
             return Err(Error::new_spanned(

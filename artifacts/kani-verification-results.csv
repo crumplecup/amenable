@@ -1,6 +1,6 @@
 proof_id,timestamp,status
 amenable_kani::calculator::add_impl_computes_exact_sum,1788382977,passed
-amenable_kani::calculator::verify_credit_access_preserves_value,1788382978,passed
+amenable_kani::calculator::verify_credit_access_preserves_value,1788480471,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1788382992,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788461242,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788383014,passed
@@ -594,8 +594,8 @@ amenable_kani::rust_std::thread::verify_local_key_with_reads_the_initialized_val
 amenable_kani::rust_std::thread::verify_thread_current_is_stable_across_repeated_calls,1788388090,passed
 amenable_kani::rust_std::thread::verify_thread_id_is_stable_across_repeated_calls,1788388102,passed
 amenable_kani::rust_std::time::verify_duration_new_normalizes_nanos_and_carries_into_secs,1788388115,passed
-amenable_kani::stoplight::verify_full_cycle_composes,1788465393,passed
-amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788388141,passed
+amenable_kani::stoplight::verify_full_cycle_composes,1788480454,passed
+amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788480463,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788388151,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788388161,passed
 amenable_kani::utf8_model::buffer::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788388173,passed

@@ -27,34 +27,34 @@ pub(super) fn expand_struct_proof_type(
         Fields::Unit => "unit_struct",
     };
     let fields = expand_proof_fields(&data.fields)?;
-    let field_names = fields.iter().map(|field| &field.ident);
-    let field_types = fields.iter().map(|field| &field.ty);
+    let field_names = fields.iter().map(|field| field.ident());
+    let field_types = fields.iter().map(|field| field.ty());
     let constructor_fields = fields.iter().map(|field| {
-        let field_ident = &field.ident;
-        let component_type = &field.component_type;
+        let field_ident = field.ident();
+        let component_type = field.component_type();
 
         quote! {
             #field_ident: <#component_type as ::amenable_core::Witness<__Verifier>>::proof()
         }
     });
     let support_terms = fields.iter().map(|field| {
-        let component_type = &field.component_type;
+        let component_type = field.component_type();
 
         quote! {
             <#component_type as ::amenable_core::Witness<__Verifier>>::support()
         }
     });
     let report_lines = fields.iter().map(|field| {
-        let field_ident = &field.ident;
-        let label = &field.label;
+        let field_ident = field.ident();
+        let label = field.label();
 
         quote! {
             writeln!(f, "member {}: {}", #label, self.#field_ident)?;
         }
     });
     let artifact_members = fields.iter().map(|field| {
-        let field_ident = &field.ident;
-        let label = &field.label;
+        let field_ident = field.ident();
+        let label = field.label();
 
         quote! {
             ::amenable_core::WitnessArtifactMember::new(

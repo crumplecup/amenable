@@ -2,11 +2,13 @@
 //! field-type collection, used by both `#[derive(Provenance)]` (`provenance`)
 //! and `#[derive(Witness)]` (`witness`).
 
+use derive_getters::Getters;
 use syn::{Data, Error, Field, Fields, LitStr, Path, Type, parse_quote};
 
+#[derive(Getters)]
 pub(crate) struct ProvenanceContainerOptions {
-    pub(crate) crate_path: Path,
-    pub(crate) tag: String,
+    crate_path: Path,
+    tag: String,
 }
 
 impl Default for ProvenanceContainerOptions {
@@ -19,15 +21,15 @@ impl Default for ProvenanceContainerOptions {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Getters)]
 pub(crate) struct WitnessContainerOptions {
-    pub(crate) verus_module: Option<String>,
+    verus_module: Option<String>,
 }
 
-#[derive(Default)]
+#[derive(Default, Getters)]
 pub(crate) struct MemberOptions {
-    pub(crate) rename: Option<String>,
-    pub(crate) skip: bool,
+    rename: Option<String>,
+    skip: bool,
 }
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]
