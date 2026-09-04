@@ -21,6 +21,12 @@
 
 use verus_builtin_macros::verus;
 
+// Only the four `#[cfg(verus_keep_ghost)]`-gated traits below name these
+// bare; every macro-generated reference elsewhere in this file goes
+// through the fully-qualified `crate::{Evidence,ProofToken,Verifier,
+// Witness}` path instead, so this import is genuinely unused under plain
+// rustc.
+#[cfg(verus_keep_ghost)]
 use crate::{Evidence, ProofToken, Verifier, Witness};
 
 verus! {
@@ -28,6 +34,7 @@ verus! {
 /// Companion specification for the real, mod-included `Verifier` trait --
 /// see this module's own doc comment for why every one of these four
 /// exists.
+#[cfg(verus_keep_ghost)]
 #[verifier::external_trait_specification]
 pub trait ExVerifier: 'static {
     /// The real trait this specification stands in for.
@@ -35,6 +42,7 @@ pub trait ExVerifier: 'static {
 }
 
 /// Companion specification for the real, mod-included `Evidence` trait.
+#[cfg(verus_keep_ghost)]
 #[verifier::external_trait_specification]
 pub trait ExEvidence {
     /// The real trait this specification stands in for.
@@ -42,6 +50,7 @@ pub trait ExEvidence {
 }
 
 /// Companion specification for the real, mod-included `ProofToken` trait.
+#[cfg(verus_keep_ghost)]
 #[verifier::external_trait_specification]
 pub trait ExProofToken {
     /// The real trait this specification stands in for.
@@ -53,6 +62,7 @@ pub trait ExProofToken {
 
 /// Companion specification for the real, mod-included (accommodation-
 /// mirrored) `Witness<V>` trait.
+#[cfg(verus_keep_ghost)]
 #[verifier::external_trait_specification]
 pub trait ExWitness<V: Verifier> {
     /// The real trait this specification stands in for.
