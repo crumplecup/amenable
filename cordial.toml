@@ -114,3 +114,13 @@ generated_files = [
 # like the other exceptions in this file.
 [proof_patterns]
 enabled = false
+
+# amenable_verus's gallery/ is a deliberately narrow "one investigation,
+# one file" convention: each file documents a single confirmed Verus
+# finding (real prose + a verus! {} block). VIS-MOD-THIN-001's 10-name
+# floor is honest here (cordial now counts real pub items inside
+# verus! {} via verus_syn) but still not met by design -- consolidating
+# files to clear it would fight the convention for no real benefit.
+# Every other visibility rule still applies to this subtree normally.
+[visibility]
+mod_thin_skip = { amenable_verus = ["gallery"] }
