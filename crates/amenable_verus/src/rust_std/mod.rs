@@ -68,4 +68,15 @@ pub mod str_and_char;
 /// `sync::atomic`/`Arc`/`Rc`/`Weak`/`mpsc`/`Once`/`Barrier` carriers.
 pub mod sync;
 /// `Future`/`task`/thread-local carriers.
-pub mod task_and_thread;
+mod task_and_thread;
+#[cfg(verus_keep_ghost)]
+pub use task_and_thread::local_key_observes_initial_then_updated;
+pub use task_and_thread::{
+    verify_context_model_from_waker_exposes_the_same_waker,
+    verify_local_key_model_with_reads_the_initialized_value, verify_pending_model_never_resolves,
+    verify_poll_fn_model_dispatches_through_to_its_closure,
+    verify_poll_model_ready_and_pending_are_disjoint,
+    verify_ready_model_resolves_immediately_with_its_value,
+    verify_thread_current_model_is_stable_across_repeated_calls,
+    verify_waker_model_wake_by_ref_invokes_the_wake_impl,
+};
