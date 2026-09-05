@@ -37,7 +37,7 @@
 //! `ProofRecord` content, not the surrounding state/token/sidecar type
 //! definitions (`Green`/`Yellow`/`Ledger`/`Transfer<S, Token>`/...), which
 //! stay hand-written, stable, one-time accommodation-model infrastructure
-//! in `amenable_creusot/src/{stoplight,ledger}.rs` -- low drift risk (they
+//! in `amenable_creusot/src/stoplight.rs`/`ledger/` -- low drift risk (they
 //! rarely change), unlike the transition bodies this replaces hand-copying
 //! of. Written via `include!`, not a `mod`, so each generated file shares
 //! its own module's scope directly -- no `use super::*;`/explicit imports

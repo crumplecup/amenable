@@ -8,7 +8,19 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [DOCUMENTATION_REVIEW_PLAN.md](DOCUMENTATION_REVIEW_PLAN.md)
 
-**Status:** Started 2026-09-05. Not yet begun executing steps.
+**Status:** ✅ Done 2026-09-05. All 8 steps complete. Real fixes across
+every crate: stale file-vs-directory citations from the 500-LOC
+modularity splits (the single largest recurring class), the
+`amenable_std::creusot_witness` → `amenable_creusot::rust_std_witness`
+move (20 sites across 6 files, 2 crates), hand-copied-then-stale
+coverage numbers in 4 READMEs (all reworded to cite live commands
+instead), a real internal contradiction in `amenable_creusot::
+stoplight.rs`, a genuinely wrong `GAAP_LEDGER_PLAN.md` step-number
+citation propagated to 10 sites across 4 crates, 18 files' worth of
+mutually-contradicting "Nth contract type" ordinal claims (dropped
+rather than reconstructed), and one real rustdoc error only visible
+under a non-default feature flag. See DOCUMENTATION_REVIEW_PLAN.md's
+own per-step notes for the full account.
 
 **Description:** MVP inflection point — core trait foundation
 (`amenable_core`) wired to real std-library coverage on all three verifier

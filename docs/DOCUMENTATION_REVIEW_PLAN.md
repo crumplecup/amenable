@@ -326,20 +326,29 @@ splice mechanism.
       confirmed current total (485) by 45%. Reworded to point at the live
       command instead of a hand-copied number.
 
-### Step 8 — `amenable` (top-level facade/CLI)
+### Step 8 — `amenable` (top-level facade/CLI) ✅ done
 
 43 files, 6038 lines. Reviewed last: the front door, and the one README a
 new reader hits first (it's what `docs.rs`/crates.io show), so it should
 summarize a workspace whose lower layers have just been re-verified.
 
-- [ ] Function docs: all 43 files (`assessment/`, `cli/`, `cli_output.rs`,
-      `creusot_export.rs`, `verus_export.rs`, `verus_exchange_export.rs`,
-      `verus_gaap_tokens_export.rs`, `error.rs`, `gallery.rs`, `kani.rs`,
-      `paths.rs`, `registry_dump.rs`).
-- [ ] Module docs: all of the above, `lib.rs`, `main.rs`.
-- [ ] README.md (75 lines, last touched 2026-09-01 — the most recently
-      touched; confirm it still reads as the workspace's front door after
-      Steps 1–7 land, and cross-link the other 7 READMEs where useful).
+- [x] Function docs: `lib.rs`/`main.rs` read in full; every other file's
+      doc-comment-bearing lines swept by citation-pattern grep (the
+      approach that caught every real issue in Steps 5–7, refined here
+      to search only `//!`/`///` lines specifically rather than whole
+      files, since this crate's implementation code is comment-light
+      relative to the proof/gallery crates).
+- [x] Module docs: same coverage.
+- [x] Found and fixed one real issue: `creusot_export.rs` cited
+      `amenable_creusot/src/{stoplight,ledger}.rs` (brace-expansion
+      shorthand implying both are bare files) — `ledger` is a directory,
+      split during the modularity pass. The crate's overall low drift
+      (one fix in ~6000 lines) tracks with it being the most recently
+      touched crate in the workspace (2026-09-01).
+- [x] README.md (75 lines) — fully accurate, zero fixes needed. Spot-
+      verified rather than assumed: all 4 codegen subcommand names and
+      all 4 cited `just` recipe names checked against the real clap
+      definitions/justfile and matched exactly.
 
 ## Validation per step
 
