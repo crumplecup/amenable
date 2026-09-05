@@ -1,5 +1,5 @@
 //! Real `Transfer<S, Token>` / `TransferError` / `Ledger` types and logic --
-//! `GAAP_LEDGER_PLAN.md`'s Step 9: the real type *and* its real logic live
+//! `GAAP_LEDGER_PLAN.md`'s Step 7: the real type *and* its real logic live
 //! here, and each backend attaches its own proof separately rather than
 //! needing its own copy of the struct or the logic.
 //!

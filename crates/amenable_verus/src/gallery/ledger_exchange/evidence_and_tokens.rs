@@ -138,7 +138,7 @@ impl<T> Evidence for Rejected<T> {
 
 // `PendingToken`/`ValidatedToken`/`CommittedToken` and their `ProofToken`/
 // `Establish<_, GalleryVerifier>` impls used to be hand-written here --
-// see `GAAP_LEDGER_PLAN.md`'s Step 8: they're now generated, `include!`d
+// see `GAAP_LEDGER_PLAN.md`'s Step 7: they're now generated, `include!`d
 // near the bottom of this file alongside `validate.rs`/`commit.rs` (see
 // that `include!`'s own comment for exactly why it has to live *outside*
 // this file's own `verus! { .. }` block, not in-line here).

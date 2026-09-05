@@ -28,7 +28,7 @@ impl<S, Token> Transfer<S, Token> {
     /// contract actually being checked. `#[cfg(kani)]`, not privacy-
     /// gated further: the crate calling this (`amenable_kani`'s own
     /// experiments/gallery) is no longer the crate defining `Transfer`
-    /// (`GAAP_LEDGER_PLAN.md`'s Step 9) -- `#[cfg(kani)]` is the real
+    /// (`GAAP_LEDGER_PLAN.md`'s Step 7) -- `#[cfg(kani)]` is the real
     /// gate instead, relying on the same global-`--cfg` scoping
     /// `ValidatedToken::diagnostic_only`'s own doc comment explains.
     #[cfg(kani)]

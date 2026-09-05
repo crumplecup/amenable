@@ -318,7 +318,7 @@ impl Ledger {
     /// defined concretely.
     ///
     /// `#[cfg_attr(kani, ..)]` carries a real Kani contract *directly* --
-    /// `GAAP_LEDGER_PLAN.md`'s Step 9 gallery investigation
+    /// `GAAP_LEDGER_PLAN.md`'s Step 7 gallery investigation
     /// (`amenable_kani::gallery::ledger_gaap_free_function_contract`)
     /// confirmed, three ways, that a Kani-contracted function whose body
     /// *delegates* to this method from a separate wrapper hits a real

@@ -1,6 +1,6 @@
 //! Emit derived Verus proof-token companions from the real registry.
 //!
-//! `GAAP_LEDGER_PLAN.md`'s Step 8: the same "codegen over hand-mirroring"
+//! `GAAP_LEDGER_PLAN.md`'s Step 7: the same "codegen over hand-mirroring"
 //! fix `creusot_export`/`verus_exchange_export` already applied to
 //! captured method bodies, extended to a new capture target -- a token
 //! type's own shape plus its `ProofToken`/`Establish` impls, mechanically

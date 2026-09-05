@@ -1,4 +1,4 @@
-//! `GAAP_LEDGER_PLAN.md`'s Step 9: does `#[kani::proof_for_contract]` work
+//! `GAAP_LEDGER_PLAN.md`'s Step 7: does `#[kani::proof_for_contract]` work
 //! when the checked function's body is a one-line delegating call into a
 //! *different* crate's real logic, rather than the logic itself living
 //! right here? This is the one genuinely unconfirmed piece behind moving

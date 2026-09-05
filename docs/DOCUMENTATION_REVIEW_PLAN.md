@@ -112,20 +112,21 @@ misleads about what code three different verifiers will actually receive.
       `proof_token.rs`), and a "read its source (`ledger.rs`, ...)" tour
       pointing at a file that's now a directory.
 
-**Open finding, not resolved (flagged, not silently fixed):**
-`docs/GAAP_LEDGER_PLAN.md`'s own heading structure has only a `### Step
-7` heading covering lines 963–1238, but 9+ source comments across 4
-crates (`amenable_gaap`, `amenable_kani`, `amenable_creusot`,
-`amenable_verus`, `amenable`) consistently cite specific sub-parts of
-that same span as "Step 8" and "Step 9" — not a typo (confirmed via
-git log: real historical commits titled "GAAP ledger Steps 6-8" and
-"Step 10" show 8/9/10 existed as real, distinct steps at some point
-before being consolidated under one "Step 7" heading in the current
-doc, without the source comments' own numbering ever being updated to
-match). Fixing this needs either splitting the heading to match the
-source citations or renumbering 9+ source comments to match the
-heading — a real decision, not something to guess silently. Left
-exactly as found in both the doc and the source.
+**Resolved (cross-crate fix, not scoped to one step):** the same "Step
+8"/"Step 9" citations above turned out to be the source comments'
+error, not the plan doc's. Stronger evidence surfaced mid-fix: the
+commit that actually landed this work (`83a5907`, "GAAP ledger Step 7
+— move Ledger's real methods to `amenable_gaap` for real, on all three
+backends, **including reject/rollback**") explicitly titles the whole
+span Step 7, and the plan doc's own prose (`GAAP_LEDGER_PLAN.md` line
+1047) calls the Creusot/Verus re-pointing section "closing Step 7's
+own follow-up," not a new step. Separately, `EXCHANGE_PROOF_DERIVATION_
+PLAN.md` has its own real Step 8/9/10 headings (confirmed its Step 10
+matches a different real commit message) — likely source of the
+cross-contamination. Renumbered all 10 stray citations (9 files across
+`amenable_gaap`/`amenable_kani`/`amenable_verus`/`amenable`) from
+"Step 8"/"Step 9" to "Step 7", verified with `check-all-package` on
+all four crates (comment-only change, no verifier re-run needed).
 
 ### Step 3 — `amenable_gaap`
 

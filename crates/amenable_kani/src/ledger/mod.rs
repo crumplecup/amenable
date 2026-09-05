@@ -1,4 +1,4 @@
-//! `GAAP_LEDGER_PLAN.md`'s Step 9: `Ledger`/`Transfer`/`TransferError` and
+//! `GAAP_LEDGER_PLAN.md`'s Step 7: `Ledger`/`Transfer`/`TransferError` and
 //! every one of `Ledger`'s real methods now live in `amenable_gaap`, with
 //! Kani contracts attached directly there (see `amenable_gaap::ledger`'s
 //! own doc comment for the confirmed "direct contract, no delegating
@@ -209,7 +209,7 @@ kani_requires!(
 // (attached to `validate`/`commit`/`reject`/`rollback`'s own impl
 // blocks) -- now hand-written here, since those methods' real bodies (and
 // the `exchange` attribute that used to sit on them) moved to
-// `amenable_gaap` for real (`GAAP_LEDGER_PLAN.md`'s Step 9), leaving
+// `amenable_gaap` for real (`GAAP_LEDGER_PLAN.md`'s Step 7), leaving
 // nothing in this crate to generate them anymore. `Ensures<V>: Witness<
 // V>` is a hard supertrait bound, so each `kani_ensures!` call above
 // cannot compile without a matching one of these.
