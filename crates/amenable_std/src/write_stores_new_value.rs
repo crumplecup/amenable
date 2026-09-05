@@ -9,7 +9,7 @@
 //! on the field they just wrote. The proof sites now share one Verus
 //! `spec fn` for that claim, and this contract type is the named witness
 //! that owns the bound in the registry.
-//! `WriteStoresNewValue` is the tenth contract type in the
+//! `WriteStoresNewValue` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist — Verus-only, since this
 //! exact write-through idiom is expressed in Verus's explicit `final(...)`
 //! style here.

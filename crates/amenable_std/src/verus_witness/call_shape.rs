@@ -65,8 +65,9 @@ pub enum VerusCallKind {
 /// to parse the clause's grammar, only substitute placeholder tokens.
 ///
 /// A separate, additive registry (see [`VerusCallShapeRecord`]) rather
-/// than a field on [`VerusCheckedProof`] itself: [`VerusCheckedProof`]
-/// already has ~280 construction sites across this file, almost none of
+/// than a field on [`VerusCheckedProof`](crate::VerusCheckedProof)
+/// itself: [`VerusCheckedProof`](crate::VerusCheckedProof) already has
+/// ~280 construction sites across this module, almost none of
 /// which are opted into Verus export (`register_witness_exports!` is
 /// deliberately opt-in — see its own doc comment). Requiring every one
 /// of those sites to supply a call shape up front, before any renderer

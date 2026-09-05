@@ -9,7 +9,7 @@
 //! `#[requires]` attributes (`amenable_creusot::rust_std`) — every one of
 //! them under the identical local variable name `byte`, restating the same
 //! precondition every `CStr`/`CString`-family proof in this workspace
-//! assumes about its payload byte. `NonNulByte` is the fifth contract type
+//! assumes about its payload byte. `NonNulByte` names this contract type
 //! in the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

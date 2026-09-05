@@ -9,7 +9,7 @@
 //! verify_linked_list_into_iter_yields_owned_values_in_order,
 //! verify_vec_deque_into_iter_yields_owned_values_in_order}`) as a
 //! byte-identical three-clause `ensures` shape.
-//! `YieldsTwoValuesInOrderThenEnds` is the thirteenth contract type in
+//! `YieldsTwoValuesInOrderThenEnds` names this contract type in
 //! the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

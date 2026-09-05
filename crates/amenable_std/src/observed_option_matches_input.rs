@@ -7,9 +7,8 @@
 //! started from. [`ObservedValueMatchesInput`](crate::ObservedValueMatchesInput)
 //! already names the bare-scalar version of this claim; this is its
 //! `Option`-wrapped counterpart, sharing one Verus `spec fn` plus one
-//! named witness in the registry. `ObservedOptionMatchesInput` is the
-//! thirteenth contract type in the `amenable_core::Ensures`/`Requires`
-//! worklist.
+//! named witness in the registry. `ObservedOptionMatchesInput` names this
+//! contract type in the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;
 

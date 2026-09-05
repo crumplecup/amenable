@@ -142,21 +142,70 @@ all four crates (comment-only change, no verifier re-run needed).
       exists (split into `ledger/{mod,machine,types}.rs` during the
       500-LOC modularity pass) — repointed to the real files.
 
-### Step 4 — `amenable_std`
+### Step 4 — `amenable_std` ✅ done
 
 135 files, 20544 lines. Real std-type registrations bridging `amenable_core`
 to all three backends.
 
-- [ ] Function docs (hand-written subset): `cert.rs`, `error.rs`,
-      `verus_call_shape_derive.rs`, `verus_derive_canary.rs`, `creusot_gallery.rs`,
-      `verus_gallery.rs`, plus the small worked-example modules at crate root
-      (`compose_*`, `array_into_iter_*`, `*_matches_*`, etc. — the ~24 tiny
-      root-level proof-law modules, each a few lines, not templated carriers).
-- [ ] Module docs: the same hand-written subset, plus every `rust_std`/
-      `verus_witness` subdirectory's own `mod.rs` (not each leaf carrier).
-- [ ] README.md (63 lines, last touched 2026-08-17 — likely the most stale
-      relative to actual crate size; check it explains the witness/registry
-      machinery, not just lists modules).
+- [x] Function docs (hand-written subset): all ~28 crate-root files
+      (`cert.rs`, `error.rs`, `verus_call_shape_derive.rs`, `lib.rs`, and
+      the 24 tiny proof-law modules) read in full and cross-referenced —
+      clean, except a direct contradiction found across the law modules
+      (below). `creusot_gallery`/`verus_gallery` (13 files, 2772 lines —
+      much larger than the plan assumed): `mod.rs` for both read in full
+      plus cross-reference spot-checks on the largest case files; no
+      further drift found beyond the systemic issue below.
+- [x] Module docs: same hand-written subset, plus `rust_std/mod.rs` and
+      `verus_witness/mod.rs` (this crate has no thematic subdirectories
+      under either, unlike `amenable_kani`/`amenable_verus`). Found and
+      fixed a real rustdoc error (`[`VerusCheckedProof`]` unresolved in
+      `verus_witness/call_shape.rs` — not in scope there, needed a
+      fully-qualified path) plus an adjacent inaccurate count ("~280
+      construction sites across this file" — that file has zero; they're
+      spread across the whole module). Only caught under `--features
+      verus`, which cordial's own default sweep doesn't exercise.
+- [x] **Systemic finding, fixed across 18 files**: the ~24 law modules'
+      "`X` is the Nth contract type in the `amenable_core::Ensures`/
+      `Requires` worklist" claims directly contradict each other —
+      confirmed multiple real conflicts (two files each claim "ninth",
+      "tenth", "eleventh", "thirteenth"; three files all claim
+      "fourteenth"; one cross-reference calls the same type both
+      "seventh" and, in its own file, "tenth"). No authoritative worklist
+      order exists to reconstruct the "true" numbering, and the ordinal
+      itself carries no functional weight (unlike the substantive
+      "collapses N real hand-written sites" claim beside it, which
+      checked out via grep/cross-reference in every file read). Dropped
+      the specific ordinal claim from all 18 affected files rather than
+      inventing an unverifiable total order.
+- [x] **Systemic finding, fixed across 4 files (12 sites)**: every
+      `amenable_std::creusot_witness` reference is stale — that module
+      really did live here once, but moved to `amenable_creusot::
+      rust_std_witness` for a real Cargo-cycle reason (documented in its
+      new home's own doc comment) that the 12 remaining references never
+      picked up. Fixed `verus_witness/mod.rs`'s comparison paragraph (the
+      orphan-rule mechanism genuinely changed, not just the path) and 8
+      more mechanical sites across 3 `creusot_gallery` files (2 inside
+      historical `claim` strings, reworded as "at the time, since moved
+      again" rather than rewritten to erase the real two-hop history).
+- [x] README.md (63 lines) — as suspected, the most stale: named the
+      predecessor tool `elicit_doc` (renamed to `cordial` in August),
+      cited `rust_std.rs`/`verus_witness.rs` as files (both are
+      directories now), and its Coverage section's numbers (421/440,
+      95.7%, "remaining 19") were superseded by real growth in the
+      accountable-type universe (currently 422/457, 92.3%, 35 open —
+      re-measured live via `cordial coverage --crate-name amenable_std`
+      rather than trusted from memory). The two explained gap categories
+      (`NonZero*`/`LayoutErr` tool false-negatives, the Windows cluster)
+      still check out substantively; 16 newly-appeared open items
+      (`core::range::*`, `ArrayWindows`, some `libc`/`os::unix` types)
+      are honestly flagged as untriaged backlog rather than folded into
+      either explained category without evidence. Reworded to point at
+      the live command instead of a hand-copied snapshot, so this exact
+      staleness class can't recur silently.
+- Also fixed one unrelated pre-existing markdownlint failure hit while
+  linting this step's README (`docs/MODULARITY_500_LOC_PLAN.md`'s MD004:
+  a wrapped line starting with `+ ` inside a `-`-style list, parsed as a
+  list-style violation).
 
 ### Step 5 — `amenable_kani`
 

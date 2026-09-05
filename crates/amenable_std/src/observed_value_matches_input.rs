@@ -8,7 +8,7 @@
 //! roundtrip wrappers like `Wrapping`, and so on), but the observed
 //! postcondition itself is identical and now has one shared Verus
 //! `spec fn` plus one named witness in the registry.
-//! `ObservedValueMatchesInput` is the eleventh contract type in the
+//! `ObservedValueMatchesInput` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

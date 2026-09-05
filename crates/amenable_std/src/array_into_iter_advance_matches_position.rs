@@ -5,9 +5,9 @@
 //! depending on the pre-state position, `advance()` yields the matching
 //! element or `None`, updates the cursor accordingly, and preserves the
 //! stored elements. This contract type gives that law a registry
-//! identity instead of leaving the helper predicate anonymous.
-//! `ArrayIntoIterAdvanceMatchesPosition` is the sixteenth contract type
-//! in the `amenable_core::Ensures`/`Requires` worklist.
+//! identity instead of leaving the helper predicate anonymous, named
+//! `ArrayIntoIterAdvanceMatchesPosition` in the `amenable_core::Ensures`/
+//! `Requires` worklist.
 
 use amenable_derive::Standard;
 

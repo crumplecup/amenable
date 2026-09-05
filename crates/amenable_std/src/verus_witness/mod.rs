@@ -1,35 +1,43 @@
 //! `VerusWitness` impls for Rust standard-library carriers.
 //!
 //! This lives here, not alongside the proof functions in `amenable_verus`,
-//! for a stronger reason than `amenable_std::creusot_witness`'s: it's not
-//! just that the witness/registry machinery is awkward to compile under
-//! Verus, it's that `amenable_verus` has *no* `amenable_core`/`inventory`
-//! dependency to build that machinery against at all. Verus is invoked as
-//! a bare compiler over a single file tree (`verus --crate-type=lib
-//! path/to/lib.rs`) — it never reads `Cargo.toml`, so it cannot resolve
-//! any external crate, proc-macro or otherwise. Confirmed empirically:
-//! pointing `verus` at this crate's pre-split structure (which depended on
-//! `amenable_core`/`amenable_derive`/`inventory`) failed immediately with
-//! unresolved-crate errors, not proof errors — matching the exact failure
-//! `elicitation_verus`'s own real, working proof crate structure avoids by
-//! depending on nothing but `verus_builtin_macros`/`vstd`.
+//! for a stronger reason than `amenable_creusot::rust_std_witness` (the
+//! Creusot counterpart) has for living in *its* crate rather than here:
+//! it's not just that the witness/registry machinery is awkward to
+//! compile under Verus, it's that `amenable_verus` has *no* `amenable_
+//! core`/`inventory` dependency to build that machinery against at all.
+//! Verus is invoked as a bare compiler over a single file tree (`verus
+//! --crate-type=lib path/to/lib.rs`) — it never reads `Cargo.toml`, so it
+//! cannot resolve any external crate, proc-macro or otherwise. Confirmed
+//! empirically: pointing `verus` at this crate's pre-split structure
+//! (which depended on `amenable_core`/`amenable_derive`/`inventory`)
+//! failed immediately with unresolved-crate errors, not proof errors —
+//! matching the exact failure `elicitation_verus`'s own real, working
+//! proof crate structure avoids by depending on nothing but
+//! `verus_builtin_macros`/`vstd`.
 //!
 //! So there is no `VERIFY_*_SRC` constant to import here the way
-//! `creusot_witness` imports one per proof from `amenable_creusot`
-//! (`amenable_derive::harness!`, the macro that generates those constants,
-//! is itself a proc-macro from a crate Verus can't resolve — it wouldn't
-//! compile under Verus's toolchain either). Each `claim` below is captured
-//! via `include_str!` instead — a plain Rust language feature (no
-//! proc-macro, no external crate), reading `amenable_verus`'s real proof
-//! source file directly at compile time, so the claim text can never drift
-//! from what `verus` actually checked.
+//! `amenable_creusot::rust_std_witness` imports one per proof from a
+//! sibling module in its own crate (`amenable_derive::harness!`, the
+//! macro that generates those constants, is itself a proc-macro from a
+//! crate Verus can't resolve — it wouldn't compile under Verus's
+//! toolchain either). Each `claim` below is captured via `include_str!`
+//! instead — a plain Rust language feature (no proc-macro, no external
+//! crate), reading `amenable_verus`'s real proof source file directly at
+//! compile time, so the claim text can never drift from what `verus`
+//! actually checked.
 //!
-//! Legal under Rust's orphan rule for the same reason `creusot_witness` is:
-//! `RustStdStandard<T>` (the `Self` type) is local to this crate. Unlike
-//! `creusot_witness`, though, `VerusVerifier`/`VerusVerifierMetadata`/
-//! `VerusWitness` are defined *here* too, not in `amenable_verus` — they
-//! need `amenable_core::{Verifier, Evidence, ...}`, which `amenable_verus`
-//! no longer depends on.
+//! Legal under Rust's orphan rule, but not for the same reason:
+//! `amenable_creusot::rust_std_witness` (unlike this file, and unlike its
+//! own predecessor, which *did* live in this crate — see that module's
+//! own doc comment for the real Cargo-cycle reason it moved) is legal
+//! because `CreusotVerifier`, its trait's own type parameter, is local to
+//! `amenable_creusot`. This file's own legality instead rests on
+//! `RustStdStandard<T>` (the `Self` type) being local to *this* crate.
+//! `VerusVerifier`/`VerusVerifierMetadata`/`VerusWitness` are defined
+//! *here* too, not in `amenable_verus` — they need `amenable_core::
+//! {Verifier, Evidence, ...}`, which `amenable_verus` no longer depends
+//! on.
 //!
 //! Split into one file per real standard-library carrier cluster, roughly
 //! following `amenable_kani::rust_std`'s own module boundaries where a

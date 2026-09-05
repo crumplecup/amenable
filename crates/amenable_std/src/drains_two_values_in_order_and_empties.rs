@@ -9,7 +9,7 @@
 //! verify_linked_list_is_fifo_through_back_and_front,
 //! verify_vec_deque_drain_removes_and_yields_in_order}`) as a
 //! byte-identical four-clause `ensures` shape.
-//! `DrainsTwoValuesInOrderAndEmpties` is the fourteenth contract type in
+//! `DrainsTwoValuesInOrderAndEmpties` names this contract type in
 //! the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

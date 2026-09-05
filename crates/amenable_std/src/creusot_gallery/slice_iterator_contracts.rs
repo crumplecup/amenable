@@ -69,7 +69,7 @@ fn verify_chunks_yields_non_overlapping_groups_with_a_short_last_chunk(
 // family is blocked on real translator/library gaps.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep these carriers registered for
+// amenable_creusot::rust_std_witness today): keep these carriers registered for
 // Creusot via explicit trusted witnesses whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable law.
 impl CreusotWitness for RustStdStandard<Chunks<'static, i32>> {
@@ -162,7 +162,7 @@ fn verify_rchunks_groups_from_the_back(
 // reverse borrowed chunk family, not a mistaken harness.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep these carriers registered for
+// amenable_creusot::rust_std_witness today): keep these carriers registered for
 // Creusot via explicit trusted witnesses whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable law.
 impl CreusotWitness for RustStdStandard<RChunks<'static, i32>> {
@@ -253,7 +253,7 @@ fn verify_slice_split_separates_on_zero(a: i32, b: i32) -> (usize, usize, bool) 
 // carriers, not a mistaken harness.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep these carriers registered for
+// amenable_creusot::rust_std_witness today): keep these carriers registered for
 // Creusot via explicit trusted witnesses whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable laws
 // through direct proofs or accommodation models as appropriate.

@@ -7,7 +7,7 @@
 //! Independently hand-written at both real Creusot proof sites
 //! (`amenable_creusot::rust_std::{verify_array_indexing_and_length,
 //! verify_slice_indexing_and_length}`) as four identical `ensures`
-//! clauses. `IndexingAndLength` is the eleventh contract type in the
+//! clauses. `IndexingAndLength` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

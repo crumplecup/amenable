@@ -13,7 +13,7 @@
 //! Verus `spec fn`s reused across
 //! `iter_sequence_carrier`, `iter_stateful_carrier`, `iter_transform_carrier`,
 //! `primitive_shapes_carrier`, and `slice_chunks_carrier`.
-//! `IncrementHeadroom` is the eighth contract type in the
+//! `IncrementHeadroom` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist — Verus-only, since this
 //! precondition exists specifically because Verus checks overflow by
 //! default; Kani/Creusot's own proofs over the same models don't need it.

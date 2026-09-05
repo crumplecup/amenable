@@ -7,11 +7,11 @@
 //! carrier files (`amenable_verus`), and one Creusot `#[requires]`
 //! attribute (`amenable_creusot`) — every one of them stating the same
 //! precondition ("only a single-UTF-8-byte character is being tested
-//! here") under a different local variable name. `AsciiByte` is the
-//! fourth contract type in the `amenable_core::Ensures`/`Requires`
-//! worklist: it doesn't add a new proof, it names an existing precondition,
-//! once, even though it needs several literal fragment spellings (one per
-//! variable name actually used) to cover every real site.
+//! here") under a different local variable name. `AsciiByte` names this
+//! contract type in the `amenable_core::Ensures`/`Requires` worklist: it
+//! doesn't add a new proof, it names an existing precondition, once, even
+//! though it needs several literal fragment spellings (one per variable
+//! name actually used) to cover every real site.
 
 use amenable_derive::Standard;
 

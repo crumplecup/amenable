@@ -195,9 +195,10 @@ Regenerating `cordial quality` after Phase 5 showed two secondary areas move:
   `WitnessContainerOptions` / `MemberOptions` / `ProofField` in `amenable_derive`:
   private structs that had to become `pub(crate)` / `pub(super)` for
   cross-submodule access during Phase 5, which lifted cordial's fully-private
-  exemption and exposed their `pub` fields. Fixed in `f15dd31` — private fields
-  + `#[derive(derive_getters::Getters)]` (its first use in the workspace; no new
-  transitive deps). Construction/mutation stay in each struct's own module
+  exemption and exposed their `pub` fields. Fixed in `f15dd31` — private
+  fields, plus `#[derive(derive_getters::Getters)]` (its first use in the
+  workspace; no new transitive deps). Construction/mutation stay in each
+  struct's own module
   where private fields are still reachable; only the cross-module reads move to
   `.field()` calls. check-all-package + fixture-corpus tests confirm emitted
   tokens unchanged; verify-creusot Proved(150), verify-verus 485/0, 3 canary

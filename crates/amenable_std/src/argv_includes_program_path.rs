@@ -10,7 +10,7 @@
 //! verify_args_reports_at_least_the_program_path,
 //! verify_args_os_reports_at_least_the_program_path}`) -- one `requires`
 //! headroom precondition and two `ensures` clauses, restated verbatim at
-//! both. `ArgvIncludesProgramPath` is the ninth contract type in the
+//! both. `ArgvIncludesProgramPath` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

@@ -11,7 +11,7 @@
 //! `observed_pair_matches_input`, is generic over both slots rather
 //! than fixed at one scalar type, unlike
 //! [`ObservedValueMatchesInput`](crate::ObservedValueMatchesInput)'s
-//! bare-scalar version. `ObservedPairMatchesInput` is the fourteenth
+//! bare-scalar version. `ObservedPairMatchesInput` names this
 //! contract type in the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

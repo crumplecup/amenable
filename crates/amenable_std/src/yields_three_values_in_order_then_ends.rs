@@ -7,7 +7,7 @@
 //! Verus `array_into_iter` carrier, and this contract type is the named
 //! witness that owns that bound in the registry instead of leaving the
 //! four-clause postcondition anonymous.
-//! `YieldsThreeValuesInOrderThenEnds` is the fourteenth contract type in
+//! `YieldsThreeValuesInOrderThenEnds` names this contract type in
 //! the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

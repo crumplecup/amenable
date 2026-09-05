@@ -7,7 +7,7 @@
 //! (`amenable_creusot::rust_std::VERIFY_CHAR_ROUNDTRIP_SRC`), and Verus
 //! (`amenable_verus::rust_std::char_carrier`/`char_try_from_carrier`), using
 //! three different but equivalent phrasings, with nothing tying them
-//! together. `ValidUnicodeScalar` is the first contract type in the
+//! together. `ValidUnicodeScalar` names one contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist: it doesn't add a new proof,
 //! it names an existing one, once, so a future correction to this bound has
 //! a single home to start from instead of at least five hand-restated

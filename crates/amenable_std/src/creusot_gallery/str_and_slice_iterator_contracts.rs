@@ -89,7 +89,7 @@ fn verify_split_char_separates_on_the_pattern() -> (Option<&'static str>, Option
 // `creusot-std` contract gap for these carriers, not a mistaken harness.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep these carriers registered for
+// amenable_creusot::rust_std_witness today): keep these carriers registered for
 // Creusot via explicit trusted witnesses whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable laws
 // through direct proofs or accommodation models as appropriate.
@@ -165,7 +165,7 @@ fn verify_escape_ascii_leaves_printable_bytes_unescaped() -> (bool, bool, bool, 
 // contracts, so the carrier is blocked even without the ICE-inducing form.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep the carrier registered for
+// amenable_creusot::rust_std_witness today): keep the carrier registered for
 // Creusot via an explicit trusted witness whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable law
 // through its bounded accommodation model.
@@ -220,7 +220,7 @@ fn verify_get_disjoint_mut_rejects_overlap_and_out_of_bounds(
 // the verifier what `get_disjoint_mut` actually does.
 
 // Working fallback (this is the real content in
-// amenable_std::creusot_witness today): keep the carrier registered for
+// amenable_creusot::rust_std_witness today): keep the carrier registered for
 // Creusot via an explicit trusted witness whose provenance still comes from
 // the same proof chain, while Kani continues to carry the executable law.
 impl CreusotWitness for RustStdStandard<GetDisjointMutError> {

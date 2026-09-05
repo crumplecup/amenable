@@ -9,9 +9,8 @@
 //! (`amenable_creusot::rust_std::{
 //! verify_from_vec_with_nul_requires_the_nul_only_at_the_end,
 //! verify_from_bytes_with_nul_requires_the_nul_only_at_the_end}`) as the
-//! identical three-flag `ensures` clause. `NulOnlyAtTheEndValidates` is
-//! the tenth contract type in the `amenable_core::Ensures`/`Requires`
-//! worklist.
+//! identical three-flag `ensures` clause. `NulOnlyAtTheEndValidates` names
+//! this contract type in the `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;
 

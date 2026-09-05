@@ -13,7 +13,7 @@
 //! verify_result_iter_mut_writes_through_to_the_result}`) as the
 //! identical three-clause `ensures` shape, differing only in whether the
 //! final value is wrapped in `Some` or `Ok`.
-//! `IterYieldsValueOnceThenEnds` is the twelfth contract type in the
+//! `IterYieldsValueOnceThenEnds` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist.
 
 use amenable_derive::Standard;

@@ -57,8 +57,11 @@ impl Provenance for CreusotVerifierMetadata {
             CreusotGalleryExpectation::TranslationError,
             r#"
 // Reduced repro (this exact shape lived in amenable_creusot::rust_std
-// before the fix — the ProofRecord registrations that now live in
-// amenable_std::creusot_witness instead):
+// before the fix — the ProofRecord registrations moved to
+// amenable_std::creusot_witness at the time, then moved again to their
+// current home, amenable_creusot::rust_std_witness, once a real Cargo-
+// cycle problem with the intermediate location was found -- see that
+// module's own doc comment):
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
         "amenable_std::rust_std::RustStdStandard<char>",
@@ -79,9 +82,11 @@ impl Provenance for CreusotVerifierMetadata {
 //
 // Fix: move every inventory::submit! (and the Witness bridge/CheckedProof
 // machinery around it) out of amenable_creusot entirely, into
-// amenable_std::creusot_witness — legal under the orphan rule because
-// RustStdStandard<T>, not the verifier marker, is the local type there.
-// amenable_creusot now contains zero inventory calls.
+// amenable_std::creusot_witness at the time (since moved again to
+// amenable_creusot::rust_std_witness -- see that module's own doc
+// comment) — legal under the orphan rule because RustStdStandard<T>, not
+// the verifier marker, was the local type there. amenable_creusot itself
+// still contains zero inventory calls.
 "#.to_owned(),
         ),
     )

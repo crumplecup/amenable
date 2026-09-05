@@ -4,9 +4,9 @@
 //! The Verus `array_into_iter` accommodation model starts with the
 //! supplied three values stored unchanged and the cursor at position
 //! zero. This contract type gives that initialization law a registry
-//! identity instead of leaving the helper predicate anonymous.
-//! `ArrayIntoIterStartsAtFirstPosition` is the fifteenth contract type
-//! in the `amenable_core::Ensures`/`Requires` worklist.
+//! identity instead of leaving the helper predicate anonymous, named
+//! `ArrayIntoIterStartsAtFirstPosition` in the `amenable_core::Ensures`/
+//! `Requires` worklist.
 
 use amenable_derive::Standard;
 

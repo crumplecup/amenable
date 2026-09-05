@@ -8,11 +8,12 @@
 //! restates identically (`final(self).value == old(self).value`) rather
 //! than naming once. `RefCell` already carries its own canonical
 //! `Ensures<VerusVerifier>` claim (the write-through postcondition
-//! `final(self).value == new_value`, homed as the seventh worklist item),
-//! so this distinct claim — value stays put, rather than value becomes
-//! something new — needs its own contract type instead of a second impl
-//! on the same `RustStdStandard<RefCell<i32>>`.
-//! `ValueUnchanged` is the ninth contract type in the
+//! `final(self).value == new_value`, named by
+//! [`WriteStoresNewValue`](crate::WriteStoresNewValue)), so this distinct
+//! claim — value stays put, rather than value becomes something new —
+//! needs its own contract type instead of a second impl on the same
+//! `RustStdStandard<RefCell<i32>>`.
+//! `ValueUnchanged` names this contract type in the
 //! `amenable_core::Ensures`/`Requires` worklist — Verus-only, since this
 //! frame condition is Verus's own explicit `old`/`final` idiom; Kani/
 //! Creusot's own proofs over the same models don't state it this way.
