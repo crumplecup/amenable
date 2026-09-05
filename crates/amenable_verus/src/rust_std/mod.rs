@@ -11,7 +11,8 @@
 //! (mirroring `amenable_kani::rust_std`'s own directory shape) rather
 //! than left as 133 files flat under one directory: [`io`], [`str_and_char`],
 //! [`ffi`], [`collections`], [`sync`], [`cell_and_ref`], [`path_and_fs`],
-//! [`process_and_net`], [`iter`], [`num`], [`task_and_thread`], and
+//! [`process_and_net`], [`iter`], [`num`], `task_and_thread` (flattened
+//! into this file directly -- see its own re-exports below), and
 //! [`misc`] (single-carrier std modules with no sibling in this crate --
 //! `Box`, `Cow`, `Discriminant`, `Layout`, `ManuallyDrop`, a handful of
 //! zero-invariant singletons, `ops`, `Option`, `Result`, `panic`,
