@@ -40,6 +40,7 @@ impl<S, Token> Transfer<S, Token> {
 impl Transfer<Pending, PendingToken> {
     /// The entry case: every transfer starts `Pending`, asserted rather
     /// than reached via any transition.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(payload)))]
     #[must_use]
     pub fn pending(payload: TransferPayload) -> Self {
         Self::new(payload, PendingToken::new())

@@ -30,18 +30,22 @@ use super::{AccountId, KaniVerifier, Pending, Sidecar, Transfer, Validated, Vali
 /// (fixed-size, and the only thing `AccountId`'s derived `PartialEq`
 /// compares at all now -- see that type's own doc comment).
 impl KaniCompose for AccountId {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Self::new(Uuid::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Self::new(Uuid::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Self::new(Uuid::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Self::new(Uuid::kani_any())
     }
@@ -65,42 +69,51 @@ impl KaniCompose for AccountId {
 /// construction cost `AccountId`'s own history already paid once to
 /// avoid.
 impl KaniCompose for Account {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Self::new(AccountId::kani_depth0(), String::new())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Self::new(AccountId::kani_depth1(), String::new())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Self::new(AccountId::kani_depth2(), String::new())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Self::new(AccountId::kani_any(), String::new())
     }
 }
 
 impl KaniCompose for Amount {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Self::new(i64::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Self::new(i64::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Self::new(i64::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Self::new(i64::kani_any())
     }
 }
 
 impl KaniCompose for TransferPayload {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Self::new(
             Account::kani_depth0(),
@@ -109,6 +122,7 @@ impl KaniCompose for TransferPayload {
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Self::new(
             Account::kani_depth1(),
@@ -117,6 +131,7 @@ impl KaniCompose for TransferPayload {
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Self::new(
             Account::kani_depth2(),
@@ -125,6 +140,7 @@ impl KaniCompose for TransferPayload {
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Self::new(Account::kani_any(), Account::kani_any(), Amount::kani_any())
     }
@@ -140,18 +156,22 @@ impl KaniCompose for TransferPayload {
 /// there is no chain to route through at all -- unlike `Validated`
 /// below.
 impl KaniCompose for Transfer<Pending, PendingToken> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Transfer::pending(TransferPayload::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Transfer::pending(TransferPayload::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Transfer::pending(TransferPayload::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Transfer::pending(TransferPayload::kani_any())
     }
@@ -176,23 +196,28 @@ impl KaniCompose for Transfer<Pending, PendingToken> {
 /// only panicking at runtime if actually called outside a real Kani
 /// run) -- this whole module already only exists under `cfg(kani)`.
 impl KaniCompose for Transfer<Validated, ValidatedToken> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         validated_from(TransferPayload::kani_depth0())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         validated_from(TransferPayload::kani_depth1())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         validated_from(TransferPayload::kani_depth2())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         validated_from(TransferPayload::kani_any())
     }
 }
 
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(payload)))]
 fn validated_from(payload: TransferPayload) -> Transfer<Validated, ValidatedToken> {
     let pending = Transfer::pending(payload.clone());
     let credential = Sidecar::sidecar(&pending);

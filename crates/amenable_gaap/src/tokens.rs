@@ -49,6 +49,7 @@ impl PendingToken {
     /// `_state: Pending` parameter here would gate nothing -- every real
     /// call site just built one fresh at the call, confirmed via a full
     /// grep of every `PendingToken::new` call before removing it.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     #[must_use]
     pub fn new() -> Self {
         Self(())

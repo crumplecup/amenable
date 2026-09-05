@@ -97,18 +97,22 @@ impl KaniCompose for () {
 /// symbolic!`), just written out by hand since `Uuid::from_u128` needs
 /// calling.
 impl KaniCompose for uuid::Uuid {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth0() -> Self {
         Self::from_u128(symbolic_any())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth1() -> Self {
         Self::from_u128(symbolic_any())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_depth2() -> Self {
         Self::from_u128(symbolic_any())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn kani_any() -> Self {
         Self::from_u128(symbolic_any())
     }
