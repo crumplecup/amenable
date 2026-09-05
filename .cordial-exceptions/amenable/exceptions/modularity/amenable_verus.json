@@ -1,0 +1,9 @@
+[
+  {
+    "file": "src/rust_std/mod.rs",
+    "line": 1,
+    "rule_id": "MODULARITY-LOPSIDED",
+    "context": "rust_std",
+    "reason": "rust_std holds 80% of amenable_verus's sibling mass (11364 vs gallery 2394 + exchange_support 374) because it's the crate's one-file-per-std-carrier proof library covering 12 thematic subdirectories, matching elicitation_verus/amenable_kani::rust_std's own granularity -- already split to its practical floor (one file per carrier, one mod.rs per family, confirmed via the crate's own modularity findings: every rust_std leaf file scores far below the file-size threshold). gallery/exchange_support are deliberately narrow by design (single-investigation-case and shared-infrastructure modules, not std-coverage libraries), so they can't grow to rebalance the ratio, and rust_std can't shrink without dropping real std-type coverage. The LOPSIDED signal compares subtree totals, not packing quality -- there is no split/extract action here that reduces total content, only one that would relocate it."
+  }
+]
