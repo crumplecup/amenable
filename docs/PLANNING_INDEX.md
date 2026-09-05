@@ -4,6 +4,21 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Documentation review: functions → modules → READMEs
+
+**Document:** [DOCUMENTATION_REVIEW_PLAN.md](DOCUMENTATION_REVIEW_PLAN.md)
+
+**Status:** Started 2026-09-05. Not yet begun executing steps.
+
+**Description:** MVP inflection point — core trait foundation
+(`amenable_core`) wired to real std-library coverage on all three verifier
+backends, cordial checklists clean. 8-crate pass, bottom-up per crate
+(hand-written function docs → module `//!` docs → README.md), dependency
+order (core → derive → gaap → std → kani → creusot → verus → amenable).
+Templated one-file-per-carrier trees (~450 files across rust_std subtrees)
+are skipped for function-doc review by explicit user scoping decision, but
+still get their directory-level `mod.rs` docs checked.
+
 ### Modularity: 500 LOC cap
 
 **Document:** [MODULARITY_500_LOC_PLAN.md](MODULARITY_500_LOC_PLAN.md)
