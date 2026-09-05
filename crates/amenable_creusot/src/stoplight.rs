@@ -8,7 +8,7 @@
 //! `Witness<CreusotVerifier>` on the real `Green`/`Yellow`/`Red` types —
 //! confirmed to compile cleanly, no ICE, since `creusot-rustc`'s
 //! translator only sweeps items *local* to the crate it's directly
-//! translating, not an ordinary dependency's own items (`ledger.rs`'s own
+//! translating, not an ordinary dependency's own items (`ledger/`'s own
 //! doc comment has the full finding). But that dependency itself was
 //! wrong: it reintroduced exactly the backend-depends-on-backend edge the
 //! "verifier backends never depend on each other" rule exists to forbid
@@ -22,7 +22,7 @@
 //! no edge between the two backends at all. This crate's Cargo dependency
 //! on `amenable_kani` has been removed entirely; the `amenable_std`/
 //! `amenable_gaap` dependencies below remain (unrelated to this
-//! correction — see `rust_std_witness.rs`/`ledger.rs` for those).
+//! correction — see `rust_std_witness/`/`ledger/` for those).
 //!
 //! **What still can't move, and why the mirror below still exists.** The
 //! real transition bodies (`green_to_yellow`/`yellow_to_red`/
@@ -50,7 +50,7 @@
 //! `creusot-rustc` translator crashes in this exact codebase (`Provenance`
 //! impls returning `Box<dyn Iterator<..>>`; a return-position `impl
 //! Trait` method; ungated `inventory::collect!`/`inventory::submit!` —
-//! see `rust_std_witness.rs`'s doc comment and `amenable_std::
+//! see `rust_std_witness/`'s doc comment and `amenable_std::
 //! creusot_gallery`'s own confirmed findings).
 //!
 //! **The three per-edge transition bodies are generated, not hand-written
@@ -107,7 +107,7 @@ mod mirror {
 
     pub(crate) use crate::CreusotVerifier;
 
-    /// Sanitized mirror of `amenable_kani::Green`.
+    /// Sanitized mirror of `amenable_core::Green`.
     pub struct Green;
 
     impl Evidence for Green {
@@ -128,7 +128,7 @@ mod mirror {
         fn proof() -> Self::ProofArtifact {}
     }
 
-    /// Sanitized mirror of `amenable_kani::Yellow`.
+    /// Sanitized mirror of `amenable_core::Yellow`.
     pub struct Yellow;
 
     impl Evidence for Yellow {
@@ -149,7 +149,7 @@ mod mirror {
         fn proof() -> Self::ProofArtifact {}
     }
 
-    /// Sanitized mirror of `amenable_kani::Red`.
+    /// Sanitized mirror of `amenable_core::Red`.
     pub struct Red;
 
     impl Evidence for Red {
@@ -354,7 +354,7 @@ include!("generated/red_to_green.rs");
 /// mirror above still exists alongside these (the real transition bodies
 /// still need private constructors this crate can't reach).
 ///
-/// `#[cfg(not(creusot))]` on this whole module, matching `ledger.rs`'s own
+/// `#[cfg(not(creusot))]` on this whole module, matching `ledger/`'s own
 /// `Witness` bridges: the real `MultiCheckProof` artifact carries `Vec`/
 /// `String`/`Display` machinery that must never be *local* during actual
 /// translation (confirmed the hard way -- see that type's own doc

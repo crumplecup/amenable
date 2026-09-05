@@ -21,7 +21,7 @@
 //! body produced a precise, real failure (`Goal Coma.vc_check_amount_
 //! positive: ✘`) before being reverted — the earlier assumption that
 //! *any* dependency beyond `amenable_core` would risk an ICE the way a
-//! *local* item does (per `amenable_std::creusot_witness`'s own doc
+//! *local* item does (per this crate's own `rust_std_witness`'s own doc
 //! comment) turned out not to generalize to an ordinary dependency
 //! crate's own items, only to items local to the crate `cargo creusot`
 //! actually translates.

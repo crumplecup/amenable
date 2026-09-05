@@ -24,7 +24,7 @@ amenable_derive::harness! {
         #[trusted]
         #[requires(true)]
         // Canonical home: RustStdStandard<System>'s Ensures<CreusotVerifier>
-        // impl (amenable_std::creusot_witness) names this exact fragment.
+        // impl (amenable_creusot::rust_std_witness) names this exact fragment.
         #[ensures(system_allocation_round_trips(value, result))]
         fn verify_system_allocates_and_deallocates_a_layout(value: i32) -> i32 {
             let _allocator = System;

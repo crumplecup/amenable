@@ -8,7 +8,7 @@
 is only one verifier Creusot works with, Creusot, so the marker belongs
 with the crate that means it. The impls bridging `CreusotWitness`/
 `Witness<CreusotVerifier>` to concrete std carriers (`RustStdStandard<T>`)
-also live here now, in `rust_std_witness.rs` — that surface used to live
+also live here now, in `rust_std_witness/` — that surface used to live
 in `amenable_std` (`creusot_witness.rs`, behind a `creusot` feature) but
 was migrated wholesale once a real, empirically-confirmed finding made
 the old split unnecessary: `creusot-rustc`'s whole-crate translation pass
@@ -34,8 +34,8 @@ definition site, not just at the point of use — a real, separately
 confirmed ICE hit twice in this crate when only a re-export or a usage
 site was gated, not the struct/impl definition itself.
 
-`rust_std.rs`/`rust_std_witness.rs` hold `amenable_std`'s harness
-functions and their witness bridge, respectively. `ledger.rs` is split
+`rust_std/`/`rust_std_witness/` hold `amenable_std`'s harness
+functions and their witness bridge, respectively. `ledger/` is split
 between the two shapes `stoplight.rs` shows separately: its four atomic
 contract predicates (`AmountPositive`/`SufficientFunds`/
 `AccountsDistinct`/`BalancedEntries`) and its `Pending`/`Validated`/
@@ -65,14 +65,17 @@ these all implement against.
 
 ## Coverage
 
-**93 harness registrations** in `rust_std.rs`. Most carry a real,
-machine-checked Pearlite `requires`/`ensures` contract, discharged by SMT
-via `cargo creusot prove` — confirmed by actually running the prover
-locally, not just the translator. Where `creusot-std` has no contract
-surface for the underlying std call (or the call touches OS-backed state
-Creusot can't reason about at all), the harness states the same claim
-under an explicit `#[trusted]` boundary instead of quietly claiming
-coverage it doesn't have.
+**174 harness registrations** in `rust_std/` as of this writing
+(`grep -rc 'amenable_derive::harness!' crates/amenable_creusot/src/rust_std/`
+— regenerate rather than trusting this number, since this crate is
+still growing). Most carry a real, machine-checked Pearlite
+`requires`/`ensures` contract, discharged by SMT via `cargo creusot
+prove` — confirmed by actually running the prover locally, not just the
+translator. Where `creusot-std` has no contract surface for the
+underlying std call (or the call touches OS-backed state Creusot can't
+reason about at all), the harness states the same claim under an
+explicit `#[trusted]` boundary instead of quietly claiming coverage it
+doesn't have.
 
 `std::os::windows::*` types can't even be named here at all —
 `creusot-rustc` has no Windows target, and its whole-crate translator
@@ -80,7 +83,7 @@ can't tolerate ordinary `inventory::submit!`-based witness wiring left
 ungated (see above). That cluster's four harnesses instead prove a law
 over a synthetic `isize`/`u64`/`u32` model — real and fully
 Creusot-proved, not a `#[trusted]` stub — with the evidence hand-linked
-to the real types' registrations by string in `rust_std_witness.rs`,
+to the real types' registrations by string in `rust_std_witness/`,
 mirroring `amenable_kani::os_windows_model`'s identical bypass for the
 identical reason (Kani/CBMC don't run on Windows either).
 
@@ -91,7 +94,7 @@ identical reason (Kani/CBMC don't run on Windows either).
 - [`amenable_std`](../amenable_std/README.md) for `RustStdType`'s own
   registrations, and overall coverage across all three verifiers.
 - [`amenable_gaap`](../amenable_gaap/README.md) for the GAAP ledger's
-  own evidence types this crate's `ledger.rs` proves against.
+  own evidence types this crate's `ledger/` proves against.
 - [`amenable_kani`](../amenable_kani/README.md),
   [`amenable_verus`](../amenable_verus/README.md) for the other two
   backends.

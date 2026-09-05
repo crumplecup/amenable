@@ -95,7 +95,7 @@ amenable_derive::harness! {
         ///
         /// Both `#[ensures]` clauses below are the canonical home
         /// `RustStdStandard<NonZero<i16>>`'s own `Ensures<CreusotVerifier>`
-        /// impl (`amenable_std::creusot_witness`) names.
+        /// impl (`amenable_creusot::rust_std_witness`) names.
         #[trusted]
         #[requires(true)]
         #[ensures(nonzero_i16_new_succeeds_exactly_when_nonzero(value, result))]

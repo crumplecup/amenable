@@ -5,7 +5,7 @@
 //! logic wrappers they depend on. Nothing here references
 //! `RustStdStandard`, registers a `ProofRecord`, or implements
 //! `CreusotWitness` -- that machinery moved to
-//! `amenable_std::creusot_witness`, which imports the `&'static str`
+//! `amenable_creusot::rust_std_witness`, which imports the `&'static str`
 //! constants below rather than duplicating the contract text. See that
 //! module's doc comment for why: creusot-rustc's translator sweeps every
 //! local item in a `creusot-std`-dependent crate, `#[cfg(creusot)]`-gated

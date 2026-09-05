@@ -16,7 +16,7 @@ use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted}
 // Creusot-checked postcondition, same as `verify_seek_from_round_trips_
 // each_variants_offset`/`verify_char_roundtrip` above: each claim is
 // simple enough field access/arithmetic that Creusot can discharge it
-// directly. `amenable_std::creusot_witness` connects these harnesses to
+// directly. `amenable_creusot::rust_std_witness` connects these harnesses to
 // the real types' evidence entries by hand-writing the exact evidence
 // string, the same bypass `os_windows_model.rs` uses for Kani.
 //

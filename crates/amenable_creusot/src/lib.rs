@@ -4,18 +4,18 @@
 //! there is only one verifier Creusot works with, Creusot, so the marker
 //! belongs with the crate that means it. But unlike Kani and Verus, the
 //! impls bridging `CreusotWitness`/`Witness<CreusotVerifier>` to concrete
-//! std carriers (`RustStdStandard<T>`) live in `amenable_std` instead of
-//! here — see `amenable_std::creusot_witness`'s doc comment for why (in
-//! short: `creusot-rustc`'s whole-crate translation pass can't handle the
-//! ordinary Rust machinery that bridge needs, so this crate stays pure
-//! Pearlite proof-function content, the thing `cargo creusot` actually
-//! translates). That split is legal under Rust's orphan rule via a
-//! different justification than usual: it's `RustStdStandard<T>` (the
-//! `Self` type, local to `amenable_std`) satisfying the "one local type"
-//! requirement there, rather than the verifier marker (local here).
+//! std carriers (`RustStdStandard<T>`) live in *this* crate's own
+//! `rust_std_witness` module instead — see that module's own doc comment
+//! for why (in short: `creusot-rustc`'s whole-crate translation pass
+//! can't handle the ordinary Rust machinery that bridge needs when it's
+//! *local* to the translated crate, so this module is `#[cfg(not(creusot))]`-
+//! gated, and the rest of this crate stays pure Pearlite proof-function
+//! content, the thing `cargo creusot` actually translates). This split is
+//! legal under Rust's orphan rule the *usual* way: `CreusotVerifier`, the
+//! trait's own type parameter, is local to this crate.
 //!
-//! `rust_std.rs` holds the actual harness functions; `witness.rs` holds
-//! the trait/marker definitions `amenable_std` implements against.
+//! `rust_std/` holds the actual harness functions; `witness.rs` holds
+//! the trait/marker definitions `rust_std_witness` implements against.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

@@ -19,8 +19,8 @@ pub trait CreusotWitness {
 /// The Creusot verifier, local to this crate: there is only one verifier
 /// Creusot works with — Creusot. `CreusotVerifier` belongs here rather
 /// than `amenable_core`: it's what makes each per-type `Witness<
-/// CreusotVerifier>` impl elsewhere in this crate (`rust_std_witness.rs`,
-/// `ledger.rs`, `stoplight.rs`) a bridge to Creusot specifically, not a
+/// CreusotVerifier>` impl elsewhere in this crate (`rust_std_witness/`,
+/// `ledger/`, `stoplight.rs`) a bridge to Creusot specifically, not a
 /// generic one no other verifier could also legally claim.
 pub struct CreusotVerifier;
 
@@ -102,7 +102,7 @@ impl Verifier for CreusotVerifier {
 /// the `Vec<(String, String)>`/`Display` machinery is exactly the kind of
 /// ordinary Rust infrastructure `creusot-rustc`'s translator chokes on
 /// when it's *local* to the crate being translated — confirmed the hard
-/// way, twice. First building `ledger.rs`'s own `Witness<CreusotVerifier>`
+/// way, twice. First building `ledger/`'s own `Witness<CreusotVerifier>`
 /// bridge (an ungated `impl Display` there caused a real internal
 /// compiler panic); then again here, the *second* time around, gating
 /// only this struct's re-export in `lib.rs` and not the struct's own

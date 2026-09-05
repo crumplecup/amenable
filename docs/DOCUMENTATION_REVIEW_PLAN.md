@@ -247,16 +247,45 @@ the naming similarity), `compose/`, `registry.rs`, `witness.rs`, `error.rs`,
       `amenable gallery list`). Reworded to point at both live commands
       instead of a hand-copied number, matching `amenable_std`'s fix.
 
-### Step 6 — `amenable_creusot`
+### Step 6 — `amenable_creusot` ✅ done
 
-83 files, 13106 lines. Hand-written subset: `ledger.rs`, `stoplight.rs`,
-`witness.rs`, `rust_std_witness.rs`, plus `generated/`'s own doc-comment
+83 files, 13106 lines. Hand-written subset: `ledger/`, `stoplight.rs`,
+`witness.rs`, `rust_std_witness/`, plus `generated/`'s own doc-comment
 *mechanism* (not its per-file content, which is codegen output).
 
-- [ ] Function docs: `ledger.rs`, `stoplight.rs`, `witness.rs`,
-      `rust_std_witness.rs`.
-- [ ] Module docs: same set, plus `rust_std`'s own `mod.rs`.
-- [ ] README.md (97 lines, last touched 2026-08-18).
+- [x] Function docs: `ledger/` (4 files), `stoplight.rs` (read in full —
+      440 lines), `witness.rs`, `rust_std_witness/` (mod.rs read in full;
+      32 leaf files, structurally a templated one-file-per-carrier tree
+      despite being hand-written, swept by citation-pattern grep after
+      spot-checking the largest 7).
+- [x] Module docs: same set, plus `rust_std/mod.rs` (already touched
+      during the systemic fix below) and `lib.rs`.
+- [x] **Systemic finding, same class as Step 4/5**: `amenable_std::
+      creusot_witness` turned out to have 8 *more* stale references
+      beyond the 12 already fixed in `amenable_std` itself — a
+      workspace-wide grep after this step's first hit found 4 in
+      `amenable_creusot::rust_std_witness/mod.rs`'s own header (ironic:
+      the module's own doc comment cited its own pre-move address) and 4
+      more scattered across `rust_std`/`rust_std_witness` leaf files.
+      Fixed all 20 sites workspace-wide now.
+- [x] Found and fixed a real internal contradiction within
+      `stoplight.rs` itself: the file's own header explains `Green`/
+      `Yellow`/`Red` moved to `amenable_core` (with the real Cargo-cycle
+      story), but 3 of 9 "Sanitized mirror of `amenable_kani::X`" struct
+      doc comments two paragraphs later still attributed the moved types
+      to `amenable_kani` — confirmed via `lib.rs`'s own export list
+      (`Green`/`Yellow`/`Red` aren't there anymore) before fixing; the
+      other 6 (tokens, `Established`, `Stoplight`, `StoplightError`)
+      were correctly still attributed to `amenable_kani`, left alone.
+- [x] Fixed ~10 more bare `ledger.rs`/`rust_std.rs`/`rust_std_witness.rs`
+      file citations (now directories) across `lib.rs`, `witness.rs`,
+      `stoplight.rs`, `ledger/mod.rs`, `rust_std_witness/mod.rs`.
+- [x] README.md (97 lines) — same three file-vs-directory citations,
+      plus a coverage count ("93 harness registrations") that underclaims
+      the current real count by nearly half (174, confirmed via grep) —
+      this crate roughly doubled in size since the README was last
+      touched. Reworded to cite the counting command directly rather
+      than a number that will go stale again.
 
 ### Step 7 — `amenable_verus`
 

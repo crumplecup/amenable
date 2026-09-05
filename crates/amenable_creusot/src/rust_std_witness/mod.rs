@@ -5,10 +5,10 @@
 //! `amenable_creusot` (needed only to name `CreusotVerifier`, the trait's
 //! own type parameter). That optional edge was a real problem: `amenable_
 //! kani` depends on `amenable_std` unconditionally, so any crate wanting to
-//! depend on `amenable_kani` (this one, eventually — see `ledger.rs`'s own
+//! depend on `amenable_kani` (this one, eventually — see `ledger/`'s own
 //! doc comment) would close a real Cargo cycle the moment it also touched
 //! `amenable_std`, confirmed directly by a real `cyclic package dependency`
-//! error. Moved here instead, matching `ledger.rs`'s own precedent for
+//! error. Moved here instead, matching `ledger/`'s own precedent for
 //! `amenable_gaap`: `amenable_creusot` takes a real, ordinary, unconditional
 //! Cargo dependency *on* `amenable_std`, and implements `Witness<
 //! CreusotVerifier>` directly on the real `RustStdStandard<T>` from this
@@ -17,7 +17,7 @@
 //! crate it's directly translating (`amenable_creusot` itself), not an
 //! ordinary dependency's own items (a return-position `impl Trait` and a
 //! `static`-generating `::inventory::submit!` are real, confirmed ICE
-//! triggers when *local*, per this session's own findings — see `ledger.rs`
+//! triggers when *local*, per this session's own findings — see `ledger/`
 //! for the real counter-example and the fix, which still applies here:
 //! anything `Vec`/`String`/`Display`-heavy stays `#[cfg(not(creusot))]`).
 //!
@@ -26,7 +26,7 @@
 //! type parameter, is local to this crate. `RustStdStandard<T>` being local
 //! to `amenable_std` instead was the *old* file's own justification for the
 //! reverse direction — no longer the mechanism in use, but still confirmed
-//! true and still how `ledger.rs`'s own `Witness<CreusotVerifier> for
+//! true and still how `ledger/`'s own `Witness<CreusotVerifier> for
 //! Validated`/`Committed` impls stay legal (`Validated`/`Committed` are
 //! local to `amenable_gaap`, not here).
 //!
