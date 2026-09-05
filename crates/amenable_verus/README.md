@@ -27,9 +27,11 @@ Verus's toolchain either).
 
 ## Coverage
 
-**332 verified proof functions**, confirmed by running `verus
---crate-type=lib crates/amenable_verus/src/lib.rs` directly: `332
-verified, 0 errors`.
+**485 verified proof functions** as of this writing, confirmed by
+running `verus --crate-type=lib crates/amenable_verus/src/lib.rs`
+directly: `485 verified, 0 errors` — regenerate via that command for a
+current count rather than trusting this one, since this crate is still
+growing.
 
 Most state a real `assume_specification` axiom directly against the
 actual std type or method. Where `vstd` has no spec support for a type

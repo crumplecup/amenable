@@ -287,22 +287,44 @@ the naming similarity), `compose/`, `registry.rs`, `witness.rs`, `error.rs`,
       touched. Reworded to cite the counting command directly rather
       than a number that will go stale again.
 
-### Step 7 — `amenable_verus`
+### Step 7 — `amenable_verus` ✅ done
 
 179 files, 14964 lines. Hand-written subset: `exchange_support.rs`,
 `witness_accommodation.rs`, `gallery/` (investigation files — real prose,
 central to how this crate documents its own findings), `lib.rs`'s `#[path]`
 splice mechanism.
 
-- [ ] Function docs: `exchange_support.rs`, `witness_accommodation.rs`,
-      every `gallery/*.rs` file (not `gallery/generated/`).
-- [ ] Module docs: same set, plus `rust_std`'s own `mod.rs` and each
-      subdirectory `mod.rs` (already partly re-verified this session via the
-      `task_and_thread`/`exchange_support` work — confirm the rest).
-- [ ] README.md (60 lines, last touched 2026-08-07 — same staleness as
-      amenable_kani; this crate gained `mod_thin_skip` exemptions, the
-      `exchange_support` cfg-gate fix, and the `task_and_thread` flatten
-      since, none reflected yet).
+- [x] Function docs: `exchange_support.rs` (already reviewed/fixed
+      earlier this session during the cfg-gate work), `witness_accommodation.rs`,
+      all 12 `gallery/*.rs` + `gallery/ledger_exchange/*.rs` files (7 read
+      in full, 5 swept by citation-pattern grep after the pattern showed
+      zero drift beyond already-known classes).
+- [x] Module docs: `gallery/mod.rs`, `gallery/support.rs`,
+      `gallery/ledger_exchange/mod.rs`, `lib.rs` (already re-verified this
+      session via the `task_and_thread`/`exchange_support` work).
+- [x] **Real finding, documented but not acted on**: `witness_accommodation.rs`
+      described itself as existing only because `amenable_core::witness`
+      mixed clean trait mechanics with `inventory`-dependent registry code
+      in one file, with a "when that's ever split, delete this and
+      mod-include the real one" note. That split already happened (Step
+      1's own review: `witness/{core_trait,registry,support,tree}.rs`).
+      Investigated whether the described fix is now that simple: not
+      quite — `core_trait.rs` itself has one real cross-file dependency
+      the other eight mod-included files don't (`use super::support::
+      WitnessSupportSummary`), so mod-including it needs `support.rs`
+      alongside it, nested to preserve that relative path, not a flat
+      swap. Documented precisely in the file itself; the actual migration
+      is real, scoped, plausible, and not performed here (would need real
+      `verus` re-verification of a structural change, beyond this pass's
+      doc-accuracy scope).
+- [x] Found and fixed a real internal contradiction in `stoplight.rs`
+      (during Step 6, this crate's own `Green`/`Yellow`/`Red` structs
+      correctly attributed to `amenable_core` there — cross-checked
+      against this crate's real exports here, consistent).
+- [x] README.md (60 lines) — as stale as `amenable_kani`: a proof-function
+      count ("332 verified") that undercounts the real, `just verify-verus`-
+      confirmed current total (485) by 45%. Reworded to point at the live
+      command instead of a hand-copied number.
 
 ### Step 8 — `amenable` (top-level facade/CLI)
 
