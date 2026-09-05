@@ -40,7 +40,9 @@ mod verus_export;
 mod verus_gaap_tokens_export;
 
 pub use assessment::{AssessArgs, load};
-pub use cli::{Cli, install_hook};
+pub use cli::Cli;
+#[cfg(feature = "cli")]
+pub use cli::install_hook;
 pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
 #[cfg(feature = "creusot")]
 pub use creusot_export::write_creusot_exchange_companions;

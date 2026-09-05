@@ -2,26 +2,28 @@
 //! each command family keeps its own clap types and nested dispatch in a
 //! sibling module.
 
+// `creusot`/`verus` are whole feature-gated subcommand families: the
+// `#[cfg]` sits once on the `mod` declaration (the shape the cfg-scatter
+// lint recommends), and the only other gated sites are the exempt enum
+// variant and its one dispatch arm below. The args types are named
+// through the module path (`creusot::CreusotArgs`) rather than re-exported
+// at crate-level, so there is no second gated `use` to scatter the
+// predicate onto. `run.rs` reaches the `emit-*` args the same way, via
+// `commands::{creusot,verus}::…`.
 #[cfg(feature = "creusot")]
-mod creusot;
+pub(in crate::cli) mod creusot;
 mod inspection;
 mod verify;
 #[cfg(feature = "verus")]
-mod verus;
+pub(in crate::cli) mod verus;
 
 use clap::Subcommand;
 use tracing::instrument;
 
 use crate::AmenableResult;
 
-#[cfg(feature = "creusot")]
-pub(in crate::cli) use creusot::{CreusotArgs, EmitCreusotCompanionsArgs};
 pub(in crate::cli) use inspection::{AuditArgs, DumpRegistryArgs};
 pub(in crate::cli) use verify::VerifyArgs;
-#[cfg(feature = "verus")]
-pub(in crate::cli) use verus::{
-    EmitVerusExchangeCompanionsArgs, EmitVerusGaapTokensArgs, EmitVerusWitnessesArgs, VerusArgs,
-};
 
 /// Top-level `amenable` subcommands.
 #[derive(Debug, Subcommand)]
@@ -33,10 +35,10 @@ pub(super) enum Commands {
     /// Materialize derived Verus artifacts (witnesses, Exchange-edge
     /// companions, GAAP tokens) from the real registry.
     #[cfg(feature = "verus")]
-    Verus(VerusArgs),
+    Verus(verus::VerusArgs),
     /// Materialize derived Creusot artifacts from the real registry.
     #[cfg(feature = "creusot")]
-    Creusot(CreusotArgs),
+    Creusot(creusot::CreusotArgs),
     /// Run and inspect non-production Kani proof-gallery experiments.
     Gallery(crate::gallery::GalleryArgs),
     /// Write the full evidence and proof registry as JSON.

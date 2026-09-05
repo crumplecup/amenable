@@ -85,7 +85,7 @@ pub(super) fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
 /// re-exports).
 #[cfg(feature = "verus")]
 mod verus_commands {
-    use super::super::commands::{
+    use super::super::commands::verus::{
         EmitVerusExchangeCompanionsArgs, EmitVerusGaapTokensArgs, EmitVerusWitnessesArgs,
     };
     use crate::AmenableResult;
@@ -161,7 +161,7 @@ pub(super) use verus_commands::{
 /// own doc comment for the full rationale.
 #[cfg(feature = "creusot")]
 mod creusot_commands {
-    use super::super::commands::EmitCreusotCompanionsArgs;
+    use super::super::commands::creusot::EmitCreusotCompanionsArgs;
     use crate::AmenableResult;
 
     use tracing::instrument;
