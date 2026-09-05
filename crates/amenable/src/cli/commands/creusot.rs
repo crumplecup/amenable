@@ -1,7 +1,11 @@
-//! Clap types for `amenable creusot <leaf>`.
+//! Clap types and execution for `amenable creusot <leaf>`.
 //!
-//! This mirrors the Verus command split, but with the single Creusot leaf the
-//! CLI exposes today.
+//! Mirrors the Verus command split, with the single Creusot leaf the CLI
+//! exposes today. One `#[cfg(feature = "creusot")]` gate on the `mod
+//! creusot;` declaration in the parent covers the whole file; the leaf's
+//! executor lives here next to its arg struct. Only `CreusotArgs` stays
+//! visible (named by the parent's `Commands::Creusot` variant); the leaf
+//! arg struct is private.
 
 use std::path::PathBuf;
 
@@ -35,14 +39,33 @@ impl CreusotCommands {
     #[instrument(level = "debug", skip(self), err(level = "warn"))]
     fn act(self) -> AmenableResult<()> {
         match self {
-            Self::EmitCompanions(args) => super::super::run::run_emit_creusot_companions(args),
+            Self::EmitCompanions(args) => run_emit_creusot_companions(args),
         }
     }
 }
 
 #[derive(Debug, Args)]
-pub(in crate::cli) struct EmitCreusotCompanionsArgs {
+struct EmitCreusotCompanionsArgs {
     /// Directory to write generated companion files into.
     #[arg(long)]
-    pub(in crate::cli) root: Option<PathBuf>,
+    root: Option<PathBuf>,
+}
+
+#[instrument(level = "info", skip(args))]
+fn run_emit_creusot_companions(args: EmitCreusotCompanionsArgs) -> AmenableResult<()> {
+    let root = args
+        .root
+        .unwrap_or_else(crate::paths::creusot_generated_directory);
+    let paths = crate::write_creusot_exchange_companions(&root)?;
+
+    crate::write_stdout_line(format!(
+        "Wrote {} Creusot Exchange-edge companion(s) under {}:",
+        paths.len(),
+        root.display()
+    ))?;
+    for path in &paths {
+        crate::write_stdout_line(format!("  {}", path.display()))?;
+    }
+
+    Ok(())
 }

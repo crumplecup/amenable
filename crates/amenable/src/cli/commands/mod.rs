@@ -3,19 +3,18 @@
 //! sibling module.
 
 // `creusot`/`verus` are whole feature-gated subcommand families: the
-// `#[cfg]` sits once on the `mod` declaration (the shape the cfg-scatter
-// lint recommends), and the only other gated sites are the exempt enum
-// variant and its one dispatch arm below. The args types are named
-// through the module path (`creusot::CreusotArgs`) rather than re-exported
-// at crate-level, so there is no second gated `use` to scatter the
-// predicate onto. `run.rs` reaches the `emit-*` args the same way, via
-// `commands::{creusot,verus}::…`.
+// `#[cfg]` sits once on each private `mod` declaration (the shape the
+// cfg-scatter lint recommends), and the only other gated sites are the
+// exempt enum variant and its one dispatch arm below. Each family's arg
+// types are named through the module path (`creusot::CreusotArgs`) and its
+// leaf executors live in that same module, so nothing crosses a boundary
+// and there is no gated re-export to scatter the predicate onto.
 #[cfg(feature = "creusot")]
-pub(in crate::cli) mod creusot;
+mod creusot;
 mod inspection;
 mod verify;
 #[cfg(feature = "verus")]
-pub(in crate::cli) mod verus;
+mod verus;
 
 use clap::Subcommand;
 use tracing::instrument;
