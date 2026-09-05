@@ -18,13 +18,14 @@
 //! and the `KaniCompose` trait impls are globally visible the moment
 //! they're compiled.
 
-use amenable_core::Establish;
-use amenable_gaap::{Account, Amount, PendingToken, TransferPayload};
+use amenable_core::{Establish, Sidecar};
+use amenable_gaap::{
+    Account, AccountId, Amount, Pending, PendingToken, Transfer, TransferPayload, Validated,
+    ValidatedToken,
+};
 use uuid::Uuid;
 
-use crate::KaniCompose;
-
-use super::{AccountId, KaniVerifier, Pending, Sidecar, Transfer, Validated, ValidatedToken};
+use crate::{KaniCompose, KaniVerifier};
 
 /// `id: Uuid` is cheap to carry fully symbolic at every depth
 /// (fixed-size, and the only thing `AccountId`'s derived `PartialEq`
