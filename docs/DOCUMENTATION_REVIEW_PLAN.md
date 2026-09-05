@@ -57,7 +57,7 @@ a style pass for its own sake.
 
 ## Steps
 
-### Step 1 — `amenable_core`
+### Step 1 — `amenable_core` ✅ done
 
 23 files, 3493 lines. The trait foundation everything else cites by name
 (`Ensures`, `Requires`, `Evidence`, `Witness<V>`, `ProofToken`, `Sidecar`,
@@ -65,13 +65,22 @@ a style pass for its own sake.
 docs right first means every later "see `amenable_core::X`'s own doc
 comment" reference is trustworthy.
 
-- [ ] Function docs: `cert.rs`, `contract.rs`, `evidence.rs`, `exchange.rs`,
+- [x] Function docs: `cert.rs`, `contract.rs`, `evidence.rs`, `exchange.rs`,
       `provenance.rs`, `roles.rs`, `state_machine.rs`, `verifier.rs`,
       `witness.rs`, `verus_carrier/discovery.rs`, `tracing_init.rs`,
       `calculation.rs`, `chain.rs`, `link.rs`, `state.rs`, `stoplight.rs`.
-- [ ] Module docs: every file above, plus `lib.rs`'s crate-level `//!`.
-- [ ] README.md (67 lines, last touched 2026-09-01 — check against current
-      trait list/examples).
+      All 23 files read in full — already excellent (recent 2026-09-01
+      polish pass), no changes needed. Every cross-reference checked
+      against real source (`docs/AMENABLE_PLAN.md`, `docs/
+      STATE_MACHINE_DERIVATION_PLAN.md`, `docs/GAAP_LEDGER_PLAN.md`'s
+      Step 7, `amenable::verus_source_directory`, `AmenableError`) —
+      all still accurate.
+- [x] Module docs: every file above, plus `lib.rs`'s crate-level `//!`.
+      Same result: accurate throughout, no changes needed.
+- [x] README.md (67 lines) — found one real stale reference: "`StateMachine`
+      / `Amenable`" listed the deleted `Amenable` trait (confirmed gone via
+      grep; `state_machine.rs`'s own doc comment says it "replaces the
+      original StateMachine/Amenable trait pair entirely"). Fixed.
 
 ### Step 2 — `amenable_derive`
 
