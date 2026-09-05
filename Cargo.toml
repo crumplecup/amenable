@@ -35,7 +35,12 @@ creusot-std = { version = "0.11.0", features = ["sc-drf"] }
 derive-getters = "0.5"
 derive-new = "0.7"
 derive_builder = "0.20"
-derive_more = { version = "2", features = ["as_ref", "display", "error", "from"] }
+derive_more = { version = "2", features = [
+  "as_ref",
+  "display",
+  "error",
+  "from",
+] }
 derive_setters = "0.1"
 inventory = "0.3"
 miette = { version = "7", features = ["fancy"] }
@@ -43,16 +48,16 @@ proc-macro2 = "1.0"
 quote = "1.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-strum = { version = "0.27", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
 syn = { version = "3", features = ["full", "extra-traits"] }
 time = { version = "0.3", features = ["formatting", "macros", "parsing"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 trybuild = "1"
 uuid = "1"
-verus_builtin_macros = "0.0.0-2026-05-31-0205"
+verus_builtin_macros = "0.0.0-2026-08-30-0159"
 verus_syn = "0.0.0-2026-08-02-0125"
-vstd = "0.0.0-2026-05-31-0205"
+vstd = "0.0.0-2026-08-30-0159"
 
 # No [workspace.lints.rust] unexpected_cfgs here: a workspace-wide union
 # list was tried and reverted -- it let a verifier's cfg name go
