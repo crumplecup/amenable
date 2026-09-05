@@ -7,7 +7,7 @@
 //! at all on stable (`error[E0425]: cannot find type`, verified empirically
 //! — not merely deprecated or feature-gated-with-a-warning, genuinely
 //! unnameable from outside `alloc` on this toolchain). See the patch list
-//! (`amenable.json` in elicit_doc's patches) for the tracked exception.
+//! (`amenable.json` in cordial's patches) for the tracked exception.
 //!
 //! `Box<T>` covers only the default-allocator, `Sized` case
 //! (`Box<T, Global>`): the generic1 macro's `impl<T>` implicitly bounds `T:

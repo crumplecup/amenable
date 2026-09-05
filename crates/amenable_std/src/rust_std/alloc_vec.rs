@@ -86,7 +86,7 @@ impl<I: Iterator> crate::RustStdType for std::vec::Splice<'_, I> {
 // names all recur across other containers with the exact same spelling,
 // so only the qualified path disambiguates which container's carrier a
 // given registration means for tooling reading the registry (e.g.
-// `elicit_doc`'s coverage report).
+// `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     Vec<i32>,
     std::vec::Drain<'static, i32>,

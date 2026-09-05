@@ -109,7 +109,7 @@ impl_rust_std_type_generic1!(
 // (unstable, but already present in rustdoc's own inventory) and
 // `std::io::Error` share these bare names — only the qualified path
 // disambiguates which one a given registration means for tooling reading
-// the registry (e.g. `elicit_doc`'s coverage report).
+// the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     std::fmt::Alignment,
     Arguments<'static>,

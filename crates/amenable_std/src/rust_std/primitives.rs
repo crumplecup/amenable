@@ -103,7 +103,7 @@ impl RustStdType for String {
 // under both `core` and `std`). `slice`/`str` are unsized (`[T]`, `str`)
 // and registered as the bare unsized type itself, not `&[T]`/`&str` --
 // registering a reference would get credited to the `reference` primitive
-// page instead (elicit_doc's shape matcher checks the `&` prefix first),
+// page instead (cordial's shape matcher checks the `&` prefix first),
 // leaving `slice`/`str` themselves looking uncovered. `RustStdType`'s
 // methods take no `self`, so implementing it for an unsized type is no
 // different from any other type here; only the Kani proof (which must

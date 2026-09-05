@@ -37,5 +37,5 @@ impl_rust_std_type!(
 // `Drain` is written fully-qualified: its bare name collides with
 // `alloc::vec::Drain`/`alloc::collections::{binary_heap,vec_deque}::Drain`,
 // and only the qualified form disambiguates for tooling reading the
-// registry (e.g. `elicit_doc`'s coverage report).
+// registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(std::string::Drain<'static>, FromUtf16Error, FromUtf8Error);

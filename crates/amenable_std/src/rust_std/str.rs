@@ -197,7 +197,7 @@ str_pattern_iter_char!(
 // `char`'s escape iterators, `core::slice`'s differently-shaped
 // `Split`/`RSplit`/`SplitN`/`RSplitN`/`SplitInclusive` family) — only the
 // qualified path disambiguates which one a given registration means for
-// tooling reading the registry (e.g. `elicit_doc`'s coverage report).
+// tooling reading the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     std::str::Bytes<'static>,
     CharIndices<'static>,

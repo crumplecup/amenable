@@ -98,7 +98,7 @@ impl_rust_std_type_generic2!(
 // Kani-toolchain reason documented at the top of this module, but still
 // present in rustdoc's own inventory) — only the qualified path
 // disambiguates which one a given registration means for tooling reading
-// the registry (e.g. `elicit_doc`'s coverage report).
+// the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     std::ops::Range<i32>,
     std::ops::RangeFrom<i32>,

@@ -90,7 +90,7 @@ impl_rust_std_type!(
 // `TryLockError` is written fully-qualified: `std::sync::TryLockError`
 // shares its bare name, and only the qualified path disambiguates which
 // one a given registration means for tooling reading the registry (e.g.
-// `elicit_doc`'s coverage report).
+// `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     DirBuilder,
     DirEntry,

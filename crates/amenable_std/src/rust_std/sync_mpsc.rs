@@ -106,7 +106,7 @@ impl_rust_std_type!(
 // (both unstable, but already present in rustdoc's own inventory) define
 // their own types with the exact same bare names, so only the qualified
 // path disambiguates which channel family a given registration means for
-// tooling reading the registry (e.g. `elicit_doc`'s coverage report).
+// tooling reading the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     std::sync::mpsc::Sender<i32>,
     SyncSender<i32>,

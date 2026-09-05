@@ -3,7 +3,7 @@
 //! `EscapeDefault` is written fully-qualified: `core::char` and
 //! `core::str` each define their own carrier by the same bare name — only
 //! the qualified path disambiguates which one a given registration means
-//! for tooling reading the registry (e.g. `elicit_doc`'s coverage report).
+//! for tooling reading the registry (e.g. `cordial`'s coverage report).
 
 use crate::rust_std::macros::{impl_rust_std_type, register_rust_std_standard_evidence};
 

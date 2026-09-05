@@ -148,7 +148,7 @@ impl_rust_std_type!(
 // own types with the exact same bare names, and `std::fs::TryLockError`
 // shares its name with `std::sync::TryLockError` too — only the qualified
 // path disambiguates which one a given registration means for tooling
-// reading the registry (e.g. `elicit_doc`'s coverage report).
+// reading the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     std::sync::Mutex<i32>,
     std::sync::MutexGuard<'static, i32>,

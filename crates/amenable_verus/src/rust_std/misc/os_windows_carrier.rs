@@ -44,7 +44,7 @@
 //! `RawHandle`/`std::os::windows::raw::HANDLE` need no separate coverage
 //! here: both are aliases for `*mut c_void`, already covered by the
 //! `pointer` primitive doc page (`primitive_shapes_carrier.rs`'s
-//! `*const i32`/`*mut i32` axioms) — confirmed via a fresh `elicit_doc
+//! `*const i32`/`*mut i32` axioms) — confirmed via a fresh `cordial
 //! run`, not assumed; an earlier cached checklist run (predating that
 //! primitive-shapes cluster) incorrectly still listed them, and
 //! `rust_std/os_windows.rs`'s own doc comment is imprecise about why

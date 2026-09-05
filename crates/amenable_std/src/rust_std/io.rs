@@ -3,7 +3,7 @@
 //! `core::io` (a `no_std`-compatible mirror of a subset of this module,
 //! e.g. `core::io::Cursor`/`ErrorKind`/`IoSlice`/`SeekFrom`) is deliberately
 //! not covered — unstable (`core_io`, rust-lang/rust#154046). It isn't
-//! caught by elicit_doc's item-level stability screening, since these
+//! caught by cordial's item-level stability screening, since these
 //! particular items don't carry their own `#[unstable]` attribute (only
 //! the surrounding feature gate does) — a real, documented limitation of
 //! that screening, not a bug in the exclusion itself.
@@ -254,7 +254,7 @@ impl_rust_std_type!(
 // `std::str::Lines`, `std::slice::Split`, `std::iter::Chain`,
 // `std::iter::Take`, `core::fmt::Error`) — only the qualified path
 // disambiguates which one a given registration means for tooling reading
-// the registry (e.g. `elicit_doc`'s coverage report).
+// the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     BufReader<&'static [u8]>,
     BufWriter<Vec<u8>>,

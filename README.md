@@ -127,9 +127,9 @@ option set.
 | [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs — derives (`Standard`, `ProofToken`, `Sidecar`, `Witness`, ...), attributes (`#[exchange]`, `#[establish]`, `#[calculation]`, ...), and `harness!` |
 | [`amenable_gaap`](crates/amenable_gaap/README.md) | GAAP ledger worked example — a real, backend-neutral evidence chain proven on all three verifiers, doubling as the reference walkthrough for building a new one |
 | [`amenable_std`](crates/amenable_std/README.md) | `RustStdType` + the registry where all three verifiers' witnesses converge |
-| [`amenable_kani`](crates/amenable_kani/README.md) | Kani backend — 419 proof harnesses |
-| [`amenable_creusot`](crates/amenable_creusot/README.md) | Creusot backend — 93 harnesses |
-| [`amenable_verus`](crates/amenable_verus/README.md) | Verus backend — 332 verified proof functions |
+| [`amenable_kani`](crates/amenable_kani/README.md) | Kani backend — ~445 proof harnesses |
+| [`amenable_creusot`](crates/amenable_creusot/README.md) | Creusot backend — ~175 harnesses |
+| [`amenable_verus`](crates/amenable_verus/README.md) | Verus backend — ~485 verified proof functions |
 
 Building a new evidence chain (a new worked example, or extending an
 existing one)? [`amenable_derive`'s onboarding
@@ -166,12 +166,18 @@ disjoint slices of `std` — most tracked types carry proofs from all
 three backends at once, which is exactly what the aggregate figure below
 measures directly.
 
-Per the project's own coverage audit (`elicit_doc`), **421 of 440
-accountable stable `std`/`core` types (95.7%) have complete evidence plus
-every applicable verifier's witness**. The remaining 19 are either
+Per the project's own coverage audit (`cordial coverage --crate-name
+amenable_std`), **422 of 457 accountable stable `std`/`core` types
+(92.3%) have complete evidence plus every applicable verifier's
+witness** as of this writing — re-run that command for a current figure
+rather than trusting this snapshot; the accountable-type universe grows
+as the standard library does. Of the 35 open items, most are either
 confirmed false-negatives in the audit tool's own type-alias resolution
-(no real gap) or the `std::os::windows` cluster's Verus proofs, which are
-only checkable on the `windows-latest` CI job mentioned above.
+(`core::num::NonZero*`, `LayoutErr` — no real gap) or the
+`std::os::windows` cluster's Verus proofs, only checkable on the
+`windows-latest` CI job mentioned above; a smaller remainder
+(`core::range::*`, a few `os::unix` raw-type aliases) is untriaged
+backlog.
 
 Not yet built: structural proof-quality heuristics on `Witness` itself
 (automatic detection of vacuous or corner-cut proofs — `amenable.md`

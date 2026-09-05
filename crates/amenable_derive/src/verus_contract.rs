@@ -14,7 +14,7 @@
 //! own value now -- nothing is smuggled in through a side channel.
 //! `ContractRecord.fragment` itself stays `fn() -> &'static str` (one
 //! fragment per record, unchanged, so `dump-registry`'s JSON schema and
-//! `elicit_doc`'s scanner don't need to change) -- this macro just
+//! `cordial`'s scanner don't need to change) -- this macro just
 //! generates the N per-clause registrations mechanically instead of by
 //! hand.
 //!

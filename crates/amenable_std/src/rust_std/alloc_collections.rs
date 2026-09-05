@@ -238,7 +238,7 @@ impl_rust_std_type_generic1!(
 // names imported above: those bare names (`Drain`, `IntoIter`, `Iter`, ...)
 // recur across many other containers with the exact same spelling, so only
 // the qualified path disambiguates which container's carrier a given
-// registration means for tooling reading the registry (e.g. `elicit_doc`'s
+// registration means for tooling reading the registry (e.g. `cordial`'s
 // coverage report).
 register_rust_std_standard_evidence!(
     BTreeMap<i32, i32>,

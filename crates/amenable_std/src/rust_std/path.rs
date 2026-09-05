@@ -97,7 +97,7 @@ impl_rust_std_type!(
 // Display/Iter are written fully-qualified: both bare names are shared by
 // several other modules (e.g. `core::fmt::Display`, `std::slice::Iter`) —
 // only the qualified path disambiguates which one a given registration
-// means for tooling reading the registry (e.g. `elicit_doc`'s coverage
+// means for tooling reading the registry (e.g. `cordial`'s coverage
 // report).
 register_rust_std_standard_evidence!(
     Ancestors<'static>,

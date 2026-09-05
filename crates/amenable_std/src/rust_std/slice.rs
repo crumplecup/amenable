@@ -190,7 +190,7 @@ impl_rust_std_type!(
 // fully-qualified: each bare name is shared by another module (e.g.
 // `core::str`'s pattern-generic siblings, `core::option`/`core::result`'s
 // `IterMut`) — only the qualified path disambiguates which one a given
-// registration means for tooling reading the registry (e.g. `elicit_doc`'s
+// registration means for tooling reading the registry (e.g. `cordial`'s
 // coverage report). The `*Mut` split variants have no such collision, since
 // `core::str` never yields mutable subslices.
 register_rust_std_standard_evidence!(

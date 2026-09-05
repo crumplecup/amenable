@@ -51,7 +51,7 @@ impl_rust_std_type!(
 // c_void is written fully-qualified: `std::os::raw::c_void` is a distinct
 // rustdoc item sharing this bare name — only the qualified path
 // disambiguates which one a given registration means for tooling reading
-// the registry (e.g. `elicit_doc`'s coverage report).
+// the registry (e.g. `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     CStr,
     FromBytesUntilNulError,

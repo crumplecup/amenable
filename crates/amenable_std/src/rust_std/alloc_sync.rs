@@ -28,6 +28,6 @@ impl_rust_std_type_generic1!(
 // `Weak` imported above: `alloc::rc::Weak` shares the same bare name, and
 // `register_rust_std_standard_evidence!`'s `stringify!`-derived evidence
 // string is the only thing that disambiguates the two for tooling reading
-// the registry (e.g. `elicit_doc`'s coverage report) — a bare `Weak<i32>`
+// the registry (e.g. `cordial`'s coverage report) — a bare `Weak<i32>`
 // here would collide with `alloc_rc.rs`'s registration.
 register_rust_std_standard_evidence!(Arc<i32>, std::sync::Weak<i32>);

@@ -78,7 +78,7 @@ impl_rust_std_type_lifetime1!(
 // `Iter`, `IterMut`) recur across many other types with the exact same
 // spelling, so only the qualified path disambiguates which carrier a
 // given registration means for tooling reading the registry (e.g.
-// `elicit_doc`'s coverage report).
+// `cordial`'s coverage report).
 register_rust_std_standard_evidence!(
     Option<i32>,
     Result<i32, i32>,

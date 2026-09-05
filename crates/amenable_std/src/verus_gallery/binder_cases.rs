@@ -183,7 +183,7 @@ pub fn verify_cycle_model_repeats_its_sequence_forever(a: i32) -> (result: (i32,
 // route around a Cargo dependency cycle or a file-based, Cargo-blind
 // invocation model. The fragment text registered in amenable_std stays
 // a manually-kept-in-sync transcription of the shared spec fn/logic
-// fn's real body, verified only by elicit_doc's contract-bound
+// fn's real body, verified only by cordial's contract-bound
 // scanner -- which is the correct layer for this specific boundary,
 // not a fallback: this boundary structurally cannot carry an
 // executable, provable connection across it, unlike the boundary
