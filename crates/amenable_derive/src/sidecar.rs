@@ -11,7 +11,7 @@
 //! either way, so unlike `#[establish]`'s trivial mint body this was
 //! *always* possible; it just never had a consumer needing it before a
 //! carrier type itself needed to live in a neutral crate (`GAAP_LEDGER_
-//! PLAN.md`'s Step 9). One real consequence: with `V` generic, there is no
+//! PLAN.md`'s Step 7). One real consequence: with `V` generic, there is no
 //! concrete verifier text left to gate `primary_ensures_attr`/`creusot_
 //! ensures_attr` on (`quote!(V).to_string()` is just `"V"`, never `
 //! "CreusotVerifier"`), so neither is ever generated in this mode --

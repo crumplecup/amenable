@@ -2,14 +2,20 @@
 //! Proposition = Y; }` from a `#[proof_token(proposition = "Y")]`
 //! attribute.
 //!
-//! Every hand-written `ProofToken` impl in this workspace (`stoplight.rs`'s
-//! `GreenToken`/`YellowToken`/`RedToken`, `ledger.rs`'s `PendingToken`/
-//! `ValidatedToken`/`CommittedToken`, and the much larger `rust_std` corpus)
-//! is the identical one-line shape: name the proposition, done. This derive
-//! collapses that duplication the same way `#[derive(Standard)]` collapses
-//! `Standard`/`Evidence`'s shared provenance value — the impl targets the
-//! type being derived on (`Self`), matching ordinary derive semantics,
-//! unlike [`crate::establish`], which cannot (its impl targets the
+//! Every hand-written `ProofToken` impl in this workspace was the
+//! identical one-line shape: name the proposition, done —
+//! `amenable_kani::stoplight`'s `GreenToken`/`YellowToken`/`RedToken`
+//! and `amenable_gaap::tokens`'s `PendingToken`/`ValidatedToken`/
+//! `CommittedToken` have all since been converted to use this derive
+//! (its own `#[derive(..., amenable_derive::ProofToken)]`); the still-
+//! hand-written cases today are `amenable_creusot::stoplight` (a
+//! translator-visible file this crate never touches, per the
+//! `verifier backends never depend on each other` rule) and the much
+//! larger `rust_std` corpus. This derive collapses that duplication the
+//! same way `#[derive(Standard)]` collapses `Standard`/`Evidence`'s
+//! shared provenance value — the impl targets the type being derived on
+//! (`Self`), matching ordinary derive semantics, unlike
+//! [`crate::establish`], which cannot (its impl targets the
 //! *proposition*, a different, usually foreign type).
 
 use proc_macro2::{Span, TokenStream};

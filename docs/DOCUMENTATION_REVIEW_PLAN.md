@@ -82,17 +82,50 @@ comment" reference is trustworthy.
       grep; `state_machine.rs`'s own doc comment says it "replaces the
       original StateMachine/Amenable trait pair entirely"). Fixed.
 
-### Step 2 — `amenable_derive`
+### Step 2 — `amenable_derive` ✅ done
 
 22 files, 5222 lines. Proc macros generating real proof code for all three
 backends — the highest-leverage crate to get right, since a stale doc here
 misleads about what code three different verifiers will actually receive.
 
-- [ ] Function docs: all 22 files (no templated subtrees in this crate).
-- [ ] Module docs: all 22 files, `lib.rs`.
-- [ ] README.md (450 lines, last touched 2026-09-01 — the largest README in
-      the workspace; confirm it still matches current macro surface after
-      recent `exchange`/`sidecar`/`kani_compose` work).
+- [x] Function docs: all 22 files read in full. Found and fixed 5 real
+      drift issues: `establish.rs`/`exchange.rs` cited a bare `ledger.rs`
+      that's now a `ledger/` directory (split during the 500-LOC
+      modularity pass) — repointed each to the real crate
+      (`amenable_gaap::ledger` vs `amenable_kani::ledger`, confirmed by
+      grepping which one actually carries the cited `reject`/`rollback`
+      content); `proof_token.rs` cited `GreenToken`/`PendingToken` &c. as
+      still-hand-written examples, but both have since been converted to
+      the very derive being documented (confirmed via grep) — reworded
+      with accurate current examples (`amenable_creusot::stoplight`, the
+      `rust_std` corpus); `sidecar.rs` cited "`GAAP_LEDGER_PLAN.md`'s Step
+      9", which doesn't exist as a heading (the doc's real headings only
+      go to Step 7) — fixed to Step 7; `verus_fragment.rs` named
+      `[crate::verus_carrier]`, a module that doesn't exist in this crate
+      (it's `amenable_core::verus_carrier` — a proc-macro crate can't
+      export non-macro items) — corrected.
+- [x] Module docs: all 22 files, `lib.rs`. Same pass as function docs
+      above (this crate's module docs and function docs are tightly
+      interleaved).
+- [x] README.md (450 lines) — found 2 more of the same drift classes:
+      "every hand-written `ProofToken` impl" overclaim (same fix as
+      `proof_token.rs`), and a "read its source (`ledger.rs`, ...)" tour
+      pointing at a file that's now a directory.
+
+**Open finding, not resolved (flagged, not silently fixed):**
+`docs/GAAP_LEDGER_PLAN.md`'s own heading structure has only a `### Step
+7` heading covering lines 963–1238, but 9+ source comments across 4
+crates (`amenable_gaap`, `amenable_kani`, `amenable_creusot`,
+`amenable_verus`, `amenable`) consistently cite specific sub-parts of
+that same span as "Step 8" and "Step 9" — not a typo (confirmed via
+git log: real historical commits titled "GAAP ledger Steps 6-8" and
+"Step 10" show 8/9/10 existed as real, distinct steps at some point
+before being consolidated under one "Step 7" heading in the current
+doc, without the source comments' own numbering ever being updated to
+match). Fixing this needs either splitting the heading to match the
+source citations or renumbering 9+ source comments to match the
+heading — a real decision, not something to guess silently. Left
+exactly as found in both the doc and the source.
 
 ### Step 3 — `amenable_gaap`
 

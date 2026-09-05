@@ -74,7 +74,8 @@ use syn::{
 /// a `Path` -- matching `#[derive(Standard)]`'s `#[standard(basis = "..")]`
 /// convention and `#[establish(..)]`'s own fields: a generic evidence type
 /// (`Rejected<Pending>`, needed once two edges converge on the same
-/// evidence family -- see `ledger.rs`'s `reject`/`rollback` doc comment)
+/// evidence family -- see `amenable_kani::ledger`'s own module doc
+/// comment, `ledger/mod.rs`, for the real `reject`/`rollback` edges)
 /// is genuinely ambiguous as a bare attribute expression (`<`/`>` read as
 /// comparison operators, not generic-argument delimiters). `cfg`/
 /// `proof_artifact`/`harness_fn`/`harness_const`/`evidence_id` stay plain

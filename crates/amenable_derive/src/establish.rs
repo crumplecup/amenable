@@ -33,11 +33,11 @@
 //! identifiers — matching `#[derive(Standard)]`'s own `#[standard(basis
 //! = "..")]` convention, for the same reason: `proposition = Rejected<
 //! Pending>` (a generic proposition, needed once two edges converge on
-//! the same evidence family — see `ledger.rs`'s `reject`/`rollback`
-//! doc comment) is genuinely ambiguous as a bare attribute expression
-//! (`<`/`>` read as comparison operators, not generic-argument
-//! delimiters); `"Rejected<Pending>"` parsed fresh as a `Path` has no
-//! such ambiguity.
+//! the same evidence family — see `amenable_gaap::ledger`'s own module
+//! doc comment, `ledger/mod.rs`, for the real `reject`/`rollback` edges)
+//! is genuinely ambiguous as a bare attribute expression (`<`/`>` read
+//! as comparison operators, not generic-argument delimiters);
+//! `"Rejected<Pending>"` parsed fresh as a `Path` has no such ambiguity.
 //!
 //! Not a `#[derive(..)]`, unlike [`crate::proof_token`], even though it
 //! sits on the same kind of item (a unit-tuple token struct) — a derive's
@@ -56,8 +56,8 @@
 //! That's not a coincidence to paper over — it's what "the credential
 //! proves the transition is lawful; the token is just proof it happened"
 //! actually looks like in code once the real claim lives in a `Witness`/
-//! `Ensures` proof elsewhere (see `stoplight.rs`'s and `ledger.rs`'s own
-//! doc comments). A token that needs to carry real data from its
+//! `Ensures` proof elsewhere (see `stoplight.rs`'s and `ledger/mod.rs`'s
+//! own doc comments). A token that needs to carry real data from its
 //! credential is a different, richer shape this macro deliberately
 //! doesn't try to cover — hand-write that `Establish` impl instead, the
 //! same "cover the common case, allow divergence" precedent `#[derive(

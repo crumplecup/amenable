@@ -1,7 +1,11 @@
 //! `verus_ensures_fragments!`/`verus_requires_fragments!`: expand a real
 //! harness name to a `&'static [&'static str]` array literal of its real
 //! `ensures`/`requires` clauses, extracted from the real carrier source
-//! at compile time via [`crate::verus_carrier`].
+//! at compile time via `amenable_core::verus_carrier` (re-exported here
+//! as `verus_find_fn`/`verus_literal_clauses`, not this crate's own
+//! module -- a `proc-macro = true` crate can export nothing but macro
+//! items, so the shared discovery/parsing logic lives in `amenable_core`
+//! instead; see that module's own doc comment for the full rationale).
 //!
 //! A missing harness or missing clause is a real `syn::Error` here, not
 //! a runtime failure discovered later by whichever caller happens to

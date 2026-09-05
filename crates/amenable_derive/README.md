@@ -109,11 +109,14 @@ walks the same macros in the order you'd actually reach for them.
 
 - **`#[derive(ProofToken)]`** (attrs: `#[proof_token(proposition =
   "...")]`) — generates `impl ProofToken for X { type Proposition = Y;
-  }`. Every hand-written `ProofToken` impl in this workspace is this
-  identical one-line shape; this collapses it and registers a
-  `ProofTokenMintRecord` (read by codegen tools like `amenable verus
-  emit-gaap-tokens`) unconditionally, at no cost to callers that
-  don't care.
+  }`. Every hand-written `ProofToken` impl in this workspace was this
+  identical one-line shape (`amenable_kani::stoplight`'s tokens and
+  `amenable_gaap::tokens`'s have both since converted to this derive;
+  `amenable_creusot::stoplight` and the much larger `rust_std` corpus
+  still hand-write it, for real reasons of their own); this collapses
+  the duplication and registers a `ProofTokenMintRecord` (read by
+  codegen tools like `amenable verus emit-gaap-tokens`) unconditionally,
+  at no cost to callers that don't care.
 
   ```rust
   #[derive(Debug, Clone, amenable_derive::ProofToken)]
@@ -437,8 +440,9 @@ For the concrete, currently-complete result of following this order —
 six real methods, three independent backends, zero per-backend
 duplicate logic — read `amenable_gaap`'s own
 [README](../amenable_gaap/README.md) as a guided tour of the finished
-shape, then its source (`ledger.rs`, `tokens.rs`, `transfer.rs`,
-`contracts.rs`) in that order.
+shape, then its source (`ledger/` — split into several files during a
+later modularity pass, but still one module — then `tokens.rs`,
+`transfer.rs`, `contracts.rs`) in that order.
 
 ## See also
 
