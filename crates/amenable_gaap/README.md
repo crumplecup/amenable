@@ -60,14 +60,15 @@ own onboarding walkthrough for the general recipe this crate follows):
    backend-generic `impl<V: Verifier> Establish<C, V> for Y` per edge,
    gated only on whichever backend has actually registered a real
    `Witness<V>` proof for `Y`.
-4. **[`ledger.rs`](src/ledger.rs)** — `Transfer<S, Token>` (a
-   `#[derive(Sidecar)]` carrier), `TransferError`, `Ledger`, and all
-   six real methods — the actual logic, each generic over `V`, each
-   decorated with `#[amenable_derive::capture_exchange_body(..)]` so
-   Creusot's/Verus's own codegen can read the real body, and each
-   carrying its own real Kani contract directly (no delegating
-   wrapper — see the module's own doc comment for why that's a hard
-   requirement, not a style choice).
+4. **[`ledger/`](src/ledger)** — `Transfer<S, Token>` (a
+   `#[derive(Sidecar)]` carrier) and `TransferError` in
+   [`types.rs`](src/ledger/types.rs), `Ledger` and all six real methods
+   in [`machine.rs`](src/ledger/machine.rs) — the actual logic, each
+   generic over `V`, each decorated with `#[amenable_derive::
+   capture_exchange_body(..)]` so Creusot's/Verus's own codegen can read
+   the real body, and each carrying its own real Kani contract directly
+   (no delegating wrapper — see `machine.rs`'s own doc comment for why
+   that's a hard requirement, not a style choice).
 
 ## The three backends
 

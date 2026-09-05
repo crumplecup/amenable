@@ -128,13 +128,19 @@ cross-contamination. Renumbered all 10 stray citations (9 files across
 "Step 8"/"Step 9" to "Step 7", verified with `check-all-package` on
 all four crates (comment-only change, no verifier re-run needed).
 
-### Step 3 — `amenable_gaap`
+### Step 3 — `amenable_gaap` ✅ done
 
 7 files, 1072 lines. Small, self-contained worked example (ledger/transfer).
 
-- [ ] Function docs: `contracts.rs`, `ledger.rs`, `tokens.rs`, `transfer.rs`.
-- [ ] Module docs: all 4 + `lib.rs`.
-- [ ] README.md (132 lines, last touched 2026-08-28).
+- [x] Function docs: `contracts.rs`, `ledger/{mod,machine,types}.rs`,
+      `tokens.rs`, `transfer.rs` — all read in full, cross-references
+      verified. Clean (the Step 7/8/9 citations here were already fixed
+      as part of the cross-crate renumbering above).
+- [x] Module docs: all files + `lib.rs`. Clean.
+- [x] README.md (132 lines) — fixed one broken link:
+      `[ledger.rs](src/ledger.rs)` pointed at a file that no longer
+      exists (split into `ledger/{mod,machine,types}.rs` during the
+      500-LOC modularity pass) — repointed to the real files.
 
 ### Step 4 — `amenable_std`
 
