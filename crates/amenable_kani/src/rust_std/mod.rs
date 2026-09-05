@@ -1,7 +1,8 @@
 //! `KaniWitness` impls for Rust standard-library carriers, split into one
 //! module per source-library area — mirrors `amenable_std::rust_std`'s
 //! module boundaries, so the Kani proof for e.g. `core::num::NonZero<T>`
-//! lives in `num.rs` here just as its `RustStdType` impl lives in
+//! lives in `num/` here (split further into its own files during the
+//! 500-LOC modularity pass) just as its `RustStdType` impl lives in
 //! `amenable_std::rust_std::num`.
 //!
 //! Each type gets exactly the harness that's actually true of it — see

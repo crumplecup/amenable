@@ -115,7 +115,7 @@ use mirror::{
 // its bare name collides with `alloc::vec::Drain` and the
 // `alloc::collections::{binary_heap,vec_deque}::Drain` carriers, and this
 // qualification is what lets `amenable_std`'s matching evidence string
-// disambiguate them for tooling reading the registry (e.g. `elicit_doc`'s
+// disambiguate them for tooling reading the registry (e.g. `cordial`'s
 // coverage report).
 impl KaniWitness for RustStdStandard<std::string::Drain<'static>> {
     type SupportingEvidence = Self;

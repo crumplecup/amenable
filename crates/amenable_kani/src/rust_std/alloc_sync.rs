@@ -118,7 +118,7 @@ amenable_derive::harness! {
 // bare/aliased `Weak`: `alloc::rc::Weak` shares the same bare name, and
 // this qualification is what lets `amenable_std`'s matching evidence
 // string (see `alloc_sync.rs`'s own registration comment) disambiguate the
-// two for tooling reading the registry (e.g. `elicit_doc`'s coverage
+// two for tooling reading the registry (e.g. `cordial`'s coverage
 // report).
 impl KaniWitness for RustStdStandard<std::sync::Weak<i32>> {
     type SupportingEvidence = Self;

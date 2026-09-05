@@ -156,7 +156,7 @@ amenable_derive::harness! {
 // bare/aliased `Weak`: `alloc::sync::Weak` shares the same bare name, and
 // this qualification is what lets `amenable_std`'s matching evidence
 // string (see `alloc_rc.rs`'s own registration comment) disambiguate the
-// two for tooling reading the registry (e.g. `elicit_doc`'s coverage
+// two for tooling reading the registry (e.g. `cordial`'s coverage
 // report).
 /// A `Weak::upgrade()` outcome, once computed, known to report `None`:
 /// once every strong reference has dropped, upgrading a `Weak` to it

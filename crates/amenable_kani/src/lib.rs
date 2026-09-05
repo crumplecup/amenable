@@ -10,7 +10,7 @@
 //! still isn't legal (the parameter itself is never "covered"), which is
 //! why each type gets its own [`KaniWitness`] impl plus a one-line
 //! mechanical bridge, rather than one generic impl for all of them — see
-//! `rust_std.rs`.
+//! `rust_std/`.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

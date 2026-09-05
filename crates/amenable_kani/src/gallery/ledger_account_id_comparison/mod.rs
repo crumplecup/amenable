@@ -1,6 +1,8 @@
 //! Isolates `GAAP_LEDGER_PLAN.md`'s Step 1 CBMC timeout:
-//! `verify_validate_accepts_a_lawful_transfer` (`ledger.rs`) times out
-//! under `just verify-kani-contract` with two free symbolic `i64`s
+//! `verify_validate_accepts_a_lawful_transfer` (`ledger.rs`, this
+//! crate's own now-retired copy at the time -- `Ledger`'s real methods
+//! moved to `amenable_gaap` in Step 7) times out under `just
+//! verify-kani-contract` with two free symbolic `i64`s
 //! (`amount`, `balance`) and two *concrete* account names
 //! ("Alice"/"Bob").
 //!

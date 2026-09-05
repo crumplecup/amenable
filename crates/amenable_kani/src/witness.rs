@@ -17,7 +17,7 @@ pub trait KaniWitness {
 
 /// The Kani verifier, local to this crate: there is only one verifier Kani
 /// works with — Kani. Being local here (not imported from `amenable_core`)
-/// is what makes the per-type bridges in `rust_std.rs` legal under Rust's
+/// is what makes the per-type bridges in `rust_std/` legal under Rust's
 /// orphan rule — a blanket bridge over a bare type parameter is not: the
 /// orphan rule requires every uncovered generic parameter to be covered
 /// before the first local type, and `Self` in a blanket impl never is.

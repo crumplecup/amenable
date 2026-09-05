@@ -1,5 +1,7 @@
 //! Isolates `GAAP_LEDGER_PLAN.md`'s Step 2 CBMC timeout:
-//! `verify_commit_always_balances` (`ledger.rs`) times out under `just
+//! `verify_commit_always_balances` (`ledger.rs`, this crate's own
+//! now-retired copy at the time -- `Ledger`'s real methods moved to
+//! `amenable_gaap` in Step 7) times out under `just
 //! verify-kani-contract`, even though `Ledger::commit` is infallible
 //! (no branching at all -- always `Ok`), its postcondition doesn't
 //! touch `AccountId`/`Uuid` comparison at all (only `payload.amount()`),

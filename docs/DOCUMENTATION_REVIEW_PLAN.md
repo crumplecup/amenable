@@ -204,22 +204,48 @@ to all three backends.
       staleness class can't recur silently.
 - Also fixed one unrelated pre-existing markdownlint failure hit while
   linting this step's README (`docs/MODULARITY_500_LOC_PLAN.md`'s MD004:
-  a wrapped line starting with `+ ` inside a `-`-style list, parsed as a
-  list-style violation).
+  a wrapped line starting with a literal `+` inside a `-`-style list,
+  parsed as a list-style violation).
 
-### Step 5 — `amenable_kani`
+### Step 5 — `amenable_kani` ✅ done
 
 226 files, 42208 lines — the largest crate. Hand-written subset: `*_model.rs`
 files at crate root (`btree_model`, `net_model`, `utf8_model`, etc. — these
 are real hand-built accommodation models, not templated carriers, despite
-the naming similarity), `compose.rs`, `registry.rs`, `witness.rs`, `error.rs`,
-`ledger.rs`, `gaap_ledger.rs`, `stoplight.rs`, `calculator.rs`, `gallery/`.
+the naming similarity), `compose/`, `registry.rs`, `witness.rs`, `error.rs`,
+`ledger/`, `gaap_ledger.rs`, `stoplight.rs`, `calculator.rs`, `gallery/`.
 
-- [ ] Function docs: every `*_model.rs` root file + the list above.
-- [ ] Module docs: same set, plus every `rust_std` subdirectory's own
-      `mod.rs`/`macros.rs`.
-- [ ] README.md (48 lines, last touched 2026-08-07 — stale by two months of
-      heavy work in this crate; needs a real rewrite, not a touch-up).
+- [x] Function docs: all ~29 crate-root files read (most in full; the
+      smaller, highly-formulaic accommodation models skimmed after the
+      first ~10 showed zero drift), `compose/` and `gallery/`'s 27 files
+      swept by citation-pattern grep after 3 full reads and spot-checks
+      confirmed the self-registration boilerplate carries no external
+      cross-references at risk of drift (only self-referential fully-
+      qualified paths, which can't go stale independent of the code
+      itself).
+- [x] Module docs: same set, plus `rust_std/mod.rs` (no thematic
+      subdirectories at this level, unlike `amenable_verus`).
+- [x] Found and fixed: `lib.rs`/`witness.rs` each had a stale bare
+      `` `rust_std.rs` `` (now `rust_std/`, split during the modularity
+      pass); `rust_std/mod.rs` cited `num.rs` for what's now a genuine
+      multi-file `num/` directory (`nonzero/{contracts,signed,unsigned}.rs`
+      alone are 870 lines); 4 files had a stale `elicit_doc` tool-name
+      reference; `gaap_ledger.rs`'s own module doc described itself as a
+      "candidate that will eventually replace" `amenable_kani::ledger`'s
+      own production `Ledger` — but `ledger/mod.rs`'s own doc comment
+      already confirms that migration is done and calls `gaap_ledger.rs`
+      the real, final harnesses; 2 gallery investigation files cited a
+      bare `ledger.rs` from before both the Step 7 relocation to
+      `amenable_gaap` and the later directory split — reworded as "this
+      crate's own now-retired copy at the time" rather than corrected to
+      a current path that doesn't apply retroactively.
+- [x] README.md (48 lines) — as flagged, the most stale: 3 more
+      file-vs-directory citations (`rust_std.rs`, `compose.rs`,
+      `fs_model.rs`), and its harness count ("419") was stale — the real,
+      CLI-verified current count is 445 (356 tracked production proofs
+      via `amenable verify kani --list` + 89 gallery cases via
+      `amenable gallery list`). Reworded to point at both live commands
+      instead of a hand-copied number, matching `amenable_std`'s fix.
 
 ### Step 6 — `amenable_creusot`
 

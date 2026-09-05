@@ -13,18 +13,22 @@ requires *some* type in `Witness<KaniVerifier>`'s type list to be local,
 and `KaniVerifier` now is. A blanket impl over a bare type parameter
 still isn't legal (the parameter itself is never "covered"), which is
 why each type gets its own `KaniWitness` impl plus a one-line mechanical
-bridge, rather than one generic impl for all of them — see `rust_std.rs`.
+bridge, rather than one generic impl for all of them — see `rust_std/`.
 
 ## Coverage
 
-**419 `#[kani::proof]` harnesses** — `rust_std.rs`'s std-lib coverage
-plus this crate's worked-example/gallery material (`calculator.rs`,
-`stoplight.rs`, `compose.rs`, and friends).
+**445 harnesses** as of this writing (356 tracked production proofs via
+`amenable verify kani --list`, plus 89 proof-gallery cases via
+`amenable gallery list`) — regenerate via those two commands for a
+current count rather than trusting this one, since this crate is still
+growing. `rust_std/`'s std-lib coverage accounts for most of it, plus
+this crate's worked-example/gallery material (`calculator.rs`,
+`stoplight.rs`, `compose/`, and friends).
 
 Where a real API's timing, platform gating, or state-space size puts a
 direct proof out of CBMC's reach, an Amenable-owned accommodation model
 states the same law over a Linux-compilable stand-in instead —
-`fs_model.rs`, `hash_model.rs`, `btree_model.rs`, `utf8_model.rs`, and
+`fs_model/`, `hash_model.rs`, `btree_model.rs`, `utf8_model.rs`, and
 several others each document their own specific reason CBMC can't take
 the direct real-type path. The proof's evidence is hand-linked to the
 real type's registration by string rather than by naming the type.

@@ -1,9 +1,9 @@
 //! Real Kani harnesses for `amenable_gaap::Ledger`'s own methods --
-//! `GAAP_LEDGER_PLAN.md`'s Step 7. Not `amenable_kani::ledger`'s own
-//! (still-separate, still-production) `Ledger`: this verifies the real
-//! `amenable_gaap::Ledger` candidate that will eventually replace it,
-//! once every method has moved and every harness/caller here has been
-//! repointed. See `amenable_gaap::ledger`'s own doc comment and
+//! `GAAP_LEDGER_PLAN.md`'s Step 7. `amenable_kani::ledger`'s own
+//! duplicate `Ledger`/`Transfer`/`TransferError` are retired (see that
+//! module's own doc comment): these are the real, final harnesses for
+//! the one real `Ledger` now, not a transitional candidate. See
+//! `amenable_gaap::ledger`'s own doc comment and
 //! `gallery::ledger_gaap_free_function_contract` for the confirmed
 //! "direct contract, no delegating wrapper" pattern every harness below
 //! relies on.
