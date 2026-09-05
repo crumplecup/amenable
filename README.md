@@ -193,9 +193,10 @@ named contract types that own those claims (value 1 above, applied to
 (`rust.authority`, `source_url`, …) is attached to the report, and the
 header says explicitly which verifiers the chain is complete for.
 
-With default features only Kani's proof is linked in; `--features
-creusot,verus` adds the other two (Creusot is still an experimental,
-partial backend, which is why it's opt-in).
+All three backends are at feature parity across the standard library —
+`--features creusot,verus` links Creusot's and Verus's proofs into the
+binary alongside Kani's. They're opt-in only to keep the default build
+and its dependency tree light.
 
 The `amenable` CLI wraps this and more:
 
@@ -261,11 +262,12 @@ running on Windows.
 ## Status
 
 The core constitutional trait family is implemented with zero runtime
-dependencies, and all three verifier backends are wired in and actively
-exercised. The per-backend proof counts in the table above aren't three
-disjoint slices of `std` — most tracked types carry proofs from all
-three backends at once, which is what the aggregate figure below
-measures directly.
+dependencies, and the standard library is covered to **feature parity
+across all three backends** — the per-backend proof counts in the table
+above aren't three disjoint slices of `std`; nearly every tracked type
+carries a Kani proof *and* a Creusot contract *and* a Verus
+postcondition at once, which is what the aggregate figure below measures
+directly.
 
 Per the project's own coverage audit (`cordial coverage --crate-name
 amenable_std`), **422 of 457 accountable stable `std`/`core` types
@@ -279,6 +281,13 @@ confirmed false-negatives in the audit tool's own type-alias resolution
 `windows-latest` CI job mentioned above; a smaller remainder
 (`core::range::*`, a few `os::unix` raw-type aliases) is untriaged
 backlog.
+
+**Roadmap.** With `std` at parity, the next expansion targets are key
+third-party crates — `jiff` and `chrono` for time handling — and
+higher-level exchange-based trait interfaces built on top of them (e.g.
+an `amenable_time`). Every addition ships with full Kani, Creusot, and
+Verus support; that parity is a standing invariant of the project, not
+a phase.
 
 Not yet built: structural proof-quality heuristics on `Witness` itself
 (automatic detection of vacuous or corner-cut proofs — `amenable.md`

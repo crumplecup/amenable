@@ -7,8 +7,9 @@
 //!
 //!     cargo run --example audit_proof_chain --features creusot,verus
 //!
-//! With default features only Kani's proof is linked in and printed
-//! (Creusot is still an experimental, partial backend, so it's opt-in):
+//! All three backends are at feature parity; `creusot`/`verus` are opt-in
+//! only to keep the default build's dependency tree light. With default
+//! features just Kani's proof is linked in and printed:
 //!
 //!     cargo run --example audit_proof_chain
 
