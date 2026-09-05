@@ -146,51 +146,56 @@ fn main() -> Result<(), amenable::ChainError> {
 ```
 
 ```console
-$ cargo run --example audit_proof_chain
-Proof chain for amenable_std::rust_std::RustStdStandard<char> (complete for: kani)
+$ cargo run --example audit_proof_chain --features creusot,verus
+Proof chain for amenable_std::rust_std::RustStdStandard<char> (complete for: verus, creusot, kani)
 
 amenable_std::rust_std::RustStdStandard<char> (root)
+  proof [verus]:
+    harness: verify_char_roundtrip
+    claim: // ... (real verus! { } source; spec fns elided)
+           pub fn verify_char_roundtrip(c: char) -> (result: char)
+               ensures
+                   char_roundtrip_preserves_value(result, c),
+                   char_is_valid_unicode_scalar(c),
+           { c }
+  proof [creusot]:
+    harness: verify_char_roundtrip
+    claim: // ... (real Pearlite source; logic fns elided)
+           #[requires(true)]
+           #[ensures(char_roundtrips(c, result))]
+           #[ensures(valid_unicode_scalar_holds(result))]
+           fn verify_char_roundtrip(c: char) -> char { c }
   proof [kani]:
     harness: verify_char_unicode_scalar
-    claim: /// `char` is constrained to Unicode scalar values (excludes the
-            /// surrogate range `0xD800..=0xDFFF`) and round-trips through `u32`.
-            /// ...
-            #[kani::proof]
-            fn verify_char_unicode_scalar() {
-                let c: char = kani::any();
-                let u = c as u32;
-
-                assert!(
-                    <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures(u),
-                    "char is a valid Unicode scalar value"
-                );
-
-                let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
-                assert!(
-                    <RustStdStandard<char> as Ensures<crate::KaniVerifier>>::ensures((c, c2)),
-                    "char round-trips through u32"
-                );
-            }
-    rust.authority_kind: external_standard
+    claim: // ...
+           #[kani::proof]
+           fn verify_char_unicode_scalar() {
+               let c: char = kani::any();
+               let u = c as u32;
+               assert!(<ValidUnicodeScalar as Ensures<KaniVerifier>>::ensures(u), "...");
+               let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
+               assert!(<RustStdStandard<char> as Ensures<KaniVerifier>>::ensures((c, c2)), "...");
+           }
     rust.authority: Rust Project Developers
-    rust.source_crate: core
-    rust.source_module: core::primitive
     source_url: https://doc.rust-lang.org/std/primitive.char.html
-    type_name: char
     semantic_summary: The character carrier stores a Unicode scalar value.
 ```
 
-That's the whole story in miniature. The claim ("`char` is a valid
-Unicode scalar value and round-trips through `u32`") is backed by the
-*actual* Kani proof source, not a description of one — and the proof
-body doesn't restate the bound inline: it calls through
-`ValidUnicodeScalar` and `RustStdStandard<char>`, the named contract
-types that own those two claims (value 1 above, applied to `std` itself).
-The provenance metadata that grounds the root (`rust.authority`,
-`source_url`, …) is right there in the report, and the report says
-explicitly which verifiers it's complete for. Build with
-`--features creusot,verus` and the same lookup returns all three
-independent proofs for this claim, not just Kani's.
+(Harness sources abridged — the tool prints each in full.) That's the
+whole story in miniature. One claim — "`char` is a valid Unicode scalar
+value and round-trips" — proven **three independent ways**: a symbolic
+Kani harness, a Pearlite contract discharged by SMT, and a `verus`-checked
+postcondition. Each is backed by its *actual* proof source, not a
+description of one, and none restates the bound inline — every backend's
+harness calls through `ValidUnicodeScalar` / `RustStdStandard<char>`, the
+named contract types that own those claims (value 1 above, applied to
+`std` itself). The provenance metadata that grounds the root
+(`rust.authority`, `source_url`, …) is attached to the report, and the
+header says explicitly which verifiers the chain is complete for.
+
+With default features only Kani's proof is linked in; `--features
+creusot,verus` adds the other two (Creusot is still an experimental,
+partial backend, which is why it's opt-in).
 
 The `amenable` CLI wraps this and more:
 
