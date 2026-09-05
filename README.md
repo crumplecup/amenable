@@ -13,40 +13,121 @@
 Software that claims to be "verified" is usually trusted on faith: a
 comment says so, a test suite is green, and a reviewer has no way to
 check what was actually established or how much confidence it deserves.
-`amenable` makes that distinction explicit and load-bearing. It is the
-foundational, dependency-light trait family for lawful proof-carrying
-software structure: it defines the roles and admissibility criteria
-governing a proof economy — which types are permitted to serve as
-trusted roots, which types may count as derived evidence, which
-exchanges are lawful, and which workflows are closed under those
-exchanges.
+`amenable` makes that distinction explicit and load-bearing.
 
-Every claim in the system is backed by exactly one of two lawful things —
-never a silent third option:
+Every claim in an `amenable` program is backed by exactly one of two
+lawful things — never a silent third option:
 
-- a genuine machine-checked proof, emitted through `Witness` and consumed by
-  a `Verifier` backend (Kani, Creusot, Verus)
-- an explicit `Standard` certification of provenance — a structured,
+- **a machine-checked proof** — emitted through `Witness`, checked by a
+  `Verifier` backend. Three independent backends (Kani, Creusot, Verus)
+  check the same claims against the same carriers, so a claim proven
+  under all three is much stronger evidence than any one alone.
+- **an explicit `Standard` certification of provenance** — a structured,
   auditable record naming the authority, source, and rationale for a
-  trust decision that cannot be mathematically derived, whether that
-  authority is a third-party citation or an asserted local design
-  decision
+  trust decision that *cannot* be mathematically derived: a third-party
+  standard, an RFC, a company policy, or an asserted local design
+  decision with no external authority to cite.
 
-Three independent verifier backends implement `Witness` against the same
-carriers, so a claim proven under Kani *and* Creusot *and* Verus
-independently is much stronger evidence than any one alone — and the
-registry backing all of this is queryable at any time, not just
-documentation (see [Try it](#try-it) below).
+When a claim can't be discharged by a proof, the framework does not fall
+back to "trivially trusted." It requires a `Standard` certification
+instead, and no blanket implementation is allowed to grant one for free.
+The trait interface is the only way to manufacture a proof token, which
+keeps the audit surface to the narrow bottleneck of the trait method
+implementations.
 
-`amenable` is upstream of every framework that consumes it. Formal
-verification does not depend on any downstream conversational or domain
-framework; those frameworks depend on `amenable`.
+## What you get
 
-See [`amenable.md`](amenable.md) for the trait-by-trait design and
-[`docs/AMENABLE_PLAN.md`](docs/AMENABLE_PLAN.md) for the original
-architectural rationale this project was built from. Planning documents
-for individual features live in [`docs/`](docs/), indexed by
-[`docs/PLANNING_INDEX.md`](docs/PLANNING_INDEX.md).
+### 1. An auditable surface of assumptions
+
+Every non-trivial program rests on invariants it can't prove from within
+itself — the same shape as an `unsafe` block needing a `// SAFETY:`
+comment. Today those assumptions live in prose: a doc comment cites "ASC
+230" or "RFC 3339 §5.6", a reviewer takes it on trust, and nothing ties
+the citation to the code that depends on it or lets you enumerate what's
+been assumed.
+
+`amenable` turns each one into a **type**. A contract type that `impl`s
+`Standard` names one assumption; its `Provenance` record carries the
+*why* — the standard number, the section, a link, the rationale — as
+structured metadata you can query, not text buried in a `///`:
+
+```rust
+use amenable_core::{MetadataEntry, Standard};
+
+/// The source and destination accounts must differ.
+#[derive(Debug, Clone, Copy, Default, amenable_derive::Standard)]
+#[standard(basis = "Self")]
+pub struct AccountsDistinct;
+
+// The citation lives with the type, as data, not in a doc comment.
+impl amenable_core::Provenance for AccountsDistinct {
+    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
+    fn metadata(&self) -> Self::MetadataIter {
+        vec![
+            MetadataEntry::new("standard", "ASC 230"),
+            MetadataEntry::new("title", "Statement of Cash Flows"),
+            MetadataEntry::new("rationale", "gross vs. net presentation needs distinct counterparties"),
+        ]
+        .into_iter()
+    }
+}
+
+// Retrievable, not buried — and the same record flows into `Standard::report()`
+// and into a tracked `Certificate` via `Standard::certification(..)`:
+assert_eq!(AccountsDistinct.get("standard").unwrap().value(), "ASC 230");
+```
+
+The `Provenance` schema is yours to define. When a citation shape
+repeats across many contract types — an ISO number, an ASC section, an
+internal policy ID, all with the same fields — make it its own struct,
+`#[derive(amenable_derive::Provenance)]` it once, and point
+`#[standard(provenance_type = "..")]` at it; the derive projects that
+struct's fields into the queryable record for you.
+
+For a code reviewer, the set of `Standard` types **is** the assumption
+surface: ideally a closure over the problem space, with every relevant
+assumption represented by a type you can list, look up, render, and
+certify — instead of a doc comment you have to go find.
+
+### 2. Multi-backend verification, derived
+
+You don't hand-write proof scaffolding three times. You decorate ordinary
+structs and enums with `amenable` derives and attributes, and the family
+wires the rest:
+
+| Macro | For |
+| --- | --- |
+| `#[derive(Provenance)]` | project a struct's fields into structured, queryable metadata |
+| `#[derive(Evidence)]` / `#[derive(Standard)]` | a claim with a real proof / an asserted-and-cited root claim |
+| `#[derive(ProofToken)]` / `#[establish(..)]` / `#[derive(Sidecar)]` | proof tokens, the lawful exchanges that mint them, and the payload+token carriers that flow through an exchange |
+| `#[exchange(..)]` | a proof-carrying state transition — its real body captured once, verbatim, then checked by every backend |
+| `#[derive(StateMachine)]` | a closed set of states and the lawful transitions over them; states are asserted `Provenance` roots, transitions are proven relations |
+
+The macros capture the structure once; each backend consumes it — Kani
+directly, Creusot and Verus through generated companion files — so the
+same annotated types are checked three ways without re-authoring the
+proofs per backend.
+
+### Worked examples
+
+Two complete evidence chains ship as reference implementations — proof of
+concept for the derives, and a walkthrough of how to apply them to your
+own domain:
+
+- **`Stoplight`** (`amenable_core`/`amenable_kani`, with backend
+  companions) — the minimal case: a three-state machine
+  (`Green → Yellow → Red → Green`) where every transition is a proven
+  `Exchange` and every state is an asserted `Standard` carrying its own
+  `Provenance` record. The reference for the `Exchange`/`StateMachine`
+  derives.
+- **`amenable_gaap`** ([README](crates/amenable_gaap/README.md)) — a real
+  double-entry ledger: `Pending → Validated → Committed` with a
+  `reject`/`rollback` branch. Its invariants — `AmountPositive`,
+  `SufficientFunds`, `AccountsDistinct`, `BalancedEntries`, each resting
+  on an accounting standard (ASC sections, foundational double-entry
+  rules) — are each a named contract type rather than an inline
+  assertion, proven on all three backends with zero per-backend
+  duplicate logic. The reference walkthrough for building your own.
 
 ## Try it
 
@@ -73,18 +154,22 @@ amenable_std::rust_std::RustStdStandard<char> (root)
     harness: verify_char_unicode_scalar
     claim: /// `char` is constrained to Unicode scalar values (excludes the
             /// surrogate range `0xD800..=0xDFFF`) and round-trips through `u32`.
+            /// ...
             #[kani::proof]
             fn verify_char_unicode_scalar() {
                 let c: char = kani::any();
                 let u = c as u32;
 
                 assert!(
-                    u <= 0xD7FF || (0xE000..=0x10FFFF).contains(&u),
+                    <ValidUnicodeScalar as Ensures<crate::KaniVerifier>>::ensures(u),
                     "char is a valid Unicode scalar value"
                 );
 
                 let c2 = char::from_u32(u).expect("valid unicode scalar round-trips");
-                assert!(c == c2, "char round-trips through u32");
+                assert!(
+                    <RustStdStandard<char> as Ensures<crate::KaniVerifier>>::ensures((c, c2)),
+                    "char round-trips through u32"
+                );
             }
     rust.authority_kind: external_standard
     rust.authority: Rust Project Developers
@@ -95,10 +180,15 @@ amenable_std::rust_std::RustStdStandard<char> (root)
     semantic_summary: The character carrier stores a Unicode scalar value.
 ```
 
-That's the whole story in miniature: the claim ("`char` is a valid
+That's the whole story in miniature. The claim ("`char` is a valid
 Unicode scalar value and round-trips through `u32`") is backed by the
-*actual* Kani proof source, not a description of one, and the report
-says explicitly which verifiers it's complete for. Build with
+*actual* Kani proof source, not a description of one — and the proof
+body doesn't restate the bound inline: it calls through
+`ValidUnicodeScalar` and `RustStdStandard<char>`, the named contract
+types that own those two claims (value 1 above, applied to `std` itself).
+The provenance metadata that grounds the root (`rust.authority`,
+`source_url`, …) is right there in the report, and the report says
+explicitly which verifiers it's complete for. Build with
 `--features creusot,verus` and the same lookup returns all three
 independent proofs for this claim, not just Kani's.
 
@@ -124,7 +214,7 @@ option set.
 | --- | --- |
 | [`amenable`](crates/amenable/README.md) | Top-level facade + the CLI above |
 | [`amenable_core`](crates/amenable_core/README.md) | The constitutional trait family itself — `Verifier`, `Witness`, `Evidence`, `Standard`, `Sidecar`, `Establish`, `Exchange`, `StateMachine`, `Provenance` |
-| [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs — derives (`Standard`, `ProofToken`, `Sidecar`, `Witness`, ...), attributes (`#[exchange]`, `#[establish]`, `#[calculation]`, ...), and `harness!` |
+| [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs — derives (`Standard`, `Provenance`, `Evidence`, `ProofToken`, `Sidecar`, `StateMachine`, `Witness`, `KaniCompose`), attributes (`#[exchange]`, `#[establish]`, `#[calculation]`, …), and `harness!` |
 | [`amenable_gaap`](crates/amenable_gaap/README.md) | GAAP ledger worked example — a real, backend-neutral evidence chain proven on all three verifiers, doubling as the reference walkthrough for building a new one |
 | [`amenable_std`](crates/amenable_std/README.md) | `RustStdType` + the registry where all three verifiers' witnesses converge |
 | [`amenable_kani`](crates/amenable_kani/README.md) | Kani backend — ~445 proof harnesses |
@@ -136,6 +226,12 @@ existing one)? [`amenable_derive`'s onboarding
 walkthrough](crates/amenable_derive/README.md#onboarding-building-a-new-worked-example)
 covers the order to reach for these macros in, using `amenable_gaap`'s
 own construction as the worked reference.
+
+See [`amenable.md`](amenable.md) for the trait-by-trait design and
+[`docs/AMENABLE_PLAN.md`](docs/AMENABLE_PLAN.md) for the architectural
+rationale this project was built from. Planning documents for individual
+features live in [`docs/`](docs/), indexed by
+[`docs/PLANNING_INDEX.md`](docs/PLANNING_INDEX.md).
 
 ## Verifiers
 
@@ -163,7 +259,7 @@ The core constitutional trait family is implemented with zero runtime
 dependencies, and all three verifier backends are wired in and actively
 exercised. The per-backend proof counts in the table above aren't three
 disjoint slices of `std` — most tracked types carry proofs from all
-three backends at once, which is exactly what the aggregate figure below
+three backends at once, which is what the aggregate figure below
 measures directly.
 
 Per the project's own coverage audit (`cordial coverage --crate-name
