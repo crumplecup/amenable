@@ -7,8 +7,8 @@
     "reason": "Models std::panic::Location::file(), which genuinely returns &'static str in real Rust; only ever constructed from a literal call site (\"proof.rs\"). Converting to an owned String would compile but would misrepresent the real API surface this type exists to mirror."
   },
   {
-    "file": "crates/amenable_kani/src/utf8_model.rs",
-    "line": 220,
+    "file": "crates/amenable_kani/src/utf8_model/mirror.rs",
+    "line": 16,
     "rule_id": "ANTIPATTERN-UNUSED-UNDERSCORE-ARG-001",
     "context": "utf8_model::mirror::KaniAssumedUtf8Validity::decide",
     "reason": "Two #[cfg]-gated definitions of decide share one name: the #[cfg(not(kani))] sibling genuinely reads bytes (real is_valid_utf8 computation, exercised by tests/utf8_model_test.rs's TooLong/InvalidUtf8 cases), while under Kani validity is asserted symbolically via kani::any() and the byte content is genuinely irrelevant. No single parameter name is honest for both; the underscore here reflects that this specific (kani) definition truly ignores its argument."
