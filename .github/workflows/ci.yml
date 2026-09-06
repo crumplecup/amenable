@@ -47,6 +47,36 @@ jobs:
       - uses: extractions/setup-just@v3
       - run: just check-features
 
+  cordial:
+    name: cordial-gate (ubuntu-latest)
+    # Quality-etiquette gate: fails if any curated action item is open
+    # (`cordial quality --deny-open`, gating `quality-report.md`'s "Total
+    # open items"). The `cordial` binary is pinned to a commit and cached
+    # by that key -- it only rebuilds when CORDIAL_REV changes.
+    # `creusot_diagnostics` is disabled in cordial.toml (needs the Creusot
+    # toolchain); the `verify-creusot` recipe covers that surface locally.
+    runs-on: ubuntu-latest
+    env:
+      # crumplecup/cordial -- bump when a cordial change is needed here.
+      CORDIAL_REV: bc0fc3f09a78b69cdf026335ecc52a1441850e1c
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: extractions/setup-just@v3
+      - name: Cache cordial binary
+        id: cordial-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/cordial
+          key: cordial-${{ env.CORDIAL_REV }}
+      - name: Install cordial
+        if: steps.cordial-cache.outputs.cache-hit != 'true'
+        run: >
+          cargo install --git https://github.com/crumplecup/cordial
+          --rev ${{ env.CORDIAL_REV }} --locked
+          --no-default-features --features quality,cli cordial
+      - run: just cordial-gate
+
   windows:
     name: check-all (windows-latest)
     # Kani/CBMC don't run on Windows, so this validates the #[cfg(windows)]

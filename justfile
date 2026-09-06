@@ -39,6 +39,16 @@ check-all-package package:
 check-features:
     cargo hack check --workspace --feature-powerset --no-dev-deps --keep-going
 
+# Loads the committed `.cordial-exceptions/` into the local store, then runs
+# every quality etiquette and fails if any curated action item is open
+# (`quality-report.md`'s "Total open items"). Needs `cordial` on PATH
+# (`just install` in ~/repos/cordial). `creusot_diagnostics` is off in
+# `cordial.toml` -- it needs the Creusot toolchain; run `just verify-creusot`
+# for that surface. Pre-merge; CI runs this too.
+cordial-gate:
+    cordial exceptions load
+    cordial quality --deny-open
+
 # Canonical Kani verification entrypoint -- delegates to the `amenable
 # verify kani` binary, never a raw `cargo kani` call, so it's registry-
 # driven: `crates/amenable/src/kani.rs`'s `registered_proofs()` iterates
