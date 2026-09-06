@@ -10,10 +10,21 @@
 
 ## What is Amenable?
 
-Software that claims to be "verified" is usually trusted on faith: a
-comment says so, a test suite is green, and a reviewer has no way to
-check what was actually established or how much confidence it deserves.
-`amenable` makes that distinction explicit and load-bearing.
+Amenable is about expressing a program's invariants as types, so the
+compiler does the hard work of enforcing them instead of the programmer.
+Every invariant a program rests on — a numeric bound, a relationship
+between two values, a trust decision that can't be derived — gets a
+**name**: a contract type that `impl`s `Standard`. A named invariant is
+the natural unit of analysis. Once it has a name you can pin bounds and
+trait impls to it, attach proof obligations to it, and assert things
+about it that the compiler then checks — instead of leaving it in a doc
+comment that nothing enforces.
+
+That has a direct payoff for review. Software that claims to be
+"verified" is usually trusted on faith: a comment says so, a test suite
+is green, and a reviewer has no way to check what was actually
+established or how much confidence it deserves. `amenable` makes that
+distinction explicit and load-bearing.
 
 Every claim in an `amenable` program is backed by exactly one of two
 lawful things — never a silent third option:
