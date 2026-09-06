@@ -115,6 +115,16 @@ generated_files = [
 [proof_patterns]
 enabled = false
 
+# The creusot-diagnostics etiquette shells out to `cargo creusot prove`,
+# which needs the full Creusot toolchain (nightly + why3 + z3 +
+# cargo-creusot) -- too heavy and fragile to stand up on a CI runner just
+# for this gate. It stays a local check: `just verify-creusot` /
+# `just verify-creusot-translate` exercise the same compilation, and it
+# was driven to zero findings (2026-09-06, amenable_derive `814552e` +
+# amenable_creusot `3373abd`). Re-enable if the toolchain ever lands in CI.
+[creusot_diagnostics]
+enabled = false
+
 # amenable_verus's gallery/ is a deliberately narrow "one investigation,
 # one file" convention: each file documents a single confirmed Verus
 # finding (real prose + a verus! {} block). VIS-MOD-THIN-001's 10-name
