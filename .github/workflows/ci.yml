@@ -1,9 +1,22 @@
 name: CI
 
+# Runs on the promotion of `dev` to `main`, on a pull request targeting
+# `main`, and on manual dispatch. Day-to-day pushes to `dev` do not trigger
+# CI -- pre-flight a promotion by running this workflow against `dev` from
+# the Actions tab (or `gh workflow run ci.yml --ref dev`) and waiting for
+# green before you fast-forward `dev` onto `main`. The `pull_request`
+# trigger exists so the occasional gated PR into `main` still gets a check;
+# with no PR open, ordinary `dev` work stays CI-free.
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   linux:
