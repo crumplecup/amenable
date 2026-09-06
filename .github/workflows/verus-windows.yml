@@ -18,7 +18,7 @@ jobs:
     name: verify rust_std::os_windows_carrier (windows-latest)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Verus ships prebuilt Windows release archives (verus.exe, z3.exe,
       # and the vstd/verus_builtin rlibs it needs, all bundled together)

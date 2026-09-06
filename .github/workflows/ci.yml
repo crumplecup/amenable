@@ -23,11 +23,11 @@ jobs:
     name: check-all (ubuntu-latest)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - uses: extractions/setup-just@v3
+      - uses: extractions/setup-just@v4
       - run: just check-all
 
   features:
@@ -39,12 +39,12 @@ jobs:
     # feature-gate break and a fmt/clippy/test break report independently.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-hack
-      - uses: extractions/setup-just@v3
+      - uses: extractions/setup-just@v4
       - run: just check-features
 
   cordial:
@@ -60,12 +60,12 @@ jobs:
       # crumplecup/cordial -- bump when a cordial change is needed here.
       CORDIAL_REV: bc0fc3f09a78b69cdf026335ecc52a1441850e1c
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
-      - uses: extractions/setup-just@v3
+      - uses: extractions/setup-just@v4
       - name: Cache cordial binary
         id: cordial-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cargo/bin/cordial
           key: cordial-${{ env.CORDIAL_REV }}
@@ -87,11 +87,11 @@ jobs:
     # (see amenable_kani/src/os_windows_model.rs).
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - uses: extractions/setup-just@v3
+      - uses: extractions/setup-just@v4
       - run: just check-all
       # Dumped only to confirm, for real, that a #[cfg(windows)] EvidenceLink
       # (amenable_std) and its hand-wired kani ProofRecord (amenable_kani,
@@ -99,7 +99,7 @@ jobs:
       # target platform -- the actual mechanism os_windows_model.rs's doc
       # comment claims, not just the compile check above.
       - run: cargo run -p amenable --bin amenable -- dump-registry --out registry-dump-windows.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: registry-dump-windows
           path: registry-dump-windows.json
