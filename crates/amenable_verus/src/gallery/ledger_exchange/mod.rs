@@ -159,6 +159,14 @@ pub mod evidence_and_tokens;
 /// `generated/*.rs` `include!`s.
 pub mod exchange_wiring;
 /// `Amount`, `TransferPayload`, `TransferError`, `Ledger`.
+#[allow(
+    missing_docs,
+    reason = "TransferError's data-carrying variants make verus! {} synthesize \
+              per-field projection accessor methods whose spans land on the enum, \
+              not on any source AST node this file declares -- neither a variant nor \
+              a field doc comment clears the resulting missing_docs (confirmed \
+              against the real toolchain). Scoped to this one file."
+)]
 pub mod transfer_and_ledger;
 /// The `AmountPositive`/`SufficientFunds`/`AccountsDistinct`/
 /// `BalancedEntries` contract-bound markers (re-exports `GalleryVerifier`
