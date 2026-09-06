@@ -1,0 +1,16 @@
+[
+  {
+    "file": "src/gallery/ledger_exchange/mod.rs",
+    "line": 162,
+    "rule_id": "ALLOW-ATTR-001",
+    "context": "gallery::ledger_exchange",
+    "reason": "verus! {} synthesizes an undocumentable per-field projection accessor method for each of TransferError's data-carrying variants (its own result->Variant_N pattern syntax); the method's span lands on the enum, not on any source AST node this file declares, so verus's own missing_docs pass has nothing to attach /// to. Confirmed against the real toolchain: no variant- or field-level doc comment clears it, an enum-level #[allow] doesn't reach verus's synthesized output, and verus! rejects an inner attr -- so the lint level on this one mod declaration is the narrowest site that works. Invisible to plain cargo build/clippy (verus-only). Reasoned per project policy."
+  },
+  {
+    "file": "src/lib.rs",
+    "line": 71,
+    "rule_id": "ALLOW-ATTR-001",
+    "context": "<crate>",
+    "reason": "verus! {} synthesizes an undocumentable per-field projection accessor method for each data-carrying variant of an enum-shaped witness's generated *Result type (its own result->Variant_N pattern syntax); the method's span lands on the enum, not on any AST node the generated source declares, so verus's own missing_docs pass has nothing to attach /// to. Confirmed against the real toolchain (no variant/field doc comment clears it; enum-level #[allow] doesn't reach verus's output; verus! rejects inner attrs). derived_witness/ is an entirely generated subtree, so the lint level on its mod declaration is the narrowest working site and the silence never reaches hand-written code. Invisible to plain cargo build/clippy (verus-only). Reasoned per project policy."
+  }
+]
