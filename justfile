@@ -112,14 +112,18 @@ check-all-creusot:
 
 # Rust -> Why3/COMA translation only, no SMT solving -- fastest way to check
 # that contracts actually parse under the real Creusot toolchain.
+# `--only=coma`: since Creusot 0.12, a bare `cargo creusot` runs the provers
+# too (the old `cargo creusot` behaviour, and the removed `prove` subcommand).
 verify-creusot-translate:
     just generate-creusot
-    env {{creusot_env}} cargo creusot -- -p amenable_creusot
+    env {{creusot_env}} cargo creusot --only=coma -- -p amenable_creusot
 
-# Full translate + prove for amenable_creusot's own contracts.
+# Full translate + prove for amenable_creusot's own contracts. A bare
+# `cargo creusot` runs both stages since 0.12 (`prove` is no longer a
+# subcommand).
 verify-creusot:
     just generate-creusot
-    env {{creusot_env}} cargo creusot prove -- -p amenable_creusot
+    env {{creusot_env}} cargo creusot -- -p amenable_creusot
 
 # `amenable_verus` compiles fine on plain stable (`verus_builtin_macros`/
 # `vstd` are ordinary crates.io deps -- the `verus! {}` macro expands to

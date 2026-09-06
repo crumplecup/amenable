@@ -2,7 +2,8 @@
 
 (* ledger::ledger_validate::mirror::Ledger *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 81 19 81 23
 let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 82 18 82 83
 let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 166 16 173 17
@@ -17,8 +18,12 @@ type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
 
 type t_Result_unit_tup2_i64_i64 = Ok () | Err tup2_i64_i64
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
-  [%#scontract_bounds] outcome = (Int64.to_int balance'0 >= Int64.to_int amount)
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 117 8 117 87] (balance'0: Int64.t) (amount: Int64.t) (outcome: bool) =
+  [%#scontract_bounds] outcome = ge_log_Int (Int64.to_int balance'0) (Int64.to_int amount)
 
 predicate check_sufficient_funds_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 160 8 164 17] (balance'0: Int64.t) (amount: Int64.t) (outcome: t_Result_unit_tup2_i64_i64) =
   [%#sledger_validate'1] match outcome with
@@ -31,9 +36,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec check_sufficient_funds_V
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 83 8 83 93] (self: t_Ledger)
-  (amount: Int64.t) (return (x: t_Result_unit_tup2_i64_i64)) = (! bb0
+let check_sufficient_funds_V [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 83 8 83 93]
+  (self: t_Ledger) (amount: Int64.t) (return (x: t_Result_unit_tup2_i64_i64)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Int64.lt self.balance amount ] s1 | s1 = any [ br0 -> {_7 = false} (! bb2) | br1 -> {_7} (! bb1) ] ]
   | bb1 = s0

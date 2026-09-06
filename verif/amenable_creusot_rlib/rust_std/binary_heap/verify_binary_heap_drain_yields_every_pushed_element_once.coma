@@ -22,9 +22,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_binary_heap_drain_yields_every_pushed_element_once
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 107 8 110 58] (a: Int32.t)
-  (b: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
+let verify_binary_heap_drain_yields_every_pushed_element_once [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/binary_heap.rs" 107 8 110 58]
+  (a: Int32.t) (b: Int32.t) (return (x: tup4_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &first <- Some a ] s1
     | s1 = [ &second <- Some b ] s2

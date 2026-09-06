@@ -10,9 +10,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_join_paths_error_reports_an_unjoinable_path
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 82 8 82 71] (return (x: bool)) =
-  (! bb0
+let verify_join_paths_error_reports_an_unjoinable_path [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 82 8 82 71]
+  (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#senv_carriers] true ] s1 | s1 = return {_ret} ] ] [ & _ret: bool = Any.any_l () ])
   [ return (result: bool) ->
   {[@stop_split] [@expl:verify_join_paths_error_reports_an_unjoinable_path ensures] [%#senv_carriers'1] result}

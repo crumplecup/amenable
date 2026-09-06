@@ -8,7 +8,7 @@
 mod mirror {
     pub(super) use creusot_std::macros::{check, ensures, requires};
     pub(super) use creusot_std::prelude::ghost;
-    pub(super) use creusot_std::std::sync::atomic::Ordering::{
+    pub(super) use creusot_std::std::sync::atomic_sc::ordering::{
         None as AtomicNone, SeqCst as AtomicSeqCst,
     };
     pub(super) use creusot_std::std::sync::atomic_sc::{
@@ -44,16 +44,16 @@ macro_rules! atomic_sc_load_store_harness {
                 fn $fn_name(initial: $value_ty, next: $value_ty) -> ($value_ty, $value_ty) {
                     let (atomic, mut own) = $atomic_ty::new(initial);
                     let observed_initial = atomic.load(ghost!(
-                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&*own)
                     ));
                     atomic.store(
                         next,
                         ghost!(
-                            |c: &mut Committer<$atomic_ty, $value_ty, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut **own)
+                            |c: &mut Committer<$atomic_ty, $value_ty, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut *own)
                         ),
                     );
                     let observed_next = atomic.load(ghost!(
-                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                        |c: &Committer<$atomic_ty, $value_ty, AtomicSeqCst, AtomicNone>| c.shoot_load(&*own)
                     ));
                     (observed_initial, observed_next)
                 }
@@ -160,16 +160,16 @@ amenable_derive::harness! {
         fn verify_atomic_ptr_load_store(initial: *mut i32, next: *mut i32) -> (bool, bool) {
             let (atomic, mut own) = CreusotAtomicPtr::new(initial);
             let observed_initial = atomic.load(ghost!(
-                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&*own)
             ));
             atomic.store(
                 next,
                 ghost!(
-                    |c: &mut Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut **own)
+                    |c: &mut Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicNone, AtomicSeqCst>| c.shoot_store(&mut *own)
                 ),
             );
             let observed_next = atomic.load(ghost!(
-                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&**own)
+                |c: &Committer<CreusotAtomicPtr<i32>, *mut i32, AtomicSeqCst, AtomicNone>| c.shoot_load(&*own)
             ));
             (observed_initial.addr() == initial.addr(), observed_next.addr() == next.addr())
         }

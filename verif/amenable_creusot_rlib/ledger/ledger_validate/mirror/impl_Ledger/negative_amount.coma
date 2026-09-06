@@ -21,9 +21,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec negative_amount
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 102 8 102 64] (bad: Int64.t)
-  (return (x: t_TransferError)) = (! bb0
+let negative_amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 102 8 102 64]
+  (bad: Int64.t) (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- NegativeAmount bad ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: Int64.t = bad ])
   [ return (result: t_TransferError) ->

@@ -1,5 +1,7 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 98 8 98 102 *)
 
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
 let%span swrapping_saturating = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 99 12 99 17
 let%span swrapping_saturating'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 96 19 96 23
 let%span swrapping_saturating'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 97 18 97 63
@@ -14,38 +16,44 @@ use int.Int
 
 type t_Saturating_i32 = { f0: Int32.t }
 
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
 constant const_MIN: Int32.t = (-2147483648: Int32.t)
 
 constant const_MAX: Int32.t = (2147483647: Int32.t)
 
-let rec add_Saturating_i32 (self_: t_Saturating_i32) (rhs: t_Saturating_i32) (return (x: t_Saturating_i32)) = any
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord'0] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+let add_Saturating_i32 (self_: t_Saturating_i32) (rhs: t_Saturating_i32) (return (x: t_Saturating_i32)) = any
   [ return (result: t_Saturating_i32) ->
-  {[@stop_split] [@expl:add_Saturating_i32 ensures] ([@stop_split] [@expl:add ensures #0] [%#swrapping_saturating'2] Int32.to_int self_.f0
-            + Int32.to_int rhs.f0
-          >= Int32.to_int const_MIN
+  {[@stop_split] [@expl:add_Saturating_i32 ensures] ([@stop_split] [@expl:add ensures #0] [%#swrapping_saturating'2] ge_log_Int (Int32.to_int self_.f0
+          + Int32.to_int rhs.f0) (Int32.to_int const_MIN)
         /\ Int32.to_int self_.f0 + Int32.to_int rhs.f0 <= Int32.to_int const_MAX
       -> Int32.to_int result.f0 = Int32.to_int self_.f0 + Int32.to_int rhs.f0)
     /\ ([@stop_split] [@expl:add ensures #1] [%#swrapping_saturating'3] Int32.to_int self_.f0 + Int32.to_int rhs.f0
         < Int32.to_int const_MIN -> Int32.to_int result.f0 = Int32.to_int const_MIN)
-    /\ ([@stop_split] [@expl:add ensures #2] [%#swrapping_saturating'4] Int32.to_int self_.f0 + Int32.to_int rhs.f0
-      > Int32.to_int const_MAX -> Int32.to_int result.f0 = Int32.to_int const_MAX)}
+    /\ ([@stop_split] [@expl:add ensures #2] [%#swrapping_saturating'4] gt_log_Int (Int32.to_int self_.f0
+      + Int32.to_int rhs.f0) (Int32.to_int const_MAX) -> Int32.to_int result.f0 = Int32.to_int const_MAX)}
     (! return {result}) ]
 
 predicate saturating_i32_add_clamps_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 72 8 76 17] (a: t_Saturating_i32) (b: t_Saturating_i32) (add_result: t_Saturating_i32) =
-  [%#swrapping_saturating'5] (Int32.to_int a.f0 + Int32.to_int b.f0 >= Int32.to_int const_MIN
+  [%#swrapping_saturating'5] (ge_log_Int (Int32.to_int a.f0 + Int32.to_int b.f0) (Int32.to_int const_MIN)
       /\ Int32.to_int a.f0 + Int32.to_int b.f0 <= Int32.to_int const_MAX
     -> Int32.to_int add_result.f0 = Int32.to_int a.f0 + Int32.to_int b.f0)
   /\ (Int32.to_int a.f0 + Int32.to_int b.f0 < Int32.to_int const_MIN
     -> Int32.to_int add_result.f0 = Int32.to_int const_MIN)
-  /\ (Int32.to_int a.f0 + Int32.to_int b.f0 > Int32.to_int const_MAX
+  /\ (gt_log_Int (Int32.to_int a.f0 + Int32.to_int b.f0) (Int32.to_int const_MAX)
   -> Int32.to_int add_result.f0 = Int32.to_int const_MAX)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_saturating_i32_add_clamps
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 98 8 98 102]
+let verify_saturating_i32_add_clamps [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/wrapping_saturating.rs" 98 8 98 102]
   (a: t_Saturating_i32) (b: t_Saturating_i32) (return (x: t_Saturating_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = add_Saturating_i32 [%#swrapping_saturating] {a} {b} (fun (_x: t_Saturating_i32) -> [ &_ret <- _x ] s1)

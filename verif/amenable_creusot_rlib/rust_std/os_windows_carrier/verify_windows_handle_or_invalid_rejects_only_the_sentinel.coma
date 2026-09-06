@@ -22,8 +22,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_windows_handle_or_invalid_rejects_only_the_sentinel
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 104 8 104 100]
+let verify_windows_handle_or_invalid_rejects_only_the_sentinel [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 104 8 104 100]
   (value: Int64.t) (return (x: tup2_bool_isize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- value = ([%#sos_windows_carrier] (-1: Int64.t)) ] s1

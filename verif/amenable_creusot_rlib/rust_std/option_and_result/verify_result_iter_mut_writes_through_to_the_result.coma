@@ -20,9 +20,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_result_iter_mut_writes_through_to_the_result
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 239 8 242 57] (value: Int32.t)
-  (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
+let verify_result_iter_mut_writes_through_to_the_result [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 239 8 242 57]
+  (value: Int32.t) (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Result_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some value ] s1
     | s1 = [ &_9 <- None ] s2

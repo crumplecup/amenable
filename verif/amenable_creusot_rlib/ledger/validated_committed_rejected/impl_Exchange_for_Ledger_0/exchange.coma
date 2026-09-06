@@ -2,8 +2,8 @@
 
 (* <ledger::ledger_validate::mirror::Ledger as amenable_core::Exchange<ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Committed, amenable_gaap::CommittedToken>, witness::CreusotVerifier>> *)
 
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 317 16 320 17
-let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 222 24 222 49
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 321 16 324 17
+let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 226 24 226 49
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 58 8 58 26
 let%span scommit'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 56 8 56 13
 let%span scommit'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 52 15 52 19
@@ -78,18 +78,18 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 221 8 221 58] (amount'0: Int64.t) =
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 225 8 225 58] (amount'0: Int64.t) =
   [%#svalidated_committed_rejected'0] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
 
-predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 313 8 315 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
+predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 317 8 319 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
   [%#svalidated_committed_rejected] match outcome with
     | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
     | Err _ -> false
     end
 
-let rec commit (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+let commit (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   (return (x: t_Result_Transfer_Committed_CommittedToken_TransferError)) =
-  {[@stop_split] [@expl:commit 'input' type invariant] [%#scommit'4] inv_Transfer_Validated_ValidatedToken input}
+{[@stop_split] [@expl:commit 'input' type invariant] [%#scommit'4] inv_Transfer_Validated_ValidatedToken input}
   any
   [ return (result: t_Result_Transfer_Committed_CommittedToken_TransferError) ->
   {[@stop_split] [@expl:commit ensures] ([@stop_split] [@expl:commit result type invariant] [%#scommit'6] inv_Result_Transfer_Committed_CommittedToken_TransferError result)
@@ -100,10 +100,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec exchange_Ledger
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 54 4 57 80] (self: t_Ledger)
-  (input: t_Transfer_Validated_ValidatedToken) (return (x: t_Result_Transfer_Committed_CommittedToken_TransferError)) =
-  {[@stop_split] [@expl:exchange 'input' type invariant] [%#scommit'0] inv_Transfer_Validated_ValidatedToken input}
+let exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 54 4 57 80]
+  (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+  (return (x: t_Result_Transfer_Committed_CommittedToken_TransferError)) =
+{[@stop_split] [@expl:exchange 'input' type invariant] [%#scommit'0] inv_Transfer_Validated_ValidatedToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = commit [%#scommit] {self} {input}

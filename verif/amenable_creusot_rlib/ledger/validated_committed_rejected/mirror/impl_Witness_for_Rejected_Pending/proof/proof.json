@@ -2,7 +2,7 @@
   "profile": [],
   "proofs": {
     "Coma": {
-      "vc_proof_Rejected_Pending": { "prover": "alt-ergo", "time": 0.01 }
+      "vc_proof_Rejected_Pending": { "prover": "alt-ergo", "time": 0.023 }
     }
   }
 }

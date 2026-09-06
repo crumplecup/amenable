@@ -14,9 +14,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_shared_reference_dereferences_to_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 9 8 9 82] (value: Int32.t)
-  (return (x: Int32.t)) = (! bb0
+let verify_shared_reference_dereferences_to_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 9 8 9 82]
+  (value: Int32.t) (return (x: Int32.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &reference <- value ] s1 | s1 = [ &_ret <- reference ] s2 | s2 = return {_ret} ] ]
   [ & _ret: Int32.t = Any.any_l () | & value: Int32.t = value | & reference: Int32.t = Any.any_l () ])
   [ return (result: Int32.t) ->

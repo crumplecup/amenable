@@ -1,7 +1,7 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 65 8 65 83 *)
 
-let%span sptr = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 373 18 373 37
-let%span sptr'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/ptr.rs" 364 18 364 45
+let%span sptr = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/ptr.rs" 373 18 373 37
+let%span sptr'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/ptr.rs" 364 18 364 45
 let%span stuple_fn_raw_pointer = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 66 23 66 39
 let%span stuple_fn_raw_pointer'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 67 12 67 23
 let%span stuple_fn_raw_pointer'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 67 27 67 37
@@ -13,14 +13,14 @@ use creusot.int.UInt64
 use creusot.prelude.Ptr
 use creusot.prelude.Any
 
-let rec cast_i32 (self_: Opaque.ptr) (return (x: Opaque.ptr)) = any
+let cast_i32 (self_: Opaque.ptr) (return (x: Opaque.ptr)) = any
   [ return (result: Opaque.ptr) -> {[@stop_split] [@expl:cast ensures] [%#sptr] result = self_} (! return {result}) ]
 
-let rec addr_u8 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
+let addr_u8 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
   [ return (result: UInt64.t) -> {[@stop_split] [@expl:addr ensures] [%#sptr'0] result = Ptr.addr_logic_u64 self_}
     (! return {result}) ]
 
-let rec addr_i32 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
+let addr_i32 (self_: Opaque.ptr) (return (x: UInt64.t)) = any
   [ return (result: UInt64.t) -> {[@stop_split] [@expl:addr ensures] [%#sptr'0] result = Ptr.addr_logic_u64 self_}
     (! return {result}) ]
 
@@ -28,8 +28,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_const_pointer_cast_preserves_the_address
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 65 8 65 83]
+let verify_const_pointer_cast_preserves_the_address [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/tuple_fn_raw_pointer.rs" 65 8 65 83]
   (ptr: Opaque.ptr) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = cast_i32 [%#stuple_fn_raw_pointer] {ptr} (fun (_x: Opaque.ptr) -> [ &cast <- _x ] s1)

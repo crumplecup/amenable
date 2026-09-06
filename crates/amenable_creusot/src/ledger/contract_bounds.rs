@@ -188,7 +188,11 @@ amenable_derive::harness! {
         /// `DeepModel` impl for any type deriving `PartialEq`, matching
         /// `CreusotVerifierMetadata`'s own precedent in this crate's
         /// `witness.rs`.
-        enum TransferOutcome {
+        // `pub`: `validated_holds` below is `#[logic(open)]` (transparent),
+        // so its body -- which destructures these variants' fields -- is
+        // exported to callers; since Creusot 0.13 those fields must be at
+        // least as visible as the transparent logic fn that reads them.
+        pub enum TransferOutcome {
             Ok,
             NegativeAmount(i64),
             InsufficientFunds { balance: i64, required: i64 },

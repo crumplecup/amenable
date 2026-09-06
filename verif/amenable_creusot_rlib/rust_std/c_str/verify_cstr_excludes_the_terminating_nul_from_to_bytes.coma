@@ -29,10 +29,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_cstr_excludes_the_terminating_nul_from_to_bytes
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 206 8 208 51] (byte: UInt8.t)
-  (return (x: tup4_usize_Option_u8_usize_Option_u8)) =
-  {[@stop_split] [@expl:verify_cstr_excludes_the_terminating_nul_from_to_bytes requires] [%#sc_str'2] non_nul_byte_holds byte}
+let verify_cstr_excludes_the_terminating_nul_from_to_bytes [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 206 8 208 51]
+  (byte: UInt8.t) (return (x: tup4_usize_Option_u8_usize_Option_u8)) =
+{[@stop_split] [@expl:verify_cstr_excludes_the_terminating_nul_from_to_bytes requires] [%#sc_str'2] non_nul_byte_holds byte}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some byte ] s1

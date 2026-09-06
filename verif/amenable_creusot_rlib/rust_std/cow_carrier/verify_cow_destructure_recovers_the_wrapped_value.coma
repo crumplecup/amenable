@@ -9,7 +9,7 @@ use creusot.prelude.Any
 
 type t_Cow_i32 = Borrowed Int32.t | Owned Int32.t
 
-let rec elim_Owned (_x: t_Cow_i32) (return (f0: Int32.t)) = any
+let elim_Owned (_x: t_Cow_i32) (return (f0: Int32.t)) = any
   [ _k (f0: Int32.t) -> {Owned f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Owned] match _x with
       | Owned _ -> true
@@ -17,7 +17,7 @@ let rec elim_Owned (_x: t_Cow_i32) (return (f0: Int32.t)) = any
       end}
     any) ]
 
-let rec elim_Borrowed (_x: t_Cow_i32) (return (f0: Int32.t)) = any
+let elim_Borrowed (_x: t_Cow_i32) (return (f0: Int32.t)) = any
   [ _k (f0: Int32.t) -> {Borrowed f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Borrowed] match _x with
       | Borrowed _ -> true
@@ -35,9 +35,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_cow_destructure_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 18 8 18 93] (value: t_Cow_i32)
-  (return (x: Int32.t)) = (! bb0
+let verify_cow_destructure_recovers_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/cow_carrier.rs" 18 8 18 93]
+  (value: t_Cow_i32) (return (x: Int32.t)) = (! bb0
   [ bb0 = any [ br0 (x0: Int32.t) -> {value = Borrowed x0} (! bb4) | br1 (x0: Int32.t) -> {value = Owned x0} (! bb3) ]
   | bb3 = s0
     [ s0 = elim_Owned {value} (fun (r0: Int32.t) -> [ &owned <- r0 ] s1)

@@ -23,9 +23,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_hash_set_insert_then_contains_reports_membership
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 136 8 138 37] (value: Int32.t)
-  (return (x: tup4_bool_bool_bool_bool)) = (! bb0
+let verify_hash_set_insert_then_contains_reports_membership [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 136 8 138 37]
+  (value: Int32.t) (return (x: tup4_bool_bool_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#shash] true);
                         f1 = ([%#shash'0] true);

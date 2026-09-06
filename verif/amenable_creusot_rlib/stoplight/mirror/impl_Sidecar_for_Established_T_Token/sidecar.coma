@@ -2,8 +2,8 @@
 
 (* <stoplight::mirror::Established<T, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/clone.rs" 14 26 14 30
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/clone.rs" 13 26 13 30
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 226 13 226 37
 
 use creusot.prelude.Any
@@ -30,14 +30,18 @@ axiom precondition_fndef:
   forall args: t_Token [precondition_clone () args]. (let self_ = args in [%#sclone] inv_ref_Token self_)
     -> precondition_clone () args
 
-predicate postcondition_once_clone (self: ()) (args: t_Token) (result: t_Token)
+predicate postcondition_clone (self: ()) (args: t_Token) (result: t_Token)
 
 axiom postcondition_fndef:
-  forall args: t_Token, res: t_Token [postcondition_once_clone () args res]. postcondition_once_clone () args res
+  forall args: t_Token, res: t_Token [postcondition_clone () args res]. postcondition_clone () args res
     -> (let self_ = args in inv_Token res)
 
-let rec clone_Token (self_: t_Token) (return (x: t_Token)) =
-  {[@stop_split] [@expl:clone requires] precondition_clone () self_}
+predicate postcondition_once_clone (self: ()) (args: t_Token) (result: t_Token) = postcondition_clone self args result
+
+meta "rewrite_def" predicate postcondition_once_clone
+
+let clone_Token (self_: t_Token) (return (x: t_Token)) =
+{[@stop_split] [@expl:clone requires] precondition_clone () self_}
   any
   [ return (result: t_Token) -> {[@stop_split] [@expl:clone ensures] postcondition_once_clone () self_ result}
     (! return {result}) ]
@@ -63,10 +67,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec sidecar_Established_T_Token
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 226 13 226 37] (self: t_Established_T_Token)
-  (return (x: t_Token)) =
-  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight] inv_ref_Established_T_Token self}
+let sidecar_Established_T_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 226 13 226 37]
+  (self: t_Established_T_Token) (return (x: t_Token)) =
+{[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight] inv_ref_Established_T_Token self}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_3 <- self.token ] s1

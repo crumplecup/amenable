@@ -3,7 +3,7 @@
 (* <ledger::transfer_and_types::mirror::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
 let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -37,10 +37,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec primary_Transfer_S_Token
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37]
+let primary_Transfer_S_Token [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37]
   (self: t_Transfer_S_Token) (return (x: t_TransferPayload)) =
-  {[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_S_Token self}
+{[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_S_Token self}
   (! bb0
   [ bb0 = s0 [ s0 = [ &_4 <- self.payload ] s1 | s1 = [ &_ret <- _4 ] s2 | s2 = return {_ret} ] ]
   [ & _ret: t_TransferPayload = Any.any_l ()

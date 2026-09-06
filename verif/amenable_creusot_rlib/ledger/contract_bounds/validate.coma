@@ -1,114 +1,63 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 237 8 237 85 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 245 8 245 85 *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 238 16 238 45
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 241 16 241 55
-let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 244 16 244 49
-let%span scontract_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 235 19 235 23
-let%span scontract_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 236 18 236 59
-let%span scontract_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 133 19 133 23
-let%span scontract_bounds'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 134 18 134 65
-let%span scontract_bounds'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 169 19 169 23
-let%span scontract_bounds'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 170 18 170 59
-let%span scontract_bounds'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 209 16 214 17
-let%span scontract_bounds'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
-let%span scontract_bounds'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 149 24 149 47
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 246 16 246 45
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 249 16 249 55
+let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 252 16 252 49
+let%span scontract_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 243 19 243 23
+let%span scontract_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 244 18 244 59
+let%span scontract_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 137 19 137 23
+let%span scontract_bounds'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 138 18 138 65
+let%span scontract_bounds'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 173 19 173 23
+let%span scontract_bounds'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 174 18 174 59
+let%span scontract_bounds'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 217 16 222 17
+let%span scontract_bounds'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
+let%span scontract_bounds'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 290 19 290 23
 let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 291 18 291 55
 let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 162 41 162 102
-let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 168 41 168 99
-let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 174 41 174 99
-let%span sord'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 180 41 180 102
-let%span sord'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 186 41 186 83
-let%span sord'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 192 42 192 59
-let%span sord'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 193 42 193 59
-let%span sord'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 194 41 194 58
-let%span sord'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 200 42 200 83
-let%span sord'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 201 41 201 85
-let%span sord'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 207 42 207 86
-let%span sord'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 208 41 208 82
-let%span sord'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 214 41 214 97
-let%span sord'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/logic/ord.rs" 296 16 302 17
 
 use creusot.int.Int64
 use creusot.int.UInt64
 use creusot.prelude.Any
 use int.Int
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount: Int64.t) (outcome: bool) =
-  [%#sledger_validate'1] outcome = (Int64.to_int amount > 0)
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
 
-let rec check_amount_positive (amount: Int64.t) (return (x: bool)) = any
+meta "rewrite_def" predicate gt_log_Int
+
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount: Int64.t) (outcome: bool) =
+  [%#sledger_validate'1] outcome = gt_log_Int (Int64.to_int amount) 0
+
+let check_amount_positive (amount: Int64.t) (return (x: bool)) = any
   [ return (result: bool) ->
   {[@stop_split] [@expl:check_amount_positive ensures] [%#sledger_validate'0] amount_positive_holds amount result}
     (! return {result}) ]
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
-  [%#scontract_bounds'9] outcome = (Int64.to_int balance >= Int64.to_int amount)
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord'0] other <= self
 
-let rec check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = any
+meta "rewrite_def" predicate ge_log_Int
+
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 117 8 117 87] (balance: Int64.t) (amount: Int64.t) (outcome: bool) =
+  [%#scontract_bounds'9] outcome = ge_log_Int (Int64.to_int balance) (Int64.to_int amount)
+
+let check_sufficient_funds (balance: Int64.t) (amount: Int64.t) (return (x: bool)) = any
   [ return (result: bool) ->
   {[@stop_split] [@expl:check_sufficient_funds ensures] [%#scontract_bounds'5] sufficient_funds_holds balance amount result}
     (! return {result}) ]
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 148 8 148 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 152 8 152 81] (from: UInt64.t) (to': UInt64.t) (outcome: bool) =
   [%#scontract_bounds'10] outcome = (from <> to')
 
-let rec check_accounts_distinct (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = any
+let check_accounts_distinct (from: UInt64.t) (to': UInt64.t) (return (x: bool)) = any
   [ return (result: bool) ->
   {[@stop_split] [@expl:check_accounts_distinct ensures] [%#scontract_bounds'7] accounts_distinct_holds from to' result}
     (! return {result}) ]
 
 type t_TransferOutcome = Ok | NegativeAmount Int64.t | InsufficientFunds Int64.t Int64.t | SameAccount
 
-type t_Ordering = Less | Equal | Greater
-
-function cmp_log_i64 (self: Int64.t) (o: Int64.t) : t_Ordering = [%#sord'12] if Int64.lt self o then
-    Less
-  else
-    if self = o then Equal else Greater
-
-
-function eq_cmp_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom eq_cmp_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord'11] (x = y) = (cmp_log_i64 x y = Equal)
-
-function antisym2_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom antisym2_i64_spec: forall x: Int64.t, y: Int64.t. ([%#sord'9] cmp_log_i64 x y = Greater)
-    -> ([%#sord'10] cmp_log_i64 y x = Less)
-
-function antisym1_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom antisym1_i64_spec: forall x: Int64.t, y: Int64.t. ([%#sord'7] cmp_log_i64 x y = Less)
-    -> ([%#sord'8] cmp_log_i64 y x = Greater)
-
-function trans_i64 (x: Int64.t) (y: Int64.t) (z: Int64.t) (o: t_Ordering) : ()
-
-axiom trans_i64_spec: forall x: Int64.t, y: Int64.t, z: Int64.t, o: t_Ordering. ([%#sord'4] cmp_log_i64 x y = o)
-    -> ([%#sord'5] cmp_log_i64 y z = o) -> ([%#sord'6] cmp_log_i64 x z = o)
-
-function refl_i64 (x: Int64.t) : ()
-
-axiom refl_i64_spec: forall x: Int64.t. [%#sord'3] cmp_log_i64 x x = Equal
-
-function cmp_gt_log_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom cmp_gt_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord'2] Int64.gt x y = (cmp_log_i64 x y = Greater)
-
-function cmp_ge_log_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom cmp_ge_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord'1] Int64.ge x y = (cmp_log_i64 x y <> Less)
-
-function cmp_lt_log_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom cmp_lt_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord'0] Int64.lt x y = (cmp_log_i64 x y = Less)
-
-function cmp_le_log_i64 (x: Int64.t) (y: Int64.t) : ()
-
-axiom cmp_le_log_i64_spec: forall x: Int64.t, y: Int64.t. [%#sord] Int64.le x y = (cmp_log_i64 x y <> Greater)
-
-predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 207 8 207 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
+predicate validated_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 215 8 215 93] (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (outcome: t_TransferOutcome) =
   [%#scontract_bounds'8] match outcome with
     | Ok -> amount_positive_holds amount true /\ accounts_distinct_holds from to' true
     | NegativeAmount bad -> bad = amount /\ Int64.to_int amount <= 0
@@ -120,7 +69,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 237 8 237 85]
+let validate [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 245 8 245 85]
   (balance: Int64.t) (amount: Int64.t) (from: UInt64.t) (to': UInt64.t) (return (x: t_TransferOutcome)) = (! bb0
   [ bb0 = s0
     [ s0 = check_amount_positive [%#scontract_bounds] {amount} (fun (_x: bool) -> [ &_11 <- _x ] s1)

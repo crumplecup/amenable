@@ -8,13 +8,13 @@
       "vc_closure3": { "prover": "alt-ergo", "time": 0.021 },
       "vc_closure4": { "prover": "alt-ergo", "time": 0.02 },
       "vc_closure5": { "prover": "alt-ergo", "time": 0.02 },
-      "vc_deref_Ghost_Box_Perm_AtomicU16_Global": {
+      "vc_deref_Ghost_Perm_AtomicU16": {
         "prover": "alt-ergo",
-        "time": 0.018
+        "time": 0.027
       },
-      "vc_deref_mut_Ghost_Box_Perm_AtomicU16_Global": {
+      "vc_deref_mut_Ghost_Perm_AtomicU16": {
         "prover": "alt-ergo",
-        "time": 0.019
+        "time": 0.028
       },
       "vc_load_FnGhostWrapper_closure3": {
         "prover": "alt-ergo",

@@ -23,10 +23,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_from_vec_with_nul_requires_the_nul_only_at_the_end
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 95 8 97 31] (byte: UInt8.t)
-  (return (x: tup3_bool_bool_bool)) =
-  {[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end requires] [%#sc_str'2] non_nul_byte_holds byte}
+let verify_from_vec_with_nul_requires_the_nul_only_at_the_end [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 95 8 97 31]
+  (byte: UInt8.t) (return (x: tup3_bool_bool_bool)) =
+{[@stop_split] [@expl:verify_from_vec_with_nul_requires_the_nul_only_at_the_end requires] [%#sc_str'2] non_nul_byte_holds byte}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#sc_str] true); f1 = ([%#sc_str'0] true); f2 = ([%#sc_str'1] true) } ] s1

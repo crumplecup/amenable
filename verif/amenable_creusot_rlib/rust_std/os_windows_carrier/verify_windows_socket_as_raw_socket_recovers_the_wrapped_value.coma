@@ -14,8 +14,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_windows_socket_as_raw_socket_recovers_the_wrapped_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 142 8 142 92]
+let verify_windows_socket_as_raw_socket_recovers_the_wrapped_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 142 8 142 92]
   (value: UInt64.t) (return (x: UInt64.t)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- value ] s1 | s1 = return {_ret} ] ]
   [ & _ret: UInt64.t = Any.any_l () | & value: UInt64.t = value ])

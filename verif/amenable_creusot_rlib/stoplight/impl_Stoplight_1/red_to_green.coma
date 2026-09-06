@@ -2,11 +2,11 @@
 
 (* stoplight::mirror::Stoplight *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 226 13 226 37
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 260 21 260 32
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 260 47 260 58
-let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 238 8 238 13
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 261 21 261 32
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 261 47 261 58
+let%span sstoplight'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 239 8 239 13
 let%span sred_to_green = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 18 45 18 60
 let%span sred_to_green'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 18 28 18 61
 let%span sred_to_green'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 19 19 19 49
@@ -51,8 +51,8 @@ meta "rewrite_def" predicate inv_ref_Established_Red_RedToken
 
 predicate inv_RedToken (_1: t_RedToken)
 
-let rec sidecar_Established_Red_RedToken (self: t_Established_Red_RedToken) (return (x: t_RedToken)) =
-  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight] inv_ref_Established_Red_RedToken self}
+let sidecar_Established_Red_RedToken (self: t_Established_Red_RedToken) (return (x: t_RedToken)) =
+{[@stop_split] [@expl:sidecar 'self' type invariant] [%#sstoplight] inv_ref_Established_Red_RedToken self}
   any
   [ return (result: t_RedToken) ->
   {[@stop_split] [@expl:sidecar result type invariant] [%#sstoplight] inv_RedToken result}
@@ -62,8 +62,8 @@ type t_GreenToken
 
 predicate inv_GreenToken (_1: t_GreenToken)
 
-let rec establish_Green (_credential: t_RedToken) (return (x: t_GreenToken)) =
-  {[@stop_split] [@expl:establish '_credential' type invariant] [%#sstoplight'0] inv_RedToken _credential}
+let establish_Green (_credential: t_RedToken) (return (x: t_GreenToken)) =
+{[@stop_split] [@expl:establish '_credential' type invariant] [%#sstoplight'0] inv_RedToken _credential}
   any
   [ return (result: t_GreenToken) ->
   {[@stop_split] [@expl:establish result type invariant] [%#sstoplight'1] inv_GreenToken result}
@@ -81,8 +81,8 @@ axiom inv_axiom'0 [@rewrite]:
   forall x: t_Established_Green_GreenToken [inv_Established_Green_GreenToken x]. inv_Established_Green_GreenToken x
     = inv__private'0 x.t_Established__private'0
 
-let rec new_Green (primary'1: ()) (token: t_GreenToken) (return (x: t_Established_Green_GreenToken)) =
-  {[@stop_split] [@expl:new 'token' type invariant] [%#sstoplight'2] inv_GreenToken token}
+let new_Green (primary'1: ()) (token: t_GreenToken) (return (x: t_Established_Green_GreenToken)) =
+{[@stop_split] [@expl:new 'token' type invariant] [%#sstoplight'2] inv_GreenToken token}
   any
   [ return (result: t_Established_Green_GreenToken) ->
   {[@stop_split] [@expl:new_Green ensures] ([@stop_split] [@expl:new result type invariant] [%#sstoplight] inv_Established_Green_GreenToken result)
@@ -106,9 +106,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 12 17 127]
+let red_to_green [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/red_to_green.rs" 17 12 17 127]
   (self: ()) (input: t_Established_Red_RedToken) (return (x: t_Result_Established_Green_GreenToken_StoplightError)) =
-  {[@stop_split] [@expl:red_to_green 'input' type invariant] [%#sred_to_green'2] inv_Established_Red_RedToken input}
+{[@stop_split] [@expl:red_to_green 'input' type invariant] [%#sred_to_green'2] inv_Established_Red_RedToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Established_Red_RedToken input} any) ]

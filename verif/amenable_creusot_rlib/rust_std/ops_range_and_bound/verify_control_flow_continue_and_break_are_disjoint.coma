@@ -13,7 +13,7 @@ use creusot.prelude.Any
 
 type t_ControlFlow_i32_i32 = Continue Int32.t | Break Int32.t
 
-let rec elim_Break (_x: t_ControlFlow_i32_i32) (return (f0: Int32.t)) = any
+let elim_Break (_x: t_ControlFlow_i32_i32) (return (f0: Int32.t)) = any
   [ _k (f0: Int32.t) -> {Break f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Break] match _x with
       | Break _ -> true
@@ -25,7 +25,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup4_bool_bool_Option_i32_Option_i32 = { f0: bool; f1: bool; f2: t_Option_i32; f3: t_Option_i32 }
 
-let rec elim_Continue (_x: t_ControlFlow_i32_i32) (return (f0'0: Int32.t)) = any
+let elim_Continue (_x: t_ControlFlow_i32_i32) (return (f0'0: Int32.t)) = any
   [ _k (f0'0: Int32.t) -> {Continue f0'0 = _x} (! return {f0'0})
   | _chk -> (! {[@expl:elim Continue] match _x with
       | Continue _ -> true
@@ -43,8 +43,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_control_flow_continue_and_break_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 122 8 124 51]
+let verify_control_flow_continue_and_break_are_disjoint [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 122 8 124 51]
   (value: t_ControlFlow_i32_i32) (return (x: tup4_bool_bool_Option_i32_Option_i32)) = (! bb0
   [ bb0 = any [ br0 (x0: Int32.t) -> {value = Continue x0} (! bb4) | br1 (x0: Int32.t) -> {value = Break x0} (! bb3) ]
   | bb3 = s0

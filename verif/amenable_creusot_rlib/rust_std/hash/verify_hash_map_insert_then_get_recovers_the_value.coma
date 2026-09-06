@@ -22,9 +22,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_hash_map_insert_then_get_recovers_the_value
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 94 8 97 45] (key: Int32.t) (value: Int32.t)
-  (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
+let verify_hash_map_insert_then_get_recovers_the_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/hash.rs" 94 8 97 45]
+  (key: Int32.t) (value: Int32.t) (return (x: tup3_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some value ] s1
     | s1 = [ &_8 <- Some value ] s2

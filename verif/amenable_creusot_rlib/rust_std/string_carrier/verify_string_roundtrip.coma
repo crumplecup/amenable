@@ -22,10 +22,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_string_roundtrip
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/string_carrier.rs" 43 8 43 55] (s: t_String)
-  (return (x: t_String)) =
-  {[@stop_split] [@expl:verify_string_roundtrip 's' type invariant] [%#sstring_carrier] inv_String s}
+let verify_string_roundtrip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/string_carrier.rs" 43 8 43 55]
+  (s: t_String) (return (x: t_String)) =
+{[@stop_split] [@expl:verify_string_roundtrip 's' type invariant] [%#sstring_carrier] inv_String s}
   (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- s ] s1 | s1 = return {_ret} ] ] [ & _ret: t_String = Any.any_l () | & s: t_String = s ])
   [ return (result: t_String) ->

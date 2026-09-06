@@ -22,10 +22,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_linked_list_iter_mut_writes_through
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 166 8 171 45] (first: Int32.t)
-  (second: Int32.t) (updated_first: Int32.t) (updated_second: Int32.t) (return (x: tup3_bool_Option_i32_Option_i32)) =
-  (! bb0
+let verify_linked_list_iter_mut_writes_through [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/linked_list.rs" 166 8 171 45]
+  (first: Int32.t) (second: Int32.t) (updated_first: Int32.t) (updated_second: Int32.t)
+  (return (x: tup3_bool_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_12 <- Some updated_first ] s1
     | s1 = [ &_14 <- Some updated_second ] s2

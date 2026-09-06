@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_binary_heap_into_iter_yields_every_pushed_element_once": {
         "prover": "alt-ergo",
-        "time": 0.015
+        "time": 0.031
       }
     }
   }

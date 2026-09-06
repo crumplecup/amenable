@@ -18,9 +18,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_vec_deque_into_iter_yields_owned_values_in_order
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 127 8 130 52] (a: Int32.t)
-  (b: Int32.t) (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
+let verify_vec_deque_into_iter_yields_owned_values_in_order [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 127 8 130 52]
+  (a: Int32.t) (b: Int32.t) (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some a ] s1
     | s1 = [ &_9 <- Some b ] s2

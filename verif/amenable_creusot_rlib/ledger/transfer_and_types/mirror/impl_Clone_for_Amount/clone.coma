@@ -11,8 +11,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec clone_Amount
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 209 13 209 18] (self: t_Amount)
-  (return (x: t_Amount)) = (! bb0
+let clone_Amount [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 209 13 209 18]
+  (self: t_Amount) (return (x: t_Amount)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_Amount = Any.any_l () | & self: t_Amount = self ]) [ return (result: t_Amount) -> (! return {result}) ]

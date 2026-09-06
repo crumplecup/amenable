@@ -19,7 +19,7 @@ type t_Option_i32 = None | Some Int32.t
 
 type tup3_bool_bool_Option_i32 = { f0: bool; f1: bool; f2: t_Option_i32 }
 
-let rec elim_Excluded (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
+let elim_Excluded (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
   [ _k (f0'0: Int32.t) -> {Excluded f0'0 = _x} (! return {f0'0})
   | _chk -> (! {[@expl:elim Excluded] match _x with
       | Excluded _ -> true
@@ -27,7 +27,7 @@ let rec elim_Excluded (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
       end}
     any) ]
 
-let rec elim_Included (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
+let elim_Included (_x: t_Bound_i32) (return (f0'0: Int32.t)) = any
   [ _k (f0'0: Int32.t) -> {Included f0'0 = _x} (! return {f0'0})
   | _chk -> (! {[@expl:elim Included] match _x with
       | Included _ -> true
@@ -46,8 +46,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_bound_round_trips_its_endpoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 82 8 84 38]
+let verify_bound_round_trips_its_endpoint [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/ops_range_and_bound.rs" 82 8 84 38]
   (value: t_Bound_i32) (return (x: tup3_bool_bool_Option_i32)) = (! bb0
   [ bb0 = any
     [ br0 (x0: Int32.t) -> {value = Included x0} (! bb6)

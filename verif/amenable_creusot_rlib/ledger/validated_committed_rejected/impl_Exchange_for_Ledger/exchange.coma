@@ -2,10 +2,12 @@
 
 (* <ledger::ledger_validate::mirror::Ledger as amenable_core::Exchange<ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>, ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, witness::CreusotVerifier>> *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 149 24 149 47
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 114 24 114 56
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 277 16 287 17
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 281 16 291 17
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 67 8 67 47
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 65 8 65 13
 let%span svalidate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 61 15 61 19
@@ -80,16 +82,24 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount'0: Int64.t) (outcome: bool) =
-  [%#sledger_validate] outcome = (Int64.to_int amount'0 > 0)
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
 
-predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 148 8 148 81] (from'0: UInt64.t) (to''0: UInt64.t) (outcome: bool) =
+meta "rewrite_def" predicate gt_log_Int
+
+predicate amount_positive_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 252 8 252 72] (amount'0: Int64.t) (outcome: bool) =
+  [%#sledger_validate] outcome = gt_log_Int (Int64.to_int amount'0) 0
+
+predicate accounts_distinct_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 152 8 152 81] (from'0: UInt64.t) (to''0: UInt64.t) (outcome: bool) =
   [%#scontract_bounds] outcome = (from'0 <> to''0)
 
-predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 113 8 113 87] (balance'0: Int64.t) (amount'0: Int64.t) (outcome: bool) =
-  [%#scontract_bounds'0] outcome = (Int64.to_int balance'0 >= Int64.to_int amount'0)
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord'0] other <= self
 
-predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 273 8 275 17] (outcome: t_Result_Transfer_Validated_ValidatedToken_TransferError) =
+meta "rewrite_def" predicate ge_log_Int
+
+predicate sufficient_funds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 117 8 117 87] (balance'0: Int64.t) (amount'0: Int64.t) (outcome: bool) =
+  [%#scontract_bounds'0] outcome = ge_log_Int (Int64.to_int balance'0) (Int64.to_int amount'0)
+
+predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 277 8 279 17] (outcome: t_Result_Transfer_Validated_ValidatedToken_TransferError) =
   [%#svalidated_committed_rejected] match outcome with
     | Ok validated -> amount_positive_holds validated.payload'0.amount.f0 true
     /\ accounts_distinct_holds validated.payload'0.from validated.payload'0.to' true
@@ -98,9 +108,9 @@ predicate validated_result_holds [#"/home/erik/repos/amenable/crates/amenable_cr
     | Err (SameAccount) -> true
     end
 
-let rec validate_CreusotVerifier (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
+let validate_CreusotVerifier (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
   (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
-  {[@stop_split] [@expl:validate 'input' type invariant] [%#svalidate'4] inv_Transfer_Pending_PendingToken input}
+{[@stop_split] [@expl:validate 'input' type invariant] [%#svalidate'4] inv_Transfer_Pending_PendingToken input}
   any
   [ return (result: t_Result_Transfer_Validated_ValidatedToken_TransferError) ->
   {[@stop_split] [@expl:validate_CreusotVerifier ensures] ([@stop_split] [@expl:validate result type invariant] [%#svalidate'6] inv_Result_Transfer_Validated_ValidatedToken_TransferError result)
@@ -111,10 +121,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec exchange_Ledger
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 63 4 66 80] (self: t_Ledger)
-  (input: t_Transfer_Pending_PendingToken) (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
-  {[@stop_split] [@expl:exchange 'input' type invariant] [%#svalidate'0] inv_Transfer_Pending_PendingToken input}
+let exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 63 4 66 80]
+  (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
+  (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
+{[@stop_split] [@expl:exchange 'input' type invariant] [%#svalidate'0] inv_Transfer_Pending_PendingToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = validate_CreusotVerifier [%#svalidate] {self} {input}

@@ -26,8 +26,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_into_string_error_recovers_the_original_cstring
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 134 8 134 114]
+let verify_into_string_error_recovers_the_original_cstring [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 134 8 134 114]
   (return (x: tup4_usize_Option_u8_Option_u8_Option_u8)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_3 <- Some ([%#sc_str] (255: UInt8.t)) ] s1

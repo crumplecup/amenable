@@ -10,7 +10,7 @@ use creusot.prelude.Any
 
 type t_SeekFrom = Start UInt64.t | End Int64.t | Current Int64.t
 
-let rec elim_Start (_x: t_SeekFrom) (return (f0: UInt64.t)) = any
+let elim_Start (_x: t_SeekFrom) (return (f0: UInt64.t)) = any
   [ _k (f0: UInt64.t) -> {Start f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Start] match _x with
       | Start _ -> true
@@ -18,7 +18,7 @@ let rec elim_Start (_x: t_SeekFrom) (return (f0: UInt64.t)) = any
       end}
     any) ]
 
-let rec elim_End (_x: t_SeekFrom) (return (f0: Int64.t)) = any
+let elim_End (_x: t_SeekFrom) (return (f0: Int64.t)) = any
   [ _k (f0: Int64.t) -> {End f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim End] match _x with
       | End _ -> true
@@ -26,7 +26,7 @@ let rec elim_End (_x: t_SeekFrom) (return (f0: Int64.t)) = any
       end}
     any) ]
 
-let rec elim_Current (_x: t_SeekFrom) (return (f0: Int64.t)) = any
+let elim_Current (_x: t_SeekFrom) (return (f0: Int64.t)) = any
   [ _k (f0: Int64.t) -> {Current f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Current] match _x with
       | Current _ -> true
@@ -43,8 +43,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_seek_from_round_trips_each_variants_offset
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 32 8 36 28]
+let verify_seek_from_round_trips_each_variants_offset [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/io_seek_from.rs" 32 8 36 28]
   (start_offset: UInt64.t) (end_offset: Int64.t) (current_offset: Int64.t) (return (x: tup3_u64_i64_i64)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_10 <- Start start_offset ] s1

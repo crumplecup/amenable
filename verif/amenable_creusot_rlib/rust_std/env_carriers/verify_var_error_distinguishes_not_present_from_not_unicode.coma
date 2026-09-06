@@ -22,8 +22,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_var_error_distinguishes_not_present_from_not_unicode
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 140 8 140 95]
+let verify_var_error_distinguishes_not_present_from_not_unicode [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 140 8 140 95]
   (return (x: tup3_bool_bool_usize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#senv_carriers] true);

@@ -18,8 +18,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec basis_TransferPayload
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 275 8 275 33]
+let basis_TransferPayload [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 275 8 275 33]
   (return (x: t_TransferPayload)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_1 <- { f0 = ([%#stransfer_and_types] (0: Int64.t)) } ] s1

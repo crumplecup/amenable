@@ -75,9 +75,9 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-let rec rollback (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
+let rollback (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   (return (x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)) =
-  {[@stop_split] [@expl:rollback 'input' type invariant] [%#srollback'4] inv_Transfer_Validated_ValidatedToken input}
+{[@stop_split] [@expl:rollback 'input' type invariant] [%#srollback'4] inv_Transfer_Validated_ValidatedToken input}
   any
   [ return (result: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError) ->
   {[@stop_split] [@expl:rollback result type invariant] [%#srollback'6] inv_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError result}
@@ -87,11 +87,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec exchange_Ledger
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/rollback.rs" 54 4 57 102]
+let exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/rollback.rs" 54 4 57 102]
   (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   (return (x: t_Result_Transfer_Rejected_Validated_RejectedFromValidatedToken_TransferError)) =
-  {[@stop_split] [@expl:exchange 'input' type invariant] [%#srollback'0] inv_Transfer_Validated_ValidatedToken input}
+{[@stop_split] [@expl:exchange 'input' type invariant] [%#srollback'0] inv_Transfer_Validated_ValidatedToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = rollback [%#srollback] {self} {input}

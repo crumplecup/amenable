@@ -1,23 +1,23 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 61 8 63 42 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 60 8 62 42 *)
 
-let%span stask_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 67 33 67 38
-let%span stask_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 66 34 66 38
-let%span stask_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 71 33 71 37
-let%span stask_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 70 34 70 39
-let%span stask_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 81 33 81 37
-let%span stask_carriers'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 80 34 80 39
-let%span stask_carriers'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 85 33 85 38
-let%span stask_carriers'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 84 34 84 38
-let%span stask_carriers'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 59 19 59 23
-let%span stask_carriers'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 60 18 60 74
-let%span stask_carriers'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 42 16 49 17
+let%span stask_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 66 33 66 38
+let%span stask_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 65 34 65 38
+let%span stask_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 70 33 70 37
+let%span stask_carriers'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 69 34 69 39
+let%span stask_carriers'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 80 33 80 37
+let%span stask_carriers'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 79 34 79 39
+let%span stask_carriers'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 84 33 84 38
+let%span stask_carriers'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 83 34 83 38
+let%span stask_carriers'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 58 19 58 23
+let%span stask_carriers'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 59 18 59 74
+let%span stask_carriers'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 41 16 48 17
 
 use creusot.int.Int32
 use creusot.prelude.Any
 
 type t_Poll_i32 = Ready Int32.t | Pending
 
-let rec elim_Ready (_x: t_Poll_i32) (return (f0: Int32.t)) = any
+let elim_Ready (_x: t_Poll_i32) (return (f0: Int32.t)) = any
   [ _k (f0: Int32.t) -> {Ready f0 = _x} (! return {f0})
   | _chk -> (! {[@expl:elim Ready] match _x with
       | Ready _ -> true
@@ -27,7 +27,7 @@ let rec elim_Ready (_x: t_Poll_i32) (return (f0: Int32.t)) = any
 
 type tup5_bool_bool_i32_bool_bool = { f0: bool; f1: bool; f2: Int32.t; f3: bool; f4: bool }
 
-predicate poll_ready_and_pending_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 37 8 40 17] (value: Int32.t) (poll_result: tup5_bool_bool_i32_bool_bool) =
+predicate poll_ready_and_pending_are_disjoint_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 36 8 39 17] (value: Int32.t) (poll_result: tup5_bool_bool_i32_bool_bool) =
   [%#stask_carriers'9] match poll_result with
     | {f0 = ready_is_ready; f1 = ready_is_pending; f2 = ready_value; f3 = pending_is_pending; f4 = pending_is_ready} -> ready_is_ready
     /\ not ready_is_pending /\ ready_value = value /\ pending_is_pending /\ not pending_is_ready
@@ -37,9 +37,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_poll_ready_and_pending_are_disjoint
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 61 8 63 42] (value: Int32.t)
-  (return (x: tup5_bool_bool_i32_bool_bool)) = (! bb0
+let verify_poll_ready_and_pending_are_disjoint [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/task_carriers.rs" 60 8 62 42]
+  (value: Int32.t) (return (x: tup5_bool_bool_i32_bool_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &ready <- Ready value ] s1
     | s1 = any [ br0 (x0: Int32.t) -> {ready = Ready x0} (! bb4) | br1 -> {ready = Pending} (! bb3) ] ]

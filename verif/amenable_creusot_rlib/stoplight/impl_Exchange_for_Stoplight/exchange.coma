@@ -51,9 +51,9 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0 -> true
       end
 
-let rec green_to_yellow (self: ()) (input: t_Established_Green_GreenToken)
+let green_to_yellow (self: ()) (input: t_Established_Green_GreenToken)
   (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) =
-  {[@stop_split] [@expl:green_to_yellow 'input' type invariant] [%#sgreen_to_yellow'4] inv_Established_Green_GreenToken input}
+{[@stop_split] [@expl:green_to_yellow 'input' type invariant] [%#sgreen_to_yellow'4] inv_Established_Green_GreenToken input}
   any
   [ return (result: t_Result_Established_Yellow_YellowToken_StoplightError) ->
   {[@stop_split] [@expl:green_to_yellow result type invariant] [%#sgreen_to_yellow'6] inv_Result_Established_Yellow_YellowToken_StoplightError result}
@@ -63,10 +63,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec exchange_Stoplight
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 53 4 56 77] (self: ())
-  (input: t_Established_Green_GreenToken) (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) =
-  {[@stop_split] [@expl:exchange 'input' type invariant] [%#sgreen_to_yellow'0] inv_Established_Green_GreenToken input}
+let exchange_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/generated/green_to_yellow.rs" 53 4 56 77]
+  (self: ()) (input: t_Established_Green_GreenToken)
+  (return (x: t_Result_Established_Yellow_YellowToken_StoplightError)) =
+{[@stop_split] [@expl:exchange 'input' type invariant] [%#sgreen_to_yellow'0] inv_Established_Green_GreenToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = green_to_yellow [%#sgreen_to_yellow] {self} {input}

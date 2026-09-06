@@ -28,9 +28,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec new_S [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37]
+let new_S [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37]
   (payload'0: t_TransferPayload) (token'0: t_Token) (return (x: t_Transfer_S_Token)) =
-  {[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types] inv_Token token'0}
+{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types] inv_Token token'0}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- () ] s1

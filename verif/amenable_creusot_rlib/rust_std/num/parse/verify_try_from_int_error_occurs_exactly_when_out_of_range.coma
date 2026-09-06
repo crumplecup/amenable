@@ -1,5 +1,7 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 254 8 256 40 *)
 
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
 let%span sparse = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 257 12 257 31
 let%span sparse'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 252 19 252 23
 let%span sparse'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 256 13 256 40
@@ -27,28 +29,35 @@ axiom inv_axiom [@rewrite]:
       | Err f0 -> inv_TryFromIntError f0
       end
 
-let rec try_from_u8 (value: Int32.t) (return (x: t_Result_u8_TryFromIntError)) = any
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord'0] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+let try_from_u8 (value: Int32.t) (return (x: t_Result_u8_TryFromIntError)) = any
   [ return (result: t_Result_u8_TryFromIntError) ->
   {[@stop_split] [@expl:try_from_u8 ensures] ([@stop_split] [@expl:try_from result type invariant] inv_Result_u8_TryFromIntError result)
     /\ ([@stop_split] [@expl:try_from ensures] [%#sparse'3] match result with
-      | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
-      | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
+      | Ok v -> ge_log_Int (Int32.to_int value) 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
+      | Err _ -> Int32.to_int value < 0 \/ gt_log_Int (Int32.to_int value) 255
       end)}
     (! return {result}) ]
 
 predicate try_from_int_error_occurs_exactly_when_out_of_range_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 225 8 228 17] (value: Int32.t) (try_from_result: t_Result_u8_TryFromIntError) =
   [%#sparse'4] match try_from_result with
-    | Ok v -> Int32.to_int value >= 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
-    | Err _ -> Int32.to_int value < 0 \/ Int32.to_int value > 255
+    | Ok v -> ge_log_Int (Int32.to_int value) 0 /\ Int32.to_int value <= 255 /\ UInt8.t'int v = Int32.to_int value
+    | Err _ -> Int32.to_int value < 0 \/ gt_log_Int (Int32.to_int value) 255
     end
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_try_from_int_error_occurs_exactly_when_out_of_range
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 254 8 256 40] (value: Int32.t)
-  (return (x: t_Result_u8_TryFromIntError)) = (! bb0
+let verify_try_from_int_error_occurs_exactly_when_out_of_range [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 254 8 256 40]
+  (value: Int32.t) (return (x: t_Result_u8_TryFromIntError)) = (! bb0
   [ bb0 = s0
     [ s0 = try_from_u8 [%#sparse] {value} (fun (_x: t_Result_u8_TryFromIntError) -> [ &_ret <- _x ] s1)
     | s1 = return {_ret} ] ] [ & _ret: t_Result_u8_TryFromIntError = Any.any_l () | & value: Int32.t = value ])

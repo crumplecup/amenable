@@ -6,8 +6,8 @@ let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creuso
 let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 122 25 122 35
 let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 121 22 121 26
 let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 109 0 109 93
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 110 0 110 93
 let%span sreject = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 45
 let%span sreject'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 53
 let%span sreject'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 19 59 19 74
@@ -55,14 +55,14 @@ predicate inv_ref_Transfer_Pending_PendingToken [@inline:trivial] (_1: t_Transfe
 
 meta "rewrite_def" predicate inv_ref_Transfer_Pending_PendingToken
 
-let rec primary_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_TransferPayload)) =
-  {[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
+let primary_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_TransferPayload)) =
+{[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
   any
   [ return (result: t_TransferPayload) -> {[@stop_split] [@expl:primary ensures] [%#stransfer_and_types] result
     = self.payload}
     (! return {result}) ]
 
-let rec clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
+let clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
   [ return (result: t_TransferPayload) -> (! return {result}) ]
 
 predicate resolve_PendingToken (_1: t_PendingToken)
@@ -75,8 +75,8 @@ axiom resolve_axiom [@rewrite]:
   forall x: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken x]. resolve_Transfer_Pending_PendingToken x
     = (resolve_PendingToken x.token /\ resolve__private x.t_Transfer__private)
 
-let rec sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_PendingToken)) =
-  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
+let sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_PendingToken)) =
+{[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
   any
   [ return (result: t_PendingToken) ->
   {[@stop_split] [@expl:sidecar result type invariant] [%#stransfer_and_types] inv_PendingToken result}
@@ -86,8 +86,8 @@ type t_RejectedFromPendingToken
 
 predicate inv_RejectedFromPendingToken (_1: t_RejectedFromPendingToken)
 
-let rec establish_Rejected_Pending (credential: t_PendingToken) (return (x: t_RejectedFromPendingToken)) =
-  {[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_PendingToken credential}
+let establish_Rejected_Pending (credential: t_PendingToken) (return (x: t_RejectedFromPendingToken)) =
+{[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_PendingToken credential}
   any
   [ return (result: t_RejectedFromPendingToken) ->
   {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_RejectedFromPendingToken result}
@@ -108,9 +108,9 @@ axiom inv_axiom'0 [@rewrite]:
   forall x: t_Transfer_Rejected_Pending_RejectedFromPendingToken [inv_Transfer_Rejected_Pending_RejectedFromPendingToken x]. inv_Transfer_Rejected_Pending_RejectedFromPendingToken x
     = (inv_RejectedFromPendingToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
 
-let rec new_Rejected_Pending (payload'1: t_TransferPayload) (token'1: t_RejectedFromPendingToken)
+let new_Rejected_Pending (payload'1: t_TransferPayload) (token'1: t_RejectedFromPendingToken)
   (return (x: t_Transfer_Rejected_Pending_RejectedFromPendingToken)) =
-  {[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_RejectedFromPendingToken token'1}
+{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_RejectedFromPendingToken token'1}
   any
   [ return (result: t_Transfer_Rejected_Pending_RejectedFromPendingToken) ->
   {[@stop_split] [@expl:new_Rejected_Pending ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types] inv_Transfer_Rejected_Pending_RejectedFromPendingToken result)
@@ -138,10 +138,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec reject [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 12 17 148]
+let reject [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 17 12 17 148]
   (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
   (return (x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)) =
-  {[@stop_split] [@expl:reject 'input' type invariant] [%#sreject'4] inv_Transfer_Pending_PendingToken input}
+{[@stop_split] [@expl:reject 'input' type invariant] [%#sreject'4] inv_Transfer_Pending_PendingToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = primary_Transfer_Pending_PendingToken [%#sreject] {input} (fun (_x: t_TransferPayload) -> [ &_7 <- _x ] s1)

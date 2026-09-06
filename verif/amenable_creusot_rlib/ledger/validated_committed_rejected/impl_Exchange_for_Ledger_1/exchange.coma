@@ -75,9 +75,9 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-let rec reject (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
+let reject (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
   (return (x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)) =
-  {[@stop_split] [@expl:reject 'input' type invariant] [%#sreject'4] inv_Transfer_Pending_PendingToken input}
+{[@stop_split] [@expl:reject 'input' type invariant] [%#sreject'4] inv_Transfer_Pending_PendingToken input}
   any
   [ return (result: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError) ->
   {[@stop_split] [@expl:reject result type invariant] [%#sreject'6] inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError result}
@@ -87,11 +87,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec exchange_Ledger
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 54 4 57 98] (self: t_Ledger)
-  (input: t_Transfer_Pending_PendingToken)
+let exchange_Ledger [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 54 4 57 98]
+  (self: t_Ledger) (input: t_Transfer_Pending_PendingToken)
   (return (x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)) =
-  {[@stop_split] [@expl:exchange 'input' type invariant] [%#sreject'0] inv_Transfer_Pending_PendingToken input}
+{[@stop_split] [@expl:exchange 'input' type invariant] [%#sreject'0] inv_Transfer_Pending_PendingToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = reject [%#sreject] {self} {input}

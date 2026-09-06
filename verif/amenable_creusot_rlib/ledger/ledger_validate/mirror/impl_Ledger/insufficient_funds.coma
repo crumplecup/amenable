@@ -23,9 +23,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec insufficient_funds
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 108 8 108 74] (bad: tup2_i64_i64)
-  (return (x: t_TransferError)) = (! bb0
+let insufficient_funds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 108 8 108 74]
+  (bad: tup2_i64_i64) (return (x: t_TransferError)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- InsufficientFunds (bad.f0) (bad.f1) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_TransferError = Any.any_l () | & bad: tup2_i64_i64 = bad ])
   [ return (result: t_TransferError) ->

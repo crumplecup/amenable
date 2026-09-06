@@ -21,8 +21,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_mutable_reference_dereferences_to_and_updates_the_referent
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 37 8 40 23]
+let verify_mutable_reference_dereferences_to_and_updates_the_referent [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/reference_carriers.rs" 37 8 40 23]
   (initial: Int32.t) (next: Int32.t) (return (x: tup2_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &value <- initial ] s1

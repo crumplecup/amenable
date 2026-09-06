@@ -10,7 +10,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec name_CreusotVerifier [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 88 4 88 29]
+let name_CreusotVerifier [#"/home/erik/repos/amenable/crates/amenable_creusot/src/witness.rs" 88 4 88 29]
   (return (x: string)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- [%#switness] "creusot" ] s1 | s1 = return {_ret} ] ] [ & _ret: string = Any.any_l () ])
   [ return (result: string) -> (! return {result}) ]

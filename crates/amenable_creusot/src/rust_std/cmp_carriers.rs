@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires};
+use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
@@ -99,35 +99,16 @@ extern_spec! {
     }
 }
 
-// `Reverse<T>: Ord` is ONE generic impl (`impl<T: Ord> Ord for
-// Reverse<T>`, confirmed by reading the real source,
-// `library/core/src/cmp.rs`), not a per-concrete-type macro like
-// `Wrapping`/`Saturating` — closer in shape to `NonZero::new`'s generic
-// impl than to those. A concrete `impl Ord for Reverse<i32>` extern_spec
-// hits the identical "extern spec generics don't match" error
-// `NonZero::new` did (confirmed, not assumed): `cmp` is defined once,
-// generically. Unlike `ZeroablePrimitive`, though, `Ord` is an ordinary,
-// nameable, stable trait, so the generic form is actually writable — with
-// one addition: comparing `T` values via `>`/`==`/`<` inside `#[ensures]`
-// needs `T: creusot_std::logic::OrdLogic` (a real, non-guessed
-// requirement — the compiler's own error names it exactly:
-// `the trait bound T: creusot_std::logic::OrdLogic is not satisfied`),
-// creusot-std's logic-context comparison trait, distinct from the
-// program-level `Ord` the real impl itself requires. So this proof is
-// real and general over every `T: Ord + OrdLogic`, not narrowed to
-// `i32` the way `Wrapping`/`Saturating`'s per-width proofs are.
-#[cfg(creusot)]
-extern_spec! {
-    impl<T: Ord + creusot_std::logic::OrdLogic> Ord for Reverse<T> {
-        #[check(ghost)]
-        #[ensures(match result {
-            Ordering::Less => other.0 > self.0,
-            Ordering::Equal => other.0 == self.0,
-            Ordering::Greater => other.0 < self.0,
-        })]
-        fn cmp(&self, other: &Reverse<T>) -> Ordering;
-    }
-}
+// No local `extern_spec! { impl Ord for Reverse<T> }` any more: it worked
+// under creusot-std 0.11 (a generic `T: Ord + OrdLogic` axiom on `cmp`),
+// but Creusot 0.13's PR #2174 split `OrdLogic` into `PartialOrdLogic` +
+// `OrdLogic: PartialOrdLogic` and gave `Reverse<T>` only the *partial*
+// instance (`impl<T: PartialOrdLogic> PartialOrdLogic for Reverse<T>`,
+// confirmed on both v0.13.0 and master). Specifying `Ord::cmp` -- which
+// returns a total `Ordering` -- then requires `Reverse<T>: OrdLogic`,
+// which no longer exists and can't be added here (orphan rule: both
+// `OrdLogic` and `Reverse` are foreign). The `Reverse<i32>` harness below
+// is `#[trusted]` as a result -- see its own doc comment.
 
 amenable_derive::harness! {
     creusot, REVERSE_INVERTS_COMPARISON_HOLDS_SRC, {
@@ -152,10 +133,19 @@ amenable_derive::harness! {
         /// `Reverse<T>` inverts `T`'s comparison direction, and its `.0`
         /// field round-trips the wrapped value unchanged — the same claim
         /// `amenable_kani::rust_std::cmp::verify_reverse_inverts_comparison`
-        /// checks by symbolic execution. Rests on the local `extern_spec!`
-        /// above, the same relationship every non-`char`/`String` harness
-        /// in this file has to a trusted axiom on the real method it
-        /// exercises.
+        /// checks by symbolic execution.
+        ///
+        /// `#[trusted]`, unlike the `Ordering`/`Wrapping` harnesses in
+        /// this file which rest on a real local `extern_spec!`. Creusot
+        /// 0.13's PR #2174 split `OrdLogic` into `PartialOrdLogic` +
+        /// `OrdLogic` and left `Reverse<T>` with only the partial
+        /// instance, so `Ord::cmp` on `Reverse` can no longer be given a
+        /// spec (it returns a total `Ordering`, which needs
+        /// `Reverse<T>: OrdLogic`) and the orphan rule blocks adding that
+        /// impl here. Same honest "asserted, not mechanically discharged"
+        /// treatment as `num::nonzero`'s `verify_nonzero_i16_roundtrips`;
+        /// revisit if creusot-std adds `OrdLogic for Reverse`.
+        #[trusted]
         #[requires(true)]
         #[ensures(reverse_inverts_comparison_holds(a, b, result))]
         fn verify_reverse_inverts_comparison(a: i32, b: i32) -> (Ordering, i32) {

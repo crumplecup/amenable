@@ -10,16 +10,15 @@ let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot
 let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 31 19 31 23
 let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 32 18 32 60
 let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 18 16 21 46
-let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/slice.rs" 288 18 288 40
+let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 331 18 331 22
 
 use creusot.slice.Slice64
 use creusot.int.Int32
 use creusot.int.UInt64
 use seq.Seq
-use creusot.slice.Slice64Ops
 use creusot.prelude.Any
 
-let rec len_i32 (self_: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
+let len_i32 (self_: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
   [ return (result: UInt64.t) -> {[@stop_split] [@expl:len ensures] [%#sslice] Seq.length (Slice64.view self_)
     = UInt64.t'int result}
     (! return {result}) ]
@@ -34,9 +33,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_array_indexing_and_length
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 33 8 33 93] (a: Int32.t)
-  (b: Int32.t) (c: Int32.t) (return (x: tup4_usize_i32_i32_i32)) = (! bb0
+let verify_array_indexing_and_length [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 33 8 33 93]
+  (a: Int32.t) (b: Int32.t) (c: Int32.t) (return (x: tup4_usize_i32_i32_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = any
       [ any_ (__arr_temp: Slice64.array Int32.t) -> (! -{Seq.get __arr_temp.Slice64.elts 0 = a
@@ -47,15 +45,15 @@ let rec verify_array_indexing_and_length
     | s2 = [ &_17 <- [%#sarray_and_slice'0] (0: UInt64.t) ] s3
     | s3 = [ &_18 <- UInt64.lt _17 ([%#sarray_and_slice'1] (3: UInt64.t)) ] s4
     | s4 = {[@expl:index in bounds] [%#sarray_and_slice'1] _18} s5
-    | s5 = Slice64Ops.get [%#sarray_and_slice'1] <Int32.t> {arr} {_17} (fun (r: Int32.t) -> [ &_16 <- r ] s6)
+    | s5 = Slice64.get [%#sarray_and_slice'1] <Int32.t> {arr} {_17} (fun (r: Int32.t) -> [ &_16 <- r ] s6)
     | s6 = [ &_20 <- [%#sarray_and_slice'2] (1: UInt64.t) ] s7
     | s7 = [ &_21 <- UInt64.lt _20 ([%#sarray_and_slice'3] (3: UInt64.t)) ] s8
     | s8 = {[@expl:index in bounds] [%#sarray_and_slice'3] _21} s9
-    | s9 = Slice64Ops.get [%#sarray_and_slice'3] <Int32.t> {arr} {_20} (fun (r: Int32.t) -> [ &_19 <- r ] s10)
+    | s9 = Slice64.get [%#sarray_and_slice'3] <Int32.t> {arr} {_20} (fun (r: Int32.t) -> [ &_19 <- r ] s10)
     | s10 = [ &_23 <- [%#sarray_and_slice'4] (2: UInt64.t) ] s11
     | s11 = [ &_24 <- UInt64.lt _23 ([%#sarray_and_slice'5] (3: UInt64.t)) ] s12
     | s12 = {[@expl:index in bounds] [%#sarray_and_slice'5] _24} s13
-    | s13 = Slice64Ops.get [%#sarray_and_slice'5] <Int32.t> {arr} {_23} (fun (r: Int32.t) -> [ &_22 <- r ] s14)
+    | s13 = Slice64.get [%#sarray_and_slice'5] <Int32.t> {arr} {_23} (fun (r: Int32.t) -> [ &_22 <- r ] s14)
     | s14 = [ &_ret <- { f0 = _13; f1 = _16; f2 = _19; f3 = _22 } ] s15
     | s15 = return {_ret} ] ]
   [ & _ret: tup4_usize_i32_i32_i32 = Any.any_l ()

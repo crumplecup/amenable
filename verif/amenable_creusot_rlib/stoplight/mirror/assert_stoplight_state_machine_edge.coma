@@ -1,4 +1,4 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 13 287 42 *)
 
 use creusot.prelude.Any
 
@@ -6,6 +6,6 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec __assert_stoplight_state_machine_edge_In
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42] (return (x: ())) = (! bb0
+let __assert_stoplight_state_machine_edge_In [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 13 287 42]
+  (return (x: ())) = (! bb0
   [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ]) [ return (result: ()) -> (! return {result}) ]

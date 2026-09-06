@@ -20,10 +20,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 187 8 187 101]
+let verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_windows_carrier.rs" 187 8 187 101]
   (code_point: UInt32.t) (return (x: UInt16.t)) =
-  {[@stop_split] [@expl:verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit requires] [%#sos_windows_carrier] encode_wide_headroom_holds code_point}
+{[@stop_split] [@expl:verify_encode_wide_model_encodes_a_bmp_code_point_as_one_code_unit requires] [%#sos_windows_carrier] encode_wide_headroom_holds code_point}
   (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- UInt16.of_int (UInt32.t'int code_point) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: UInt16.t = Any.any_l () | & code_point: UInt32.t = code_point ])

@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec amount'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 266 8 266 45]
+let amount'0 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 266 8 266 45]
   (self: t_TransferPayload) (return (x: t_Amount)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- self.amount ] s1 | s1 = return {_ret} ] ]
   [ & _ret: t_Amount = Any.any_l () | & self: t_TransferPayload = self ])

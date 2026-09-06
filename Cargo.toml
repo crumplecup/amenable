@@ -31,7 +31,7 @@ amenable_creusot = { path = "crates/amenable_creusot", version = "0.1.0" }
 amenable_verus = { path = "crates/amenable_verus", version = "0.1.0" }
 
 clap = { version = "4", features = ["derive"] }
-creusot-std = { version = "0.11.0", features = ["sc-drf"] }
+creusot-std = { version = "0.13.0", features = ["sc-drf"] }
 derive-getters = "0.5"
 derive-new = "0.7"
 derive_builder = "0.20"

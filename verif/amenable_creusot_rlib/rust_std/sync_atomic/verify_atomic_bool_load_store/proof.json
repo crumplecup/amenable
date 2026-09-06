@@ -8,13 +8,13 @@
       "vc_closure3": { "prover": "alt-ergo", "time": 0.015 },
       "vc_closure4": { "prover": "alt-ergo", "time": 0.02 },
       "vc_closure5": { "prover": "alt-ergo", "time": 0.017 },
-      "vc_deref_Ghost_Box_Perm_AtomicBool_Global": {
+      "vc_deref_Ghost_Perm_AtomicBool": {
         "prover": "alt-ergo",
-        "time": 0.019
+        "time": 0.03
       },
-      "vc_deref_mut_Ghost_Box_Perm_AtomicBool_Global": {
+      "vc_deref_mut_Ghost_Perm_AtomicBool": {
         "prover": "alt-ergo",
-        "time": 0.016
+        "time": 0.03
       },
       "vc_load_FnGhostWrapper_closure3": {
         "prover": "alt-ergo",
@@ -37,13 +37,13 @@
         "prover": "alt-ergo",
         "time": 0.016
       },
-      "vc_shoot_load_AtomicBool": { "prover": "alt-ergo", "time": 0.015 },
+      "vc_shoot_load_AtomicBool": { "prover": "alt-ergo", "time": 0.03 },
       "vc_shoot_store_AtomicBool": { "prover": "alt-ergo", "time": 0.017 },
       "vc_store_FnGhostWrapper_closure4": {
         "prover": "alt-ergo",
         "time": 0.022
       },
-      "vc_verify_atomic_bool_load_store": { "prover": "cvc5", "time": 0.071 }
+      "vc_verify_atomic_bool_load_store": { "prover": "z3", "time": 0.016 }
     }
   }
 }

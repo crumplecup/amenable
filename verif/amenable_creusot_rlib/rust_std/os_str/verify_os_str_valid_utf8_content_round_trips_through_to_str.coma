@@ -20,8 +20,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_os_str_valid_utf8_content_round_trips_through_to_str
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 36 8 36 89]
+let verify_os_str_valid_utf8_content_round_trips_through_to_str [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/os_str.rs" 36 8 36 89]
   (return (x: tup2_bool_usize)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_ret <- { f0 = ([%#sos_str] true); f1 = ([%#sos_str'0] (2: UInt64.t)) } ] s1 | s1 = return {_ret} ] ]

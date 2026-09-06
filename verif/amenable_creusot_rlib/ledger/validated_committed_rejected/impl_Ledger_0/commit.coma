@@ -6,10 +6,10 @@ let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creuso
 let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 109 25 109 35
 let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 108 22 108 26
 let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 85 8 85 18
-let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 317 16 320 17
-let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 222 24 222 49
-let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 95 0 95 87
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 321 16 324 17
+let%span svalidated_committed_rejected'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 226 24 226 49
+let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 96 0 96 87
 let%span scommit = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 18 30 18 45
 let%span scommit'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 18 30 18 53
 let%span scommit'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 19 49 19 64
@@ -58,15 +58,15 @@ predicate inv_ref_Transfer_Validated_ValidatedToken [@inline:trivial] (_1: t_Tra
 
 meta "rewrite_def" predicate inv_ref_Transfer_Validated_ValidatedToken
 
-let rec primary_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
+let primary_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
   (return (x: t_TransferPayload)) =
-  {[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Validated_ValidatedToken self}
+{[@stop_split] [@expl:primary 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Validated_ValidatedToken self}
   any
   [ return (result: t_TransferPayload) -> {[@stop_split] [@expl:primary ensures] [%#stransfer_and_types] result
     = self.payload}
     (! return {result}) ]
 
-let rec clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
+let clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayload)) = any
   [ return (result: t_TransferPayload) -> (! return {result}) ]
 
 predicate resolve_ValidatedToken (_1: t_ValidatedToken)
@@ -79,9 +79,9 @@ axiom resolve_axiom [@rewrite]:
   forall x: t_Transfer_Validated_ValidatedToken [resolve_Transfer_Validated_ValidatedToken x]. resolve_Transfer_Validated_ValidatedToken x
     = (resolve_ValidatedToken x.token /\ resolve__private x.t_Transfer__private)
 
-let rec sidecar_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
+let sidecar_Transfer_Validated_ValidatedToken (self: t_Transfer_Validated_ValidatedToken)
   (return (x: t_ValidatedToken)) =
-  {[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Validated_ValidatedToken self}
+{[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Validated_ValidatedToken self}
   any
   [ return (result: t_ValidatedToken) ->
   {[@stop_split] [@expl:sidecar result type invariant] [%#stransfer_and_types] inv_ValidatedToken result}
@@ -91,8 +91,8 @@ type t_CommittedToken
 
 predicate inv_CommittedToken (_1: t_CommittedToken)
 
-let rec establish_Committed (credential: t_ValidatedToken) (return (x: t_CommittedToken)) =
-  {[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_ValidatedToken credential}
+let establish_Committed (credential: t_ValidatedToken) (return (x: t_CommittedToken)) =
+{[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_ValidatedToken credential}
   any
   [ return (result: t_CommittedToken) ->
   {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_CommittedToken result}
@@ -113,9 +113,9 @@ axiom inv_axiom'0 [@rewrite]:
   forall x: t_Transfer_Committed_CommittedToken [inv_Transfer_Committed_CommittedToken x]. inv_Transfer_Committed_CommittedToken x
     = (inv_CommittedToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
 
-let rec new_Committed (payload'1: t_TransferPayload) (token'1: t_CommittedToken)
+let new_Committed (payload'1: t_TransferPayload) (token'1: t_CommittedToken)
   (return (x: t_Transfer_Committed_CommittedToken)) =
-  {[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_CommittedToken token'1}
+{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_CommittedToken token'1}
   any
   [ return (result: t_Transfer_Committed_CommittedToken) ->
   {[@stop_split] [@expl:new_Committed ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types] inv_Transfer_Committed_CommittedToken result)
@@ -139,10 +139,10 @@ axiom inv_axiom'1 [@rewrite]:
       | Err f0'0 -> true
       end
 
-predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 221 8 221 58] (amount'0: Int64.t) =
+predicate committed_amount_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 225 8 225 58] (amount'0: Int64.t) =
   [%#svalidated_committed_rejected'0] - Int64.to_int amount'0 + Int64.to_int amount'0 = 0
 
-predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 313 8 315 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
+predicate committed_result_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 317 8 319 17] (outcome: t_Result_Transfer_Committed_CommittedToken_TransferError) =
   [%#svalidated_committed_rejected] match outcome with
     | Ok committed -> committed_amount_holds committed.payload'0.amount.f0
     | Err _ -> false
@@ -152,10 +152,10 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec commit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 17 12 17 134]
+let commit [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/commit.rs" 17 12 17 134]
   (self: t_Ledger) (input: t_Transfer_Validated_ValidatedToken)
   (return (x: t_Result_Transfer_Committed_CommittedToken_TransferError)) =
-  {[@stop_split] [@expl:commit 'input' type invariant] [%#scommit'4] inv_Transfer_Validated_ValidatedToken input}
+{[@stop_split] [@expl:commit 'input' type invariant] [%#scommit'4] inv_Transfer_Validated_ValidatedToken input}
   (! bb0
   [ bb0 = s0
     [ s0 = primary_Transfer_Validated_ValidatedToken [%#scommit] {input}

@@ -1,10 +1,10 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 13 287 42 *)
 
 (* <stoplight::mirror::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
 
-let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 290 14 290 21
-let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 14 291 22
-let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 292 14 292 19
+let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 291 14 291 21
+let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 292 14 292 22
+let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 293 14 293 19
 
 use creusot.slice.Slice64
 use creusot.prelude.Any
@@ -13,7 +13,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec states_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 286 13 286 42]
+let states_Stoplight [#"/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 13 287 42]
   (return (x: Slice64.slice string)) = (! bb0
   [ bb0 = s0
     [ s0 = bb0'0

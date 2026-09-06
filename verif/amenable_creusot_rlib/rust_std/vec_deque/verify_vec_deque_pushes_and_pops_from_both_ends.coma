@@ -27,9 +27,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_vec_deque_pushes_and_pops_from_both_ends
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 104 8 107 71] (a: Int32.t)
-  (b: Int32.t) (return (x: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
+let verify_vec_deque_pushes_and_pops_from_both_ends [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/vec_deque.rs" 104 8 107 71]
+  (a: Int32.t) (b: Int32.t) (return (x: tup5_Option_i32_Option_i32_Option_i32_Option_i32_bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_7 <- Some b ] s1
     | s1 = [ &_9 <- Some a ] s2

@@ -1,21 +1,21 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 171 8 174 52 *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/invariant.rs" 93 20 93 44
-let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 103 29 103 33
-let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/iter.rs" 99 26 102 17
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
+let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 124 29 124 33
+let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 120 26 123 17
 let%span soption_and_result = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 177 29 177 43
 let%span soption_and_result'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 178 39 178 48
 let%span soption_and_result'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 186 40 186 49
 let%span soption_and_result'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 169 19 169 23
 let%span soption_and_result'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 170 18 170 74
 let%span soption_and_result'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 108 16 110 57
-let%span soption = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 325 18 331 9
-let%span soption'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 734 20 734 53
-let%span soption'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 740 12 741 96
-let%span soption'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 746 14 746 47
-let%span soption'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 750 15 750 32
-let%span soption'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 751 15 751 32
-let%span soption'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.11.0/src/std/option.rs" 752 14 752 42
+let%span soption = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 313 18 319 9
+let%span soption'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 795 20 795 53
+let%span soption'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 801 12 802 96
+let%span soption'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 807 14 807 47
+let%span soption'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 811 15 811 32
+let%span soption'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 812 15 812 32
+let%span soption'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 813 14 813 42
 
 use creusot.int.Int32
 use creusot.prelude.MutBorrow
@@ -57,7 +57,7 @@ meta "rewrite_def" predicate resolve_refmut_IterMut_i32
 predicate completed_IterMut_i32 (self: MutBorrow.t t_IterMut_i32) =
   [%#soption'0] view_IterMut_i32 self.current = None'0 /\ resolve_refmut_IterMut_i32 self
 
-let rec iter_mut_i32 (self_: MutBorrow.t t_Option_i32) (return (x: t_IterMut_i32)) = any
+let iter_mut_i32 (self_: MutBorrow.t t_Option_i32) (return (x: t_IterMut_i32)) = any
   [ return (result: t_IterMut_i32) ->
   {[@stop_split] [@expl:iter_mut_i32 ensures] ([@stop_split] [@expl:iter_mut result type invariant] inv_IterMut_i32 result)
     /\ ([@stop_split] [@expl:iter_mut ensures] [%#soption] match { f0 = self_.current; f1 = self_.final } with
@@ -78,8 +78,8 @@ predicate inv_refmut_IterMut_i32 [@inline:trivial] (_1: MutBorrow.t t_IterMut_i3
 
 meta "rewrite_def" predicate inv_refmut_IterMut_i32
 
-let rec next_IterMut_i32 (self_: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
-  {[@stop_split] [@expl:next 'self_' type invariant] [%#siter] inv_refmut_IterMut_i32 self_}
+let next_IterMut_i32 (self_: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
+{[@stop_split] [@expl:next 'self_' type invariant] [%#siter] inv_refmut_IterMut_i32 self_}
   any
   [ return (result: t_Option_refmut_i32) -> {[@stop_split] [@expl:next ensures] [%#siter'0] match result with
       | None'0 -> completed_IterMut_i32 self_
@@ -87,7 +87,7 @@ let rec next_IterMut_i32 (self_: MutBorrow.t t_IterMut_i32) (return (x: t_Option
       end}
     (! return {result}) ]
 
-let rec elim_Some (_x: t_Option_refmut_i32) (return (f0'0: MutBorrow.t Int32.t)) = any
+let elim_Some (_x: t_Option_refmut_i32) (return (f0'0: MutBorrow.t Int32.t)) = any
   [ _k (f0'0: MutBorrow.t Int32.t) -> {Some'0 f0'0 = _x} (! return {f0'0})
   | _chk -> (! {[@expl:elim Some] match _x with
       | Some'0 _ -> true
@@ -111,9 +111,8 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_option_iter_mut_writes_through_to_the_option
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 171 8 174 52] (value: Int32.t)
-  (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
+let verify_option_iter_mut_writes_through_to_the_option [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 171 8 174 52]
+  (value: Int32.t) (updated: Int32.t) (return (x: tup3_Option_i32_Option_i32_Option_i32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &opt <- Some value ] s1
     | s1 = MutBorrow.borrow_mut <t_Option_i32> {opt}

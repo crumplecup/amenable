@@ -37,10 +37,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let rec verify_cstring_excludes_the_terminator_and_rejects_interior_nul
-  [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 65 8 67 57] (byte: UInt8.t)
-  (return (x: tup5_usize_Option_u8_usize_Option_u8_bool)) =
-  {[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#sc_str'3] non_nul_byte_holds byte}
+let verify_cstring_excludes_the_terminator_and_rejects_interior_nul [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/c_str.rs" 65 8 67 57]
+  (byte: UInt8.t) (return (x: tup5_usize_Option_u8_usize_Option_u8_bool)) =
+{[@stop_split] [@expl:verify_cstring_excludes_the_terminator_and_rejects_interior_nul requires] [%#sc_str'3] non_nul_byte_holds byte}
   (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- Some byte ] s1
