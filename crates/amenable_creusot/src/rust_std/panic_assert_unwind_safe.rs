@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 #[cfg(creusot)]
 use std::panic::AssertUnwindSafe;
 amenable_derive::harness! {

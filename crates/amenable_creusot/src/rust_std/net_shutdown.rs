@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, requires, trusted};
 #[cfg(creusot)]
 use std::net::Shutdown;
 amenable_derive::harness! {

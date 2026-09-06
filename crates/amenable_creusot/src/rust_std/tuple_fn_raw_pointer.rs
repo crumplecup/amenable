@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires, trusted};
 amenable_derive::harness! {
     creusot, VERIFY_TUPLE_FIELD_ACCESS_SRC, {
         /// A tuple's fields recover the values it was constructed with,

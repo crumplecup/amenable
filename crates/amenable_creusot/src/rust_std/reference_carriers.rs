@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 amenable_derive::harness! {
     creusot, VERIFY_SHARED_REFERENCE_DEREFERENCES_TO_THE_REFERENT_SRC, {
         /// Dereferencing a shared reference recovers exactly the value it

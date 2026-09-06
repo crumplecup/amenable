@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 #[cfg(creusot)]
 use creusot_std::std::time::nanos_to_secs;
 #[cfg(creusot)]

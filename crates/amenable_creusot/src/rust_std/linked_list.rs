@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 amenable_derive::harness! {
     creusot, DRAINS_TWO_VALUES_IN_ORDER_AND_EMPTIES_SRC, {
         /// The `amenable_std::DrainsTwoValuesInOrderAndEmpties`

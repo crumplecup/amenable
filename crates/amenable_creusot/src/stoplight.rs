@@ -226,12 +226,13 @@ mod mirror {
     #[derive(amenable_derive::Sidecar)]
     #[sidecar(verifier = "CreusotVerifier", constructor = "pub(super)")]
     pub struct Established<T, Token> {
-        // Fully `pub`, not private -- see `ledger::Transfer`'s own fields'
-        // doc comment for the real "less-visible item" transparency error
-        // this avoids: `Sidecar::primary()` (a `pub` trait method) is more
-        // visible than `new`'s own private constructor here, so even though
-        // both derive-generated `ensures` clauses reach these fields, the
-        // *more* visible one (`primary()`) is what sets the real floor.
+        /// The established value this credential carries. Fully `pub`, not
+        /// private -- see `ledger::Transfer`'s own fields' doc comment for
+        /// the real "less-visible item" transparency error this avoids:
+        /// `Sidecar::primary()` (a `pub` trait method) is more visible than
+        /// `new`'s own private constructor here, so even though both
+        /// derive-generated `ensures` clauses reach these fields, the
+        /// *more* visible one (`primary()`) is what sets the real floor.
         #[sidecar(primary)]
         pub primary: T,
         #[sidecar(token)]
@@ -310,6 +311,11 @@ mod mirror {
     /// a *generated, unmodified* body can no longer do without becoming a
     /// silently different claim than the one actually captured.
     #[derive(Debug, Clone, Copy)]
+    // Proof scaffolding: exists only to give the generated `Ok(..)` bodies
+    // a concrete `Err` type to name -- no edge constructs it, by design.
+    // Same "verifier is the consumer, not Rust code" reason `harness!`
+    // gates its own items behind `#[cfg_attr(creusot, allow(dead_code))]`.
+    #[cfg_attr(creusot, allow(dead_code))]
     pub enum StoplightError {
         /// The one variant. Exists so `StoplightError` is an ordinary
         /// constructible type, not so any edge below constructs it.

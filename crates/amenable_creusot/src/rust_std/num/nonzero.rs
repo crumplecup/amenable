@@ -53,11 +53,15 @@ amenable_derive::harness! {
         /// `nonzero_i16_get` (itself `#[trusted] #[logic(opaque)]`), and
         /// Creusot rejects an `open` (transparent) definition that would
         /// expose a less-visible item to its own callers.
+        // `opaque` hides the body from rustc's own pass (unlike the
+        // `open` sibling above), so the parameters read as unused there;
+        // underscore them -- the same shape `nonzero_i16_get`'s own
+        // `_nz` already uses. Creusot still reads the `pearlite!` body.
         #[logic(opaque)]
-        fn nonzero_i16_get_round_trips(value: i16, new_result: Option<NonZero<i16>>) -> bool {
+        fn nonzero_i16_get_round_trips(_value: i16, _new_result: Option<NonZero<i16>>) -> bool {
             pearlite! {
-                match new_result {
-                    Some(nz) => nonzero_i16_get(&nz) == value,
+                match _new_result {
+                    Some(nz) => nonzero_i16_get(&nz) == _value,
                     None => true,
                 }
             }

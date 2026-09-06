@@ -1,12 +1,9 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{check, ensures, extern_spec, logic, requires};
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
 #[cfg(creusot)]
-use std::num::{
-    FpCategory, IntErrorKind, NonZero, ParseFloatError, ParseIntError, Saturating, TryFromIntError,
-    Wrapping,
-};
+use std::num::Wrapping;
 // `Ordering::reverse` is uncontracted (creusot-std has no coverage for
 // `core::cmp::Ordering` at all) — and unlike `String::len`/`Duration::
 // as_secs`, matching the `(o, result)` pair structurally in `#[ensures]`

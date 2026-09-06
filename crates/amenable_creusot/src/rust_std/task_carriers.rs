@@ -5,7 +5,7 @@
 /// this file's own top level.
 #[cfg(creusot)]
 mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+    pub(super) use creusot_std::macros::{ensures, logic, requires, trusted};
     pub(super) use std::future::{Pending, PollFn, Ready};
     pub(super) use std::sync::atomic::Ordering as AtomicOrdering;
     pub(super) use std::task::Waker;
@@ -13,8 +13,7 @@ mod mirror {
 }
 #[cfg(creusot)]
 use mirror::{
-    AtomicOrdering, Context, Pending, Poll, PollFn, Ready, Waker, check, ensures, extern_spec,
-    logic, requires, trusted,
+    AtomicOrdering, Context, Pending, Poll, PollFn, Ready, Waker, ensures, logic, requires, trusted,
 };
 
 // `creusot-std` 0.11.0 ships no `core::future` / `core::task` contract

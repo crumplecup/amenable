@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 // `std::os::windows::{ffi::EncodeWide, io::{BorrowedHandle, BorrowedSocket,
 // HandleOrInvalid, OwnedHandle, OwnedSocket}}`: same wall
 

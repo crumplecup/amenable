@@ -1,6 +1,10 @@
 #[cfg(creusot)]
-use creusot_std::macros::{ensures, extern_spec, logic, requires};
+use creusot_std::macros::{ensures, logic, requires};
 
+// Consumed only by `not_creusot_mirror` below; gated so the translator
+// pass doesn't see it as an unused import (the `#[cfg(not(creusot))]`
+// block that uses it is stripped there).
+#[cfg(not(creusot))]
 use super::ledger_validate::{AMOUNT_POSITIVE_HOLDS_SRC, VERIFY_CHECK_AMOUNT_POSITIVE_SRC};
 #[cfg(creusot)]
 use super::ledger_validate::{amount_positive_holds, check_amount_positive};

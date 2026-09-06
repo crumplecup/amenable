@@ -13,7 +13,7 @@
 /// consumer of anything defined here.
 #[cfg(creusot)]
 mod mirror {
-    use amenable_core::{Establish, Evidence, Sidecar, Witness};
+    use amenable_core::{Establish, Evidence, Witness};
     use amenable_gaap::{
         Committed, CommittedToken, Pending, PendingToken, Rejected, RejectedFromPendingToken,
         RejectedFromValidatedToken, Validated, ValidatedToken,

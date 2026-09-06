@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 amenable_derive::harness! {
     creusot, VERIFY_CHAR_ROUNDTRIP_SRC, {
         /// `char` is constrained to Unicode scalar values (excludes the

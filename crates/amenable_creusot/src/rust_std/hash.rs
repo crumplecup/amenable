@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires, trusted};
 #[cfg(creusot)]
 use std::hash::{BuildHasher, DefaultHasher, Hash, Hasher, RandomState};
 amenable_derive::harness! {

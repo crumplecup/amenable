@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 // Accommodation models for the CStr/CString cluster below: `creusot-std`
 // 0.11.0 ships no contracts for CStr/CString construction or
 // observation at all, and (per this session's `BinaryHeap`/`BTreeMap`

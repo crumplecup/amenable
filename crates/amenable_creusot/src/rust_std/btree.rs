@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 amenable_derive::harness! {
     creusot, A_LESS_THAN_B_HOLDS_SRC, {
         /// The precondition `verify_btree_set_iterates_in_sorted_order`

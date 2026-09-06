@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 // Unlike every non-`char`/`String` type above, `Option<T>` needs no local
 // `extern_spec!` at all: `creusot_std::std::option` already ships real
 // `#[check(ghost)]` contracts for `is_some`/`is_none`/`unwrap`/`unwrap_or`

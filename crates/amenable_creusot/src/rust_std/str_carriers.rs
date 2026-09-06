@@ -1,5 +1,5 @@
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 amenable_derive::harness! {
     creusot, ASCII_BYTE_HOLDS_SRC, {
         /// The `amenable_std::AsciiByte` precondition -- real, callable

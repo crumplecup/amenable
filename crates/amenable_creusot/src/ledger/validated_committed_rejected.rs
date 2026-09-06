@@ -72,9 +72,13 @@ use mirror::{
     requires, sufficient_funds_holds,
 };
 
+// Consumed only by `not_creusot_mirror` below; gated so the translator
+// pass doesn't flag them as unused (that block is stripped there).
+#[cfg(not(creusot))]
 use super::contract_bounds::{
     VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC, VERIFY_CHECK_SUFFICIENT_FUNDS_SRC,
 };
+#[cfg(not(creusot))]
 use super::ledger_validate::VERIFY_CHECK_AMOUNT_POSITIVE_SRC;
 /// The `#[cfg(not(creusot))]` counterpart content this file needs
 /// (`BalancedEntries`'s own `Witness`/`Ensures` impls, and the two

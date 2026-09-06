@@ -6,7 +6,7 @@
 /// own top level.
 #[cfg(creusot)]
 mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+    pub(super) use creusot_std::macros::{check, ensures, requires};
     pub(super) use creusot_std::prelude::ghost;
     pub(super) use creusot_std::std::sync::atomic::Ordering::{
         None as AtomicNone, SeqCst as AtomicSeqCst,
@@ -26,7 +26,7 @@ use mirror::{
     AtomicNone, AtomicSeqCst, Committer, CreusotAtomicBool, CreusotAtomicI8, CreusotAtomicI16,
     CreusotAtomicI32, CreusotAtomicI64, CreusotAtomicIsize, CreusotAtomicPtr, CreusotAtomicU8,
     CreusotAtomicU16, CreusotAtomicU32, CreusotAtomicU64, CreusotAtomicUsize, check, ensures,
-    extern_spec, ghost, logic, requires, trusted,
+    ghost, requires,
 };
 
 macro_rules! atomic_sc_load_store_harness {

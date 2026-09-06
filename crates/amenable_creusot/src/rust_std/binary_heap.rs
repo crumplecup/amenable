@@ -1,7 +1,7 @@
 #[cfg(creusot)]
 use crate::rust_std::btree::a_less_than_b_holds;
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires};
 // Accommodation models for the five `BinaryHeap<i32>` proofs below: real,
 // Creusot-checked ordering laws over an explicit two-element max/min
 // pair, not a `#[trusted]` assumption on the real type and not a real

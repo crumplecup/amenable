@@ -3,7 +3,7 @@ use crate::rust_std::linked_list::{
     drains_two_values_in_order_and_empties, yields_two_values_in_order_then_ends,
 };
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{ensures, logic, requires, trusted};
 #[cfg(creusot)]
 use std::collections::TryReserveError;
 amenable_derive::harness! {
