@@ -99,8 +99,21 @@ pub fn expand_harness(
         TokenStream::new()
     };
 
+    // A `#[requires]`/`#[ensures]`-contracted proof harness has no Rust
+    // caller by design -- the verifier is its only consumer, and the
+    // translator's own dead-code pass (`creusot-rustc`) can't see that.
+    // Suppress `dead_code` for the harness cfg only, mirroring what
+    // Kani's `#[kani::proof]` does automatically (which is why `kani`
+    // harnesses stay quiet under `cargo kani` and need nothing here).
+    let dead_code_allow = if cfg_name == "kani" {
+        TokenStream::new()
+    } else {
+        quote! { #[cfg_attr(#cfg_name, allow(dead_code))] }
+    };
+
     Ok(quote! {
         #[cfg(#cfg_name)]
+        #dead_code_allow
         #item
 
         /// Verbatim source of this harness, whitespace and all, captured
