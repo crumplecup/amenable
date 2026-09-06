@@ -30,6 +30,23 @@ jobs:
       - uses: extractions/setup-just@v3
       - run: just check-all
 
+  features:
+    name: check-features (ubuntu-latest)
+    # Feature-powerset compile check -- every combination of cli/creusot/
+    # verus across the workspace. Linux-only; the Windows job already
+    # covers the #[cfg(windows)] surface, and doubling the powerset onto
+    # a Windows runner isn't worth it. Separate from `check-all` so a
+    # feature-gate break and a fmt/clippy/test break report independently.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack
+      - uses: extractions/setup-just@v3
+      - run: just check-features
+
   windows:
     name: check-all (windows-latest)
     # Kani/CBMC don't run on Windows, so this validates the #[cfg(windows)]

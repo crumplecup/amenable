@@ -31,6 +31,14 @@ check-all-package package:
     cargo clippy -p {{package}} --all-targets --all-features -- -D warnings
     cargo test -p {{package}}
 
+# ~22 `cargo check` runs -- the feature surface (cli/creusot/verus) is
+# small, so the full powerset needs no `--depth` cap. `--no-dev-deps`
+# temporarily edits Cargo.toml (restored on exit). Needs cargo-hack
+# (`cargo install cargo-hack`).
+# Pre-merge: compile-check every combination of every crate's features.
+check-features:
+    cargo hack check --workspace --feature-powerset --no-dev-deps --keep-going
+
 # Canonical Kani verification entrypoint -- delegates to the `amenable
 # verify kani` binary, never a raw `cargo kani` call, so it's registry-
 # driven: `crates/amenable/src/kani.rs`'s `registered_proofs()` iterates
