@@ -198,3 +198,40 @@ check-windows:
 
 check-windows-package package:
     CROSS_CONTAINER_ENGINE=podman cross check --target x86_64-pc-windows-gnu -p {{package}}
+
+# CI does not run on ordinary pushes to `dev`; `gh` must be authenticated.
+# Pre-flight a promotion: dispatch `main` CI against a branch, block on it.
+ci-check ref="dev":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "dispatching CI against {{ref}} ..."
+    gh workflow run ci.yml --ref {{ref}}
+    sleep 5
+    run_id=$(gh run list --workflow=ci.yml --branch={{ref}} --event=workflow_dispatch \
+        --limit=1 --json databaseId --jq '.[0].databaseId')
+    echo "watching run ${run_id} ( https://github.com/crumplecup/amenable/actions/runs/${run_id} )"
+    gh run watch "${run_id}" --exit-status
+
+# Guards: on `dev`, `dev` pushed to `origin/dev`, `origin/main` fast-
+# forwards to `dev`. Runs `just ci-check dev`, then pushes `dev` to `main`
+# and resyncs local `main`. `just promote skip-ci` skips the pre-flight.
+# Pre-flight, then fast-forward `dev` onto `main`; resync local `main`.
+promote mode="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    [ "${branch}" = "dev" ] || { echo "not on dev (on ${branch})"; exit 1; }
+    git fetch --quiet origin
+    [ "$(git rev-parse dev)" = "$(git rev-parse origin/dev)" ] || {
+        echo "local dev != origin/dev -- push dev first"; exit 1; }
+    git merge-base --is-ancestor origin/main dev || {
+        echo "origin/main does not fast-forward to dev -- rebase dev onto origin/main"; exit 1; }
+    if [ "$(git rev-parse dev)" = "$(git rev-parse origin/main)" ]; then
+        echo "origin/main already at dev -- nothing to promote"; exit 0
+    fi
+    git --no-pager log --oneline origin/main..dev
+    if [ "{{mode}}" != "skip-ci" ]; then just ci-check dev; fi
+    git push origin dev:main
+    git fetch --quiet origin
+    git branch -f main origin/main
+    echo "promoted $(git rev-parse --short origin/main); local main resynced, still on dev"
