@@ -22,7 +22,7 @@
 //! it belongs with the real transition logic that captures it (Step 1),
 //! not speculated on before any transition exists to need it.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 use uuid::Uuid;
 
@@ -155,18 +155,17 @@ pub struct TransferPayload {
 #[standard(basis = "Self")]
 pub struct Pending;
 
-impl Provenance for Pending {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for Pending {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
             "asserted",
             "transfer state, by construction (every Transfer starts Pending)",
         )]
-        .into_iter()
     }
 }
+
+impl Provenance for Pending {}
 
 /// The transfer has been validated and is ready to commit — see
 /// [`Pending`] for why this is a root claim, not a derived one, even
@@ -178,36 +177,34 @@ impl Provenance for Pending {
 #[standard(basis = "Self")]
 pub struct Validated;
 
-impl Provenance for Validated {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for Validated {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
             "asserted",
             "transfer state, reachable only via a proven Pending -> Validated exchange",
         )]
-        .into_iter()
     }
 }
+
+impl Provenance for Validated {}
 
 /// The transfer has been committed to the ledger — see [`Pending`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
 #[standard(basis = "Self")]
 pub struct Committed;
 
-impl Provenance for Committed {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for Committed {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
             "asserted",
             "transfer state, reachable only via a proven Validated -> Committed exchange",
         )]
-        .into_iter()
     }
 }
+
+impl Provenance for Committed {}
 
 /// The transfer was rejected — validation failed (`Rejected<Pending>`),
 /// or a validated transfer was manually rolled back before commit
@@ -255,31 +252,29 @@ impl Provenance for Committed {
 #[standard(basis = "Self", bound = "Self: Provenance")]
 pub struct Rejected<T>(std::marker::PhantomData<T>);
 
-impl Provenance for Rejected<Pending> {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for Rejected<Pending> {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
             "asserted",
             "transfer state, reachable only via a proven Pending -> Rejected exchange (validation failure)",
         )]
-        .into_iter()
     }
 }
 
-impl Provenance for Rejected<Validated> {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
+impl Provenance for Rejected<Pending> {}
 
+impl Metadata for Rejected<Validated> {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
             "asserted",
             "transfer state, reachable only via a proven Validated -> Rejected exchange (manual rollback)",
         )]
-        .into_iter()
     }
 }
+
+impl Provenance for Rejected<Validated> {}
 
 // `#[derive(Standard)]`'s auto `EvidenceLink` registration only covers
 // non-generic roots (a generic basis has no single concrete name to

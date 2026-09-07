@@ -112,7 +112,11 @@ impl Registry for CertRegistry {
         let certificate = ProvenanceCertificate::new(
             CertId::new(self.next_id),
             subject.to_string(),
-            provenance.metadata().collect(),
+            provenance
+                .snapshot()
+                .iter()
+                .map(MetadataEntry::from)
+                .collect(),
         );
 
         self.next_id += 1;

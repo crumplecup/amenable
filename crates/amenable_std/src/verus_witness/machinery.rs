@@ -6,8 +6,8 @@
 //! assuming its conclusion).
 
 use amenable_core::{
-    Evidence, MetadataEntry, Provenance, Verifier, WitnessArtifact, WitnessArtifactNode,
-    WitnessSupportKind, WitnessSupportSummary,
+    Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier, WitnessArtifact,
+    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -42,11 +42,9 @@ pub struct VerusVerifier;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct VerusVerifierMetadata;
 
-impl Provenance for VerusVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for VerusVerifierMetadata {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "verus"),
             ("authority", "Verus project"),
@@ -61,13 +59,11 @@ impl Provenance for VerusVerifierMetadata {
                 "binary path, source selection, flags, timeout, and report output",
             ),
         ];
-        FACTS
-            .iter()
-            .map(|&(k, v)| MetadataEntry::new(k, v))
-            .collect::<Vec<_>>()
-            .into_iter()
+        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
     }
 }
+
+impl Provenance for VerusVerifierMetadata {}
 
 impl Verifier for VerusVerifier {
     type Metadata = VerusVerifierMetadata;
@@ -221,7 +217,10 @@ impl WitnessArtifact for RustStdProvenance {
             WitnessSupportKind::Trusted,
             WitnessSupportSummary::trusted_leaf(),
             self.report().to_string(),
-            self.metadata(),
+            self.snapshot()
+                .iter()
+                .map(MetadataEntry::from)
+                .collect::<Vec<_>>(),
         )
     }
 }

@@ -1,7 +1,7 @@
 #[path = "support_reporting.rs"]
 mod support;
 
-use amenable_core::{Provenance as ProvenanceTrait, Registry, Standard};
+use amenable_core::{ErasedEntry, Metadata, Registry, Standard};
 use amenable_std::{
     CertRegistry, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,
@@ -18,28 +18,32 @@ fn rust_std_types_emit_derived_provenance_records() -> miette::Result<()> {
         provenance
             .get("rust.authority")
             .ok_or_else(|| miette::miette!("shared authority fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         "Rust Project Developers"
     );
     assert_eq!(
         provenance
             .get("rust.source_module")
             .ok_or_else(|| miette::miette!("shared source module fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         "core::primitive"
     );
     assert_eq!(
         provenance
             .get("type_name")
             .ok_or_else(|| miette::miette!("type name fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         "i32"
     );
     assert_eq!(
         provenance
             .get("semantic_summary")
             .ok_or_else(|| miette::miette!("semantic summary fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         "The signed 32-bit integer carrier stores values in the i32 range defined by Rust."
     );
     Ok(())
@@ -56,41 +60,49 @@ fn fixed_width_integer_types_share_rust_language_provenance_but_vary_type_specif
         i8_provenance
             .get("rust.authority")
             .ok_or_else(|| miette::miette!("i8 shared authority fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         i32_provenance
             .get("rust.authority")
             .ok_or_else(|| miette::miette!("i32 shared authority fact present"))?
-            .value(),
+            .value()
+            .to_string(),
     );
     assert_eq!(
         i8_provenance
             .get("rust.source_crate")
             .ok_or_else(|| miette::miette!("i8 shared crate fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         i32_provenance
             .get("rust.source_crate")
             .ok_or_else(|| miette::miette!("i32 shared crate fact present"))?
-            .value(),
+            .value()
+            .to_string(),
     );
     assert_ne!(
         i8_provenance
             .get("source_url")
             .ok_or_else(|| miette::miette!("i8 source url fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         i32_provenance
             .get("source_url")
             .ok_or_else(|| miette::miette!("i32 source url fact present"))?
-            .value(),
+            .value()
+            .to_string(),
     );
     assert_ne!(
         i8_provenance
             .get("type_name")
             .ok_or_else(|| miette::miette!("i8 type name fact present"))?
-            .value(),
+            .value()
+            .to_string(),
         i32_provenance
             .get("type_name")
             .ok_or_else(|| miette::miette!("i32 type name fact present"))?
-            .value(),
+            .value()
+            .to_string(),
     );
     Ok(())
 }

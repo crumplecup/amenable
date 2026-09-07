@@ -3,7 +3,7 @@
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
-use amenable_core::{OwnedProvenanceReport, Provenance as _, Registry};
+use amenable_core::{OwnedMetadataReport, Provenance as _, Registry};
 use amenable_derive::{Provenance, Standard};
 
 /// Provenance helper for Rust standard-library-backed carriers.
@@ -27,8 +27,8 @@ pub trait RustStdType {
     }
 
     /// Render the provenance report for this standard type.
-    fn report() -> OwnedProvenanceReport<RustStdProvenance> {
-        OwnedProvenanceReport::new(Self::provenance())
+    fn report() -> OwnedMetadataReport<RustStdProvenance> {
+        OwnedMetadataReport::new(Self::provenance())
     }
 
     /// Issue a certificate for this trusted standard type through a registry.
@@ -137,7 +137,7 @@ pub struct RustStdProvenance {
 impl Display for RustStdProvenance {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", OwnedProvenanceReport::new(self.clone()))
+        write!(f, "{}", OwnedMetadataReport::new(self.clone()))
     }
 }
 
