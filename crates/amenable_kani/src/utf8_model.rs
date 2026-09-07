@@ -12,7 +12,7 @@
 //! - if the real owned UTF-8 conversion path conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 mod buffer;
@@ -75,27 +75,24 @@ impl KaniAssumedUtf8Validity {
     }
 }
 
-impl Provenance for KaniAssumedUtf8Validity {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniAssumedUtf8Validity {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "UTF-8 validity, standing in for the real std::str::from_utf8 algorithm",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "the real validation algorithm times out under Kani even for two fully-valid bytes -- see gallery::utf8_validation_algorithm_cost",
-                ),
-                MetadataEntry::new("valid", self.valid.to_string()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "UTF-8 validity, standing in for the real std::str::from_utf8 algorithm",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "the real validation algorithm times out under Kani even for two fully-valid bytes -- see gallery::utf8_validation_algorithm_cost",
+            ),
+            OwnedEntry::new("valid", self.valid.to_string()),
+        ]
     }
 }
+
+impl Provenance for KaniAssumedUtf8Validity {}
 
 /// Modeled owned valid UTF-8 bytes.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

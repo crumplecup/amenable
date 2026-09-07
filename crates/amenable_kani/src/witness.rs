@@ -1,6 +1,6 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance, Verifier};
 
 /// Kani-specific witness: identifies the Kani proof harness (if any) behind
 /// a piece of evidence, without ever running it.
@@ -27,30 +27,28 @@ pub struct KaniVerifier;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct KaniVerifierMetadata;
 
-impl Provenance for KaniVerifierMetadata {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniVerifierMetadata {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            const FACTS: &[(&str, &str)] = &[
-                ("verifier_family", "kani"),
-                ("authority", "Kani Rust Verifier"),
-                ("source_url", "https://model-checking.github.io/kani/"),
-                ("proof_artifact", "Rust proof harness token stream"),
-                (
-                    "configuration_channel",
-                    "CLI arguments and KANI_* or PROVE_* environment variables",
-                ),
-                (
-                    "configuration_surface",
-                    "package selection, flags, timeout, and report output",
-                ),
-            ];
-            FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        const FACTS: &[(&str, &str)] = &[
+            ("verifier_family", "kani"),
+            ("authority", "Kani Rust Verifier"),
+            ("source_url", "https://model-checking.github.io/kani/"),
+            ("proof_artifact", "Rust proof harness token stream"),
+            (
+                "configuration_channel",
+                "CLI arguments and KANI_* or PROVE_* environment variables",
+            ),
+            (
+                "configuration_surface",
+                "package selection, flags, timeout, and report output",
+            ),
+        ];
+        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
     }
 }
+
+impl Provenance for KaniVerifierMetadata {}
 
 impl Verifier for KaniVerifier {
     type Metadata = KaniVerifierMetadata;

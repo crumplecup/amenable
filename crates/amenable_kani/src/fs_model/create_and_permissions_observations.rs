@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 use super::tree_primitives::{KaniFsDirEntry, KaniFsLabel, KaniFsNodeKind, KaniFsPath};
@@ -20,33 +20,30 @@ pub struct KaniCreateNewObservation {
     kind: Option<KaniFsNodeKind>,
 }
 
-impl Provenance for KaniCreateNewObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCreateNewObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            let prior_kind = match self.kind {
-                None => "missing",
-                Some(KaniFsNodeKind::File) => "existing_file",
-                Some(KaniFsNodeKind::Directory) => "existing_directory",
-            };
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        let prior_kind = match self.kind {
+            None => "missing",
+            Some(KaniFsNodeKind::File) => "existing_file",
+            Some(KaniFsNodeKind::Directory) => "existing_directory",
+        };
 
-            vec![
-            MetadataEntry::new(
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "create_new's outcome is determined entirely by a ternary prior existence state, standing in for the real OS-backed existence check",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the general filesystem state machine times out under Kani even for create_new alone -- see gallery::filesystem_observation_granularity",
             ),
-            MetadataEntry::new("prior_kind", prior_kind),
+            OwnedEntry::new("prior_kind", prior_kind),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniCreateNewObservation {}
 
 /// Modeled error for `create_new` against a path that already has a file.
 /// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking
@@ -170,27 +167,24 @@ pub struct KaniPermissionsObservation {
     readonly: bool,
 }
 
-impl Provenance for KaniPermissionsObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniPermissionsObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "flipping .set_readonly() and applying it via fs::set_permissions is reflected the next time the file's permissions are read, standing in for the real OS-backed permission bit",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("readonly", self.readonly.to_string()),
+            OwnedEntry::new("readonly", self.readonly.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniPermissionsObservation {}
 
 impl KaniPermissionsObservation {
     /// Model a freshly created file's permissions (never readonly).
@@ -227,28 +221,25 @@ pub struct KaniReadDirObservation {
     second: KaniFsDirEntry,
 }
 
-impl Provenance for KaniReadDirObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniReadDirObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 ".read_dir() yields exactly the files that were created in that directory, no more and no fewer, standing in for the real OS-backed directory listing",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("first", format!("{:?}", self.first.path())),
-            MetadataEntry::new("second", format!("{:?}", self.second.path())),
+            OwnedEntry::new("first", format!("{:?}", self.first.path())),
+            OwnedEntry::new("second", format!("{:?}", self.second.path())),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniReadDirObservation {}
 
 impl KaniReadDirObservation {
     /// Model a directory containing exactly two created file entries.

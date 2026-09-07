@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of a second handle's `.try_lock()` while a first
@@ -17,27 +17,24 @@ pub struct KaniLockObservation {
     locked: bool,
 }
 
-impl Provenance for KaniLockObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniLockObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a second handle's .try_lock() fails while a first handle still holds the file lock, standing in for the real OS-backed advisory lock",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("locked", self.locked.to_string()),
+            OwnedEntry::new("locked", self.locked.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniLockObservation {}
 
 /// Modeled error for a second `try_lock` while the modeled lock is held.
 /// Not `PartialEq`/`Eq`/`Hash`/`PartialOrd`/`Ord`: location tracking

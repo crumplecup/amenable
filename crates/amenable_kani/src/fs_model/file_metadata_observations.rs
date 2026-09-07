@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 use super::tree_primitives::KaniFsNodeKind;
@@ -20,28 +20,25 @@ pub struct KaniFileTypeObservation {
     directory: KaniFsNodeKind,
 }
 
-impl Provenance for KaniFileTypeObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniFileTypeObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a regular file's FileType reports is_file() and a directory's reports is_dir(), never both, standing in for the real OS-backed type distinction",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("file", format!("{:?}", self.file)),
-            MetadataEntry::new("directory", format!("{:?}", self.directory)),
+            OwnedEntry::new("file", format!("{:?}", self.file)),
+            OwnedEntry::new("directory", format!("{:?}", self.directory)),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniFileTypeObservation {}
 
 impl KaniFileTypeObservation {
     /// Model one file node and one directory node.
@@ -105,27 +102,24 @@ pub struct KaniFileContentObservation {
     content: [u8; 4],
 }
 
-impl Provenance for KaniFileContentObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniFileContentObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "bytes written to a file and flushed by Drop are read back unchanged through a fresh handle, standing in for the real OS-backed write/read path",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("content", format!("{:?}", self.content)),
+            OwnedEntry::new("content", format!("{:?}", self.content)),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniFileContentObservation {}
 
 impl KaniFileContentObservation {
     /// Model writing `content` to a fresh file.
@@ -158,27 +152,24 @@ pub struct KaniFileLenObservation {
     len: u8,
 }
 
-impl Provenance for KaniFileLenObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniFileLenObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 ".len() reports exactly the number of bytes written to the file, standing in for the real OS-backed metadata query",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("len", self.len.to_string()),
+            OwnedEntry::new("len", self.len.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniFileLenObservation {}
 
 impl KaniFileLenObservation {
     /// Model writing `len` bytes to a fresh file.
@@ -218,30 +209,27 @@ pub struct KaniFileTimesObservation {
     modified_unix_seconds: u64,
 }
 
-impl Provenance for KaniFileTimesObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniFileTimesObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a target modification time set via .set_modified() is reflected exactly in the file's metadata, standing in for the real OS-backed filesystem clock",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "modified_unix_seconds",
                 self.modified_unix_seconds.to_string(),
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniFileTimesObservation {}
 
 impl KaniFileTimesObservation {
     /// Model setting a file's modification time.

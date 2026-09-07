@@ -1,4 +1,4 @@
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Root assumption behind the bounded line-buffering observation.
@@ -6,26 +6,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniLineWriterWindow;
 
-impl Provenance for KaniLineWriterWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniLineWriterWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a bounded line writer flushes immediately after a completed line ending in newline, while a trailing partial line remains buffered until an explicit flush",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct in-memory LineWriter path still times out under Kani's line-buffering internals",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniLineWriterWindow {}
 
 /// Bounded line-buffering observation over one complete line and one trailing byte.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
@@ -77,26 +74,23 @@ impl Evidence for KaniLineWriterObservation {
 #[standard(basis = "Self")]
 pub struct KaniLinesWindow;
 
-impl Provenance for KaniLinesWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniLinesWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a bounded buffered reader with newline separators yields each line body without its trailing terminator",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct in-memory BufRead::lines path still times out under Kani's line iteration and string machinery",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniLinesWindow {}
 
 /// Bounded line-splitting observation over three one-byte ASCII lines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]

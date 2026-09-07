@@ -16,7 +16,7 @@
 use amenable_core::Ensures;
 #[cfg(kani)]
 use amenable_core::Requires;
-use amenable_core::{Establish, MetadataEntry, ProofToken, Provenance, Witness};
+use amenable_core::{Establish, Metadata, OwnedEntry, ProofToken, Provenance, Witness};
 use amenable_derive::{Standard, calculation};
 use amenable_std::RustStdStandard;
 
@@ -39,14 +39,14 @@ impl Debit {
     }
 }
 
-impl Provenance for Debit {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for Debit {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new("value", self.value.to_string())]
     }
 }
+
+impl Provenance for Debit {}
 
 ::inventory::submit! {
     ::amenable_core::EvidenceLink::new(
@@ -114,14 +114,14 @@ impl Credit {
     }
 }
 
-impl Provenance for Credit {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for Credit {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(vec![MetadataEntry::new("value", self.value.to_string())].into_iter())
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new("value", self.value.to_string())]
     }
 }
+
+impl Provenance for Credit {}
 
 ::inventory::submit! {
     ::amenable_core::EvidenceLink::new(

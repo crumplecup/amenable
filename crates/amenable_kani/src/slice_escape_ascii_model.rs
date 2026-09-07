@@ -5,7 +5,7 @@
 //! `collect::<Vec<u8>>()` or stepwise `next()` calls. This module keeps the
 //! smaller escaped-byte law the production proof actually claims.
 
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// The assumption `KaniEscapeAsciiWindow` stands in for: a fixed two-byte
@@ -15,26 +15,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniEscapeAsciiWindow;
 
-impl Provenance for KaniEscapeAsciiWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniEscapeAsciiWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a fixed two-byte source [printable, newline] escapes to [printable, backslash, n]",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::slice::EscapeAscii iterator times out under Kani even on that fixed witness, both when eagerly collected and when observed with next()",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniEscapeAsciiWindow {}
 
 /// Audit payload for the bounded `escape_ascii` observation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters)]

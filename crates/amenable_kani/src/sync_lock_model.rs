@@ -7,7 +7,7 @@
 //! This module captures the smaller observable laws the production proofs
 //! actually claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of locking once, rejecting a second lock while held, then
@@ -37,27 +37,24 @@ impl KaniMutexExclusionObservation {
     }
 }
 
-impl Provenance for KaniMutexExclusionObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniMutexExclusionObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "locking once exposes the wrapped value, rejects a second lock while the first guard is live, and allows a fresh lock once that guard is released",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "Kani's no-concurrency environment model does not enforce the real Mutex try_lock exclusion guarantee",
             ),
-            MetadataEntry::new("held_value", self.held_value.to_string()),
+            OwnedEntry::new("held_value", self.held_value.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniMutexExclusionObservation {}
 
 /// Observable result of a one-party barrier wait.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
@@ -79,27 +76,24 @@ impl KaniBarrierLeaderObservation {
     }
 }
 
-impl Provenance for KaniBarrierLeaderObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniBarrierLeaderObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a barrier configured for exactly one participant returns immediately and reports that participant as the leader",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Barrier wait path reaches an unsupported futex syscall boundary under Kani",
             ),
-            MetadataEntry::new("leader", "true"),
+            OwnedEntry::new("leader", "true"),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniBarrierLeaderObservation {}
 
 /// Observable result of a never-notified timeout wait.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
@@ -121,27 +115,24 @@ impl KaniWaitTimeoutObservation {
     }
 }
 
-impl Provenance for KaniWaitTimeoutObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniWaitTimeoutObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a never-notified conditional-variable wait with a timeout reports that it timed out",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Condvar wait_timeout path reaches an unsupported clock_gettime boundary under Kani",
             ),
-            MetadataEntry::new("timed_out", "true"),
+            OwnedEntry::new("timed_out", "true"),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniWaitTimeoutObservation {}
 
 /// Observable result of lock poisoning and non-blocking lock failure.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters, derive_new::new)]
@@ -179,25 +170,22 @@ impl KaniMutexFailureObservation {
     }
 }
 
-impl Provenance for KaniMutexFailureObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniMutexFailureObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a panic while a guard is live poisons the lock without discarding the guarded value, and a separate already-held try_lock case reports WouldBlock",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct poisoning path reaches unsupported catch_unwind under Kani, while the direct would-block path is distorted by Kani's no-concurrency environment model",
             ),
-            MetadataEntry::new("poisoned_value", self.poisoned_value.to_string()),
-            MetadataEntry::new("held_value", self.held_value.to_string()),
+            OwnedEntry::new("poisoned_value", self.poisoned_value.to_string()),
+            OwnedEntry::new("held_value", self.held_value.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniMutexFailureObservation {}

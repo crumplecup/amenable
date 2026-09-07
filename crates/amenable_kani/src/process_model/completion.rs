@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of one completed child exit status.
@@ -30,27 +30,24 @@ impl KaniExitStatusObservation {
     }
 }
 
-impl Provenance for KaniExitStatusObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniExitStatusObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "a completed child exit status preserves the modeled exit code and success flag",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "the direct Command::status path reaches the same unsupported spawn boundary as Command::spawn under Kani",
-                ),
-                MetadataEntry::new("exit_code", self.exit_code.to_string()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "a completed child exit status preserves the modeled exit code and success flag",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "the direct Command::status path reaches the same unsupported spawn boundary as Command::spawn under Kani",
+            ),
+            OwnedEntry::new("exit_code", self.exit_code.to_string()),
+        ]
     }
 }
+
+impl Provenance for KaniExitStatusObservation {}
 
 /// Observable result of collecting one command's output bundle.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -89,28 +86,25 @@ impl KaniOutputObservation {
     }
 }
 
-impl Provenance for KaniOutputObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniOutputObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "Command::output preserves the completed exit status together with the captured stdout bytes",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "the direct Command::output path reaches unsupported Stdio conversion machinery under Kani",
-                ),
-                MetadataEntry::new("exit_code", self.exit_code.to_string()),
-                MetadataEntry::new("stdout_text", self.stdout_text.clone()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "Command::output preserves the completed exit status together with the captured stdout bytes",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "the direct Command::output path reaches unsupported Stdio conversion machinery under Kani",
+            ),
+            OwnedEntry::new("exit_code", self.exit_code.to_string()),
+            OwnedEntry::new("stdout_text", self.stdout_text.clone()),
+        ]
     }
 }
+
+impl Provenance for KaniOutputObservation {}
 
 /// Observable result of choosing between `Stdio::null()` and `Stdio::piped()`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -138,31 +132,28 @@ impl KaniStdioObservation {
     }
 }
 
-impl Provenance for KaniStdioObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStdioObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "stdio handle presence reflects the configured stdout policy for null versus piped children",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "the direct Stdio configuration path reaches an unsupported C string literal construct under Kani",
-                ),
-                MetadataEntry::new(
-                    "null_stdout_handle_present",
-                    self.null_stdout_handle_present.to_string(),
-                ),
-                MetadataEntry::new(
-                    "piped_stdout_handle_present",
-                    self.piped_stdout_handle_present.to_string(),
-                ),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "stdio handle presence reflects the configured stdout policy for null versus piped children",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "the direct Stdio configuration path reaches an unsupported C string literal construct under Kani",
+            ),
+            OwnedEntry::new(
+                "null_stdout_handle_present",
+                self.null_stdout_handle_present.to_string(),
+            ),
+            OwnedEntry::new(
+                "piped_stdout_handle_present",
+                self.piped_stdout_handle_present.to_string(),
+            ),
+        ]
     }
 }
+
+impl Provenance for KaniStdioObservation {}

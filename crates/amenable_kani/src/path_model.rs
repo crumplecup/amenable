@@ -6,7 +6,7 @@
 //! verifier host. This module keeps the smaller Rust-facing path laws the
 //! production proofs actually claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of rendering a valid UTF-8 path through `Display`.
@@ -38,27 +38,24 @@ impl KaniPathDisplayObservation {
     }
 }
 
-impl Provenance for KaniPathDisplayObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniPathDisplayObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a path made entirely of valid Unicode renders through Display exactly as its own source text",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Path::display formatting path times out under Kani even for a fully concrete UTF-8 literal path",
             ),
-            MetadataEntry::new("text", self.text.clone()),
+            OwnedEntry::new("text", self.text.clone()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniPathDisplayObservation {}
 
 /// Observable result of parsing a Windows drive-letter prefix component.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -82,25 +79,22 @@ impl KaniWindowsPrefixObservation {
     }
 }
 
-impl Provenance for KaniWindowsPrefixObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniWindowsPrefixObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a Windows drive-letter prefix component preserves both its raw text and its parsed Disk drive letter",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "direct std::path prefix parsing is host-platform-specific, so the Windows-only path is not executable on this Linux verifier host",
             ),
-            MetadataEntry::new("raw_text", self.raw_text.clone()),
-            MetadataEntry::new("drive_letter", char::from(self.drive_letter).to_string()),
+            OwnedEntry::new("raw_text", self.raw_text.clone()),
+            OwnedEntry::new("drive_letter", char::from(self.drive_letter).to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniWindowsPrefixObservation {}

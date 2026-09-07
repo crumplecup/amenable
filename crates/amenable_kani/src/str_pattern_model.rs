@@ -27,7 +27,7 @@
 //! layouts, then the modeled Kani proof carries the intended Rust-facing
 //! claim.
 
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// The assumption `KaniStrRSplitWindow` stands in for: a one-occurrence
@@ -38,26 +38,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniStrRSplitWindow;
 
-impl Provenance for KaniStrRSplitWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStrRSplitWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a one-occurrence rsplit reduces to a fixed [before, pattern, after] window, reversed to [after, before], standing in for str::RSplit's internal CharSearcher::next_match_back search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "CharSearcher::next_match_back bottoms out in memchr::memrchr, whose internal scan loop CBMC can't bound even for a single .next() call on a five-byte fixed str -- see gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniStrRSplitWindow {}
 
 /// Bounded one-occurrence `rsplit` observation for `[before, pattern, after]`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
@@ -108,26 +105,23 @@ impl Evidence for KaniStrRSplitObservation {
 #[standard(basis = "Self")]
 pub struct KaniStrRSplitNWindow;
 
-impl Provenance for KaniStrRSplitNWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStrRSplitNWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a two-occurrence rsplitn(2, pattern) reduces to a fixed [a, pattern, b, pattern, c] window capped at two pieces, standing in for str::RSplitN's internal reverse CharSearcher search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the same memchr::memrchr scan-loop cost documented for KaniStrRSplitWindow applies here too -- see gallery::replace_recommendations::str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniStrRSplitNWindow {}
 
 /// Bounded two-occurrence `rsplitn` observation for `[a, pattern, b,
 /// pattern, c]`.
@@ -180,26 +174,23 @@ impl Evidence for KaniStrRSplitNObservation {
 #[standard(basis = "Self")]
 pub struct KaniStrSplitTerminatorWindow;
 
-impl Provenance for KaniStrSplitTerminatorWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStrSplitTerminatorWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a two-occurrence split_terminator/rsplit_terminator reduces to a fixed [a, pattern, b, pattern] window with nothing after the final match, standing in for str::SplitTerminator's/RSplitTerminator's internal search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the forward direction reaches an unexplained real-crate-only timeout (passes in an isolated probe crate, still times out inside amenable_kani) and the reverse direction hits the same memchr::memrchr scan-loop cost as KaniStrRSplitWindow -- see gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate and str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniStrSplitTerminatorWindow {}
 
 /// Bounded two-occurrence, nothing-trailing `split_terminator` observation
 /// for `[a, pattern, b, pattern]`.
@@ -254,26 +245,23 @@ impl Evidence for KaniStrSplitTerminatorObservation {
 #[standard(basis = "Self")]
 pub struct KaniStrMatchWindow;
 
-impl Provenance for KaniStrMatchWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStrMatchWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a two-occurrence matches/rmatches/match_indices/rmatch_indices reduces to a fixed [f0, pattern, f1, pattern, f2] window with matches at byte offsets 1 and 3, standing in for str::MatchIndicesInternal's internal search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the forward direction (Matches/MatchIndices) reaches an unexplained real-crate-only timeout and the reverse direction (RMatches/RMatchIndices) hits the same memchr::memrchr scan-loop cost as KaniStrRSplitWindow -- see gallery::replace_recommendations::str_split_terminator_matches_forward_pattern_iteration_times_out_in_the_real_crate and str_rsplit_reverse_pattern_search_times_out_even_for_a_single_next_call",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniStrMatchWindow {}
 
 /// Bounded two-occurrence `matches`/`match_indices` observation for
 /// `[f0, pattern, f1, pattern, f2]`.

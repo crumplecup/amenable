@@ -1,4 +1,4 @@
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Root assumption behind the bounded buffered-read observation.
@@ -6,26 +6,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniBufferedReadWindow;
 
-impl Provenance for KaniBufferedReadWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniBufferedReadWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a bounded buffered read preserves the exact underlying byte order while abstracting over std::io::BufReader's internal refill machinery",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct in-memory BufReader path still times out under Kani despite having no OS boundary",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniBufferedReadWindow {}
 
 /// Bounded buffered-read observation over a two-byte payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]
@@ -62,26 +59,23 @@ impl Evidence for KaniBufferedReadObservation {
 #[standard(basis = "Self")]
 pub struct KaniFlushErrorWindow;
 
-impl Provenance for KaniFlushErrorWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniFlushErrorWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a bounded flush failure reports failure while still recovering the buffered writer state needed by IntoInnerError",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct in-memory into_inner error-recovery path still times out under Kani's buffered-writer expansion",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniFlushErrorWindow {}
 
 /// Bounded `IntoInnerError`-style recovery observation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]

@@ -23,7 +23,7 @@
 //! - if the real channel conforms to these laws,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 const KANI_MPSC_MAX_QUEUE: usize = 2;
@@ -80,35 +80,32 @@ pub struct KaniChannel<T> {
     capacity: Option<usize>,
 }
 
-impl<T> Provenance for KaniChannel<T> {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl<T> Metadata for KaniChannel<T> {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            let capacity = match self.capacity {
-                None => "unbounded".to_owned(),
-                Some(capacity) => capacity.to_string(),
-            };
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        let capacity = match self.capacity {
+            None => "unbounded".to_owned(),
+            Some(capacity) => capacity.to_string(),
+        };
 
-            vec![
-            MetadataEntry::new(
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "std::sync::mpsc's flavor-switching, atomics-backed queue is fully captured by this small FIFO/open-flag/capacity state machine",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "even the simplest single send-then-recv on the real channel times out under Kani -- see gallery::replace_recommendations",
             ),
-            MetadataEntry::new("sender_open", self.sender_open.to_string()),
-            MetadataEntry::new("receiver_open", self.receiver_open.to_string()),
-            MetadataEntry::new("capacity", capacity),
-            MetadataEntry::new("queue_len", self.queue.len().to_string()),
+            OwnedEntry::new("sender_open", self.sender_open.to_string()),
+            OwnedEntry::new("receiver_open", self.receiver_open.to_string()),
+            OwnedEntry::new("capacity", capacity),
+            OwnedEntry::new("queue_len", self.queue.len().to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl<T> Provenance for KaniChannel<T> {}
 
 impl<T> KaniChannel<T> {
     /// Construct a fresh, open, empty unbounded channel.

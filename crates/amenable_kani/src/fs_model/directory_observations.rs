@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 use super::create_and_permissions_observations::KaniAlreadyExists;
@@ -31,29 +31,26 @@ pub struct KaniRecursiveDirObservation {
     leaf: KaniFsPath,
 }
 
-impl Provenance for KaniRecursiveDirObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniRecursiveDirObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "recursive directory creation reaches exactly the ancestors implied by repeated path-segment joins, standing in for the real OS-backed directory tree",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("first_ancestor", format!("{:?}", self.first_ancestor)),
-            MetadataEntry::new("second_ancestor", format!("{:?}", self.second_ancestor)),
-            MetadataEntry::new("leaf", format!("{:?}", self.leaf)),
+            OwnedEntry::new("first_ancestor", format!("{:?}", self.first_ancestor)),
+            OwnedEntry::new("second_ancestor", format!("{:?}", self.second_ancestor)),
+            OwnedEntry::new("leaf", format!("{:?}", self.leaf)),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniRecursiveDirObservation {}
 
 impl KaniRecursiveDirObservation {
     /// Model a three-segment recursive directory creation.
@@ -96,27 +93,24 @@ pub struct KaniDirEntryObservation {
     entry: KaniFsDirEntry,
 }
 
-impl Provenance for KaniDirEntryObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniDirEntryObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a directory entry yielded for a created file reports that file's own name and full path exactly, standing in for the real OS-backed directory listing",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::fs path crosses OS-backed state Kani cannot symbolically execute well today",
             ),
-            MetadataEntry::new("entry_path", format!("{:?}", self.entry.path())),
+            OwnedEntry::new("entry_path", format!("{:?}", self.entry.path())),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniDirEntryObservation {}
 
 impl KaniDirEntryObservation {
     /// Model a directory containing a single created file entry.

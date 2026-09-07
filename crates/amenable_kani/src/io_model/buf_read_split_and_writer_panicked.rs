@@ -1,4 +1,4 @@
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Root assumption behind the bounded delimiter-splitting observation.
@@ -6,26 +6,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniBufReadSplitWindow;
 
-impl Provenance for KaniBufReadSplitWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniBufReadSplitWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a bounded buffered reader split on one repeated delimiter yields the delimiter-separated segments and drops the delimiter itself",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct in-memory BufRead::split path still times out under Kani despite incremental observation",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniBufReadSplitWindow {}
 
 /// Bounded delimiter-splitting observation over `[first, delimiter, second, delimiter, third]`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
@@ -75,26 +72,23 @@ impl Evidence for KaniBufReadSplitObservation {
 #[standard(basis = "Self")]
 pub struct KaniWriterPanickedWindow;
 
-impl Provenance for KaniWriterPanickedWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniWriterPanickedWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "if a buffered writer's inner write panics after bytes are already buffered, WriterPanicked recovers those buffered bytes intact",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std path reaches catch_unwind before the recovery property can be checked under Kani",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniWriterPanickedWindow {}
 
 /// Bounded panic-recovery observation for `WriterPanicked`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_new::new)]

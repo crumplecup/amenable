@@ -5,7 +5,7 @@
 //! (`pthread_key_create` and `clock_gettime`, respectively). This module keeps
 //! the smaller Rust-facing laws the production proofs actually claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of repeatedly querying the currently running thread.
@@ -37,28 +37,25 @@ impl KaniCurrentThreadObservation {
     }
 }
 
-impl Provenance for KaniCurrentThreadObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCurrentThreadObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "repeated queries for the already-running current thread return the same handle and thread id",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::thread::current path reaches an unsupported pthread_key_create boundary under Kani",
             ),
-            MetadataEntry::new("handle_stable", "true"),
-            MetadataEntry::new("id_stable", "true"),
+            OwnedEntry::new("handle_stable", "true"),
+            OwnedEntry::new("id_stable", "true"),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniCurrentThreadObservation {}
 
 /// Observable result of reading a monotonic clock twice in sequence.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Standard)]
@@ -80,24 +77,21 @@ impl KaniInstantObservation {
     }
 }
 
-impl Provenance for KaniInstantObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniInstantObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a later monotonic clock reading is never earlier than an earlier one",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Instant::now path reaches an unsupported clock_gettime boundary under Kani",
             ),
-            MetadataEntry::new("monotonic", "true"),
+            OwnedEntry::new("monotonic", "true"),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniInstantObservation {}

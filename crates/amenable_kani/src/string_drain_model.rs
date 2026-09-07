@@ -6,7 +6,7 @@
 //! production proof actually claims instead: draining the whole string yields
 //! its exact UTF-8 content and leaves the source empty.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 use crate::KaniUtf8Buffer;
@@ -25,27 +25,24 @@ pub struct KaniStringDrainObservation {
     yielded: KaniUtf8Buffer<2>,
 }
 
-impl Provenance for KaniStringDrainObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniStringDrainObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "draining a whole string yields its exact UTF-8 content in order and leaves the source empty, standing in for the direct String::drain iterator path",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct String::drain path times out under Kani even for a single ASCII character -- see gallery::string_drain",
             ),
-            MetadataEntry::new("yielded_bytes", format!("{:?}", self.yielded.as_bytes())),
+            OwnedEntry::new("yielded_bytes", format!("{:?}", self.yielded.as_bytes())),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniStringDrainObservation {}
 
 impl KaniStringDrainObservation {
     /// Model draining the entire source string.

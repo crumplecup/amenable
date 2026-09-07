@@ -17,7 +17,7 @@
 //!   bounded layouts,
 //! - then the modeled Kani proof carries the intended Rust-facing claim.
 
-use amenable_core::{Evidence, MetadataEntry, Provenance};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// The assumption `KaniSplitObservation` stands in for: a one-delimiter
@@ -33,26 +33,23 @@ use amenable_derive::Standard;
 #[standard(basis = "Self")]
 pub struct KaniSplitWindow;
 
-impl Provenance for KaniSplitWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniSplitWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a one-delimiter split reduces to a fixed [before, delimiter, after] window, standing in for std::slice::Split's internal symbolic-length delimiter search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "Split::next() times out under Kani even on the identical fixed 3-element array and predicate a bare Iter::position resolves immediately -- see gallery::slice_split_position",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniSplitWindow {}
 
 /// Bounded one-delimiter split observation for `[before, delimiter, after]`.
 #[derive(
@@ -133,26 +130,23 @@ impl<T: Copy> Evidence for KaniSplitObservation<T> {
 #[standard(basis = "Self")]
 pub struct KaniSplitNWindow;
 
-impl Provenance for KaniSplitNWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniSplitNWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a two-delimiter splitn/rsplitn reduces to a fixed [first, d1, middle, d2, last] window capped at two pieces, standing in for std::slice::SplitN's internal symbolic-length delimiter search",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the same internal Iterator::position search cost documented for the one-delimiter case applies here too -- see gallery::slice_split_position",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniSplitNWindow {}
 
 /// Bounded two-delimiter split observation for `[first, d1, middle, d2, last]`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_builder::Builder)]
@@ -219,26 +213,23 @@ impl<T: Copy> Evidence for KaniSplitNObservation<T> {
 #[standard(basis = "Self")]
 pub struct KaniChunkByWindow;
 
-impl Provenance for KaniChunkByWindow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniChunkByWindow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a two-element chunk_by witness reduces to either one grouped pair or two one-element chunks depending only on whether the adjacent predicate holds",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct std::slice::ChunkBy path still times out under Kani even on a fixed two-element array with stepwise observation, so the production proof uses a bounded grouping observation instead",
             ),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniChunkByWindow {}
 
 /// Audit payload for a bounded `chunk_by` observation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_getters::Getters)]

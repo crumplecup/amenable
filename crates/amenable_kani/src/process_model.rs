@@ -5,7 +5,7 @@
 //! the smaller Rust-facing laws the production proofs actually claim so every
 //! process carrier can still have explicit passing evidence.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 mod command;
@@ -47,28 +47,25 @@ impl KaniChildObservation {
     }
 }
 
-impl Provenance for KaniChildObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniChildObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a spawned child reports a nonzero process id and waiting on it yields the modeled exit code",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Command::spawn path reaches an unsupported gnu_get_libc_version boundary under Kani",
             ),
-            MetadataEntry::new("process_id", self.process_id.to_string()),
-            MetadataEntry::new("exit_code", self.exit_code.to_string()),
+            OwnedEntry::new("process_id", self.process_id.to_string()),
+            OwnedEntry::new("exit_code", self.exit_code.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniChildObservation {}
 
 /// Observable result of capturing one child's stderr independently of stdout.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -94,28 +91,25 @@ impl KaniChildStderrObservation {
     }
 }
 
-impl Provenance for KaniChildStderrObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniChildStderrObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a child with piped stderr preserves stderr bytes independently of stdout",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct piped-child stderr path reaches unsupported stdio pipe machinery under Kani",
             ),
-            MetadataEntry::new("stdout_text", self.stdout_text.clone()),
-            MetadataEntry::new("stderr_text", self.stderr_text.clone()),
+            OwnedEntry::new("stdout_text", self.stdout_text.clone()),
+            OwnedEntry::new("stderr_text", self.stderr_text.clone()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniChildStderrObservation {}
 
 /// Observable result of writing text to one child's stdin and reading it back.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -141,28 +135,25 @@ impl KaniChildStdinObservation {
     }
 }
 
-impl Provenance for KaniChildStdinObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniChildStdinObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "bytes written to a piped child stdin are delivered to the child and can be echoed back on stdout",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct piped-child stdin path reaches the unsupported pipe2 boundary under Kani",
             ),
-            MetadataEntry::new("input_text", self.input_text.clone()),
-            MetadataEntry::new("echoed_stdout", self.echoed_stdout.clone()),
+            OwnedEntry::new("input_text", self.input_text.clone()),
+            OwnedEntry::new("echoed_stdout", self.echoed_stdout.clone()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniChildStdinObservation {}
 
 /// Observable result of capturing one child's stdout.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -182,24 +173,21 @@ impl KaniChildStdoutObservation {
     }
 }
 
-impl Provenance for KaniChildStdoutObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniChildStdoutObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a child with piped stdout preserves the bytes it wrote there",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct piped-child stdout path reaches the unsupported pipe2 boundary under Kani",
             ),
-            MetadataEntry::new("stdout_text", self.stdout_text.clone()),
+            OwnedEntry::new("stdout_text", self.stdout_text.clone()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniChildStdoutObservation {}

@@ -5,7 +5,7 @@
 //! Rust-facing laws in this crate can be checked. This module keeps the
 //! narrower observable contracts the production proofs actually claim.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of two tracked call sites in one source file.
@@ -61,29 +61,26 @@ impl KaniCallerLocationObservation {
     }
 }
 
-impl Provenance for KaniCallerLocationObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCallerLocationObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "two calls to the same track_caller function from different lines in one file report that shared file and different immediate caller lines",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct Location::caller path reaches Kani's unsupported caller_location boundary",
             ),
-            MetadataEntry::new("file", self.file),
-            MetadataEntry::new("first_line", self.first_line.to_string()),
-            MetadataEntry::new("second_line", self.second_line.to_string()),
+            OwnedEntry::new("file", self.file),
+            OwnedEntry::new("first_line", self.first_line.to_string()),
+            OwnedEntry::new("second_line", self.second_line.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniCallerLocationObservation {}
 
 /// Observable result of a panic hook capturing the panic's own payload text.
 #[derive(Debug, Clone, PartialEq, Eq, Standard)]
@@ -112,24 +109,21 @@ impl KaniPanicHookObservation {
     }
 }
 
-impl Provenance for KaniPanicHookObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniPanicHookObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "a panic hook installed for one panic observes that panic's own payload message exactly",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct panic-hook path reaches Kani's unsupported catch_unwind boundary before the payload check can complete",
             ),
-            MetadataEntry::new("message", self.message.clone()),
+            OwnedEntry::new("message", self.message.clone()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniPanicHookObservation {}

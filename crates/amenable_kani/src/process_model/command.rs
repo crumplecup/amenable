@@ -1,4 +1,4 @@
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of reading back the configured command arguments.
@@ -25,28 +25,25 @@ impl KaniCommandArgsObservation {
     }
 }
 
-impl Provenance for KaniCommandArgsObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCommandArgsObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "command builder argument introspection preserves the configured argument sequence",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "even direct Command construction reaches an unsupported CString strlen boundary under Kani",
-                ),
-                MetadataEntry::new("first_arg", self.args[0].clone()),
-                MetadataEntry::new("second_arg", self.args[1].clone()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "command builder argument introspection preserves the configured argument sequence",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "even direct Command construction reaches an unsupported CString strlen boundary under Kani",
+            ),
+            OwnedEntry::new("first_arg", self.args[0].clone()),
+            OwnedEntry::new("second_arg", self.args[1].clone()),
+        ]
     }
 }
+
+impl Provenance for KaniCommandArgsObservation {}
 
 /// Observable result of one environment override being visible to a spawned command.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -79,29 +76,26 @@ impl KaniCommandEnvObservation {
     }
 }
 
-impl Provenance for KaniCommandEnvObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCommandEnvObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "a command environment override is visible to the spawned child under the same key and value",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "the direct env-plus-spawn path combines unsupported command construction and real spawn boundaries under Kani",
-                ),
-                MetadataEntry::new("key", self.key.clone()),
-                MetadataEntry::new("value", self.value.clone()),
-                MetadataEntry::new("visible_stdout", self.visible_stdout.clone()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "a command environment override is visible to the spawned child under the same key and value",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "the direct env-plus-spawn path combines unsupported command construction and real spawn boundaries under Kani",
+            ),
+            OwnedEntry::new("key", self.key.clone()),
+            OwnedEntry::new("value", self.value.clone()),
+            OwnedEntry::new("visible_stdout", self.visible_stdout.clone()),
+        ]
     }
 }
+
+impl Provenance for KaniCommandEnvObservation {}
 
 /// Observable result of reading back one configured environment override.
 #[derive(Debug, Clone, PartialEq, Eq, Standard, derive_getters::Getters)]
@@ -127,25 +121,22 @@ impl KaniCommandEnvsObservation {
     }
 }
 
-impl Provenance for KaniCommandEnvsObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniCommandEnvsObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-                MetadataEntry::new(
-                    "assumed",
-                    "command builder environment introspection preserves configured key-value overrides",
-                ),
-                MetadataEntry::new(
-                    "rationale",
-                    "direct Command environment introspection still times out under Kani before the override law can be checked",
-                ),
-                MetadataEntry::new("key", self.key.clone()),
-                MetadataEntry::new("value", self.value.clone()),
-            ]
-            .into_iter()
-        })
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
+                "assumed",
+                "command builder environment introspection preserves configured key-value overrides",
+            ),
+            OwnedEntry::new(
+                "rationale",
+                "direct Command environment introspection still times out under Kani before the override law can be checked",
+            ),
+            OwnedEntry::new("key", self.key.clone()),
+            OwnedEntry::new("value", self.value.clone()),
+        ]
     }
 }
+
+impl Provenance for KaniCommandEnvsObservation {}

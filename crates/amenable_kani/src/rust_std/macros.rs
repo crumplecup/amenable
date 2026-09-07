@@ -2,7 +2,7 @@
 //! falls into, plus the shared [`CheckedProof`] artifact type for the
 //! "checked" case.
 
-use amenable_core::Provenance;
+use amenable_core::Metadata;
 use amenable_std::RustStdProvenance;
 
 /// Mechanical bridge from `KaniWitness` to `Witness<KaniVerifier>` — every
@@ -57,7 +57,7 @@ macro_rules! impl_kani_witness_trusted {
                 ::amenable_core::ProofRecord::new(
                     concat!("amenable_std::rust_std::RustStdStandard<", stringify!($ty), ">"),
                     "kani",
-                    || amenable_core::Provenance::report(
+                    || amenable_core::Metadata::report(
                         &<amenable_std::RustStdStandard<$ty> as crate::KaniWitness>::proof(),
                     ).to_string(),
                 )

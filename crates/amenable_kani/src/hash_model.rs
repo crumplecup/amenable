@@ -5,7 +5,7 @@
 //! checked. This module keeps the narrower contract the production proof
 //! actually claims.
 
-use amenable_core::{MetadataEntry, Provenance};
+use amenable_core::{Metadata, OwnedEntry, Provenance};
 use amenable_derive::Standard;
 
 /// Observable result of hashing the same input twice through one `RandomState`.
@@ -51,25 +51,22 @@ impl KaniRandomStateObservation {
     }
 }
 
-impl Provenance for KaniRandomStateObservation {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for KaniRandomStateObservation {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            vec![
-            MetadataEntry::new(
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new(
                 "assumed",
                 "two hashers built from the same RandomState instance hash the same input to the same digest",
             ),
-            MetadataEntry::new(
+            OwnedEntry::new(
                 "rationale",
                 "the direct RandomState::new path reaches an unsupported OS entropy-source boundary under Kani",
             ),
-            MetadataEntry::new("input", self.input.clone()),
-            MetadataEntry::new("digest", self.digest.to_string()),
+            OwnedEntry::new("input", self.input.clone()),
+            OwnedEntry::new("digest", self.digest.to_string()),
         ]
-        .into_iter()
-        })
     }
 }
+
+impl Provenance for KaniRandomStateObservation {}
