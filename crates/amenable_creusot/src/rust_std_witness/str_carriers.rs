@@ -4,7 +4,7 @@ use crate::{
     ASCII_BYTE_HOLDS_SRC, CreusotVerifier, CreusotWitness, STR_BYTE_LENGTH_AND_CONTENT_HOLDS_SRC,
     VERIFY_STR_BYTE_LENGTH_AND_CONTENT_SRC,
 };
-use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
+use amenable_core::{Ensures, Evidence, Metadata, Requires, Witness};
 
 use amenable_std::{AsciiByte, RustStdProvenance, RustStdStandard};
 

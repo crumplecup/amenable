@@ -2,7 +2,7 @@ use std::iter::Flatten;
 use std::ops::Range;
 
 use crate::{CreusotVerifier, CreusotWitness};
-use amenable_core::{Evidence, Provenance, Witness};
+use amenable_core::{Evidence, Metadata, Witness};
 
 use amenable_std::{RustStdProvenance, RustStdStandard};
 

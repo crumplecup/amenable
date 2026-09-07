@@ -124,7 +124,7 @@ pub struct CheckedProof {
 
 impl std::fmt::Display for CheckedProof {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use amenable_core::Provenance;
+        use amenable_core::Metadata;
 
         writeln!(f, "harness: {}", self.harness)?;
         writeln!(f, "claim: {}", self.claim)?;

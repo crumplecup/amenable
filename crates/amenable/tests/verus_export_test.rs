@@ -9,9 +9,9 @@ use std::{
 };
 
 use amenable::{
-    ClassifiedWitness, Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact,
-    WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant,
-    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
+    ClassifiedWitness, Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier,
+    Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode, WitnessArtifactShape,
+    WitnessArtifactVariant, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
 };
 use miette::{IntoDiagnostic, WrapErr};
 
@@ -21,13 +21,13 @@ struct LocalVerusVerifier;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct LocalVerusVerifierMetadata;
 
-impl Provenance for LocalVerusVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new("backend", "local-verus")].into_iter()
+impl Metadata for LocalVerusVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new("backend", "local-verus")]
     }
 }
+
+impl Provenance for LocalVerusVerifierMetadata {}
 
 impl Verifier for LocalVerusVerifier {
     type Metadata = LocalVerusVerifierMetadata;

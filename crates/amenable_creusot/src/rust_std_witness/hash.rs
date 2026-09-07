@@ -12,7 +12,7 @@ use crate::{
     VERIFY_HASH_SET_INSERT_THEN_CONTAINS_REPORTS_MEMBERSHIP_SRC,
     VERIFY_RANDOM_STATE_GIVES_THE_SAME_HASHER_SEED_ACROSS_CALLS_SRC,
 };
-use amenable_core::{Ensures, Evidence, Provenance, Witness};
+use amenable_core::{Ensures, Evidence, Metadata, Witness};
 
 use amenable_std::{RustStdProvenance, RustStdStandard};
 

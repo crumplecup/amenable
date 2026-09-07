@@ -70,7 +70,7 @@ use std::vec::Vec;
 use core::panic::{Location, PanicInfo, PanicMessage};
 
 use crate::{CreusotVerifier, CreusotWitness};
-use amenable_core::{Evidence, Provenance, Witness};
+use amenable_core::{Evidence, Metadata as _, Witness};
 
 use amenable_std::{RustStdProvenance, RustStdStandard};
 

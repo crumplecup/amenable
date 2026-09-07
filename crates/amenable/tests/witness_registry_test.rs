@@ -1,7 +1,7 @@
 use amenable::{
-    ClassifiedWitness, Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact,
-    WitnessArtifactNode, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
-    witness_exports,
+    ClassifiedWitness, Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier,
+    Witness, WitnessArtifact, WitnessArtifactNode, WitnessModulePath, WitnessSupportKind,
+    WitnessSupportSummary, witness_exports,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -10,13 +10,13 @@ struct LocalVerifier;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct LocalVerifierMetadata;
 
-impl Provenance for LocalVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new("backend", "local-verifier")].into_iter()
+impl Metadata for LocalVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new("backend", "local-verifier")]
     }
 }
+
+impl Provenance for LocalVerifierMetadata {}
 
 impl Verifier for LocalVerifier {
     type Metadata = LocalVerifierMetadata;

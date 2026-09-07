@@ -11,7 +11,7 @@ use crate::{
     VERIFY_SPLIT_PATHS_RECOVERS_PATHS_JOINED_BY_JOIN_PATHS_SRC,
     VERIFY_VAR_ERROR_DISTINGUISHES_NOT_PRESENT_FROM_NOT_UNICODE_SRC,
 };
-use amenable_core::{Ensures, Evidence, Provenance, Requires, Witness};
+use amenable_core::{Ensures, Evidence, Metadata, Requires, Witness};
 
 use amenable_std::{ArgvIncludesProgramPath, RustStdProvenance, RustStdStandard};
 

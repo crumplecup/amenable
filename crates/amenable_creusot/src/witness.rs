@@ -1,6 +1,6 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{Evidence, MetadataEntry, Provenance, Verifier};
+use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance, Verifier};
 use creusot_std::macros::trusted;
 
 /// Creusot-specific witness: identifies the Creusot contract (if any) behind
@@ -39,27 +39,22 @@ pub struct CreusotVerifier;
 #[derive(Debug, Clone, Copy, Hash, Default)]
 pub struct CreusotVerifierMetadata;
 
-impl Provenance for CreusotVerifierMetadata {
-    // `Vec::IntoIter`, not `Box<dyn Iterator<...>>` like every other
-    // verifier's own metadata (see `amenable_kani`/`amenable_verus`'s own
-    // `witness.rs`) — this is the one `Provenance` impl in this workspace
-    // that's actually swept up by `creusot-rustc`'s translation of
-    // `amenable_creusot` (it's local, unlike `amenable_std`'s registrations,
-    // which only ever compile in ordinary mode as a dependency). `dyn` is
-    // confirmed unsupported there: `error: forbidden dyn type: dyn
-    // std::iter::Iterator<...> (dyn support is currently minimal)`.
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
+impl Metadata for CreusotVerifierMetadata {
+    // This is the one `Metadata` impl in this workspace that's actually
+    // swept up by `creusot-rustc`'s translation of `amenable_creusot`
+    // (it's local, unlike `amenable_std`'s registrations, which only ever
+    // compile in ordinary mode as a dependency).
+    //
     // Ordinary reporting code, not a proof claim — nothing here states or
     // needs a Pearlite postcondition, but creusot-rustc still generates a
     // real verification condition for every translated function unless
-    // told not to, and that VC is unprovable as stated: `MetadataEntry::
-    // new` has no contract, so calling it "yields an impossible
-    // precondition" (its own warning, confirmed by why3find actually
-    // failing this exact goal — `Coma.vc_metadata_CreusotVerifierMetadata`
-    // — before this attribute was added).
+    // told not to, and that VC is unprovable as stated: neither
+    // `OwnedEntry::new` nor its inner `Arc::new` has a contract, so
+    // calling one "yields an impossible precondition" (creusot's own
+    // warning — the same goal, `Coma.vc_snapshot_CreusotVerifierMetadata`,
+    // that failed under `why3find` before this attribute was added).
     #[trusted]
-    fn metadata(&self) -> Self::MetadataIter {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
         const FACTS: &[(&str, &str)] = &[
             ("verifier_family", "creusot"),
             ("authority", "Creusot project"),
@@ -74,13 +69,11 @@ impl Provenance for CreusotVerifierMetadata {
                 "package selection, flags, binary path, timeout, and report output",
             ),
         ];
-        FACTS
-            .iter()
-            .map(|&(k, v)| MetadataEntry::new(k, v))
-            .collect::<Vec<_>>()
-            .into_iter()
+        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
     }
 }
+
+impl Provenance for CreusotVerifierMetadata {}
 
 impl Verifier for CreusotVerifier {
     type Metadata = CreusotVerifierMetadata;
