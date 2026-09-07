@@ -13,10 +13,11 @@ This file tracks all planning documents for the amenable project.
 7 crates, `#[derive(Provenance)]` rewritten), all three backends
 re-verified (Verus `485 verified`, Creusot `Proved (149 files)` — the
 `Arc<dyn>` risk did not materialize, Kani sample + full test suite).
-Standalone `#[derive(Metadata)]` + Step 8 docs done. Remaining: the
-`#[entry]`/`#[entry(nested)]` attribute split (deferred — ~40 derive
-sites) and the typed `Entry` trait (nothing implements it yet). Design
-for a dedicated `Metadata` trait family
+Steps 6 + 8 done: standalone `#[derive(Metadata)]`, the `#[entry]` /
+`#[entry(nested)]` / `#[entry(flatten)]` field-role split (additive —
+legacy behaviour kept for un-annotated fields), docs. Remaining: the
+typed `Entry` trait (nothing implements it yet). Design for a dedicated
+`Metadata` trait family
 (`MetadataValue` / `Entry` / `ErasedEntry` / `Metadata`, `OwnedEntry`
 carrier holding `Arc<dyn MetadataValue>`), replacing `MetadataEntry`'s
 role as the de facto metadata interface. `Provenance: Metadata`

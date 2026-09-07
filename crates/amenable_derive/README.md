@@ -21,18 +21,24 @@ walks the same macros in the order you'd actually reach for them.
 
 ### Evidence & provenance
 
-- **`#[derive(Metadata)]`** (attrs: `#[metadata(...)]`) — projects a
-  struct's or enum's own fields into a queryable `Metadata` record
-  (`snapshot()` walks each field's `Metadata::snapshot()`; a scalar field
-  reports one `"value"`-keyed entry the parent re-keys to the field name,
-  a nested `#[derive(Metadata)]` type's entries are spliced under a
-  `"<field>."` prefix). Use this for plain spec/schema types.
-- **`#[derive(Provenance)]`** (attrs: `#[provenance(...)]`) — the same
-  `Metadata` projection **plus** the marker `impl Provenance for T {}`,
-  for schemas that are a constitutional trust basis. Container attributes
-  (both derives): `crate = "path"` (default `amenable_core`), `tag =
-  "name"` (the discriminant key an enum's metadata carries, default
-  `"variant"`). Field/variant attributes: `rename = "name"`, `skip`.
+- **`#[derive(Metadata)]`** (attrs: `#[metadata(...)]`, `#[entry(...)]`) —
+  projects a struct's or enum's own fields into a queryable `Metadata`
+  record (`snapshot()`). Use it for plain spec/schema types.
+- **`#[derive(Provenance)]`** (attrs: `#[provenance(...)]`, `#[entry(...)]`)
+  — the same `Metadata` projection **plus** the marker `impl Provenance
+  for T {}`, for schemas that are a constitutional trust basis.
+
+  Container attributes (both derives): `crate = "path"` (default
+  `amenable_core`), `tag = "name"` (an enum's discriminant key, default
+  `"variant"`).
+
+  Per-field roles: **`#[entry]`** — a `MetadataValue` leaf, one entry keyed
+  by the field name; **`#[entry(nested)]`** — a sub-record, its entries
+  spliced under a `"<field>."` prefix; **`#[entry(flatten)]`** — a
+  sub-record spliced with no prefix; **`#[entry(skip)]`**,
+  **`#[entry(rename = "name")]`**. A field with no `#[entry(...)]` (or
+  only `#[provenance(skip | rename)]`) keeps the legacy behaviour: recurse
+  via `Metadata::snapshot()`, re-key a `"value"` child to the field name.
 
   ```rust
   #[derive(Debug, Clone, PartialEq, Eq, Default, amenable_derive::Provenance)]

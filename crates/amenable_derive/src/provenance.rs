@@ -1,13 +1,20 @@
 //! `#[derive(Metadata)]` / `#[derive(Provenance)]`: a `Metadata` impl whose
-//! `snapshot()` walks every non-`#[metadata(skip)]` / non-`#[provenance(skip)]`
-//! field's own `Metadata::snapshot()`. `#[derive(Provenance)]` additionally
-//! emits the marker `impl Provenance for T {}`.
+//! `snapshot()` projects each field per its `#[entry(..)]` role.
+//! `#[derive(Provenance)]` additionally emits the marker `impl Provenance for
+//! T {}`.
 //!
-//! A scalar field reports itself as a single `"value"`-keyed entry (via
-//! `amenable_core`'s `impl_scalar_metadata!`), which the parent re-keys to the
-//! field name; a nested `#[derive(Metadata)]` type's entries are spliced in
-//! under a `"<field>."` prefix. `#[metadata(rename = "...")]` overrides the key
-//! or prefix; `#[metadata(skip)]` omits the field.
+//! Field roles ([`EntryKind`]):
+//!
+//! - **`#[entry]`** — leaf: `OwnedEntry::new("<field>", self.<field>.clone())`.
+//!   Bound `FieldTy: MetadataValue + Clone`.
+//! - **`#[entry(nested)]`** — sub-record: the field's own entries spliced under
+//!   a `"<field>."` prefix. Bound `FieldTy: Metadata`.
+//! - **`#[entry(flatten)]`** — sub-record spliced with no prefix.
+//! - **`#[entry(skip)]`** / **`#[entry(rename = "..")]`**.
+//! - **no `#[entry]` attribute** — legacy `Bare`: recurse via
+//!   `Metadata::snapshot()`, re-key a `"value"`-keyed child entry to the field
+//!   name, else prefix. `#[provenance(skip | rename)]` / `#[metadata(..)]` also
+//!   keep a field `Bare`.
 
 use quote::{format_ident, quote};
 use syn::{

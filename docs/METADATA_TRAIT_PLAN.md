@@ -23,17 +23,16 @@ re-verified:
 7 crates converted to `impl Metadata { snapshot } + impl Provenance {}`;
 `#[derive(Provenance)]` rewritten to emit that shape.
 
-✅ **Step 6 (part) + Step 8 done** (`f01e2450`, `81e79f9f`): standalone
-`#[derive(Metadata)]` added; `#[derive(Provenance)]` delegates to it;
-`#[metadata(..)]`/`#[provenance(..)]` interchangeable; docs refreshed
-(`AMENABLE_PLAN.md`, `creusot_gallery` narratives, `amenable_derive`
-README, `WidgetSchema` worked example in `metadata_test.rs`).
+✅ **Steps 6 + 8 done** (`f01e2450`, `7cb7adc6`, `81e79f9f`): standalone
+`#[derive(Metadata)]`; `#[entry]` / `#[entry(nested)]` / `#[entry(flatten)]`
+field-role split (additive — legacy `Bare` behaviour preserved for
+un-annotated fields); docs refreshed.
 
-**Remaining:** the `#[entry]` (leaf) / `#[entry(nested)]` (sub-record)
-attribute split — deferred as its own task (~40 derive sites + fixtures).
-The uniform field-recursion + `impl_scalar_metadata!` + `"value"` sentinel
-stay. The typed **`Entry`** trait is still deferred — nothing implements
-it yet.
+**Remaining:** the typed **`Entry`** trait — deferred, nothing implements
+it yet; it lands with the first named-entry vocabulary along with its
+`ErasedEntry`-blanket coherence question. The `Bare` path's
+`impl_scalar_metadata!` + `"value"` sentinel could be retired once every
+derive site is annotated `#[entry]` — cosmetic, not urgent.
 
 The phased plan at the bottom is the implementation order. Supersedes the
 two open `AMENABLE_PLAN.md` Phase 2 bullets on `Provenance` ("Redesign
@@ -613,21 +612,25 @@ all Kani runs (per `feedback_serialize_kani_calls`).
   `amenable_verus` `81a3a702`; creusot artifacts `be07f851`). Full
   workspace `just check-all` + `just check-features` clean; `verify-verus`
   / `verify-creusot` green.
-- [~] **Step 6 — the derives.** ✅ Standalone `#[proc_macro_derive(Metadata,
-  attributes(metadata))]` added (`f01e2450`): emits just the `impl Metadata`
-  that `#[derive(Provenance)]` already generates; `#[derive(Provenance)]`
-  now delegates to the shared `expand_metadata` + appends `impl Provenance
-  for T {}`. `#[metadata(..)]` and `#[provenance(..)]` are interchangeable
-  schema attrs. Enum lowering (tagged variants + payloads) already worked
-  and carries over unchanged (was Step 7).
-  ⏳ **Not done: the `#[entry]` (leaf) / `#[entry(nested)]` (sub-record)
-  attribute split.** It would need annotating ~40 existing `#[derive(
-  Provenance)]` sites and reworking their `expected_entries` fixtures, so
-  it's its own task. The uniform field-recursion (`Metadata::snapshot`
-  everywhere) + `impl_scalar_metadata!` + the `"value"` sentinel key stay
-  in place. The sentinel's one latent bug — a *nested* struct with a field
-  literally named `value` collapses wrong — is not hit by any current
-  schema.
+- [x] **Step 6 — the derives.**
+  - Standalone `#[proc_macro_derive(Metadata, attributes(metadata, entry))]`
+    (`f01e2450`): emits just the `impl Metadata` that `#[derive(Provenance)]`
+    generates; `#[derive(Provenance)]` delegates to the shared
+    `expand_metadata` + appends `impl Provenance for T {}`. `#[metadata(..)]`
+    / `#[provenance(..)]` interchangeable. Enum lowering (was Step 7) already
+    worked and carries over.
+  - **`#[entry]` / `#[entry(nested)]` / `#[entry(flatten)]` field-role
+    split** (`7cb7adc6`): additive. `#[entry]` = `MetadataValue + Clone`
+    leaf; `#[entry(nested)]` = `Metadata` sub-record with `"<field>."`
+    prefix; `#[entry(flatten)]` = no prefix; `#[entry(skip|rename)]`. A
+    field with **no** `#[entry(..)]` keeps the legacy `Bare` behaviour
+    (recurse + `"value"` sentinel), so the ~40 existing derive sites and
+    their fixtures are untouched. `RustLanguageProvenance` /
+    `RustStdProvenance` migrated to explicit `#[entry]` (identical output).
+  - Still carried for `Bare` fields: `impl_scalar_metadata!` and the
+    `"value"` sentinel (its one latent bug — a *nested* struct field
+    literally named `value` — is hit by no current schema, and `#[entry]`
+    sidesteps it entirely).
 - [x] **Step 8 — docs.** `AMENABLE_PLAN.md` Phase 2 bullets ticked;
   `amenable_std` `creusot_gallery` RPITIT / `Box<dyn Iterator>` narratives
   refreshed; `amenable_derive/README.md` documents both derives; trait doc
