@@ -54,14 +54,9 @@ pub struct GalleryVerifierMetadata;
 
 // Incidental plumbing (`Verifier::Metadata` needs *some* `Provenance`
 // impl to exist, but nothing any gallery case's own claim calls into
-// it).
+// it). `Provenance` is a marker in this crate's accommodation mirror
+// (see `provenance_accommodation`), so this impl is empty.
 #[verifier::external]
-impl crate::Provenance for GalleryVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<crate::MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
-    }
-}
+impl crate::Provenance for GalleryVerifierMetadata {}
 
 } // verus!

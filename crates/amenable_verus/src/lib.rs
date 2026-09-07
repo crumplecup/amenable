@@ -27,10 +27,16 @@
 //! evidence_self_referential_root` verifies the real, unmodified
 //! `Evidence`/`Witness`/`ProofToken`/`Establish` trait family — including
 //! a genuine self-referential root — end to end (`351 verified, 0
-//! errors`). `witness.rs` is the one exception (mixes the `Witness<V>`
-//! trait's own definition with `inventory`-dependent registry code in the
-//! same file); `witness_accommodation` is a hand-trimmed mirror of just
-//! the trait mechanics, pending a real split of `witness.rs` itself.
+//! errors`). Two files are the exception: `witness.rs` (mixes the
+//! `Witness<V>` trait's own definition with `inventory`-dependent
+//! registry code) and, since the metadata-trait split, `provenance.rs` /
+//! `roles.rs` (the real `Provenance: Metadata` supertrait pulls in
+//! `amenable_core::metadata`'s `Arc<dyn ...>` / `Any` machinery). Each
+//! gets a hand-trimmed mirror instead — `witness_accommodation` and
+//! `provenance_accommodation` — carrying just the trait mechanics this
+//! crate's proofs actually name. `metadata_entry.rs` (the frozen
+//! `MetadataEntry` snapshot type, no `Arc`/`Any`) is still included
+//! verbatim, for `cert.rs`.
 //!
 //! `char` and `String` are real Rust primitives/std types with genuine
 //! `vstd` spec support (`char as u32` casts and `String`'s `View` impl
@@ -77,6 +83,7 @@
 pub mod derived_witness;
 mod exchange_support;
 pub mod gallery;
+mod provenance_accommodation;
 pub mod rust_std;
 mod witness_accommodation;
 
@@ -95,10 +102,8 @@ mod amenable_core_contract;
 mod amenable_core_evidence;
 #[path = "../../amenable_core/src/exchange.rs"]
 mod amenable_core_exchange;
-#[path = "../../amenable_core/src/provenance.rs"]
-mod amenable_core_provenance;
-#[path = "../../amenable_core/src/roles.rs"]
-mod amenable_core_roles;
+#[path = "../../amenable_core/src/metadata_entry.rs"]
+mod amenable_core_metadata_entry;
 #[path = "../../amenable_core/src/state_machine.rs"]
 mod amenable_core_state_machine;
 #[path = "../../amenable_core/src/verifier.rs"]
@@ -108,10 +113,8 @@ pub use amenable_core_cert::{Certificate, Registry, RegistryReport};
 pub use amenable_core_contract::{Ensures, Requires};
 pub use amenable_core_evidence::Evidence;
 pub use amenable_core_exchange::{Establish, Exchange, ProofToken, Sidecar};
-pub use amenable_core_provenance::{
-    MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport,
-};
-pub use amenable_core_roles::{AsStandard, Standard};
+pub use amenable_core_metadata_entry::MetadataEntry;
 pub use amenable_core_state_machine::{StateMachine, Transition, TransitionAudit};
 pub use amenable_core_verifier::Verifier;
+pub use provenance_accommodation::{AsStandard, Provenance, Standard};
 pub use witness_accommodation::Witness;
