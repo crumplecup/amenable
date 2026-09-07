@@ -85,7 +85,7 @@ pub fn gallery_harness(input: TokenStream) -> TokenStream {
 /// struct or enum. Use this for plain spec/schema types that are not a trust
 /// basis; use `#[derive(Provenance)]` when they are.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
-#[proc_macro_derive(Metadata, attributes(metadata))]
+#[proc_macro_derive(Metadata, attributes(metadata, entry))]
 pub fn derive_metadata(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
@@ -99,7 +99,7 @@ pub fn derive_metadata(input: TokenStream) -> TokenStream {
 /// `impl Provenance for T {}`, from a `#[derive(Provenance)]` on a struct or
 /// enum.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
-#[proc_macro_derive(Provenance, attributes(provenance))]
+#[proc_macro_derive(Provenance, attributes(provenance, entry))]
 pub fn derive_provenance(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 

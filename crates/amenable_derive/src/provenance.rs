@@ -16,7 +16,7 @@ use syn::{
 };
 
 use crate::attr_options::{
-    ProvenanceContainerOptions, collect_field_types, field_name, parse_member_options,
+    EntryKind, ProvenanceContainerOptions, collect_field_bounds, field_name, parse_member_options,
     parse_provenance_container_options,
 };
 
@@ -78,8 +78,15 @@ fn augmented_generics(input: &DeriveInput, crate_path: &Path) -> syn::Result<syn
     let mut generics = input.generics.clone();
     let where_clause = generics.make_where_clause();
 
-    for field_type in collect_field_types(&input.data)? {
-        let predicate: WherePredicate = parse_quote!(#field_type: ::#crate_path::Metadata);
+    for (field_type, kind) in collect_field_bounds(&input.data)? {
+        let predicate: WherePredicate = match kind {
+            EntryKind::Leaf => {
+                parse_quote!(#field_type: ::#crate_path::MetadataValue + ::core::clone::Clone)
+            }
+            EntryKind::Bare | EntryKind::Nested | EntryKind::Flatten => {
+                parse_quote!(#field_type: ::#crate_path::Metadata)
+            }
+        };
         where_clause.predicates.push(predicate);
     }
 
@@ -165,6 +172,7 @@ fn expand_variant_arm(
                         crate_path,
                         field_name,
                         quote!(#field_ident),
+                        *field_options.kind(),
                     )))
                 })
                 .collect::<syn::Result<Vec<_>>>()?
@@ -208,6 +216,7 @@ fn expand_variant_arm(
                         crate_path,
                         field_name,
                         quote!(#field_binding),
+                        *field_options.kind(),
                     )))
                 })
                 .collect::<syn::Result<Vec<_>>>()?
@@ -280,24 +289,45 @@ fn expand_struct_field_push(
         crate_path,
         field_name(field, position)?,
         field_access,
+        *options.kind(),
     ))
 }
 
+/// Push one field's entries, per its [`EntryKind`]. `field_access` is a
+/// reference to the field (`&self.x` for a struct, a `&T` match binding for an
+/// enum variant).
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field_access)))]
 fn expand_field_entries(
     crate_path: &Path,
     field_name: String,
     field_access: proc_macro2::TokenStream,
+    kind: EntryKind,
 ) -> proc_macro2::TokenStream {
-    quote! {
-        for entry in ::#crate_path::Metadata::snapshot(#field_access) {
-            let key = if ::#crate_path::ErasedEntry::key(&entry) == "value" {
-                ::std::string::String::from(#field_name)
-            } else {
-                ::std::format!("{}.{}", #field_name, ::#crate_path::ErasedEntry::key(&entry))
-            };
+    match kind {
+        EntryKind::Leaf => quote! {
+            entries.push(::#crate_path::OwnedEntry::new(
+                #field_name,
+                ::core::clone::Clone::clone(#field_access),
+            ));
+        },
+        EntryKind::Nested => quote! {
+            for entry in ::#crate_path::Metadata::snapshot(#field_access) {
+                entries.push(entry.prefixed(#field_name));
+            }
+        },
+        EntryKind::Flatten => quote! {
+            entries.extend(::#crate_path::Metadata::snapshot(#field_access));
+        },
+        EntryKind::Bare => quote! {
+            for entry in ::#crate_path::Metadata::snapshot(#field_access) {
+                let key = if ::#crate_path::ErasedEntry::key(&entry) == "value" {
+                    ::std::string::String::from(#field_name)
+                } else {
+                    ::std::format!("{}.{}", #field_name, ::#crate_path::ErasedEntry::key(&entry))
+                };
 
-            entries.push(entry.with_key(key));
-        }
+                entries.push(entry.with_key(key));
+            }
+        },
     }
 }

@@ -138,19 +138,35 @@ impl Metadata for MapMetadata {
 
 /// `#[derive(Metadata)]` on a plain spec struct — the widget use case: a
 /// composite queried by fully-qualified key, structured values back, no
-/// `impl Provenance`.
+/// `impl Provenance`. Fields carry explicit `#[entry]` (leaf) /
+/// `#[entry(nested)]` (sub-record) roles.
 #[derive(Debug, Clone, Default, amenable_derive::Metadata)]
 #[metadata(crate = "amenable_core")]
 struct MotorSchema {
+    #[entry]
     max_rpm: u32,
+    #[entry(rename = "pn")]
     part_number: String,
 }
 
 #[derive(Debug, Clone, Default, amenable_derive::Metadata)]
 #[metadata(crate = "amenable_core")]
+struct FirmwareSchema {
+    #[entry]
+    version: String,
+}
+
+#[derive(Debug, Clone, Default, amenable_derive::Metadata)]
+#[metadata(crate = "amenable_core")]
 struct WidgetSchema {
+    #[entry]
     serial: String,
+    #[entry(nested)]
     motor: MotorSchema,
+    #[entry(flatten)]
+    firmware: FirmwareSchema,
+    #[entry(skip)]
+    scratch: String,
 }
 
 #[test]
@@ -162,17 +178,26 @@ fn derive_metadata_composes_and_stays_out_of_the_provenance_role() {
             max_rpm: 15_000,
             part_number: "M-3".to_string(),
         },
+        firmware: FirmwareSchema {
+            version: "2.1.0".to_string(),
+        },
+        scratch: "ignored".to_string(),
     };
 
     assert_eq!(
         widget.keys(),
-        vec!["serial", "motor.max_rpm", "motor.part_number"]
+        // leaf; nested (prefixed); flatten (no prefix); skip omitted
+        vec!["serial", "motor.max_rpm", "motor.pn", "version"]
     );
     assert_eq!(widget.get_as::<u32>("motor.max_rpm"), Some(15_000));
+    assert_eq!(widget.get_as::<String>("motor.pn"), Some("M-3".to_string()));
     assert_eq!(
-        widget.get_as::<String>("motor.part_number"),
-        Some("M-3".to_string())
+        widget.get_as::<String>("version"),
+        Some("2.1.0".to_string())
     );
+    // `#[entry(skip)]` field is still a normal field, just not projected.
+    assert_eq!(widget.scratch, "ignored");
+    assert!(!widget.contains_key("scratch"));
 
     // `#[derive(Metadata)]` does not make the type a `Provenance`.
     fn assert_metadata<M: Metadata>(_: &M) {}

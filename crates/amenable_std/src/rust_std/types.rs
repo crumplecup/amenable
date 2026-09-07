@@ -62,15 +62,19 @@ pub trait RustStdType {
 #[provenance(crate = "amenable_core")]
 pub struct RustLanguageProvenance {
     /// The class of authority this provenance record represents.
+    #[entry]
     #[new(into)]
     authority_kind: String,
     /// The authorizing body for the documented semantics.
+    #[entry]
     #[new(into)]
     authority: String,
     /// The Rust crate that normatively defines the type.
+    #[entry]
     #[new(into)]
     source_crate: String,
     /// The Rust module path that normatively defines the type.
+    #[entry]
     #[new(into)]
     source_module: String,
 }
@@ -122,14 +126,18 @@ impl RustLanguageProvenance {
 #[provenance(crate = "amenable_core")]
 pub struct RustStdProvenance {
     /// The shared Rust-language provenance this type-specific record relies on.
+    #[entry(nested)]
     rust: RustLanguageProvenance,
     /// The canonical documentation URL for the type.
+    #[entry]
     #[new(into)]
     source_url: String,
     /// The fully-qualified Rust type name being certified.
+    #[entry]
     #[new(into)]
     type_name: String,
     /// Concise summary of the semantic promise made by the standard library.
+    #[entry]
     #[new(into)]
     semantic_summary: String,
 }
