@@ -41,7 +41,7 @@
 //! where that derive genuinely cannot reach, not a lapse in "dogfood the
 //! derives" discipline.
 
-use crate::{Evidence, MetadataEntry, Provenance, Standard};
+use crate::{Evidence, Metadata, OwnedEntry, Provenance, Standard};
 
 /// The light is green — a root state claim, asserted rather than derived
 /// from a prior transition: the first assertion any running `Stoplight`
@@ -50,20 +50,17 @@ use crate::{Evidence, MetadataEntry, Provenance, Standard};
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct Green;
 
-impl Provenance for Green {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for Green {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, by design convention (power-on default)",
-            )]
-            .into_iter(),
-        )
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
+            "asserted",
+            "traffic light state, by design convention (power-on default)",
+        )]
     }
 }
+
+impl Provenance for Green {}
 
 impl Standard for Green {
     type Provenance = Self;
@@ -101,20 +98,17 @@ impl Evidence for Green {
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct Yellow;
 
-impl Provenance for Yellow {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for Yellow {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, reachable only via a proven Green -> Yellow exchange",
-            )]
-            .into_iter(),
-        )
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
+            "asserted",
+            "traffic light state, reachable only via a proven Green -> Yellow exchange",
+        )]
     }
 }
+
+impl Provenance for Yellow {}
 
 impl Standard for Yellow {
     type Provenance = Self;
@@ -150,20 +144,17 @@ impl Evidence for Yellow {
 #[cfg_attr(kani, derive(kani::Arbitrary))]
 pub struct Red;
 
-impl Provenance for Red {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
+impl Metadata for Red {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(
-            vec![MetadataEntry::new(
-                "asserted",
-                "traffic light state, reachable only via a proven Yellow -> Red exchange",
-            )]
-            .into_iter(),
-        )
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
+            "asserted",
+            "traffic light state, reachable only via a proven Yellow -> Red exchange",
+        )]
     }
 }
+
+impl Provenance for Red {}
 
 impl Standard for Red {
     type Provenance = Self;

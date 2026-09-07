@@ -1,4 +1,7 @@
-use amenable_core::{Certificate, MetadataEntry, Provenance, Registry, Standard, Verifier};
+use amenable_core::{
+    Certificate, ErasedEntry, Metadata, MetadataEntry, OwnedEntry, Provenance, Registry, Standard,
+    Verifier,
+};
 use amenable_derive::Standard;
 use std::fmt::{self, Display, Formatter};
 
@@ -9,20 +12,17 @@ struct ManualProvenance {
     source: String,
 }
 
-impl Provenance for ManualProvenance {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new(
-            vec![
-                MetadataEntry::new("authority_kind", self.authority_kind.clone()),
-                MetadataEntry::new("authority", self.authority.clone()),
-                MetadataEntry::new("source", self.source.clone()),
-            ]
-            .into_iter(),
-        )
+impl Metadata for ManualProvenance {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![
+            OwnedEntry::new("authority_kind", self.authority_kind.clone()),
+            OwnedEntry::new("authority", self.authority.clone()),
+            OwnedEntry::new("source", self.source.clone()),
+        ]
     }
 }
+
+impl Provenance for ManualProvenance {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Standard)]
 #[standard(
@@ -107,7 +107,11 @@ impl Registry for ManualRegistry {
         let certificate = ManualCertificate {
             id: ManualCertId(self.next_id),
             subject: subject.to_string(),
-            entries: provenance.metadata().collect(),
+            entries: provenance
+                .snapshot()
+                .iter()
+                .map(MetadataEntry::from)
+                .collect(),
         };
 
         self.next_id += 1;
@@ -124,17 +128,18 @@ impl Registry for ManualRegistry {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 struct ManualVerifierMetadata;
 
-impl Provenance for ManualVerifierMetadata {
-    type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Box::new({
-            const FACTS: &[(&str, &str)] =
-                &[("verifier_family", "manual"), ("authority", "Test Fixture")];
-            FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v))
-        })
+impl Metadata for ManualVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        const FACTS: &[(&str, &str)] =
+            &[("verifier_family", "manual"), ("authority", "Test Fixture")];
+        FACTS
+            .iter()
+            .map(|&(key, value)| OwnedEntry::new(key, value))
+            .collect()
     }
 }
+
+impl Provenance for ManualVerifierMetadata {}
 
 struct ManualVerifier;
 
@@ -153,17 +158,17 @@ fn verifier_metadata_marker_is_zero_sized() {
 }
 
 #[test]
-fn verifier_metadata_iterates_lazily_generated_entries() -> miette::Result<()> {
+fn verifier_metadata_builds_entries_on_demand() -> miette::Result<()> {
     amenable_core::init_tracing();
     let metadata = ManualVerifier::metadata();
 
     assert!(!metadata.is_empty());
-    assert_eq!(metadata.len(), metadata.metadata().count());
+    assert_eq!(metadata.len(), metadata.snapshot().len());
 
     let entry = metadata
         .get("verifier_family")
         .ok_or_else(|| miette::miette!("verifier_family fact present"))?;
-    assert_eq!(entry.value(), "manual");
+    assert_eq!(entry.value().to_string(), "manual");
 
     assert!(metadata.contains_key("authority"));
     assert!(!metadata.contains_key("nonexistent_key"));
@@ -180,35 +185,22 @@ fn provenance_exposes_rich_projected_metadata_views() {
         source: "layout/decision-12".to_string(),
     };
 
-    let keys = provenance.keys().collect::<Vec<_>>();
-    let values = provenance.values().collect::<Vec<_>>();
-
-    assert_eq!(keys, vec!["authority_kind", "authority", "source"]);
     assert_eq!(
-        values,
-        vec!["local_design", "UI Working Group", "layout/decision-12"]
-    );
-}
-
-#[test]
-fn scalar_provenance_exposes_leaf_value_metadata() {
-    amenable_core::init_tracing();
-    let string_value = "Rust Project Developers".to_string();
-    let integer_value = 32_i32;
-
-    assert_eq!(
-        string_value.keys().collect::<Vec<_>>(),
-        vec!["value".to_string()]
+        provenance
+            .keys()
+            .iter()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        ["authority_kind", "authority", "source"]
     );
     assert_eq!(
-        string_value.values().collect::<Vec<_>>(),
-        vec!["Rust Project Developers".to_string()]
+        provenance
+            .values()
+            .iter()
+            .map(String::as_str)
+            .collect::<Vec<_>>(),
+        ["local_design", "UI Working Group", "layout/decision-12"]
     );
-    assert_eq!(
-        integer_value.values().collect::<Vec<_>>(),
-        vec!["32".to_string()]
-    );
-    assert_eq!(integer_value.report().to_string(), "value: 32");
 }
 
 #[test]

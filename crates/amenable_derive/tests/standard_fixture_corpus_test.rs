@@ -1,6 +1,6 @@
 mod support;
 
-use amenable_core::{EvidenceLink, Standard};
+use amenable_core::{EvidenceLink, Metadata, Standard};
 use support::{
     DeriveFixtureKind, FixtureCase, expected_keys, expected_report, expected_values,
     for_each_fixture_type,
@@ -57,22 +57,23 @@ where
             F::KIND,
             instance.label
         );
+        let provenance = instance.value.provenance();
         assert_eq!(
-            Standard::len(&instance.value),
+            Metadata::len(&provenance),
             instance.expected_entries.len(),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
-            Standard::keys(&instance.value).collect::<Vec<_>>(),
+            Metadata::keys(&provenance),
             expected_keys(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
-            Standard::values(&instance.value).collect::<Vec<_>>(),
+            Metadata::values(&provenance),
             expected_values(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,

@@ -1,5 +1,5 @@
 use amenable_core::{
-    Evidence, MetadataEntry, Provenance, Standard, Verifier, Witness, WitnessSupportSummary,
+    Evidence, Metadata, OwnedEntry, Provenance, Standard, Verifier, Witness, WitnessSupportSummary,
 };
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
@@ -48,13 +48,13 @@ impl WitnessLeaf {
     }
 }
 
-impl Provenance for WitnessLeaf {
-    type MetadataIter = <String as Provenance>::MetadataIter;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        self.0.metadata()
+impl Metadata for WitnessLeaf {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        self.0.snapshot()
     }
 }
+
+impl Provenance for WitnessLeaf {}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WitnessLeafProof {
@@ -72,13 +72,13 @@ pub struct FixtureVerifier;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct FixtureVerifierMetadata;
 
-impl Provenance for FixtureVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        vec![MetadataEntry::new("verifier", "fixture")].into_iter()
+impl Metadata for FixtureVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new("verifier", "fixture")]
     }
 }
+
+impl Provenance for FixtureVerifierMetadata {}
 
 impl Verifier for FixtureVerifier {
     type Metadata = FixtureVerifierMetadata;
@@ -150,7 +150,7 @@ impl<T> FixtureWitnessMember for T where
 
 pub fn expected_report(entries: &[(String, String)]) -> String {
     if entries.is_empty() {
-        return "(no provenance metadata)".to_string();
+        return "(no metadata)".to_string();
     }
 
     entries

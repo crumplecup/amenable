@@ -1,8 +1,8 @@
 #![cfg(feature = "verus")]
 
 use amenable_core::{
-    ContractRecord, Ensures, Evidence, MetadataEntry, Provenance, Requires, Verifier, Witness,
-    WitnessSupportSummary,
+    ContractRecord, Ensures, Evidence, Metadata, OwnedEntry, Provenance, Requires, Verifier,
+    Witness, WitnessSupportSummary,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -11,13 +11,13 @@ struct VerusVerifier;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct VerusVerifierMetadata;
 
-impl Provenance for VerusVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
+impl Metadata for VerusVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        Vec::new()
     }
 }
+
+impl Provenance for VerusVerifierMetadata {}
 
 impl Verifier for VerusVerifier {
     type Metadata = VerusVerifierMetadata;

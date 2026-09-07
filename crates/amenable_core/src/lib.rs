@@ -32,6 +32,7 @@ mod evidence;
 mod exchange;
 mod link;
 mod metadata;
+mod metadata_entry;
 mod provenance;
 mod roles;
 mod state;
@@ -59,7 +60,8 @@ pub use metadata::{
     ErasedEntry, Metadata, MetadataRecord, MetadataReport, MetadataValue, OwnedEntry,
     OwnedMetadataReport,
 };
-pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
+pub use metadata_entry::MetadataEntry;
+pub use provenance::Provenance;
 pub use roles::{AsStandard, Standard};
 pub use state::State;
 pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};

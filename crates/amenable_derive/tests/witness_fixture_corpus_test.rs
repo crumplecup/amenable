@@ -1,6 +1,6 @@
 mod support;
 
-use amenable_core::{Provenance, Witness};
+use amenable_core::{Metadata, Witness};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
@@ -16,28 +16,28 @@ where
 {
     for instance in F::instances() {
         assert_eq!(
-            Provenance::len(&instance.value),
+            Metadata::len(&instance.value),
             instance.expected_entries.len(),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
-            Provenance::keys(&instance.value).collect::<Vec<_>>(),
+            Metadata::keys(&instance.value),
             expected_keys(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
-            Provenance::values(&instance.value).collect::<Vec<_>>(),
+            Metadata::values(&instance.value),
             expected_values(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,
             instance.label
         );
         assert_eq!(
-            Provenance::report(&instance.value).to_string(),
+            Metadata::report(&instance.value).to_string(),
             expected_report(&instance.expected_entries),
             "{:?}::{}",
             F::KIND,

@@ -87,14 +87,20 @@ impl OwnedEntry {
         }
     }
 
+    /// Replace this entry's key, keeping the value [`Arc`].
+    pub fn with_key(self, key: impl Into<String>) -> Self {
+        Self {
+            key: key.into(),
+            value: self.value,
+        }
+    }
+
     /// Namespace this entry under a parent field: `"max_rpm"` becomes
     /// `"motor.max_rpm"`. Applied to every entry of an `#[entry(nested)]` field
     /// during assembly; the value [`Arc`] is moved through untouched.
     pub fn prefixed(self, parent: &str) -> Self {
-        Self {
-            key: format!("{parent}.{}", self.key),
-            value: self.value,
-        }
+        let key = format!("{parent}.{}", self.key);
+        self.with_key(key)
     }
 }
 
@@ -316,3 +322,24 @@ where
         Display::fmt(&MetadataReport::new(&self.metadata), f)
     }
 }
+
+/// Leaf `Metadata` for scalar carriers: one entry keyed `"value"`.
+///
+/// `#[derive(Provenance)]` walks every field's `Metadata::snapshot()`, so a
+/// struct with a plain `String` / `u32` / `bool` field needs the field type to
+/// be `Metadata`. The parent re-keys the `"value"` entry to the field name.
+macro_rules! impl_scalar_metadata {
+    ($($ty:ty),* $(,)?) => {
+        $(
+            impl Metadata for $ty {
+                fn snapshot(&self) -> Vec<OwnedEntry> {
+                    ::std::vec![OwnedEntry::new("value", self.clone())]
+                }
+            }
+        )*
+    };
+}
+
+impl_scalar_metadata!(
+    bool, char, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64, String,
+);

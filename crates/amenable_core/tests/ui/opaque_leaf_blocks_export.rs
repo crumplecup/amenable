@@ -5,8 +5,8 @@
 //! error, not compile, panic at runtime, or silently succeed.
 
 use amenable_core::{
-    Evidence, MetadataEntry, Provenance, Verifier, Witness, WitnessArtifact, WitnessArtifactNode,
-    WitnessModulePath, WitnessSupportSummary,
+    Evidence, Metadata, OwnedEntry, Provenance, Verifier, Witness, WitnessArtifact,
+    WitnessArtifactNode, WitnessModulePath, WitnessSupportSummary,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -15,13 +15,13 @@ struct DemoVerifier;
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 struct DemoVerifierMetadata;
 
-impl Provenance for DemoVerifierMetadata {
-    type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-
-    fn metadata(&self) -> Self::MetadataIter {
-        Vec::new().into_iter()
+impl Metadata for DemoVerifierMetadata {
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        Vec::new()
     }
 }
+
+impl Provenance for DemoVerifierMetadata {}
 
 impl Verifier for DemoVerifier {
     type Metadata = DemoVerifierMetadata;

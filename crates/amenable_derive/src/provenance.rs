@@ -1,5 +1,6 @@
-//! `#[derive(Provenance)]`: a `Provenance` impl whose `metadata()` walks
-//! every non-`#[provenance(skip)]` field's own `Provenance::metadata()`.
+//! `#[derive(Provenance)]`: a `Metadata` impl whose `snapshot()` walks every
+//! non-`#[provenance(skip)]` field's own `Metadata::snapshot()`, plus a marker
+//! `impl Provenance for T {}`.
 
 use quote::{format_ident, quote};
 use syn::{
@@ -22,13 +23,13 @@ pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2:
     let where_clause = generics.make_where_clause();
 
     for field_type in field_types {
-        let predicate: WherePredicate = parse_quote!(#field_type: ::#crate_path::Provenance);
+        let predicate: WherePredicate = parse_quote!(#field_type: ::#crate_path::Metadata);
         where_clause.predicates.push(predicate);
     }
 
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let metadata_body = match &input.data {
+    let snapshot_body = match &input.data {
         Data::Struct(data) => expand_struct_metadata(crate_path, data)?,
         Data::Enum(data) => expand_enum_metadata(crate_path, data, &options)?,
         Data::Union(data) => {
@@ -40,13 +41,13 @@ pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2:
     };
 
     Ok(quote! {
-        impl #impl_generics ::#crate_path::Provenance for #name #ty_generics #where_clause {
-            type MetadataIter = ::std::boxed::Box<dyn ::core::iter::Iterator<Item = ::#crate_path::MetadataEntry>>;
-
-            fn metadata(&self) -> Self::MetadataIter {
-                ::std::boxed::Box::new({ #metadata_body })
+        impl #impl_generics ::#crate_path::Metadata for #name #ty_generics #where_clause {
+            fn snapshot(&self) -> ::std::vec::Vec<::#crate_path::OwnedEntry> {
+                #snapshot_body
             }
         }
+
+        impl #impl_generics ::#crate_path::Provenance for #name #ty_generics #where_clause {}
     })
 }
 
@@ -60,7 +61,7 @@ fn expand_struct_metadata(
     Ok(quote! {
         let mut entries = ::std::vec::Vec::new();
         #(#field_pushes)*
-        entries.into_iter()
+        entries
     })
 }
 
@@ -125,20 +126,11 @@ fn expand_variant_arm(
                         .clone()
                         .unwrap_or_else(|| field_ident.to_string());
 
-                    Ok(Some(quote! {
-                        for entry in ::#crate_path::Provenance::metadata(#field_ident) {
-                            let key = if entry.key() == "value" {
-                                ::std::borrow::ToOwned::to_owned(#field_name)
-                            } else {
-                                ::std::format!("{}.{}", #field_name, entry.key())
-                            };
-
-                            entries.push(::#crate_path::MetadataEntry::new(
-                                key,
-                                entry.value().to_owned(),
-                            ));
-                        }
-                    }))
+                    Ok(Some(expand_field_entries(
+                        crate_path,
+                        field_name,
+                        quote!(#field_ident),
+                    )))
                 })
                 .collect::<syn::Result<Vec<_>>>()?
                 .into_iter()
@@ -148,9 +140,9 @@ fn expand_variant_arm(
             Ok(quote! {
                 Self::#ident { #(#field_idents),* } => {
                     let mut entries = ::std::vec::Vec::new();
-                    entries.push(::#crate_path::MetadataEntry::new(#tag, #variant_name));
+                    entries.push(::#crate_path::OwnedEntry::new(#tag, #variant_name));
                     #(#field_pushes)*
-                    entries.into_iter()
+                    entries
                 }
             })
         }
@@ -191,17 +183,15 @@ fn expand_variant_arm(
             Ok(quote! {
                 Self::#ident(#(#field_bindings),*) => {
                     let mut entries = ::std::vec::Vec::new();
-                    entries.push(::#crate_path::MetadataEntry::new(#tag, #variant_name));
+                    entries.push(::#crate_path::OwnedEntry::new(#tag, #variant_name));
                     #(#field_pushes)*
-                    entries.into_iter()
+                    entries
                 }
             })
         }
         Fields::Unit => Ok(quote! {
             Self::#ident => {
-                let mut entries = ::std::vec::Vec::new();
-                entries.push(::#crate_path::MetadataEntry::new(#tag, #variant_name));
-                entries.into_iter()
+                ::std::vec![::#crate_path::OwnedEntry::new(#tag, #variant_name)]
             }
         }),
     }
@@ -265,17 +255,14 @@ fn expand_field_entries(
     field_access: proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     quote! {
-        for entry in ::#crate_path::Provenance::metadata(#field_access) {
-            let key = if entry.key() == "value" {
-                ::std::borrow::ToOwned::to_owned(#field_name)
+        for entry in ::#crate_path::Metadata::snapshot(#field_access) {
+            let key = if ::#crate_path::ErasedEntry::key(&entry) == "value" {
+                ::std::string::String::from(#field_name)
             } else {
-                ::std::format!("{}.{}", #field_name, entry.key())
+                ::std::format!("{}.{}", #field_name, ::#crate_path::ErasedEntry::key(&entry))
             };
 
-            entries.push(::#crate_path::MetadataEntry::new(
-                key,
-                entry.value().to_owned(),
-            ));
+            entries.push(entry.with_key(key));
         }
     }
 }

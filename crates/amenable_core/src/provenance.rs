@@ -1,226 +1,35 @@
-//! Provenance metadata for constitutional proof claims.
+//! The provenance role: a metadata record that is also a trust basis.
 
-use std::fmt::{self, Display, Formatter};
+use std::fmt::Display;
 
-use crate::Registry;
+use crate::{Metadata, Registry};
 
-/// Structured provenance describing how a root obligation is sourced and
-/// audited.
+/// A [`Metadata`] record whose facts constitute an auditable trust basis.
 ///
-/// The concrete schema lives on the implementing Rust type itself, typically
-/// a user-defined struct or enum. This trait is the common reporting view
-/// over that structured object: it projects the implementor into a
-/// deterministic stream of metadata entries without forcing every provenance
-/// carrier into one storage representation.
-pub trait Provenance {
-    /// Concrete iterator type backing [`metadata`](Provenance::metadata).
+/// `Provenance` is the first link in the constitutional chain `Provenance ->
+/// Standard -> Evidence -> Witness`. Where [`Metadata`] is a bag of typed facts
+/// making no claim about meaning, a `Provenance` record asserts *why a trust
+/// decision is legitimate* -- authority, source, scope, rationale. A plain spec
+/// bag such as a widget's `WidgetSpecs` is [`Metadata`] and must **not** be
+/// `Provenance`.
+///
+/// It is a **supertrait** of [`Metadata`], not an associated type: a provenance
+/// type *is* its own metadata record, so `provenance.get_as::<T>("...")` and
+/// `provenance.report()` work directly. `#[derive(Provenance)]` reuses the
+/// `#[derive(Metadata)]` field walk and adds `impl Provenance for T {}` -- the
+/// role is today mostly a marker, letting `<P: Provenance>` bounds demand a
+/// certified trust basis where `<M: Metadata>` bounds accept any spec bag.
+/// Required entries and further methods land as real bounds need them.
+pub trait Provenance: Metadata {
+    /// Issue a tracked certificate for this trust basis.
     ///
-    /// An associated type rather than a return-position `impl Trait`: the
-    /// latter desugars to a compiler-synthesized opaque type at every impl
-    /// site, and at least one verifier toolchain (Creusot's `creusot-rustc`,
-    /// as of the `0.11.0` release pinned in `amenable_creusot`) panics
-    /// enumerating local def-ids when a translated crate contains one —
-    /// confirmed via a real ICE on `CreusotVerifierMetadata`'s own impl, not
-    /// a defensive guess. An associated type is an ordinary named item, not
-    /// an opaque one, and sidesteps the bug entirely while still letting
-    /// each implementor pick its own concrete iterator rather than being
-    /// forced into one storage representation (e.g. `Vec<MetadataEntry>`)
-    /// for every carrier.
-    type MetadataIter: Iterator<Item = MetadataEntry>;
-
-    /// Iterate over the provenance facts describing this claim's source of
-    /// trust, generated on demand rather than pre-built into a stored
-    /// collection.
-    fn metadata(&self) -> Self::MetadataIter;
-
-    /// Backward-compatible alias for the projected metadata stream.
-    fn iter(&self) -> impl Iterator<Item = MetadataEntry> {
-        self.metadata()
-    }
-
-    /// Look up the fact for a given key, if present.
-    fn get(&self, key: &str) -> Option<MetadataEntry> {
-        self.metadata().find(|entry| entry.key() == key)
-    }
-
-    /// Return whether a fact with the given key is present.
-    fn contains_key(&self, key: &str) -> bool {
-        self.get(key).is_some()
-    }
-
-    /// Number of provenance facts.
-    fn len(&self) -> usize {
-        self.metadata().count()
-    }
-
-    /// Whether there are no provenance facts.
-    fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    /// Iterate over every metadata key.
-    fn keys(&self) -> impl Iterator<Item = String> {
-        self.metadata().map(|entry| entry.key().to_owned())
-    }
-
-    /// Iterate over every metadata value.
-    fn values(&self) -> impl Iterator<Item = String> {
-        self.metadata().map(|entry| entry.value().to_owned())
-    }
-
-    /// Borrow a human-readable rendering of the projected provenance facts.
-    fn report(&self) -> ProvenanceReport<'_, Self>
-    where
-        Self: Sized,
-    {
-        ProvenanceReport::new(self)
-    }
-
-    /// Issue a tracked provenance certificate through the registry.
+    /// A certificate certifies a *trust basis*, not arbitrary metadata, so this
+    /// stays on `Provenance` rather than [`Metadata`].
     fn certification<R>(&self, registry: &mut R, subject: impl Display) -> R::Certificate
     where
-        Self: Sized,
         R: Registry,
+        Self: Sized,
     {
         registry.issue_provenance_certificate(subject, self)
     }
 }
-
-/// One provenance metadata fact expressed as a key-value pair.
-///
-/// Hand-written `new`/`key`/`value` instead of `derive_new`/
-/// `derive_getters`, despite otherwise matching that exact shape:
-/// `amenable_verus` `#[path]`-includes this file directly into its own
-/// crate, and the real `verus` binary is invoked as a bare compiler
-/// over a single file tree (`verus --crate-type=lib
-/// crates/amenable_verus/src/lib.rs`) that never reads `Cargo.toml` at
-/// all -- so a dependency declared there (even a real one, as
-/// confirmed by `cargo check --all-features` passing) is still
-/// invisible to the real verifier. Confirmed the hard way, twice: a
-/// version of this file gained these derives, `cargo check
-/// --all-features` passed clean (only `amenable_verus`'s own
-/// `Cargo.toml` dependency, checked via ordinary `cargo`, which does
-/// read `Cargo.toml`), and the real `verus` binary still failed with
-/// "cannot find crate `derive_getters`" -- the two toolchains disagree
-/// about what's resolvable here, and only the real `verus` invocation
-/// is authoritative for this file.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct MetadataEntry {
-    /// Stable metadata key.
-    key: String,
-    /// Stable metadata value.
-    value: String,
-}
-
-impl MetadataEntry {
-    /// Create a new provenance metadata entry.
-    pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
-        Self {
-            key: key.into(),
-            value: value.into(),
-        }
-    }
-
-    /// Return the metadata key.
-    pub fn key(&self) -> &str {
-        &self.key
-    }
-
-    /// Return the metadata value.
-    pub fn value(&self) -> &str {
-        &self.value
-    }
-}
-
-impl Display for MetadataEntry {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}: {}", self.key, self.value)
-    }
-}
-
-/// Borrowed human-readable rendering of provenance metadata.
-#[derive(Debug, Clone, Copy)]
-pub struct ProvenanceReport<'a, P>
-where
-    P: Provenance + ?Sized,
-{
-    provenance: &'a P,
-}
-
-impl<'a, P> ProvenanceReport<'a, P>
-where
-    P: Provenance + ?Sized,
-{
-    /// Create a borrowed report view over a provenance record.
-    pub const fn new(provenance: &'a P) -> Self {
-        Self { provenance }
-    }
-}
-
-impl<P> Display for ProvenanceReport<'_, P>
-where
-    P: Provenance + ?Sized,
-{
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let mut entries = self.provenance.metadata();
-
-        match entries.next() {
-            Some(entry) => {
-                write!(f, "{entry}")?;
-
-                for entry in entries {
-                    write!(f, "\n{entry}")?;
-                }
-
-                Ok(())
-            }
-            None => write!(f, "(no provenance metadata)"),
-        }
-    }
-}
-
-/// Owned human-readable rendering of provenance metadata.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OwnedProvenanceReport<P>
-where
-    P: Provenance,
-{
-    provenance: P,
-}
-
-impl<P> OwnedProvenanceReport<P>
-where
-    P: Provenance,
-{
-    /// Create an owned report view over a provenance record.
-    pub const fn new(provenance: P) -> Self {
-        Self { provenance }
-    }
-}
-
-impl<P> Display for OwnedProvenanceReport<P>
-where
-    P: Provenance,
-{
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        Display::fmt(&ProvenanceReport::new(&self.provenance), f)
-    }
-}
-
-macro_rules! impl_scalar_provenance {
-    ($($ty:ty),* $(,)?) => {
-        $(
-            impl Provenance for $ty {
-                type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
-
-                fn metadata(&self) -> Self::MetadataIter {
-                    Box::new(vec![MetadataEntry::new("value", self.to_string())].into_iter())
-                }
-            }
-        )*
-    };
-}
-
-impl_scalar_provenance!(
-    bool, char, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64, String,
-);

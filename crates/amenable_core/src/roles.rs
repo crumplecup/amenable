@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, marker::PhantomData};
 
-use crate::{Evidence, MetadataEntry, OwnedProvenanceReport, Provenance, Registry};
+use crate::{Evidence, OwnedMetadataReport, Provenance, Registry};
 
 /// A provenance-backed root obligation the program claims it will uphold.
 ///
@@ -15,6 +15,10 @@ use crate::{Evidence, MetadataEntry, OwnedProvenanceReport, Provenance, Registry
 /// just to compile. Where a `Standard`-backed value genuinely needs to
 /// carry a real proof, that requirement is stated explicitly at the
 /// `Sidecar`/`Exchange` level that actually needs it, not baked in here.
+///
+/// The metadata query surface is **not** re-exposed here — reach the facts
+/// through `standard.provenance()`, which is itself a [`Metadata`](crate::
+/// Metadata) record.
 pub trait Standard: Evidence {
     /// Structured provenance for this root obligation.
     type Provenance: Provenance;
@@ -22,44 +26,9 @@ pub trait Standard: Evidence {
     /// Produce the provenance record describing this standard.
     fn provenance(&self) -> Self::Provenance;
 
-    /// Iterate over the projected metadata for the backing provenance.
-    fn metadata(&self) -> impl Iterator<Item = MetadataEntry> {
-        self.provenance().metadata().collect::<Vec<_>>().into_iter()
-    }
-
-    /// Look up the fact for a given metadata key.
-    fn get(&self, key: &str) -> Option<MetadataEntry> {
-        self.provenance().get(key)
-    }
-
-    /// Return whether the backing provenance contains a given key.
-    fn contains_key(&self, key: &str) -> bool {
-        self.provenance().contains_key(key)
-    }
-
-    /// Count the projected provenance facts.
-    fn len(&self) -> usize {
-        self.provenance().len()
-    }
-
-    /// Return whether the backing provenance yields no facts.
-    fn is_empty(&self) -> bool {
-        self.provenance().is_empty()
-    }
-
-    /// Iterate over every projected provenance key.
-    fn keys(&self) -> impl Iterator<Item = String> {
-        self.provenance().keys().collect::<Vec<_>>().into_iter()
-    }
-
-    /// Iterate over every projected provenance value.
-    fn values(&self) -> impl Iterator<Item = String> {
-        self.provenance().values().collect::<Vec<_>>().into_iter()
-    }
-
     /// Render the backing provenance as an owned audit surface.
-    fn report(&self) -> OwnedProvenanceReport<Self::Provenance> {
-        OwnedProvenanceReport::new(self.provenance())
+    fn report(&self) -> OwnedMetadataReport<Self::Provenance> {
+        OwnedMetadataReport::new(self.provenance())
     }
 
     /// Issue a tracked provenance certificate for this standard.
