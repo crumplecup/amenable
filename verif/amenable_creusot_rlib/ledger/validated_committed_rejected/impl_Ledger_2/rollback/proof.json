@@ -10,7 +10,7 @@
       "vc_new_Rejected_Validated": { "prover": "alt-ergo", "time": 0.018 },
       "vc_primary_Transfer_Validated_ValidatedToken": {
         "prover": "alt-ergo",
-        "time": 0.015
+        "time": 0.03
       },
       "vc_rollback": { "prover": "alt-ergo", "time": 0.022 },
       "vc_sidecar_Transfer_Validated_ValidatedToken": {

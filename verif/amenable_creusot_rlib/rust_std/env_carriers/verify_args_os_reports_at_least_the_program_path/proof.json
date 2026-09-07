@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_args_os_reports_at_least_the_program_path": {
         "prover": "alt-ergo",
-        "time": 0.016
+        "time": 0.036
       }
     }
   }
