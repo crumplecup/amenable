@@ -34,6 +34,7 @@ mod link;
 mod metadata;
 mod metadata_entry;
 mod provenance;
+mod provenance_vocab;
 mod roles;
 mod state;
 mod state_machine;
@@ -57,11 +58,15 @@ pub use link::{
     ContractRecord, EvidenceLink, ExchangeEdgeRecord, ProofRecord, ProofTokenMintRecord,
 };
 pub use metadata::{
-    ErasedEntry, Metadata, MetadataRecord, MetadataReport, MetadataValue, OwnedEntry,
+    Entry, ErasedEntry, Metadata, MetadataRecord, MetadataReport, MetadataValue, OwnedEntry,
     OwnedMetadataReport,
 };
 pub use metadata_entry::MetadataEntry;
 pub use provenance::Provenance;
+pub use provenance_vocab::{
+    Authority, AuthorityKind, ConfigurationChannel, ConfigurationSurface, ProofArtifact,
+    SemanticSummary, SourceCrate, SourceModule, SourceUrl, TypeName, VerifierFamily,
+};
 pub use roles::{AsStandard, Standard};
 pub use state::State;
 pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};

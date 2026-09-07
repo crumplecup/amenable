@@ -49,11 +49,46 @@ impl<T: Display + Debug + Send + Sync + 'static> MetadataValue for T {
     }
 }
 
+/// A single, canonically-keyed metadata fact — the unit a provenance
+/// vocabulary is built from.
+///
+/// `KEY` is fixed per type: every [`Authority`](crate::Authority) keys
+/// `"authority"`, every [`SourceUrl`](crate::SourceUrl) keys `"source_url"`,
+/// so a vocabulary shared across provenance records (and across the three
+/// verifier backends) cannot drift. Vocabulary types are also [`Metadata`]
+/// (a one-entry record holding the value by clone) and [`MetadataValue`], so
+/// an `#[entry(flatten)]` field of a vocabulary type projects to its one
+/// canonically-keyed entry and `record.get_as::<Authority>(Authority::KEY)`
+/// recovers the typed value.
+pub trait Entry {
+    /// The canonical key shared by every value of this type.
+    const KEY: &'static str;
+
+    /// The value this entry carries.
+    type Value: ?Sized;
+
+    /// Borrow the value.
+    fn value(&self) -> &Self::Value;
+
+    /// The canonical key ([`KEY`](Entry::KEY)).
+    fn key(&self) -> &'static str {
+        Self::KEY
+    }
+
+    /// Freeze this vocabulary value into its one [`OwnedEntry`].
+    fn into_entry(self) -> OwnedEntry
+    where
+        Self: Sized + MetadataValue,
+    {
+        OwnedEntry::new(Self::KEY, self)
+    }
+}
+
 /// Object-safe view of one metadata fact: the element type every [`Metadata`]
 /// record yields.
 ///
 /// [`OwnedEntry`] implements it directly. A future blanket implementation will
-/// derive it for every typed `Entry`.
+/// derive it for every typed [`Entry`].
 pub trait ErasedEntry: Debug {
     /// Fully-qualified key, e.g. `"motor.max_rpm"` after nesting.
     fn key(&self) -> &str;
