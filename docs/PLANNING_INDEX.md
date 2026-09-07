@@ -4,6 +4,35 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Metadata trait family
+
+**Document:** [METADATA_TRAIT_PLAN.md](METADATA_TRAIT_PLAN.md)
+
+**Status:** 🚧 In progress (2026-09-07). ✅ Step 0 landed — core types
+in `amenable_core/src/metadata.rs`, not wired; all three backends green
+(Verus `485 verified`, Creusot translate clean, Kani sample passes).
+Steps 1–8 remain. Design for a dedicated `Metadata` trait family
+(`MetadataValue` / `Entry` / `ErasedEntry` / `Metadata`, `OwnedEntry`
+carrier holding `Arc<dyn MetadataValue>`), replacing `MetadataEntry`'s
+role as the de facto metadata interface. `Provenance: Metadata`
+(supertrait) — a provenance type *is* its own metadata record;
+`#[derive(Provenance)]` reuses the `#[derive(Metadata)]` codegen.
+`Metadata` has no associated types and returns owned values
+(`snapshot(&self) -> Vec<OwnedEntry>`), so ZSTs can implement it.
+`MetadataEntry` shrinks to the frozen certificate snapshot. Enables
+typed spec queries over composed schemas
+(`specs.get_as::<Rpm>("motor.max_rpm")`). Supersedes the two open
+`AMENABLE_PLAN.md` Phase 2 `Provenance`/`#[derive(Provenance)]` bullets.
+8 phased steps; Step 0 de-risks `Arc<dyn>` under Creusot (fallback:
+`MetadataValueKind` enum).
+
+**Description:** `amenable_core` has no trait interface for metadata —
+one concrete `MetadataEntry { key: String, value: String }` bears all
+the weight, and every value is stringified at the boundary, losing
+structure. The target use case: a complex widget composes metadata from
+five sub-components and a programmer queries assembled specs by key,
+getting structured typed values back, as a pre-flight check.
+
 ### Documentation review: functions → modules → READMEs
 
 **Document:** [DOCUMENTATION_REVIEW_PLAN.md](DOCUMENTATION_REVIEW_PLAN.md)

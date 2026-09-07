@@ -31,6 +31,7 @@ mod contract;
 mod evidence;
 mod exchange;
 mod link;
+mod metadata;
 mod provenance;
 mod roles;
 mod state;
@@ -53,6 +54,10 @@ pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
 pub use link::{
     ContractRecord, EvidenceLink, ExchangeEdgeRecord, ProofRecord, ProofTokenMintRecord,
+};
+pub use metadata::{
+    ErasedEntry, Metadata, MetadataRecord, MetadataReport, MetadataValue, OwnedEntry,
+    OwnedMetadataReport,
 };
 pub use provenance::{MetadataEntry, OwnedProvenanceReport, Provenance, ProvenanceReport};
 pub use roles::{AsStandard, Standard};
