@@ -22,6 +22,8 @@ use std::{
     sync::Arc,
 };
 
+use crate::MetadataEntry;
+
 /// A value carried by a metadata entry.
 ///
 /// Blanket-implemented for every owned `Display + Debug + Send + Sync +
@@ -110,6 +112,15 @@ impl ErasedEntry for OwnedEntry {
     }
 }
 
+/// Freeze any live entry into a [`MetadataEntry`] snapshot: the rendered,
+/// `Clone + Ord + Hash` form a [`Certificate`](crate::Certificate) stores.
+/// The structured value is not preserved — that is the point of a snapshot.
+impl<E: ErasedEntry + ?Sized> From<&E> for MetadataEntry {
+    fn from(entry: &E) -> Self {
+        MetadataEntry::new(entry.key(), entry.value().to_string())
+    }
+}
+
 /// A queryable metadata record: a flat namespace of fully-qualified keys over
 /// structured, owned values.
 ///
@@ -153,6 +164,14 @@ pub trait Metadata {
         self.snapshot()
             .iter()
             .map(|entry| entry.key().to_owned())
+            .collect()
+    }
+
+    /// Every value, rendered to a string, in snapshot order.
+    fn values(&self) -> Vec<String> {
+        self.snapshot()
+            .iter()
+            .map(|entry| entry.value().to_string())
             .collect()
     }
 

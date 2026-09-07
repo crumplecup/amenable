@@ -559,17 +559,17 @@ all Kani runs (per `feedback_serialize_kani_calls`).
   moved to Step 1 (coherence with `impl ErasedEntry for OwnedEntry`).
   Deep Creusot translation of `Arc<dyn>` is exercised in Step 5, not here
   — `amenable_core` items are a dependency, not translated locally.
-- [ ] **Step 1 — `Entry` vocabulary + `MetadataEntry` bridge.** Add the
-  typed `Entry` trait and resolve the `ErasedEntry` bridge: either a
-  blanket `impl<E: Entry + Debug> ErasedEntry for E where E::Value:
-  MetadataValue` that coheres with `impl ErasedEntry for OwnedEntry`
-  (partitioned by `E::Value` being unsized / not `MetadataValue`), or a
-  `#[derive(ErasedEntry)]`, or hand impls per vocab type — pick whatever
-  the compiler actually accepts. Shrink `MetadataEntry`'s role: add
-  `impl Entry for MetadataEntry` and `impl<E: ErasedEntry> From<&E> for
-  MetadataEntry`. `Provenance` still untouched. Unit tests: `get_as`,
-  nesting via `prefixed`, `report` output, `MetadataEntry::from`, a
-  `HashMap`-backed `Metadata` impl.
+- [x] **Step 1 — `MetadataEntry` bridge + tests.** Added
+  `impl<E: ErasedEntry + ?Sized> From<&E> for MetadataEntry` (coheres
+  with the reflexive `From<T> for T`) and `Metadata::values()` for parity
+  with `keys()`. `tests/metadata_test.rs` covers `get_as` typed
+  recovery, `prefixed` nesting (value survives re-keying), `report`
+  output incl. empty, `MetadataEntry::from`, and a `HashMap`-backed
+  `Metadata` with a `get` override. The typed `Entry` trait is deferred
+  again — nothing implements it yet, and `#[derive(Metadata)]` (Step 6)
+  builds `Vec<OwnedEntry>` from fields without it. It lands with the
+  first real named-entry vocabulary, and the `ErasedEntry` blanket /
+  coherence question with it. `Provenance` still untouched.
 - [ ] **Step 2 — flip `Provenance` and `Standard`.** `Provenance` becomes
   `trait Provenance: Metadata` — just `certification()`, losing
   `type MetadataIter` and every query/report method (inherited now).
