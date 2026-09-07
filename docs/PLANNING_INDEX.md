@@ -8,10 +8,14 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [METADATA_TRAIT_PLAN.md](METADATA_TRAIT_PLAN.md)
 
-**Status:** 🚧 In progress (2026-09-07). ✅ Step 0 landed — core types
-in `amenable_core/src/metadata.rs`, not wired; all three backends green
-(Verus `485 verified`, Creusot translate clean, Kani sample passes).
-Steps 1–8 remain. Design for a dedicated `Metadata` trait family
+**Status:** 🚧 In progress (2026-09-07). ✅ Steps 0–5 landed —
+`Provenance: Metadata` is live workspace-wide (~65 impls migrated across
+7 crates, `#[derive(Provenance)]` rewritten), all three backends
+re-verified (Verus `485 verified`, Creusot `Proved (149 files)` — the
+`Arc<dyn>` risk did not materialize, Kani sample + full test suite).
+Remaining: Step 6 (the `#[entry]`/`#[entry(nested)]` attribute split +
+standalone `#[derive(Metadata)]`; a stopgap is in place) and Step 8
+(docs). Design for a dedicated `Metadata` trait family
 (`MetadataValue` / `Entry` / `ErasedEntry` / `Metadata`, `OwnedEntry`
 carrier holding `Arc<dyn MetadataValue>`), replacing `MetadataEntry`'s
 role as the de facto metadata interface. `Provenance: Metadata`

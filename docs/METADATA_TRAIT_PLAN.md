@@ -1,18 +1,36 @@
 # Metadata Trait Family Plan
 
-**Status:** 🚧 In progress. ✅ **Step 0 landed** (2026-09-07): the core
-types (`MetadataValue` / `ErasedEntry` / `OwnedEntry` / `Metadata` /
-`MetadataRecord` / `MetadataReport`) are in `amenable_core/src/metadata.rs`,
-not wired to anything. `amenable_core` compiles clean (`clippy -D
-warnings`, `fmt`, all tests); Verus `485 verified, 0 errors` (module
-correctly excluded from the `#[path]` include); Creusot `--cfg creusot`
-graph-wide + `cargo creusot --only=coma` translate clean; a sample Kani
-harness passes with `amenable_core` compiled under kani codegen. The
-`Arc<dyn>` risk did not materialize for the compile paths; the real
-Creusot *translation* test comes in Step 5 when `amenable_creusot` adopts
-`OwnedEntry` (dependency items are not translated). `Entry` + the
-`Entry`→`ErasedEntry` blanket deferred to Step 1 (a coherence question
-with `impl ErasedEntry for OwnedEntry`). Steps 1–8 remain.
+**Status:** 🚧 In progress (2026-09-07). ✅ **Steps 0–5 landed** — the
+whole workspace compiles on the new contract and all three backends
+re-verified:
+
+- `just check-all` / `clippy -D warnings` / `fmt` green workspace-wide;
+  `just check-features` clean.
+- **Verus** `485 verified, 0 errors` — `provenance.rs` / `roles.rs` are
+  no longer `#[path]`-included; `provenance_accommodation.rs` (marker
+  `Provenance` + trimmed `Standard`) stands in, like
+  `witness_accommodation`. `metadata_entry.rs` (the frozen `MetadataEntry`,
+  no `Arc`/`Any`) is included for `cert.rs`.
+- **Creusot** `Proved (149 files) ✔` — `Arc<dyn MetadataValue>` in
+  `CreusotVerifierMetadata::snapshot` (`#[trusted]`) translated fine. **The
+  `Arc<dyn>` risk did not materialize; the `MetadataValueKind` fallback is
+  not needed.**
+- **Kani** — full `cargo test` + a representative harness sample
+  (`calculator::{verify_credit,verify_debit,add}`) pass; the migration
+  only touched reporting code proofs never call.
+
+`Provenance: Metadata` is live. ~65 hand-written `impl Provenance` across
+7 crates converted to `impl Metadata { snapshot } + impl Provenance {}`;
+`#[derive(Provenance)]` rewritten to emit that shape.
+
+**Remaining:** proper **Step 6** — the `#[entry]` (leaf) / `#[entry(nested)]`
+(sub-record) attribute split and a standalone `#[derive(Metadata)]`
+proc-macro. The migration kept the old uniform field-recursion via an
+`impl_scalar_metadata!` stopgap + the `"value"` sentinel key. **Step 8**
+docs (this file's boxes, `AMENABLE_PLAN.md`, READMEs, the
+`creusot_gallery` narrative's stale `impl_scalar_provenance!` reference,
+the worked example). The typed **`Entry`** trait is still deferred —
+nothing implements it yet.
 
 The phased plan at the bottom is the implementation order. Supersedes the
 two open `AMENABLE_PLAN.md` Phase 2 bullets on `Provenance` ("Redesign
@@ -570,24 +588,28 @@ all Kani runs (per `feedback_serialize_kani_calls`).
   builds `Vec<OwnedEntry>` from fields without it. It lands with the
   first real named-entry vocabulary, and the `ErasedEntry` blanket /
   coherence question with it. `Provenance` still untouched.
-- [ ] **Step 2 — flip `Provenance` and `Standard`.** `Provenance` becomes
-  `trait Provenance: Metadata` — just `certification()`, losing
-  `type MetadataIter` and every query/report method (inherited now).
-  `Standard` loses its query passthrough, keeps a thin `report()`.
-  Delete `impl_scalar_provenance!`. Migrate the 3 `amenable_core` impls
-  (`stoplight.rs`, `provenance_test.rs`, scalar-macro fallout) and every
-  `.report()` call site's type annotation. Re-verify `amenable_core` on
-  all three backends.
-- [ ] **Step 3 — `amenable_std`.** `cert.rs`, `verus_witness/machinery.rs`,
-  `creusot_gallery/macro_and_type_translation.rs` (this file *documents* the
-  RPITIT ICE — update its narrative to match the new shape). Re-verify.
-- [ ] **Step 4 — `amenable_kani`.** ~30 impls across ~26 files. Purely
-  mechanical. Spot-verify a representative sample of Kani harnesses plus the
-  full `cargo test` (per `feedback_no_bash_gymnastics`).
-- [ ] **Step 5 — the rest.** `amenable_gaap/transfer.rs`,
-  `amenable_creusot/witness.rs`, `amenable/` integration tests, the
-  `amenable_derive` test-support module and UI tests. Full workspace
-  `just check-all` + `just check-features`.
+- [x] **Step 2 — flip `Provenance` and `Standard`.** `Provenance` is now
+  `trait Provenance: Metadata` (just `certification()`); `Standard` keeps
+  `provenance()` / `report()` / `certification()`, drops the query
+  passthrough. `MetadataEntry` split into `metadata_entry.rs`;
+  `ProvenanceReport` / `OwnedProvenanceReport` deleted;
+  `impl_scalar_provenance!` → `impl_scalar_metadata!`. `#[derive(Provenance)]`
+  rewritten to emit `impl Metadata { snapshot } + impl Provenance {}`.
+  `amenable_core` + `amenable_derive` committed together
+  (`688271d4`), all checks green.
+- [x] **Step 3 — `amenable_std`** (+ `amenable_gaap`, committed
+  `7f983c02`). `cert.rs`, `verus_witness/machinery.rs`, `rust_std/types.rs`
+  (`OwnedMetadataReport`), the `RustStdProvenance` `WitnessArtifact` path.
+  `creusot_gallery/macro_and_type_translation.rs`'s narrative still says
+  `impl_scalar_provenance!` — deferred to Step 8 (it's doc text in raw
+  strings, not a compile blocker).
+- [x] **Step 4 — `amenable_kani`** (committed `14c3eb35`). 58 `impl
+  Provenance` across 23 files, semi-automated. `just check-all-package`
+  green; representative harness sample verified.
+- [x] **Step 5 — the rest** (`amenable_creusot` + `amenable` `e03db88a`;
+  `amenable_verus` `81a3a702`; creusot artifacts `be07f851`). Full
+  workspace `just check-all` + `just check-features` clean; `verify-verus`
+  / `verify-creusot` green.
 - [ ] **Step 6 — `#[derive(Metadata)]`, struct support.** New expansion in
   `amenable_derive` reusing `attr_options.rs` (container `#[metadata(crate
   = "…")]`; field `#[entry]` leaf / `#[entry(nested)]` sub-record, with
