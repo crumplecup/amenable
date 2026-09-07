@@ -517,13 +517,21 @@ a bare `String`.
 - [ ] Redesign `Evidence` around rich associated output types (`type Lineage`,
   `type Audit`) rather than a fixed `&'static str`/`&'static [&'static str]`
   reporting shape.
-- [ ] Redesign `Provenance` from the current iter-only capability into a
+- [x] Redesign `Provenance` from the current iter-only capability into a
   richer trait over concrete user-defined structs and enums, with predictable
-  metadata projection plus convenience methods built from it.
-- [ ] Add `amenable_derive` as a proc-macro crate hosting
-  `#[derive(Provenance)]`, starting with struct support.
-- [ ] Extend `#[derive(Provenance)]` to enums, including tagged variants and
-  payload fields, with explicit collision rules and deterministic lowering.
+  metadata projection plus convenience methods built from it. **Done via the
+  dedicated `Metadata` trait** (`docs/METADATA_TRAIT_PLAN.md`):
+  `trait Provenance: Metadata`, where `Metadata` is the queryable key/value
+  mechanism (`snapshot()` + `get` / `get_as::<T>` / `keys` / `values` / `len`
+  / `report`, all owned) and `Provenance` adds only `certification()` and the
+  constitutional-role marker. `MetadataEntry` shrinks to the frozen
+  certificate snapshot; the live carrier is `OwnedEntry` (an `Arc<dyn
+  MetadataValue>` value, downcastable via `get_as`). All three backends
+  re-verified.
+- [x] Add `amenable_derive` as a proc-macro crate hosting
+  `#[derive(Provenance)]` and `#[derive(Metadata)]`, struct support.
+- [x] Extend the derive to enums, including tagged variants and payload
+  fields (`#[metadata(tag = "...")]`, deterministic per-variant lowering).
 - [x] Confirm the derive-based provenance model is sufficient to register a
   Rust-standard-library trust decision as a certification (the `RustStdType`
   surface in `amenable_std` is the first proving ground).

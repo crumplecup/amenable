@@ -17,7 +17,8 @@ use super::model::{
             CreusotGalleryExpectation::Ice,
             r#"
 // Reduced repro (this exact shape lived in amenable_creusot::witness before
-// the fix — see amenable_core::Provenance's own doc comment):
+// the fix — the metadata layer has since been redesigned again, but the
+// creusot-rustc RPITIT finding this case records still holds):
 trait Provenance {
     fn metadata(&self) -> impl Iterator<Item = MetadataEntry>;
 }
@@ -40,9 +41,10 @@ impl Provenance for CreusotVerifierMetadata {
 // always-compiled code, swept up because it's local to a crate that
 // depends on creusot-std at all.
 //
-// Fix: replace with an associated type (`type MetadataIter: Iterator<Item
-// = MetadataEntry>; fn metadata(&self) -> Self::MetadataIter;`) — an
-// ordinary named item, not an opaque one. See amenable_core::Provenance.
+// Fix: never return-position `impl Trait` at an impl site in translated
+// code. The original fix used a named associated iterator type; the
+// current `Metadata` trait sidesteps it further with `fn snapshot(&self)
+// -> Vec<OwnedEntry>` — a concrete return type, no opaque item at all.
 "#.to_owned(),
         ),
     )
@@ -243,10 +245,17 @@ fn verify_string_roundtrip(s: String) -> String { s }
             CreusotGalleryDisposition::FalseTrail,
             CreusotGalleryExpectation::TranslationError,
             r#"
-// Failing form (this exact shape was amenable_creusot::witness's own
-// Provenance impl before the fix — and is still the shape every OTHER
-// verifier backend's own equivalent impl uses, in amenable_kani/
-// amenable_verus, since neither of those crates is ever creusot-translated):
+// The metadata-trait split (docs/METADATA_TRAIT_PLAN.md) has since removed
+// the `Provenance::metadata() -> Self::MetadataIter` shape entirely -- the
+// trait is now `Provenance: Metadata` with `Metadata::snapshot(&self) ->
+// Vec<OwnedEntry>` (no associated iterator type, no `Box<dyn Iterator>`
+// anywhere). But the underlying creusot-rustc finding this case records is
+// unchanged and still worth keeping: a `Box<dyn Iterator<...>>` as the
+// return type of a translated function fails translation.
+
+// Failing form (this exact shape WAS amenable_creusot::witness's own
+// Provenance impl, before both the "use a named iterator" fix AND the
+// later metadata-trait redesign):
 type MetadataIter = Box<dyn Iterator<Item = MetadataEntry>>;
 fn metadata(&self) -> Self::MetadataIter {
     Box::new(FACTS.iter().map(|&(k, v)| MetadataEntry::new(k, v)))
@@ -257,20 +266,15 @@ fn metadata(&self) -> Self::MetadataIter {
 //   amenable_core::MetadataEntry> (dyn support is currently minimal,
 //   please open an issue to improve this feature)
 
-// Working form (this is the real, proven impl, in
-// amenable_creusot::witness today):
-type MetadataIter = std::vec::IntoIter<MetadataEntry>;
-fn metadata(&self) -> Self::MetadataIter {
-    FACTS
-        .iter()
-        .map(|&(k, v)| MetadataEntry::new(k, v))
-        .collect::<Vec<_>>()
-        .into_iter()
+// Working form today (amenable_creusot::witness, `#[trusted]`):
+fn snapshot(&self) -> Vec<OwnedEntry> {
+    FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
 }
-// Only matters for the one Provenance impl actually local to a
-// creusot-translated crate — everywhere else in this workspace, `Box<dyn
-// Iterator<...>>` is the right, general answer (see
-// amenable_core::provenance's impl_scalar_provenance! macro).
+// `Vec<OwnedEntry>` -- a concrete owned collection -- translates fine
+// (with `#[trusted]` shielding the body's VC, since neither `OwnedEntry::
+// new` nor its inner `Arc::new` carries a contract). Only matters for the
+// one `Metadata` impl actually local to a creusot-translated crate;
+// `Box<dyn Iterator<...>>` is not the answer anywhere anymore.
 "#.to_owned(),
         ),
     )

@@ -21,12 +21,18 @@ walks the same macros in the order you'd actually reach for them.
 
 ### Evidence & provenance
 
-- **`#[derive(Provenance)]`** (attrs: `#[provenance(...)]`) — projects a
-  struct's or enum's own fields into structured, chain-derived
-  `Provenance` metadata. Container attributes: `crate = "path"` (default
-  `amenable_core`), `tag = "name"` (the discriminant key an enum's
-  metadata carries, default `"variant"`). Field/variant attributes:
-  `rename = "name"`, `skip`.
+- **`#[derive(Metadata)]`** (attrs: `#[metadata(...)]`) — projects a
+  struct's or enum's own fields into a queryable `Metadata` record
+  (`snapshot()` walks each field's `Metadata::snapshot()`; a scalar field
+  reports one `"value"`-keyed entry the parent re-keys to the field name,
+  a nested `#[derive(Metadata)]` type's entries are spliced under a
+  `"<field>."` prefix). Use this for plain spec/schema types.
+- **`#[derive(Provenance)]`** (attrs: `#[provenance(...)]`) — the same
+  `Metadata` projection **plus** the marker `impl Provenance for T {}`,
+  for schemas that are a constitutional trust basis. Container attributes
+  (both derives): `crate = "path"` (default `amenable_core`), `tag =
+  "name"` (the discriminant key an enum's metadata carries, default
+  `"variant"`). Field/variant attributes: `rename = "name"`, `skip`.
 
   ```rust
   #[derive(Debug, Clone, PartialEq, Eq, Default, amenable_derive::Provenance)]
