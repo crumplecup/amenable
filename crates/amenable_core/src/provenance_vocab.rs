@@ -40,6 +40,12 @@ macro_rules! string_vocab_entry {
             }
         }
 
+        impl From<&str> for $name {
+            fn from(value: &str) -> Self {
+                Self(value.to_owned())
+            }
+        }
+
         impl Entry for $name {
             const KEY: &'static str = $key;
             type Value = str;

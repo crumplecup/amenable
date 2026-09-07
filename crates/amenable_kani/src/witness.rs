@@ -1,6 +1,9 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance, Verifier};
+use amenable_core::{
+    Authority, ConfigurationChannel, ConfigurationSurface, Entry, Evidence, Metadata, OwnedEntry,
+    ProofArtifact, Provenance, SourceUrl, Verifier, VerifierFamily,
+};
 
 /// Kani-specific witness: identifies the Kani proof harness (if any) behind
 /// a piece of evidence, without ever running it.
@@ -30,21 +33,16 @@ pub struct KaniVerifierMetadata;
 impl Metadata for KaniVerifierMetadata {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn snapshot(&self) -> Vec<OwnedEntry> {
-        const FACTS: &[(&str, &str)] = &[
-            ("verifier_family", "kani"),
-            ("authority", "Kani Rust Verifier"),
-            ("source_url", "https://model-checking.github.io/kani/"),
-            ("proof_artifact", "Rust proof harness token stream"),
-            (
-                "configuration_channel",
-                "CLI arguments and KANI_* or PROVE_* environment variables",
-            ),
-            (
-                "configuration_surface",
-                "package selection, flags, timeout, and report output",
-            ),
-        ];
-        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
+        vec![
+            VerifierFamily::new("kani").into_entry(),
+            Authority::new("Kani Rust Verifier").into_entry(),
+            SourceUrl::new("https://model-checking.github.io/kani/").into_entry(),
+            ProofArtifact::new("Rust proof harness token stream").into_entry(),
+            ConfigurationChannel::new("CLI arguments and KANI_* or PROVE_* environment variables")
+                .into_entry(),
+            ConfigurationSurface::new("package selection, flags, timeout, and report output")
+                .into_entry(),
+        ]
     }
 }
 

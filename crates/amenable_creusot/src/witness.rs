@@ -1,6 +1,9 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{Evidence, Metadata, OwnedEntry, Provenance, Verifier};
+use amenable_core::{
+    Authority, ConfigurationChannel, ConfigurationSurface, Entry, Evidence, Metadata, OwnedEntry,
+    ProofArtifact, Provenance, SourceUrl, Verifier, VerifierFamily,
+};
 use creusot_std::macros::trusted;
 
 /// Creusot-specific witness: identifies the Creusot contract (if any) behind
@@ -55,21 +58,20 @@ impl Metadata for CreusotVerifierMetadata {
     // that failed under `why3find` before this attribute was added).
     #[trusted]
     fn snapshot(&self) -> Vec<OwnedEntry> {
-        const FACTS: &[(&str, &str)] = &[
-            ("verifier_family", "creusot"),
-            ("authority", "Creusot project"),
-            ("source_url", "https://creusot-rs.github.io/creusot/"),
-            ("proof_artifact", "Why3-oriented proof token stream"),
-            (
-                "configuration_channel",
+        vec![
+            VerifierFamily::new("creusot").into_entry(),
+            Authority::new("Creusot project").into_entry(),
+            SourceUrl::new("https://creusot-rs.github.io/creusot/").into_entry(),
+            ProofArtifact::new("Why3-oriented proof token stream").into_entry(),
+            ConfigurationChannel::new(
                 "CLI arguments and CREUSOT_* or PROVE_* environment variables",
-            ),
-            (
-                "configuration_surface",
+            )
+            .into_entry(),
+            ConfigurationSurface::new(
                 "package selection, flags, binary path, timeout, and report output",
-            ),
-        ];
-        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
+            )
+            .into_entry(),
+        ]
     }
 }
 

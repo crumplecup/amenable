@@ -18,9 +18,9 @@ pub trait RustStdType {
     fn provenance() -> RustStdProvenance {
         RustStdProvenance::new(
             Self::rust_language_provenance(),
-            SourceUrl::new(Self::rust_doc_url()),
-            TypeName::new(std::any::type_name::<Self>()),
-            SemanticSummary::new(Self::rust_semantics_summary()),
+            Self::rust_doc_url(),
+            std::any::type_name::<Self>(),
+            Self::rust_semantics_summary(),
         )
     }
 
@@ -119,12 +119,15 @@ pub struct RustStdProvenance {
     rust: RustLanguageProvenance,
     /// The canonical documentation URL for the type.
     #[entry(flatten)]
+    #[new(into)]
     source_url: SourceUrl,
     /// The fully-qualified Rust type name being certified.
     #[entry(flatten)]
+    #[new(into)]
     type_name: TypeName,
     /// Concise summary of the semantic promise made by the standard library.
     #[entry(flatten)]
+    #[new(into)]
     semantic_summary: SemanticSummary,
 }
 

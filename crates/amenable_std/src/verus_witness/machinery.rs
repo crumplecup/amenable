@@ -6,8 +6,9 @@
 //! assuming its conclusion).
 
 use amenable_core::{
-    Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier, WitnessArtifact,
-    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
+    Authority, ConfigurationChannel, ConfigurationSurface, Entry, Evidence, Metadata,
+    MetadataEntry, OwnedEntry, ProofArtifact, Provenance, SourceUrl, Verifier, VerifierFamily,
+    WitnessArtifact, WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 
 use crate::{RustStdProvenance, RustStdStandard};
@@ -45,21 +46,18 @@ pub struct VerusVerifierMetadata;
 impl Metadata for VerusVerifierMetadata {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn snapshot(&self) -> Vec<OwnedEntry> {
-        const FACTS: &[(&str, &str)] = &[
-            ("verifier_family", "verus"),
-            ("authority", "Verus project"),
-            ("source_url", "https://verus-lang.github.io/verus/"),
-            ("proof_artifact", "Verus proof module token stream"),
-            (
-                "configuration_channel",
-                "CLI arguments and VERUS_* environment variables",
-            ),
-            (
-                "configuration_surface",
+        vec![
+            VerifierFamily::new("verus").into_entry(),
+            Authority::new("Verus project").into_entry(),
+            SourceUrl::new("https://verus-lang.github.io/verus/").into_entry(),
+            ProofArtifact::new("Verus proof module token stream").into_entry(),
+            ConfigurationChannel::new("CLI arguments and VERUS_* environment variables")
+                .into_entry(),
+            ConfigurationSurface::new(
                 "binary path, source selection, flags, timeout, and report output",
-            ),
-        ];
-        FACTS.iter().map(|&(k, v)| OwnedEntry::new(k, v)).collect()
+            )
+            .into_entry(),
+        ]
     }
 }
 
