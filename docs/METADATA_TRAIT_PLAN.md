@@ -23,14 +23,17 @@ re-verified:
 7 crates converted to `impl Metadata { snapshot } + impl Provenance {}`;
 `#[derive(Provenance)]` rewritten to emit that shape.
 
-**Remaining:** proper **Step 6** — the `#[entry]` (leaf) / `#[entry(nested)]`
-(sub-record) attribute split and a standalone `#[derive(Metadata)]`
-proc-macro. The migration kept the old uniform field-recursion via an
-`impl_scalar_metadata!` stopgap + the `"value"` sentinel key. **Step 8**
-docs (this file's boxes, `AMENABLE_PLAN.md`, READMEs, the
-`creusot_gallery` narrative's stale `impl_scalar_provenance!` reference,
-the worked example). The typed **`Entry`** trait is still deferred —
-nothing implements it yet.
+✅ **Step 6 (part) + Step 8 done** (`f01e2450`, `81e79f9f`): standalone
+`#[derive(Metadata)]` added; `#[derive(Provenance)]` delegates to it;
+`#[metadata(..)]`/`#[provenance(..)]` interchangeable; docs refreshed
+(`AMENABLE_PLAN.md`, `creusot_gallery` narratives, `amenable_derive`
+README, `WidgetSchema` worked example in `metadata_test.rs`).
+
+**Remaining:** the `#[entry]` (leaf) / `#[entry(nested)]` (sub-record)
+attribute split — deferred as its own task (~40 derive sites + fixtures).
+The uniform field-recursion + `impl_scalar_metadata!` + `"value"` sentinel
+stay. The typed **`Entry`** trait is still deferred — nothing implements
+it yet.
 
 The phased plan at the bottom is the implementation order. Supersedes the
 two open `AMENABLE_PLAN.md` Phase 2 bullets on `Provenance` ("Redesign
@@ -610,21 +613,27 @@ all Kani runs (per `feedback_serialize_kani_calls`).
   `amenable_verus` `81a3a702`; creusot artifacts `be07f851`). Full
   workspace `just check-all` + `just check-features` clean; `verify-verus`
   / `verify-creusot` green.
-- [ ] **Step 6 — `#[derive(Metadata)]`, struct support.** New expansion in
-  `amenable_derive` reusing `attr_options.rs` (container `#[metadata(crate
-  = "…")]`; field `#[entry]` leaf / `#[entry(nested)]` sub-record, with
-  `skip` / `rename` / `flatten` modifiers). Generates `impl Metadata for T`
-  — `snapshot` walks the fields, `get` key-splits — with leaf fields
-  bounded `MetadataValue` and nested fields bounded `Metadata` in the
-  `where` clause. `#[derive(Provenance)]` reuses this exact codegen and
-  appends `impl Provenance for T {}` (see Open Questions on whether the two
-  stay distinct). Convert the hand-written `amenable_core` impls the derive
-  can now reach.
-- [ ] **Step 7 — `#[derive(Metadata)]`, enum support.** Tagged variants +
-  payload fields, mirroring today's `#[derive(Provenance)]` enum lowering.
-- [ ] **Step 8 — docs.** Tick the `AMENABLE_PLAN.md` Phase 2 boxes, rewrite
-  `provenance.rs` module docs, update the `amenable_core` / `amenable_std`
-  READMEs, add the worked example to the appropriate crate.
+- [~] **Step 6 — the derives.** ✅ Standalone `#[proc_macro_derive(Metadata,
+  attributes(metadata))]` added (`f01e2450`): emits just the `impl Metadata`
+  that `#[derive(Provenance)]` already generates; `#[derive(Provenance)]`
+  now delegates to the shared `expand_metadata` + appends `impl Provenance
+  for T {}`. `#[metadata(..)]` and `#[provenance(..)]` are interchangeable
+  schema attrs. Enum lowering (tagged variants + payloads) already worked
+  and carries over unchanged (was Step 7).
+  ⏳ **Not done: the `#[entry]` (leaf) / `#[entry(nested)]` (sub-record)
+  attribute split.** It would need annotating ~40 existing `#[derive(
+  Provenance)]` sites and reworking their `expected_entries` fixtures, so
+  it's its own task. The uniform field-recursion (`Metadata::snapshot`
+  everywhere) + `impl_scalar_metadata!` + the `"value"` sentinel key stay
+  in place. The sentinel's one latent bug — a *nested* struct with a field
+  literally named `value` collapses wrong — is not hit by any current
+  schema.
+- [x] **Step 8 — docs.** `AMENABLE_PLAN.md` Phase 2 bullets ticked;
+  `amenable_std` `creusot_gallery` RPITIT / `Box<dyn Iterator>` narratives
+  refreshed; `amenable_derive/README.md` documents both derives; trait doc
+  comments were updated inline during the migration. (A dedicated worked
+  example lives in `amenable_core/tests/metadata_test.rs` —
+  `WidgetSchema`/`MotorSchema` — rather than a separate example file.)
 
 ## Fallback (if Step 0 fails on Creusot/Verus `dyn`)
 
