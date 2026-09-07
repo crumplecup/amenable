@@ -3,7 +3,10 @@
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
-use amenable_core::{OwnedMetadataReport, Provenance as _, Registry};
+use amenable_core::{
+    Authority, AuthorityKind, OwnedMetadataReport, Provenance as _, Registry, SemanticSummary,
+    SourceCrate, SourceModule, SourceUrl, TypeName,
+};
 use amenable_derive::{Provenance, Standard};
 
 /// Provenance helper for Rust standard-library-backed carriers.
@@ -15,9 +18,9 @@ pub trait RustStdType {
     fn provenance() -> RustStdProvenance {
         RustStdProvenance::new(
             Self::rust_language_provenance(),
-            Self::rust_doc_url(),
-            std::any::type_name::<Self>(),
-            Self::rust_semantics_summary(),
+            SourceUrl::new(Self::rust_doc_url()),
+            TypeName::new(std::any::type_name::<Self>()),
+            SemanticSummary::new(Self::rust_semantics_summary()),
         )
     }
 
@@ -62,44 +65,30 @@ pub trait RustStdType {
 #[provenance(crate = "amenable_core")]
 pub struct RustLanguageProvenance {
     /// The class of authority this provenance record represents.
-    #[entry]
-    #[new(into)]
-    authority_kind: String,
+    #[entry(flatten)]
+    authority_kind: AuthorityKind,
     /// The authorizing body for the documented semantics.
-    #[entry]
-    #[new(into)]
-    authority: String,
+    #[entry(flatten)]
+    authority: Authority,
     /// The Rust crate that normatively defines the type.
-    #[entry]
-    #[new(into)]
-    source_crate: String,
+    #[entry(flatten)]
+    source_crate: SourceCrate,
     /// The Rust module path that normatively defines the type.
-    #[entry]
-    #[new(into)]
-    source_module: String,
+    #[entry(flatten)]
+    source_module: SourceModule,
 }
 
 impl RustLanguageProvenance {
     /// Provenance for Rust's primitive carriers as documented through `core`.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn core_primitive() -> Self {
-        Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            "core",
-            "core::primitive",
-        )
+        Self::for_source("core", "core::primitive")
     }
 
     /// Provenance for `String` as documented through `alloc`.
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn alloc_string() -> Self {
-        Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            "alloc",
-            "alloc::string",
-        )
+        Self::for_source("alloc", "alloc::string")
     }
 
     /// Provenance for a type documented through `source_crate`/`source_module`.
@@ -109,10 +98,10 @@ impl RustLanguageProvenance {
     )]
     pub fn for_source(source_crate: impl Into<String>, source_module: impl Into<String>) -> Self {
         Self::new(
-            "external_standard",
-            "Rust Project Developers",
-            source_crate,
-            source_module,
+            AuthorityKind::ExternalStandard,
+            Authority::new("Rust Project Developers"),
+            SourceCrate::new(source_crate),
+            SourceModule::new(source_module),
         )
     }
 }
@@ -129,17 +118,14 @@ pub struct RustStdProvenance {
     #[entry(nested)]
     rust: RustLanguageProvenance,
     /// The canonical documentation URL for the type.
-    #[entry]
-    #[new(into)]
-    source_url: String,
+    #[entry(flatten)]
+    source_url: SourceUrl,
     /// The fully-qualified Rust type name being certified.
-    #[entry]
-    #[new(into)]
-    type_name: String,
+    #[entry(flatten)]
+    type_name: TypeName,
     /// Concise summary of the semantic promise made by the standard library.
-    #[entry]
-    #[new(into)]
-    semantic_summary: String,
+    #[entry(flatten)]
+    semantic_summary: SemanticSummary,
 }
 
 impl Display for RustStdProvenance {
