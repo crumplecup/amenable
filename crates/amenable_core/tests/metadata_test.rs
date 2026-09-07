@@ -136,6 +136,49 @@ impl Metadata for MapMetadata {
     }
 }
 
+/// `#[derive(Metadata)]` on a plain spec struct — the widget use case: a
+/// composite queried by fully-qualified key, structured values back, no
+/// `impl Provenance`.
+#[derive(Debug, Clone, Default, amenable_derive::Metadata)]
+#[metadata(crate = "amenable_core")]
+struct MotorSchema {
+    max_rpm: u32,
+    part_number: String,
+}
+
+#[derive(Debug, Clone, Default, amenable_derive::Metadata)]
+#[metadata(crate = "amenable_core")]
+struct WidgetSchema {
+    serial: String,
+    motor: MotorSchema,
+}
+
+#[test]
+fn derive_metadata_composes_and_stays_out_of_the_provenance_role() {
+    amenable_core::init_tracing();
+    let widget = WidgetSchema {
+        serial: "W-9".to_string(),
+        motor: MotorSchema {
+            max_rpm: 15_000,
+            part_number: "M-3".to_string(),
+        },
+    };
+
+    assert_eq!(
+        widget.keys(),
+        vec!["serial", "motor.max_rpm", "motor.part_number"]
+    );
+    assert_eq!(widget.get_as::<u32>("motor.max_rpm"), Some(15_000));
+    assert_eq!(
+        widget.get_as::<String>("motor.part_number"),
+        Some("M-3".to_string())
+    );
+
+    // `#[derive(Metadata)]` does not make the type a `Provenance`.
+    fn assert_metadata<M: Metadata>(_: &M) {}
+    assert_metadata(&widget);
+}
+
 #[test]
 fn a_map_backed_record_satisfies_metadata() {
     amenable_core::init_tracing();

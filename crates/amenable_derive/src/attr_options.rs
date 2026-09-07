@@ -1,9 +1,17 @@
-//! Shared `#[provenance(..)]` / `#[witness(..)]` attribute parsing and
-//! field-type collection, used by both `#[derive(Provenance)]` (`provenance`)
-//! and `#[derive(Witness)]` (`witness`).
+//! Shared `#[metadata(..)]` / `#[provenance(..)]` / `#[witness(..)]` attribute
+//! parsing and field-type collection, used by `#[derive(Metadata)]`
+//! (`metadata`), `#[derive(Provenance)]` (`provenance`) and `#[derive(Witness)]`
+//! (`witness`).
 
 use derive_getters::Getters;
 use syn::{Data, Error, Field, Fields, LitStr, Path, Type, parse_quote};
+
+/// Whether an attribute is one of the two interchangeable schema attributes
+/// (`#[metadata(..)]` on a `#[derive(Metadata)]`, `#[provenance(..)]` on a
+/// `#[derive(Provenance)]`).
+fn is_schema_attr(attr: &syn::Attribute) -> bool {
+    attr.path().is_ident("metadata") || attr.path().is_ident("provenance")
+}
 
 #[derive(Getters)]
 pub(crate) struct ProvenanceContainerOptions {
@@ -102,10 +110,7 @@ pub(crate) fn parse_provenance_container_options(
 ) -> syn::Result<ProvenanceContainerOptions> {
     let mut options = ProvenanceContainerOptions::default();
 
-    for attr in attrs
-        .iter()
-        .filter(|attr| attr.path().is_ident("provenance"))
-    {
+    for attr in attrs.iter().filter(|attr| is_schema_attr(attr)) {
         attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("crate") {
                 let value: LitStr = meta.value()?.parse()?;
@@ -159,10 +164,7 @@ pub(crate) fn parse_witness_container_options(
 pub(crate) fn parse_member_options(attrs: &[syn::Attribute]) -> syn::Result<MemberOptions> {
     let mut options = MemberOptions::default();
 
-    for attr in attrs
-        .iter()
-        .filter(|attr| attr.path().is_ident("provenance"))
-    {
+    for attr in attrs.iter().filter(|attr| is_schema_attr(attr)) {
         attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("rename") {
                 let value: LitStr = meta.value()?.parse()?;

@@ -1,6 +1,13 @@
-//! `#[derive(Provenance)]`: a `Metadata` impl whose `snapshot()` walks every
-//! non-`#[provenance(skip)]` field's own `Metadata::snapshot()`, plus a marker
-//! `impl Provenance for T {}`.
+//! `#[derive(Metadata)]` / `#[derive(Provenance)]`: a `Metadata` impl whose
+//! `snapshot()` walks every non-`#[metadata(skip)]` / non-`#[provenance(skip)]`
+//! field's own `Metadata::snapshot()`. `#[derive(Provenance)]` additionally
+//! emits the marker `impl Provenance for T {}`.
+//!
+//! A scalar field reports itself as a single `"value"`-keyed entry (via
+//! `amenable_core`'s `impl_scalar_metadata!`), which the parent re-keys to the
+//! field name; a nested `#[derive(Metadata)]` type's entries are spliced in
+//! under a `"<field>."` prefix. `#[metadata(rename = "...")]` overrides the key
+//! or prefix; `#[metadata(skip)]` omits the field.
 
 use quote::{format_ident, quote};
 use syn::{
@@ -13,20 +20,13 @@ use crate::attr_options::{
     parse_provenance_container_options,
 };
 
+/// `#[derive(Metadata)]`: the `impl Metadata` alone.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
-pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+pub(crate) fn expand_metadata(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let options = parse_provenance_container_options(&input.attrs)?;
     let name = &input.ident;
     let crate_path = options.crate_path();
-    let field_types = collect_field_types(&input.data)?;
-    let mut generics = input.generics.clone();
-    let where_clause = generics.make_where_clause();
-
-    for field_type in field_types {
-        let predicate: WherePredicate = parse_quote!(#field_type: ::#crate_path::Metadata);
-        where_clause.predicates.push(predicate);
-    }
-
+    let generics = augmented_generics(input, crate_path)?;
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let snapshot_body = match &input.data {
@@ -35,7 +35,7 @@ pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2:
         Data::Union(data) => {
             return Err(Error::new_spanned(
                 data.union_token,
-                "Provenance can only be derived for structs and enums",
+                "Metadata can only be derived for structs and enums",
             ));
         }
     };
@@ -46,9 +46,44 @@ pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2:
                 #snapshot_body
             }
         }
+    })
+}
+
+/// `#[derive(Provenance)]`: the same `impl Metadata` the `Metadata` derive
+/// emits, plus the marker `impl Provenance for T {}`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
+pub(crate) fn expand_provenance(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+    let metadata_impl = expand_metadata(input)?;
+
+    let options = parse_provenance_container_options(&input.attrs)?;
+    let crate_path = options.crate_path();
+    let name = &input.ident;
+    let generics = augmented_generics(input, crate_path)?;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
+    Ok(quote! {
+        #metadata_impl
 
         impl #impl_generics ::#crate_path::Provenance for #name #ty_generics #where_clause {}
     })
+}
+
+/// The input's generics with a `FieldTy: Metadata` bound added per non-skip
+/// field.
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(input, crate_path))
+)]
+fn augmented_generics(input: &DeriveInput, crate_path: &Path) -> syn::Result<syn::Generics> {
+    let mut generics = input.generics.clone();
+    let where_clause = generics.make_where_clause();
+
+    for field_type in collect_field_types(&input.data)? {
+        let predicate: WherePredicate = parse_quote!(#field_type: ::#crate_path::Metadata);
+        where_clause.predicates.push(predicate);
+    }
+
+    Ok(generics)
 }
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(data)))]

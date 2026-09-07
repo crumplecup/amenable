@@ -34,7 +34,7 @@ use exchange::{ExchangeArgs, expand_exchange};
 use harness::{HarnessRegistration, expand_harness};
 use kani_compose::expand_kani_compose;
 use proof_token::expand_proof_token;
-use provenance::expand_provenance;
+use provenance::{expand_metadata, expand_provenance};
 use sidecar::expand_sidecar;
 use standard::expand_standard;
 use state_machine::expand_state_machine;
@@ -80,9 +80,24 @@ pub fn gallery_harness(input: TokenStream) -> TokenStream {
     }
 }
 
-/// Generate a `Provenance` impl (`metadata()` walking every non-`#[provenance(skip)]`
-/// field's own `Provenance::metadata()`), from a `#[derive(Provenance)]` on
-/// a struct or enum.
+/// Generate a `Metadata` impl (`snapshot()` walking every non-`#[metadata(skip)]`
+/// field's own `Metadata::snapshot()`), from a `#[derive(Metadata)]` on a
+/// struct or enum. Use this for plain spec/schema types that are not a trust
+/// basis; use `#[derive(Provenance)]` when they are.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
+#[proc_macro_derive(Metadata, attributes(metadata))]
+pub fn derive_metadata(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_metadata(&input) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate a `Metadata` impl (as `#[derive(Metadata)]`) plus the marker
+/// `impl Provenance for T {}`, from a `#[derive(Provenance)]` on a struct or
+/// enum.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
 #[proc_macro_derive(Provenance, attributes(provenance))]
 pub fn derive_provenance(input: TokenStream) -> TokenStream {
