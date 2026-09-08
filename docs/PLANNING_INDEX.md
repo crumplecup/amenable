@@ -9,12 +9,12 @@ This file tracks all planning documents for the amenable project.
 **Document:** [METADATA_TRAIT_PLAN.md](METADATA_TRAIT_PLAN.md)
 
 **Status:** ✅ Complete (2026-09-07). `Provenance: Metadata` live
-workspace-wide (~65 impls migrated across 7 crates); both derives
-(`#[derive(Metadata)]`, `#[derive(Provenance)]`); the `#[entry]` /
-`#[entry(nested)]` / `#[entry(flatten)]` field-role split (additive); the
-typed `Entry` trait with its first vocabulary
-(`amenable_core::provenance_vocab` — `Authority`,
-`AuthorityKind` closed enum, `Source*`, `VerifierFamily`, etc.), with
+workspace-wide (~65 impls migrated across 7 crates); three derives
+(`#[derive(Metadata)]`, `#[derive(Provenance)]`, `#[derive(Entry)]`); the
+`#[entry]` / `#[entry(nested)]` / `#[entry(flatten)]` field-role split
+(additive); the typed `Entry` trait with its first vocabulary
+(`amenable_std::provenance_vocab` — `Authority`, `AuthorityKind` closed
+enum, `Source*`, `VerifierFamily`, etc., all `#[derive(Entry)]`), with
 `RustLanguageProvenance` / `RustStdProvenance` and the three
 verifier-descriptor records rewired to it (killing the 3-way `const FACTS`
 drift). All three backends re-verified after every phase (Verus `485

@@ -34,14 +34,19 @@ the new contract and all three backends re-verified):
 `#[derive(Metadata)]`; `#[entry]` / `#[entry(nested)]` / `#[entry(flatten)]`
 field-role split (additive); docs refreshed.
 
-✅ **Typed `Entry` trait done** (`a2343cfe`, `eb28f550`, `cb4850e8`):
+✅ **Typed `Entry` trait done** (`a2343cfe`..`cb4850e8`, then `0a3de503`):
 `Entry` = `const KEY: &'static str` (canonical per type) + `type Value` +
-`value()` + `into_entry()`. First vocabulary in
-`amenable_core::provenance_vocab` (`Authority`, `SourceCrate/Module/Url`,
-`TypeName`, `SemanticSummary`, `VerifierFamily`, `ProofArtifact`,
-`ConfigurationChannel/Surface`, + `AuthorityKind` as a closed enum),
-macro-generated. `RustLanguageProvenance` / `RustStdProvenance` rewired to
-vocab `#[entry(flatten)]` fields; the three verifier-descriptor records
+`value()` + `into_entry()`. **`#[derive(Entry)]`** (`amenable_derive`)
+emits `impl Entry` + `impl Metadata` (the one canonically-keyed entry);
+`#[entry(key = "...", crate = "...")]`. First vocabulary in
+**`amenable_std::provenance_vocab`** (moved from `amenable_core`, which
+can't use `#[derive]`): `Authority`, `SourceCrate/Module/Url`, `TypeName`,
+`SemanticSummary`, `VerifierFamily`, `ProofArtifact`,
+`ConfigurationChannel/Surface` — thin macro wrapping `#[derive(Entry)]` +
+`new`/`From<&str>` — and `AuthorityKind` as a `#[derive(Entry,
+derive_more::Display)]` closed enum, no hand impls.
+`RustLanguageProvenance` / `RustStdProvenance` use vocab
+`#[entry(flatten)]` fields; the three verifier-descriptor records
 (`KaniVerifierMetadata` / `CreusotVerifierMetadata` /
 `VerusVerifierMetadata`) build their entries from the same vocab via
 `into_entry()` — the six shared keys can no longer drift. No `ErasedEntry`
