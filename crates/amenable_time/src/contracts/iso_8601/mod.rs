@@ -12,9 +12,37 @@
 //! the live count.
 
 mod calendar;
+mod combined_and_format;
 mod definitions;
 mod duration_units;
 mod time_of_day;
+mod utc_offset;
+
+pub use combined_and_format::{
+    BasicFormatUsesMinimumComponentsForRequiredAccuracy, ColonSeparatesTimeComponents,
+    CombinedDateTimeDateComponentMustNotUseReducedAccuracy,
+    CombinedDateTimePermitsCalendarDateComponent, CombinedDateTimePermitsOrdinalDateComponent,
+    CombinedDateTimePermitsWeekDateComponent,
+    CombinedDateTimeUsesSingleFormatAcrossDateAndTimeComponents,
+    CombinedDateTimeUsesTimeDesignator, CompleteRepresentationCarriesAllRequiredComponents,
+    DateTimeFormatRepresentationDescribesRepresentationFamily,
+    DateTimeFormatRepresentationsForbiddenInTelexRepertoire,
+    DateTimeRepresentationIdentifiesPointIntervalOrRecurrence,
+    ExpandedRepresentationRequiresAdditionalAgreement, FixedWidthComponentsRequireLeadingZeros,
+    FormatRepresentationUsesPlaceholderCharactersForDigitsAndSigns, HyphenSeparatesDateComponents,
+    LiteralFormatCharactersCopyIntoRepresentations,
+    ReducedAccuracyRepresentationOmitsLowerOrderComponents,
+    SpaceForbiddenUnlessExplicitlyPermitted, UnderlineFallbackPrecedesQualifiedFormatCharacter,
+    UnderlinedFormatPlaceholderRepresentsZeroOrMoreDigits, UtcDesignatorIsUppercaseZ,
+    WeekDateUsesWeekDesignator,
+};
+pub use utc_offset::{
+    UtcDifferenceAppendedImmediatelyWithoutSpace, UtcDifferenceExpressionIsNotSelfStanding,
+    UtcDifferenceMinutesOmittedOnlyForIntegralHourOffsets,
+    UtcDifferenceSignEncodesDirectionRelativeToUtc, UtcOfDayUsesTrailingZuluDesignatorImmediately,
+    UtcOffsetCarriesSignHourAndOptionalMinute, UtcOffsetHourInRangeZeroToTwentyThree,
+    UtcOffsetMinuteInRangeZeroToFiftyNine,
+};
 
 pub use duration_units::{
     CalendarDayDurationMayBeModifiedByLeapSecondsOrLocalTimeShifts,
