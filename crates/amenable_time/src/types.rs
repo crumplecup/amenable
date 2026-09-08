@@ -1,41 +1,16 @@
 //! Neutral temporal descriptors — the accord vocabulary that crosses
-//! trait boundaries.
+//! trait boundaries, ported from `elicit_temporal::types` (259
+//! definitions there).
 //!
-//! Ported from `elicit_temporal::types` (259 definitions there). This
-//! file holds the minimal set the Phase 0 slice needs; the rest lands in
-//! plan Phase 2, at which point the descriptor structs also gain
-//! `#[derive(Evidence)]` so they can serve as `Sidecar::Primary`
-//! payloads. Descriptors carry **no** construction-time validation — a
-//! `month = 13` is rejected by a proof, not a constructor guard
-//! (`docs/AMENABLE_TIME_PLAN.md`, decision 5).
+//! This file holds only the two closed enums the Phase 0 slice needs
+//! (`TemporalComponent` for `TemporalReporter`-adjacent typing,
+//! `SerializationProfile` for `TemporalReporter` and `TemporalError`).
+//! The descriptor structs (`CalendarDateDescriptor`, …) and the
+//! `#[derive(Evidence)]` pass land in Phase 2. Descriptors carry **no**
+//! construction-time validation — a `month = 13` is rejected by a proof,
+//! not a constructor guard (`docs/AMENABLE_TIME_PLAN.md`, decision 5).
 
 use strum::EnumIter;
-
-/// The fractional-second component of a temporal value: the decimal digits
-/// after the fractional separator, verbatim.
-///
-/// The first descriptor carrying real string data — the Phase 0
-/// `Exchange` edge (`amenable_kani::time`) threads one through a
-/// `Sidecar` to exercise the non-`Copy` payload path. No construction
-/// validation (`docs/AMENABLE_TIME_PLAN.md`, decision 5): whether the
-/// digits are well-formed is a proof's job, not a constructor's.
-#[derive(
-    Debug,
-    Clone,
-    Default,
-    PartialEq,
-    Eq,
-    Hash,
-    derive_getters::Getters,
-    derive_new::new,
-    amenable_derive::Evidence,
-)]
-#[evidence(basis = "Self")]
-pub struct FractionalSecond {
-    /// The decimal digits after the fractional separator.
-    #[new(into)]
-    digits: String,
-}
 
 /// The smallest named temporal unit relevant to ISO 8601 precision rules.
 #[derive(
