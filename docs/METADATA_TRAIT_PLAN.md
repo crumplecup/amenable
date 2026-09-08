@@ -1,8 +1,15 @@
 # Metadata Trait Family Plan
 
-**Status:** 🚧 In progress (2026-09-07). ✅ **Steps 0–5 landed** — the
-whole workspace compiles on the new contract and all three backends
-re-verified:
+**Status:** ✅ **Complete (2026-09-07).** The whole plan is implemented —
+`Provenance: Metadata` workspace-wide, both derives, the `#[entry]`
+field-role split, and the typed `Entry` trait with its first vocabulary.
+All three backends re-verified after every phase. See the phase notes
+below; the only residue is the legacy `Bare` derive path
+(`impl_scalar_metadata!` + `"value"` sentinel), kept for un-annotated
+fields, whose removal is cosmetic.
+
+Phase history (Steps 0–5 landed first — the whole workspace compiles on
+the new contract and all three backends re-verified):
 
 - `just check-all` / `clippy -D warnings` / `fmt` green workspace-wide;
   `just check-features` clean.
@@ -25,14 +32,24 @@ re-verified:
 
 ✅ **Steps 6 + 8 done** (`f01e2450`, `7cb7adc6`, `81e79f9f`): standalone
 `#[derive(Metadata)]`; `#[entry]` / `#[entry(nested)]` / `#[entry(flatten)]`
-field-role split (additive — legacy `Bare` behaviour preserved for
-un-annotated fields); docs refreshed.
+field-role split (additive); docs refreshed.
 
-**Remaining:** the typed **`Entry`** trait — deferred, nothing implements
-it yet; it lands with the first named-entry vocabulary along with its
-`ErasedEntry`-blanket coherence question. The `Bare` path's
-`impl_scalar_metadata!` + `"value"` sentinel could be retired once every
-derive site is annotated `#[entry]` — cosmetic, not urgent.
+✅ **Typed `Entry` trait done** (`a2343cfe`, `eb28f550`, `cb4850e8`):
+`Entry` = `const KEY: &'static str` (canonical per type) + `type Value` +
+`value()` + `into_entry()`. First vocabulary in
+`amenable_core::provenance_vocab` (`Authority`, `SourceCrate/Module/Url`,
+`TypeName`, `SemanticSummary`, `VerifierFamily`, `ProofArtifact`,
+`ConfigurationChannel/Surface`, + `AuthorityKind` as a closed enum),
+macro-generated. `RustLanguageProvenance` / `RustStdProvenance` rewired to
+vocab `#[entry(flatten)]` fields; the three verifier-descriptor records
+(`KaniVerifierMetadata` / `CreusotVerifierMetadata` /
+`VerusVerifierMetadata`) build their entries from the same vocab via
+`into_entry()` — the six shared keys can no longer drift. No `ErasedEntry`
+blanket needed (vocab types are `Metadata` one-entry records).
+
+**Nothing left in this plan.** The `Bare` path's `impl_scalar_metadata!` +
+`"value"` sentinel remain as legacy support for un-annotated derive
+fields; retiring them is cosmetic.
 
 The phased plan at the bottom is the implementation order. Supersedes the
 two open `AMENABLE_PLAN.md` Phase 2 bullets on `Provenance` ("Redesign

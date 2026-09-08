@@ -8,16 +8,18 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [METADATA_TRAIT_PLAN.md](METADATA_TRAIT_PLAN.md)
 
-**Status:** 🚧 In progress (2026-09-07). ✅ Steps 0–5 landed —
-`Provenance: Metadata` is live workspace-wide (~65 impls migrated across
-7 crates, `#[derive(Provenance)]` rewritten), all three backends
-re-verified (Verus `485 verified`, Creusot `Proved (149 files)` — the
-`Arc<dyn>` risk did not materialize, Kani sample + full test suite).
-Steps 6 + 8 done: standalone `#[derive(Metadata)]`, the `#[entry]` /
-`#[entry(nested)]` / `#[entry(flatten)]` field-role split (additive —
-legacy behaviour kept for un-annotated fields), docs. Remaining: the
-typed `Entry` trait (nothing implements it yet). Design for a dedicated
-`Metadata` trait family
+**Status:** ✅ Complete (2026-09-07). `Provenance: Metadata` live
+workspace-wide (~65 impls migrated across 7 crates); both derives
+(`#[derive(Metadata)]`, `#[derive(Provenance)]`); the `#[entry]` /
+`#[entry(nested)]` / `#[entry(flatten)]` field-role split (additive); the
+typed `Entry` trait with its first vocabulary
+(`amenable_core::provenance_vocab` — `Authority`,
+`AuthorityKind` closed enum, `Source*`, `VerifierFamily`, etc.), with
+`RustLanguageProvenance` / `RustStdProvenance` and the three
+verifier-descriptor records rewired to it (killing the 3-way `const FACTS`
+drift). All three backends re-verified after every phase (Verus `485
+verified`, Creusot `Proved (149 files)` — the `Arc<dyn>` risk never
+materialized). Design for a dedicated `Metadata` trait family
 (`MetadataValue` / `Entry` / `ErasedEntry` / `Metadata`, `OwnedEntry`
 carrier holding `Arc<dyn MetadataValue>`), replacing `MetadataEntry`'s
 role as the de facto metadata interface. `Provenance: Metadata`
