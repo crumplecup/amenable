@@ -25,6 +25,8 @@ mod contracts;
 mod error;
 mod provenance;
 mod provenance_vocab;
+mod traits;
+mod types;
 
 pub use contracts::{
     FractionalSecondDigitsAreContiguous, FractionalSecondPrecisionDeclared,
@@ -36,3 +38,5 @@ pub use provenance_vocab::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,
     StandardsBody,
 };
+pub use traits::TemporalReporter;
+pub use types::{SerializationProfile, TemporalComponent};

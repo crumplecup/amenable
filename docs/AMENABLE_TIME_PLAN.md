@@ -491,19 +491,28 @@ verify-verus`, per the METADATA plan's own cadence.
       wiring, the Metadata query surface, both tiers, cross-check
       projection, and `EvidenceLink` self-registration. `just
       check-all-package amenable_time` clean.
-- [ ] Port `types.rs`'s `SerializationProfile`, `TemporalComponent`,
-      `PrecisionDescriptor` (the minimal descriptor set `precision`
-      needs) as `Evidence` payloads.
-- [ ] Port `TemporalReporter` as a plain trait (no proofs — cheapest
-      real trait to stand up).
+- [x] Port the minimal descriptor set (`src/types.rs`): `TemporalComponent`
+      and `SerializationProfile` as plain closed enums (`strum::EnumIter`
+      + `derive_more::Display`, house policy). `PrecisionDescriptor` and
+      the `#[derive(Evidence)]` pass deferred to Phase 2 — nothing in
+      Phase 0 outside the (also-deferred) Exchange edge needs them.
+- [x] Port `TemporalReporter` as a plain trait (`src/traits/report.rs`,
+      7 methods) — explicitly *not* an `Exchange`.
 - [ ] One `Exchange` edge end-to-end: pick the single simplest parser
       method (`parse_reduced_local_time` or similar), wire
       `RawInput` → `Proven` sidecars, an `ExchangeEdgeRecord`, and a
       real Kani `Witness<KaniVerifier>` proof for its output proposition.
+      **Scoping fork raised with the user** — full three-backend edge
+      now, or a leaner Kani-only edge with Creusot/Verus companions
+      folded into Phase 4/5 (the Exchange machinery is already proven
+      end-to-end by `stoplight` and `gaap_ledger`; what Phase 0 uniquely
+      de-risked — the `Standard` / provenance / bulk-registration story
+      — is done).
 - [ ] Generate the Creusot + Verus companions for that one edge; verify
-      all three backends.
+      all three backends. *(Gated on the fork above.)*
 - [x] `docs/PLANNING_INDEX.md` entry.
-- [ ] Coverage checklist scaffold.
+- [x] Coverage checklist scaffold — `docs/AMENABLE_TIME_COVERAGE.md`,
+      one row per `elicit_temporal` source module.
 
 Phase 0 exit: the full vertical slice works for one contract module and
 one exchange. Everything after is width.
