@@ -150,6 +150,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "amenable_time"
+version = "0.1.0"
+dependencies = [
+ "amenable_core",
+ "amenable_derive",
+ "amenable_std",
+ "derive-getters",
+ "derive-new",
+ "derive_more",
+ "inventory",
+ "miette",
+ "tracing",
+]
+
+[[package]]
 name = "amenable_verus"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,30 @@
+[package]
+name = "amenable_time"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme = "README.md"
+
+description = "Temporal contract interface: standards-anchored date, time, offset, and timestamp propositions expressed as amenable Standards and Exchanges"
+keywords = ["formal-verification", "proof", "time", "temporal", "provenance"]
+categories = ["date-and-time", "development-tools"]
+
+[dependencies]
+amenable_core = { workspace = true }
+amenable_derive = { workspace = true }
+amenable_std = { workspace = true }
+derive-getters = { workspace = true }
+derive-new = { workspace = true }
+derive_more = { workspace = true }
+inventory = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+miette = { workspace = true }
+
+[lints]
+workspace = true

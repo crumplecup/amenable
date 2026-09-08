@@ -4,6 +4,52 @@ This file tracks all planning documents for the amenable project.
 
 ## Current Active Plans
 
+### Amenable Time (`amenable_time`)
+
+**Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
+
+**Status:** 🔲 In progress (2026-09-08). Plan reviewed, all 7 decisions
+settled. **Phase 0 partially landed**: `crates/amenable_time` exists with
+the error layer, `provenance_vocab` (`NormativeDocument` / `Section` /
+`Status` / `StandardsBody` / `NormativeQuotation` enum / `CrossCheck`),
+the `TemporalProvenance` record, the `temporal_standard!` macro, and
+`contracts::precision` (5 contracts, 6 passing tests) — `just
+check-all-package amenable_time` clean. Remaining Phase 0: minimal
+descriptors, `TemporalReporter`, one end-to-end `Exchange` edge with
+three-backend proofs, coverage checklist.
+Migrate the full scope of `~/repos/elicitation/crates/elicit_temporal`
+(31 files, ~15.6k lines: ~440 contract ZSTs across 9 normative
+authorities, 259 descriptor types, ~35 traits / ~175 methods, ~98
+`ProvableFrom` edges) into a new dedicated `amenable_time` crate,
+re-expressed in `amenable`'s trait family so **every contract type is a
+`Standard`** (citation-only structural contracts) **or `Evidence`** (the
+`proof_composition` aggregates, per the GAAP lesson) **and every trait
+method is an `Exchange`** (`Sidecar` in → `Sidecar` out;
+`TemporalReporter` is the one documented exception). Purpose: put the
+trait system under *width* stress the current worked examples
+(`Stoplight`, `amenable_gaap`, `amenable_std`) never create. 8 phases
+(0: skeleton + one module + one exchange end-to-end on all 3 backends;
+1: all citation-only contracts as `Standard`s; 2: descriptors as
+`Evidence`; 3: the `ProvableFrom` graph → `Establish<C, V>`; 4: trait
+methods → `Exchange`; 5: semantic bundles → composed `Witness<V>` +
+native carriers; 6: real proofs for the genuinely-checkable range /
+ordering / leap-year contracts; 7: surfaces + umbrella certificate + one
+reference backend double). Shared vocabulary + one `TemporalProvenance`
+record + the existing `Registry`/`Certificate` as the umbrella (not
+per-source metadata structs). Contracts + descriptors + `Exchange`
+interfaces in `amenable_time`; `Witness<V>`/`Ensures<V>` impls in
+`amenable_{kani,creusot,verus}::time` (orphan rules; backend-to-backend
+deps stay forbidden). Producer crates (`amenable_time_jiff` etc.) are a
+follow-on, out of scope. 6 open questions flagged for review (vocabulary
+home, macro home, `Establish`'s `V` story, the `Standard`/`Evidence`
+split, descriptor construction-time validation, scale cutoff).
+
+**Description:** MVP-for-proper-testing — the trait interface only
+becomes load-bearing once something large actively uses it.
+`elicit_temporal` is a ready-made large contract-first interface crate
+(no implementation, no current consumers) covering ISO 8601-1/-2, RFC
+3339, RFC 9557, CalConnect CC 18011, IANA TZDB, SI/BIPM, and LoC EDTF.
+
 ### Metadata trait family
 
 **Document:** [METADATA_TRAIT_PLAN.md](METADATA_TRAIT_PLAN.md)
