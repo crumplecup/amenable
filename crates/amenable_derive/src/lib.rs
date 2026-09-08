@@ -6,6 +6,7 @@
 mod attr_options;
 mod calculation;
 mod capture_exchange_body;
+mod entry;
 mod establish;
 mod evidence;
 mod exchange;
@@ -28,6 +29,7 @@ use syn::{DeriveInput, ItemFn, ItemImpl, ItemStruct, parse_macro_input};
 
 use calculation::{CalculationArgs, expand_calculation};
 use capture_exchange_body::{CaptureExchangeBodyArgs, expand_capture_exchange_body};
+use entry::expand_entry;
 use establish::{EstablishArgs, expand_establish};
 use evidence::{expand_evidence, expand_evidence_derive};
 use exchange::{ExchangeArgs, expand_exchange};
@@ -75,6 +77,21 @@ pub fn harness(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn gallery_harness(input: TokenStream) -> TokenStream {
     match expand_harness(input.into(), HarnessRegistration::GalleryOnly) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.to_compile_error().into(),
+    }
+}
+
+/// Generate `Entry` + `Metadata` impls for a vocabulary entry type — one
+/// canonically-keyed fact. Container attribute: `#[entry(key = "...", crate =
+/// "...")]`. A one-field struct projects its `Value` from the wrapped type
+/// (`str` for a `String` newtype); anything else uses `Value = Self`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
+#[proc_macro_derive(Entry, attributes(entry))]
+pub fn derive_entry(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    match expand_entry(&input) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
     }

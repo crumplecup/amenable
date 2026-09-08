@@ -3,11 +3,12 @@
 use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 
-use amenable_core::{
-    Authority, AuthorityKind, OwnedMetadataReport, Provenance as _, Registry, SemanticSummary,
-    SourceCrate, SourceModule, SourceUrl, TypeName,
-};
+use amenable_core::{OwnedMetadataReport, Provenance as _, Registry};
 use amenable_derive::{Provenance, Standard};
+
+use crate::{
+    Authority, AuthorityKind, SemanticSummary, SourceCrate, SourceModule, SourceUrl, TypeName,
+};
 
 /// Provenance helper for Rust standard-library-backed carriers.
 ///

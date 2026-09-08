@@ -33,6 +33,7 @@ mod nul_only_at_the_end_validates;
 mod observed_option_matches_input;
 mod observed_pair_matches_input;
 mod observed_value_matches_input;
+mod provenance_vocab;
 mod rust_std;
 mod valid_unicode_scalar;
 mod value_unchanged;
@@ -72,6 +73,10 @@ pub use nul_only_at_the_end_validates::NulOnlyAtTheEndValidates;
 pub use observed_option_matches_input::ObservedOptionMatchesInput;
 pub use observed_pair_matches_input::ObservedPairMatchesInput;
 pub use observed_value_matches_input::ObservedValueMatchesInput;
+pub use provenance_vocab::{
+    Authority, AuthorityKind, ConfigurationChannel, ConfigurationSurface, ProofArtifact,
+    SemanticSummary, SourceCrate, SourceModule, SourceUrl, TypeName, VerifierFamily,
+};
 pub use rust_std::{
     RustLanguageProvenance, RustStdProvenance, RustStdStandard, RustStdType,
     write_rust_std_certificate_artifacts,

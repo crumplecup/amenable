@@ -6,12 +6,14 @@
 //! assuming its conclusion).
 
 use amenable_core::{
-    Authority, ConfigurationChannel, ConfigurationSurface, Entry, Evidence, Metadata,
-    MetadataEntry, OwnedEntry, ProofArtifact, Provenance, SourceUrl, Verifier, VerifierFamily,
-    WitnessArtifact, WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
+    Entry, Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier, WitnessArtifact,
+    WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 
-use crate::{RustStdProvenance, RustStdStandard};
+use crate::{
+    Authority, ConfigurationChannel, ConfigurationSurface, ProofArtifact, RustStdProvenance,
+    RustStdStandard, SourceUrl, VerifierFamily,
+};
 
 /// Verus-specific witness: identifies the Verus spec (if any) behind a
 /// piece of evidence, without ever running it.

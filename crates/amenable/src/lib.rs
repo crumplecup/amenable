@@ -91,8 +91,10 @@ pub use amenable_kani::{
     KaniWitness, NonNegativeFd, RedToken, Stoplight, Sum, YellowToken, add,
 };
 pub use amenable_std::{
-    CertId, CertRegistry, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
-    RustStdStandard, RustStdType, ValidUnicodeScalar, write_rust_std_certificate_artifacts,
+    Authority, AuthorityKind, CertId, CertRegistry, ConfigurationChannel, ConfigurationSurface,
+    ProofArtifact, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
+    RustStdStandard, RustStdType, SemanticSummary, SourceCrate, SourceModule, SourceUrl, TypeName,
+    ValidUnicodeScalar, VerifierFamily, write_rust_std_certificate_artifacts,
 };
 #[cfg(feature = "verus")]
 pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};

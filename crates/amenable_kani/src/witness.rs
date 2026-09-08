@@ -1,8 +1,8 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{
-    Authority, ConfigurationChannel, ConfigurationSurface, Entry, Evidence, Metadata, OwnedEntry,
-    ProofArtifact, Provenance, SourceUrl, Verifier, VerifierFamily,
+use amenable_core::{Entry, Evidence, Metadata, OwnedEntry, Provenance, Verifier};
+use amenable_std::{
+    Authority, ConfigurationChannel, ConfigurationSurface, ProofArtifact, SourceUrl, VerifierFamily,
 };
 
 /// Kani-specific witness: identifies the Kani proof harness (if any) behind

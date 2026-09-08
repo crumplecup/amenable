@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use amenable_core::{
-    Authority, AuthorityKind, Entry, ErasedEntry, Metadata, MetadataEntry, MetadataRecord,
-    OwnedEntry, OwnedMetadataReport, SourceUrl,
+    Entry, ErasedEntry, Metadata, MetadataEntry, MetadataRecord, OwnedEntry, OwnedMetadataReport,
 };
 
 /// A distinct value type, to prove `get_as` recovers the real type rather
@@ -203,65 +202,39 @@ fn derive_metadata_composes_and_stays_out_of_the_provenance_role() {
     // calls above; `#[derive(Metadata)]` does not also make it `Provenance`.
 }
 
-/// A provenance record composed from the shared vocabulary via
-/// `#[entry(flatten)]` — canonical keys, typed values recoverable.
+/// `#[derive(Entry)]` — a vocabulary type: canonically keyed, also a one-entry
+/// `Metadata` record whose value is recoverable via `get_as`. (The real
+/// provenance vocabulary lives in `amenable_std`; this exercises the derive.)
+#[derive(
+    Debug, Clone, PartialEq, Eq, amenable_derive::Entry, derive_more::Display, derive_more::From,
+)]
+#[entry(key = "authority", crate = "amenable_core")]
+struct TestAuthority(String);
+
 #[derive(Debug, Clone, amenable_derive::Metadata)]
 #[metadata(crate = "amenable_core")]
-struct KaniDescriptor {
+struct TestDescriptor {
     #[entry(flatten)]
-    family: amenable_core::VerifierFamily,
-    #[entry(flatten)]
-    authority: Authority,
-    #[entry(flatten)]
-    url: SourceUrl,
-    #[entry(flatten)]
-    kind: AuthorityKind,
+    who: TestAuthority,
 }
 
 #[test]
-fn vocabulary_entries_carry_canonical_keys_and_typed_values() {
+fn derive_entry_yields_a_canonically_keyed_one_entry_record() {
     amenable_core::init_tracing();
 
-    // keys are fixed on the type, not the field name
-    assert_eq!(Authority::KEY, "authority");
-    assert_eq!(SourceUrl::KEY, "source_url");
-    assert_eq!(AuthorityKind::KEY, "authority_kind");
+    assert_eq!(TestAuthority::KEY, "authority");
+    let who = TestAuthority("Kani Rust Verifier".to_string());
+    assert_eq!(who.key(), "authority");
+    assert_eq!(who.value(), "Kani Rust Verifier");
+    assert_eq!(who.snapshot()[0].key(), "authority");
 
-    let descriptor = KaniDescriptor {
-        family: amenable_core::VerifierFamily::new("kani"),
-        authority: Authority::new("Kani Rust Verifier"),
-        url: SourceUrl::new("https://model-checking.github.io/kani/"),
-        kind: AuthorityKind::ExternalStandard,
-    };
-
-    // `#[entry(flatten)]` fields land under their vocabulary key, not "family"
+    // `#[entry(flatten)]` lands it under its vocabulary key, not the field name
+    let descriptor = TestDescriptor { who: who.clone() };
+    assert_eq!(descriptor.keys(), vec!["authority"]);
+    assert_eq!(descriptor.get_as::<TestAuthority>("authority"), Some(who));
     assert_eq!(
-        descriptor.keys(),
-        vec![
-            "verifier_family",
-            "authority",
-            "source_url",
-            "authority_kind"
-        ]
-    );
-
-    // typed value recovered
-    assert_eq!(
-        descriptor.get_as::<Authority>("authority"),
-        Some(Authority::new("Kani Rust Verifier"))
-    );
-    assert_eq!(
-        descriptor.get_as::<AuthorityKind>(AuthorityKind::KEY),
-        Some(AuthorityKind::ExternalStandard)
-    );
-    // and renders as the plain string
-    assert_eq!(
-        descriptor.report().to_string().lines().next(),
-        Some("verifier_family: kani")
-    );
-    assert_eq!(
-        AuthorityKind::ExternalStandard.to_string(),
-        "external_standard"
+        descriptor.report().to_string(),
+        "authority: Kani Rust Verifier"
     );
 }
 

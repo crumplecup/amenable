@@ -1,6 +1,6 @@
-//! The shared provenance vocabulary: canonically-keyed [`Entry`] types the
-//! standard-library provenance records and the three verifier-descriptor
-//! records are built from.
+//! The shared provenance vocabulary: canonically-keyed [`Entry`](amenable_core::
+//! Entry) types the standard-library provenance records and the three
+//! verifier-descriptor records are built from.
 //!
 //! Each type fixes its own key, so the keys cannot drift across the records
 //! that use them (before this, `KaniVerifierMetadata` /
@@ -8,15 +8,14 @@
 //! byte-for-byte-identical `const FACTS: &[(&str, &str)]` slice in a different
 //! crate). `Authority` and `SourceUrl` are shared by both vocabularies.
 //!
-//! `amenable_core` cannot depend on `amenable_derive` (the proc-macro crate
-//! optionally depends back on this one), so these are macro-generated here
-//! rather than `#[derive(Entry)]`-generated — the same reason `stoplight.rs`
-//! hand-writes its `Standard` impls.
+//! Lives in `amenable_std`, not `amenable_core`: nothing in core uses the
+//! vocabulary, and here it can be `#[derive(Entry)]`-generated rather than
+//! hand-rolled.
 
-use crate::{Entry, Metadata, OwnedEntry};
+use amenable_derive::Entry;
 
-/// Define a `String`-valued vocabulary [`Entry`] type: a newtype that is also a
-/// one-entry [`Metadata`] record (keyed by `$key`, holding the value by clone).
+/// Define a `String`-valued vocabulary [`Entry`](amenable_core::Entry) type: a
+/// `#[derive(Entry)]` newtype with the ergonomic `new` / `From<&str>` wrappers.
 macro_rules! string_vocab_entry {
     ($(#[$doc:meta])* $name:ident, $key:literal) => {
         $(#[$doc])*
@@ -28,9 +27,11 @@ macro_rules! string_vocab_entry {
             PartialOrd,
             Ord,
             Hash,
+            Entry,
             derive_more::Display,
             derive_more::From,
         )]
+        #[entry(key = $key, crate = "amenable_core")]
         pub struct $name(String);
 
         impl $name {
@@ -43,21 +44,6 @@ macro_rules! string_vocab_entry {
         impl From<&str> for $name {
             fn from(value: &str) -> Self {
                 Self(value.to_owned())
-            }
-        }
-
-        impl Entry for $name {
-            const KEY: &'static str = $key;
-            type Value = str;
-
-            fn value(&self) -> &str {
-                &self.0
-            }
-        }
-
-        impl Metadata for $name {
-            fn snapshot(&self) -> ::std::vec::Vec<OwnedEntry> {
-                ::std::vec![OwnedEntry::new($key, self.clone())]
             }
         }
     };
@@ -105,7 +91,8 @@ string_vocab_entry! {
 }
 
 /// The class of authority a provenance record represents — a closed vocabulary.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, derive_more::Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Entry, derive_more::Display)]
+#[entry(key = "authority_kind", crate = "amenable_core")]
 pub enum AuthorityKind {
     /// A third-party standard the program cites and upholds (the common case:
     /// Rust's own documented std-library semantics).
@@ -114,21 +101,4 @@ pub enum AuthorityKind {
     /// A local design decision with no external authority behind it.
     #[display("local_design")]
     LocalDesign,
-}
-
-impl Entry for AuthorityKind {
-    const KEY: &'static str = "authority_kind";
-    type Value = AuthorityKind;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn value(&self) -> &AuthorityKind {
-        self
-    }
-}
-
-impl Metadata for AuthorityKind {
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn snapshot(&self) -> Vec<OwnedEntry> {
-        vec![OwnedEntry::new("authority_kind", *self)]
-    }
 }

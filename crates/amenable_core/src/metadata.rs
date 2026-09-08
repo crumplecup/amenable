@@ -6,8 +6,8 @@
 //! `Metadata` record yields; [`OwnedEntry`] is the universal carrier, holding
 //! its value behind an [`Arc`] so an entry is `Clone` while the concrete value
 //! type stays reachable for downcasting. [`Entry`] is the typed authoring
-//! contract for a single canonically-keyed fact — its implementors live in
-//! `provenance_vocab.rs`.
+//! contract for a single canonically-keyed fact — its first implementors are
+//! `amenable_std`'s provenance vocabulary, via `#[derive(Entry)]`.
 //!
 //! Deliberately *not* `#[path]`-included into `amenable_verus`: it uses
 //! `Arc<dyn ...>` and [`Any`], which the raw `verus` compiler has no need to
@@ -40,14 +40,14 @@ pub trait MetadataValue: Debug + Send + Sync + 'static {
 /// A single, canonically-keyed metadata fact — the unit a provenance
 /// vocabulary is built from.
 ///
-/// `KEY` is fixed per type: every [`Authority`](crate::Authority) keys
-/// `"authority"`, every [`SourceUrl`](crate::SourceUrl) keys `"source_url"`,
-/// so a vocabulary shared across provenance records (and across the three
-/// verifier backends) cannot drift. Vocabulary types are also [`Metadata`]
-/// (a one-entry record holding the value by clone) and [`MetadataValue`], so
-/// an `#[entry(flatten)]` field of a vocabulary type projects to its one
-/// canonically-keyed entry and `record.get_as::<Authority>(Authority::KEY)`
-/// recovers the typed value.
+/// `KEY` is fixed per type (every `Authority` keys `"authority"`, every
+/// `SourceUrl` keys `"source_url"`), so a vocabulary shared across provenance
+/// records — and across the three verifier backends — cannot drift.
+/// `#[derive(Entry)]` also emits [`Metadata`] (a one-entry record holding the
+/// value by clone), so an `#[entry(flatten)]` field of a vocabulary type
+/// projects to its one canonically-keyed entry and, when the type is also
+/// [`MetadataValue`], `record.get_as::<Authority>(Authority::KEY)` recovers the
+/// typed value.
 pub trait Entry {
     /// The canonical key shared by every value of this type.
     const KEY: &'static str;
