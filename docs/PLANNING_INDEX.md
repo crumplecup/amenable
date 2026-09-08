@@ -34,9 +34,12 @@ facade-exported. `just check-all-package amenable_time` clean.
 A synthetic `Received -> Preserved` Exchange edge was built and reverted
 (off-plan — do not clone `Stoplight`/`gaap` typestate shapes).
 
-**Phase 1 (in progress):** `contracts/iso_8601.rs` — 6/109 (§3.1.1.x
-definitional group). See `docs/AMENABLE_TIME_COVERAGE.md` for the live
-per-module count.
+**Phase 1 (in progress):** `contracts/iso_8601` **complete (109/109)** —
+split into six group files under the 500-LOC cap, all tier-C
+`ParaphraseOnly`. Remaining modules: extended (48), rfc3339 (20),
+rfc9557 (38), calconnect (61), interval (25), zone (21), instant (6),
+serialization (5), conversion (7). See `docs/AMENABLE_TIME_COVERAGE.md`
+for the live count.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
