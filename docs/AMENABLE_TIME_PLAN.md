@@ -2,60 +2,64 @@
 
 ## Status
 
-🔲 In progress — plan reviewed, all 7 decisions settled (2026-09-08).
-**Phase 0 landed except the Exchange edge**: `crates/amenable_time` has
-the error layer, `provenance_vocab`, `TemporalProvenance`, the
-`temporal_standard!` macro, `contracts::precision` (5 real contracts, 6
-passing tests), `TemporalReporter`, and `TemporalComponent` /
-`SerializationProfile` — all faithful ports, `just check-all-package
-amenable_time` clean.
+🔲 Phase 0 complete (2026-09-08); Phase 1 starting. All 7 decisions
+settled. `crates/amenable_time` has the error layer, `provenance_vocab`,
+`TemporalProvenance`, the `temporal_standard!` macro, `contracts::precision`
+(5 real contracts, 6 passing tests), `TemporalReporter`, and
+`TemporalComponent` / `SerializationProfile` — all faithful ports, `just
+check-all-package amenable_time` clean.
 
-A first attempt at the Exchange edge (commit `1bda1f9d`) invented a
-`Received -> Preserved` typestate machine that has no basis in
-`elicit_temporal` — reverted (`295918bd`). The edge, redone per this
-plan's "Every trait method is an `Exchange`" section, is generic
-`RawInput<T>` / `Proven<D, P>` sidecar wrappers plus one **real**
-`TemporalParser` method (`parse_calendar_date`) with its real
-`CalendarDateDescriptor` / `CalendarDateValid` / `CalendarDateEvidence`.
-Not yet built — pending direction on whether to do it now or defer it
-into Phase 4 (see the Phase 0 bullet).
+Phase 0 no longer includes an Exchange edge — that was probe thinking
+(a synthetic `Received -> Preserved` typestate machine was built in
+`1bda1f9d` and reverted in `295918bd`). Exchanges are Phase 4. Phase 0's
+job was the registration machinery + one real contract module as the
+pattern-setter; both are done.
 
 ## Why this exists
 
-`amenable_core`'s trait family (`Standard`, `Evidence`, `Provenance`,
-`Metadata`, `Witness<V>`, `Sidecar<V>`, `Establish<C, V>`,
-`Exchange<Input, Output, V>`, `Ensures<V>`/`Requires<V>`, `Registry`/
-`Certificate`) has so far been exercised by:
+This is a **straight, full-scope port** of `elicit_temporal` into a
+dedicated `amenable_time` crate, re-expressed in `amenable`'s trait
+family. Not a probe, not a vertical-slice de-risk, not a "test it on a
+tiny fraction first."
 
-- `Stoplight` — three edges, every state a zero-field ZST with one
-  inhabitant.
-- `amenable_gaap` — one `Transfer` typestate, four atomic contracts, one
-  arithmetic identity.
-- `amenable_std` — a wide but shallow field of one-fact-per-file
-  std-library leaves.
+Whether the trait family *works* for this shape is not in question —
+`Stoplight` (three `Exchange` edges) and `amenable_gaap` (a `Transfer`
+typestate, four atomic contracts, `Establish` chains, all three backends)
+already establish that. The point of doing the **whole** crate — ~345
+citation-only contracts across 9 normative authorities, ~95 composed
+aggregates, ~175 trait methods — is:
 
-None of these puts the interface under *width* stress: many hundreds of
-distinct contract types drawn from several independent normative
-authorities, dozens of trait methods each carrying two or three proof
-sidecars, aggregate "semantic bundle" proofs composed from a dozen
-leaves, and a real cross-authority provenance vocabulary. `elicit_temporal`
-is exactly that shape and already exists as prior art. Migrating its
-**full scope** into a dedicated `amenable_time` crate is the load test:
-it will show where `Standard`/`Exchange`/the derives/the registration
-story bend or break at scale, under conditions the current worked
-examples never create.
+1. A real, working `amenable_time` crate.
+2. The edge cases that only surface *at scope and scale* — naming
+   collisions, provenance-vocabulary gaps, derive limits, registration
+   friction across hundreds of entries. These are the actual finding;
+   they don't appear in a one-example slice.
 
-The migration is also the first real answer to a question `amenable`'s
-own positioning raises (memory `project_amenable_positioning`): *express
-program invariants as named types so the compiler does the
-invariant-checking*. `elicit_temporal` names ~440 invariants as types
-already; the exercise is re-expressing them in `amenable`'s vocabulary
-such that **every contract type is a `Standard`** (or, where it is
-genuinely provable rather than cited, an `Evidence` — see the split
-below) **and every trait method is an `Exchange`**.
+It is also the first real answer to `amenable`'s own positioning (memory
+`project_amenable_positioning`): *express program invariants as named
+types so the compiler does the invariant-checking*. `elicit_temporal`
+names ~440 invariants as types; the exercise re-expresses them so **every
+contract type is a `Standard`** (or `Evidence`, where it is genuinely
+proven — see the split) **and every trait method is an `Exchange`**.
+
+### Work order
+
+The proof architecture (per-backend `Witness<V>` / `Ensures<V>`, Kani /
+Creusot / Verus) comes **last**, after the whole port. Order:
+
+1. **Phase 1** — every citation-only contract as a `Standard` with a
+   real `Provenance` (web link, or embedded verbatim clause per the
+   redistributability tiers). Hundreds of entries; several sessions.
+2. **Phase 2** — the descriptors (`types.rs`).
+3. **Phase 3** — the `proof_composition` aggregates as `Evidence` + the
+   `Establish` relationships.
+4. **Phase 4** — the trait methods, minted as `Exchange` impls +
+   `ExchangeEdgeRecord`s. No per-edge proof here.
+5. **Phase 5–6** — the e2e proof architecture, where the "what breaks at
+   scale" question is the deliverable, not "will it work."
 
 This is a multi-session effort. The plan is the whole elephant; the
-phases eat it in bites.
+phases eat it in bites, in this order.
 
 ## Source material: the `elicit_temporal` inventory
 
@@ -471,7 +475,7 @@ Each phase commits per file / per contract module (memory
 means `just verify-kani` sample + `just verify-creusot` + `just
 verify-verus`, per the METADATA plan's own cadence.
 
-### Phase 0 — skeleton + one module end-to-end
+### Phase 0 — skeleton + the registration machinery — **done**
 
 - [x] Create `crates/amenable_time` (`Cargo.toml`, `build.rs` declaring
       `cfg(kani)`, `lib.rs` = `mod` + `pub use`, `#![forbid(unsafe_code)]`,
@@ -499,43 +503,21 @@ verify-verus`, per the METADATA plan's own cadence.
       wiring, the Metadata query surface, both tiers, cross-check
       projection, and `EvidenceLink` self-registration. `just
       check-all-package amenable_time` clean.
-- [x] Port the minimal descriptor set (`src/types.rs`): `TemporalComponent`
-      and `SerializationProfile` as plain closed enums (`strum::EnumIter`
-      + `derive_more::Display`, house policy). `PrecisionDescriptor` and
-      the `#[derive(Evidence)]` pass deferred to Phase 2 — nothing in
-      Phase 0 outside the (also-deferred) Exchange edge needs them.
+- [x] `src/types.rs`: `TemporalComponent` and `SerializationProfile` as
+      plain closed enums (`strum::EnumIter` + `derive_more::Display`,
+      house policy) — the two enums `TemporalReporter` / `TemporalError`
+      need. The descriptor structs and the `#[derive(Evidence)]` pass are
+      Phase 2.
 - [x] Port `TemporalReporter` as a plain trait (`src/traits/report.rs`,
       7 methods) — explicitly *not* an `Exchange`.
-- [ ] Generic sidecar wrappers in `amenable_time` (neutral crate, so no
-      per-backend mirror — `project_creusot_translator_dependency_scope`):
-      `RawInput<T>` (`Primary = T`, `Proposition = InputReceived`) and
-      `Proven<D, P>` (`Primary = D`, `Proposition = P`), both verifier-less
-      `#[derive(Sidecar)]`. `InputReceived` is a trivial `Standard`.
-- [ ] Port the one real parser method the plan's own example uses:
-      `TemporalParser::parse_calendar_date` and just that method, with
-      its real `CalendarDateDescriptor` (from `types.rs`), `CalendarDateValid`
-      + `CalendarDateEvidence` (from `proof_composition.rs`), and the
-      `CalendarDateEvidence -> CalendarDateValid` establish. A reference
-      `TemporalParser` impl (in-crate test double) provides the body.
-- [ ] Wire the method as `Exchange<RawInput<UnvalidatedCalendarDate>,
-      Proven<CalendarDateDescriptor, CalendarDateValid>, V>` + an
-      `ExchangeEdgeRecord`; real Kani `Witness<KaniVerifier>` proof for
-      `CalendarDateValid`; generated Creusot + Verus companions; verify
-      all three backends.
-      **Open — do this now, or defer the whole edge to Phase 4?** The
-      Exchange machinery is already proven on all three backends by
-      `stoplight` and `gaap_ledger`; the first *temporal* Exchange edge
-      is naturally Phase 4 work (porting `TemporalParser` wholesale).
-      Phase 0's unique de-risking — the `Standard` / provenance /
-      bulk-registration story — is done. Deferring keeps Phase 0 a clean
-      faithful-port checkpoint and moves straight to Phase 1's ~345
-      contracts.
 - [x] `docs/PLANNING_INDEX.md` entry.
 - [x] Coverage checklist scaffold — `docs/AMENABLE_TIME_COVERAGE.md`,
       one row per `elicit_temporal` source module.
 
-Phase 0 exit: the full vertical slice works for one contract module and
-one exchange. Everything after is width.
+Phase 0 exit: the pipeline from `temporal_standard!` to a `Standard`
+carrying a `TemporalProvenance` and an `EvidenceLink` registration works,
+proven by `contracts::precision`. No `Exchange` edge — exchanges are
+Phase 4. Everything after Phase 0 is the port at scale.
 
 ### Phase 1 — all citation-only contracts as `Standard`s
 
@@ -584,9 +566,14 @@ Phase 1 exit: ~345 `Standard`s registered, each with a real
       accepts: `Establish<C, V>`'s `Self: Witness<V>` bound must be
       satisfiable for all `V` from Phase 3, not Phase 6.
 
-### Phase 4 — trait methods → `Exchange`
+### Phase 4 — trait methods → `Exchange` (no proofs yet)
 
-Per trait, commit per method-group:
+Generic sidecar wrappers first: `RawInput<T>` (`Primary = T`,
+`Proposition = InputReceived`, a trivial `Standard`) and `Proven<D, P>`
+(`Primary = D`, `Proposition = P`), both verifier-less `#[derive(Sidecar)]`
+in `amenable_time` — neutral crate, so no per-backend mirror
+(`project_creusot_translator_dependency_scope`). Then, per trait, commit
+per method-group:
 
 - [ ] `TemporalParser` (24 methods).
 - [ ] `TemporalFormatter` (36).
@@ -595,8 +582,12 @@ Per trait, commit per method-group:
 - [ ] `TemporalCalConnectFactory` (19).
 - [ ] `TemporalBackend` aggregate supertrait + its blanket impl.
 - [ ] Each method → an `Exchange<In, Out, V>` impl + an
-      `ExchangeEdgeRecord`. Methods with multiple proof sidecars get a
-      composed `Out::Proposition`.
+      `ExchangeEdgeRecord` (the codegen input for Phase 5–6 companions).
+      Methods with multiple proof sidecars get a composed
+      `Out::Proposition`. **No `Witness`/`Ensures` proof here** — the
+      `Establish`/`Witness<V>` scaffolding from Phase 3 already satisfies
+      the `Sidecar<V>` bounds; real proofs are Phase 6. A reference
+      in-crate `TemporalBackend` test double provides the method bodies.
 
 ### Phase 5 — semantic bundles + native carriers
 
