@@ -64,6 +64,7 @@ fn newtype_field(data: &Data) -> Option<(proc_macro2::TokenStream, Type)> {
 }
 
 /// Whether a type path ends in `String` — its `Value` is projected as `str`.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(ty), ret))]
 fn is_string(ty: &Type) -> bool {
     matches!(ty, Type::Path(p) if p.path.segments.last().is_some_and(|s| s.ident == "String"))
 }
