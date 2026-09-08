@@ -8,41 +8,35 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 In progress (2026-09-08). Plan reviewed, all 7 decisions
-settled. **Phase 0 partially landed**: `crates/amenable_time` exists with
-the error layer, `provenance_vocab` (`NormativeDocument` / `Section` /
-`Status` / `StandardsBody` / `NormativeQuotation` enum / `CrossCheck`),
-the `TemporalProvenance` record, the `temporal_standard!` macro, and
-`contracts::precision` (5 contracts, 6 passing tests) — `just
-check-all-package amenable_time` clean. Remaining Phase 0: minimal
-descriptors, `TemporalReporter`, one end-to-end `Exchange` edge with
-three-backend proofs, coverage checklist.
-Migrate the full scope of `~/repos/elicitation/crates/elicit_temporal`
-(31 files, ~15.6k lines: ~440 contract ZSTs across 9 normative
-authorities, 259 descriptor types, ~35 traits / ~175 methods, ~98
-`ProvableFrom` edges) into a new dedicated `amenable_time` crate,
-re-expressed in `amenable`'s trait family so **every contract type is a
-`Standard`** (citation-only structural contracts) **or `Evidence`** (the
-`proof_composition` aggregates, per the GAAP lesson) **and every trait
-method is an `Exchange`** (`Sidecar` in → `Sidecar` out;
-`TemporalReporter` is the one documented exception). Purpose: put the
-trait system under *width* stress the current worked examples
-(`Stoplight`, `amenable_gaap`, `amenable_std`) never create. 8 phases
-(0: skeleton + one module + one exchange end-to-end on all 3 backends;
-1: all citation-only contracts as `Standard`s; 2: descriptors as
-`Evidence`; 3: the `ProvableFrom` graph → `Establish<C, V>`; 4: trait
-methods → `Exchange`; 5: semantic bundles → composed `Witness<V>` +
-native carriers; 6: real proofs for the genuinely-checkable range /
-ordering / leap-year contracts; 7: surfaces + umbrella certificate + one
-reference backend double). Shared vocabulary + one `TemporalProvenance`
-record + the existing `Registry`/`Certificate` as the umbrella (not
-per-source metadata structs). Contracts + descriptors + `Exchange`
-interfaces in `amenable_time`; `Witness<V>`/`Ensures<V>` impls in
-`amenable_{kani,creusot,verus}::time` (orphan rules; backend-to-backend
-deps stay forbidden). Producer crates (`amenable_time_jiff` etc.) are a
-follow-on, out of scope. 6 open questions flagged for review (vocabulary
-home, macro home, `Establish`'s `V` story, the `Standard`/`Evidence`
-split, descriptor construction-time validation, scale cutoff).
+**Status:** 🔲 Phase 0 complete, Phase 1 in progress (2026-09-08). A
+**straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
+(~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
+~175 trait methods) into `amenable_time` — **not a probe**; whether the
+trait family works is settled by `Stoplight` + `amenable_gaap`, so the
+deliverable is a working crate plus the edge cases that surface at scope
+and scale. Every contract type → `Standard` (citation-only) or `Evidence`
+(`proof_composition`); every trait method → `Exchange`; `TemporalReporter`
+the one exception. **Work order: proof architecture last.** Phase 1 (all
+citation-only contracts as `Standard` + `Provenance` — web link or
+embedded verbatim clause per redistributability tier — several sessions)
+→ Phase 2 (descriptors) → Phase 3 (`proof_composition` + `Establish`) →
+Phase 4 (trait methods as `Exchange` impls + `ExchangeEdgeRecord`s, no
+proofs) → Phase 5–6 (per-backend `Witness`/`Ensures`, Kani/Creusot/Verus).
+All 7 decisions settled (see plan's "Resolved decisions").
+
+**Phase 0 (done):** `crates/amenable_time` — error layer,
+`provenance_vocab` (`NormativeDocument` / `Section` / `NormativeStatus` /
+`StandardsBody` / `NormativeQuotation` enum / `CrossCheck`),
+`TemporalProvenance` record, the `temporal_standard!` macro,
+`contracts::precision` (5 real contracts) as the pattern-setter,
+`TemporalReporter`, `TemporalComponent` / `SerializationProfile`. Not
+facade-exported. `just check-all-package amenable_time` clean.
+A synthetic `Received -> Preserved` Exchange edge was built and reverted
+(off-plan — do not clone `Stoplight`/`gaap` typestate shapes).
+
+**Phase 1 (in progress):** `contracts/iso_8601.rs` — 6/109 (§3.1.1.x
+definitional group). See `docs/AMENABLE_TIME_COVERAGE.md` for the live
+per-module count.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
