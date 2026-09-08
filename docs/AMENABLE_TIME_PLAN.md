@@ -3,14 +3,22 @@
 ## Status
 
 🔲 In progress — plan reviewed, all 7 decisions settled (2026-09-08).
-**Phase 0 partially landed**: `crates/amenable_time` exists — error
-layer, `provenance_vocab`, `TemporalProvenance`, the `temporal_standard!`
-macro, and `contracts::precision` (5 contracts, 6 passing tests) are all
-in and `just check-all-package amenable_time` clean. Remaining Phase 0:
-the minimal descriptor set, `TemporalReporter`, the one end-to-end
-`Exchange` edge with its three-backend proofs, and the coverage
-checklist. Design written after a direct read of
-`~/repos/elicitation/crates/elicit_temporal` (31 files, ~15.6k lines).
+**Phase 0 landed except the Exchange edge**: `crates/amenable_time` has
+the error layer, `provenance_vocab`, `TemporalProvenance`, the
+`temporal_standard!` macro, `contracts::precision` (5 real contracts, 6
+passing tests), `TemporalReporter`, and `TemporalComponent` /
+`SerializationProfile` — all faithful ports, `just check-all-package
+amenable_time` clean.
+
+A first attempt at the Exchange edge (commit `1bda1f9d`) invented a
+`Received -> Preserved` typestate machine that has no basis in
+`elicit_temporal` — reverted (`295918bd`). The edge, redone per this
+plan's "Every trait method is an `Exchange`" section, is generic
+`RawInput<T>` / `Proven<D, P>` sidecar wrappers plus one **real**
+`TemporalParser` method (`parse_calendar_date`) with its real
+`CalendarDateDescriptor` / `CalendarDateValid` / `CalendarDateEvidence`.
+Not yet built — pending direction on whether to do it now or defer it
+into Phase 4 (see the Phase 0 bullet).
 
 ## Why this exists
 
@@ -498,18 +506,30 @@ verify-verus`, per the METADATA plan's own cadence.
       Phase 0 outside the (also-deferred) Exchange edge needs them.
 - [x] Port `TemporalReporter` as a plain trait (`src/traits/report.rs`,
       7 methods) — explicitly *not* an `Exchange`.
-- [ ] One `Exchange` edge end-to-end: pick the single simplest parser
-      method (`parse_reduced_local_time` or similar), wire
-      `RawInput` → `Proven` sidecars, an `ExchangeEdgeRecord`, and a
-      real Kani `Witness<KaniVerifier>` proof for its output proposition.
-      **Scoping fork raised with the user** — full three-backend edge
-      now, or a leaner Kani-only edge with Creusot/Verus companions
-      folded into Phase 4/5 (the Exchange machinery is already proven
-      end-to-end by `stoplight` and `gaap_ledger`; what Phase 0 uniquely
-      de-risked — the `Standard` / provenance / bulk-registration story
-      — is done).
-- [ ] Generate the Creusot + Verus companions for that one edge; verify
-      all three backends. *(Gated on the fork above.)*
+- [ ] Generic sidecar wrappers in `amenable_time` (neutral crate, so no
+      per-backend mirror — `project_creusot_translator_dependency_scope`):
+      `RawInput<T>` (`Primary = T`, `Proposition = InputReceived`) and
+      `Proven<D, P>` (`Primary = D`, `Proposition = P`), both verifier-less
+      `#[derive(Sidecar)]`. `InputReceived` is a trivial `Standard`.
+- [ ] Port the one real parser method the plan's own example uses:
+      `TemporalParser::parse_calendar_date` and just that method, with
+      its real `CalendarDateDescriptor` (from `types.rs`), `CalendarDateValid`
+      + `CalendarDateEvidence` (from `proof_composition.rs`), and the
+      `CalendarDateEvidence -> CalendarDateValid` establish. A reference
+      `TemporalParser` impl (in-crate test double) provides the body.
+- [ ] Wire the method as `Exchange<RawInput<UnvalidatedCalendarDate>,
+      Proven<CalendarDateDescriptor, CalendarDateValid>, V>` + an
+      `ExchangeEdgeRecord`; real Kani `Witness<KaniVerifier>` proof for
+      `CalendarDateValid`; generated Creusot + Verus companions; verify
+      all three backends.
+      **Open — do this now, or defer the whole edge to Phase 4?** The
+      Exchange machinery is already proven on all three backends by
+      `stoplight` and `gaap_ledger`; the first *temporal* Exchange edge
+      is naturally Phase 4 work (porting `TemporalParser` wholesale).
+      Phase 0's unique de-risking — the `Standard` / provenance /
+      bulk-registration story — is done. Deferring keeps Phase 0 a clean
+      faithful-port checkpoint and moves straight to Phase 1's ~345
+      contracts.
 - [x] `docs/PLANNING_INDEX.md` entry.
 - [x] Coverage checklist scaffold — `docs/AMENABLE_TIME_COVERAGE.md`,
       one row per `elicit_temporal` source module.
