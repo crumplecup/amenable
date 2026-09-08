@@ -25,6 +25,7 @@ mod contracts;
 mod error;
 mod provenance;
 mod provenance_vocab;
+mod subsecond;
 mod traits;
 mod types;
 
@@ -38,5 +39,6 @@ pub use provenance_vocab::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,
     StandardsBody,
 };
+pub use subsecond::{Preserved, Received};
 pub use traits::TemporalReporter;
-pub use types::{SerializationProfile, TemporalComponent};
+pub use types::{FractionalSecond, SerializationProfile, TemporalComponent};

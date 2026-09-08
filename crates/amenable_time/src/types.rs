@@ -11,6 +11,32 @@
 
 use strum::EnumIter;
 
+/// The fractional-second component of a temporal value: the decimal digits
+/// after the fractional separator, verbatim.
+///
+/// The first descriptor carrying real string data — the Phase 0
+/// `Exchange` edge (`amenable_kani::time`) threads one through a
+/// `Sidecar` to exercise the non-`Copy` payload path. No construction
+/// validation (`docs/AMENABLE_TIME_PLAN.md`, decision 5): whether the
+/// digits are well-formed is a proof's job, not a constructor's.
+#[derive(
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    derive_getters::Getters,
+    derive_new::new,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
+pub struct FractionalSecond {
+    /// The decimal digits after the fractional separator.
+    #[new(into)]
+    digits: String,
+}
+
 /// The smallest named temporal unit relevant to ISO 8601 precision rules.
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
