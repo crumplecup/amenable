@@ -13,6 +13,7 @@
 
 mod calendar;
 mod definitions;
+mod time_of_day;
 
 pub use calendar::{
     CalendarDateHasYearMonthDay, CalendarDateUsesGregorianCalendar, CalendarDayWithinMonthBounds,
@@ -34,4 +35,18 @@ pub use definitions::{
     DateIdentifiesPositionWithinCalendar, InstantIsPointOnTimeAxis,
     TimeAxisOrdersTimePointsByTemporalPosition, TimeIsMarkOnSpecifiedTimeScale,
     TimeOfDayOccursWithinCalendarDay, TimeScaleAssociatesTimePointsWithOrderedMeasure,
+};
+pub use time_of_day::{
+    DecimalRepresentationUsesLowestOrderComponentFraction,
+    EndOfDayTwentyFourHourAllowedOnlyWithinIntervalOrRecurrence,
+    EndOfDayTwentyFourHourForbiddenForSingleTimePoint, FractionAppliesToLowestOrderComponent,
+    FractionUsesDecimalSign, HourInRangeZeroToTwentyFour, LeapSecondOccursOnlyAtUtcBoundary,
+    LocalTimeHasHourMinuteSecond, LocalTimeRequiresTimeDesignatorWhenContextAmbiguous,
+    LocalTimeScaleMayBeStandardOrNonUtcBased, LocalTimeUsesLocallyApplicableTimeScale,
+    MinuteInRangeZeroToFiftyNine, ReducedAccuracyLocalTimeUsesHourMinuteRepresentation,
+    ReducedAccuracyLocalTimeUsesHourOnlyRepresentation, SecondInRangeZeroToSixty,
+    StandardTimeDerivedFromUtcByLocalShift, StandardTimeOfDayUsesStandardTimeScale,
+    TimeShiftIsConstantDurationBetweenTimeScales,
+    TwentyFourHourRequiresZeroMinuteSecondAndFraction, TwentyFourHourReservedForEndOfDay,
+    UtcIsReferenceTimeScale, UtcOfDayIdentifiesTimeWithinUtcCalendarDay,
 };
