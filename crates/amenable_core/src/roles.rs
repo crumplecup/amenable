@@ -17,8 +17,8 @@ use crate::{Evidence, OwnedMetadataReport, Provenance, Registry};
 /// `Sidecar`/`Exchange` level that actually needs it, not baked in here.
 ///
 /// The metadata query surface is **not** re-exposed here — reach the facts
-/// through `standard.provenance()`, which is itself a [`Metadata`](crate::
-/// Metadata) record.
+/// through `standard.provenance()`, which is itself a
+/// [`Metadata`](crate::Metadata) record.
 pub trait Standard: Evidence {
     /// Structured provenance for this root obligation.
     type Provenance: Provenance;
@@ -59,6 +59,7 @@ impl<P> AsStandard<P> {
 }
 
 impl<P> From<P> for AsStandard<P> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(_value)))]
     fn from(_value: P) -> Self {
         Self::new()
     }

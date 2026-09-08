@@ -303,7 +303,10 @@ fn expand_struct_field_push(
 /// Push one field's entries, per its [`EntryKind`]. `field_access` is a
 /// reference to the field (`&self.x` for a struct, a `&T` match binding for an
 /// enum variant).
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(field_access)))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(field_access, kind))
+)]
 fn expand_field_entries(
     crate_path: &Path,
     field_name: String,

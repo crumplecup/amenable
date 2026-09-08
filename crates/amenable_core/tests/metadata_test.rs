@@ -199,10 +199,8 @@ fn derive_metadata_composes_and_stays_out_of_the_provenance_role() {
     // `#[entry(skip)]` field is still a normal field, just not projected.
     assert_eq!(widget.scratch, "ignored");
     assert!(!widget.contains_key("scratch"));
-
-    // `#[derive(Metadata)]` does not make the type a `Provenance`.
-    fn assert_metadata<M: Metadata>(_: &M) {}
-    assert_metadata(&widget);
+    // `WidgetSchema: Metadata` is exercised by the `.keys()` / `.get_as()`
+    // calls above; `#[derive(Metadata)]` does not also make it `Provenance`.
 }
 
 /// A provenance record composed from the shared vocabulary via

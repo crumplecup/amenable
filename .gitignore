@@ -13,6 +13,12 @@ target/
 .why3find/
 rustc-ice-*.txt
 
+# cordial: `cordial build rustdoc` / `cordial quality` drop per-crate
+# rustdoc JSON at `crates/*/doc/`; throwaway, regenerated on demand. The
+# real cordial store is `~/.cordial/`, and the curated exceptions live at
+# `.cordial-exceptions/` (tracked).
+doc/
+
 # Verus: `verus --crate-type=lib` (invoked as a bare compiler, not through
 # Cargo) drops its compiled rlib next to the source tree with no way to
 # redirect it -- a throwaway build artifact, not evidence (unlike

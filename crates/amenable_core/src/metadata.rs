@@ -5,16 +5,14 @@
 //! [`ErasedEntry`] is the object-safe view of one fact, the element type every
 //! `Metadata` record yields; [`OwnedEntry`] is the universal carrier, holding
 //! its value behind an [`Arc`] so an entry is `Clone` while the concrete value
-//! type stays reachable for downcasting.
+//! type stays reachable for downcasting. [`Entry`] is the typed authoring
+//! contract for a single canonically-keyed fact — its implementors live in
+//! `provenance_vocab.rs`.
 //!
-//! Deliberately *not* `#[path]`-included into `amenable_verus` (unlike
-//! `provenance.rs`): it uses `Arc<dyn ...>` and [`Any`], which the raw `verus`
-//! compiler has no need to see. `MetadataEntry` stays in `provenance.rs` for
-//! that reason.
-//!
-//! The typed authoring trait `Entry` and its blanket bridge to `ErasedEntry`
-//! land alongside the first concrete entry vocabulary; this module currently
-//! carries only the erased view and the carriers built on it.
+//! Deliberately *not* `#[path]`-included into `amenable_verus`: it uses
+//! `Arc<dyn ...>` and [`Any`], which the raw `verus` compiler has no need to
+//! see. `MetadataEntry` (the frozen snapshot) lives in `metadata_entry.rs`,
+//! which *is* included, for that reason.
 
 use std::{
     any::Any,
@@ -37,16 +35,6 @@ pub trait MetadataValue: Debug + Send + Sync + 'static {
 
     /// Borrow this value as an [`Any`] trait object, for downcasting.
     fn as_any(&self) -> &dyn Any;
-}
-
-impl<T: Display + Debug + Send + Sync + 'static> MetadataValue for T {
-    fn as_display(&self) -> &dyn Display {
-        self
-    }
-
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
 }
 
 /// A single, canonically-keyed metadata fact — the unit a provenance
@@ -87,8 +75,7 @@ pub trait Entry {
 /// Object-safe view of one metadata fact: the element type every [`Metadata`]
 /// record yields.
 ///
-/// [`OwnedEntry`] implements it directly. A future blanket implementation will
-/// derive it for every typed [`Entry`].
+/// [`OwnedEntry`] implements it directly.
 pub trait ErasedEntry: Debug {
     /// Fully-qualified key, e.g. `"motor.max_rpm"` after nesting.
     fn key(&self) -> &str;
@@ -99,67 +86,6 @@ pub trait ErasedEntry: Debug {
     /// Structured view of the value: `entry.value_any().downcast_ref::<Rpm>()`
     /// returns the real value, not a stringification. Survives nesting.
     fn value_any(&self) -> &dyn Any;
-}
-
-/// The universal metadata carrier: the one entry type every [`Metadata`] record
-/// yields.
-///
-/// Owns its key. Holds its value behind [`Arc`] so the entry is `Clone` (needed
-/// by [`Metadata::snapshot`] and by hand-built records) while the concrete
-/// value type stays reachable through [`value_any`](ErasedEntry::value_any).
-#[derive(Debug, Clone)]
-pub struct OwnedEntry {
-    key: String,
-    value: Arc<dyn MetadataValue>,
-}
-
-impl OwnedEntry {
-    /// Build an entry from a key and any owned [`MetadataValue`].
-    pub fn new(key: impl Into<String>, value: impl MetadataValue) -> Self {
-        Self {
-            key: key.into(),
-            value: Arc::new(value),
-        }
-    }
-
-    /// Replace this entry's key, keeping the value [`Arc`].
-    pub fn with_key(self, key: impl Into<String>) -> Self {
-        Self {
-            key: key.into(),
-            value: self.value,
-        }
-    }
-
-    /// Namespace this entry under a parent field: `"max_rpm"` becomes
-    /// `"motor.max_rpm"`. Applied to every entry of an `#[entry(nested)]` field
-    /// during assembly; the value [`Arc`] is moved through untouched.
-    pub fn prefixed(self, parent: &str) -> Self {
-        let key = format!("{parent}.{}", self.key);
-        self.with_key(key)
-    }
-}
-
-impl ErasedEntry for OwnedEntry {
-    fn key(&self) -> &str {
-        &self.key
-    }
-
-    fn value(&self) -> &dyn Display {
-        self.value.as_display()
-    }
-
-    fn value_any(&self) -> &dyn Any {
-        self.value.as_any()
-    }
-}
-
-/// Freeze any live entry into a [`MetadataEntry`] snapshot: the rendered,
-/// `Clone + Ord + Hash` form a [`Certificate`](crate::Certificate) stores.
-/// The structured value is not preserved — that is the point of a snapshot.
-impl<E: ErasedEntry + ?Sized> From<&E> for MetadataEntry {
-    fn from(entry: &E) -> Self {
-        MetadataEntry::new(entry.key(), entry.value().to_string())
-    }
 }
 
 /// A queryable metadata record: a flat namespace of fully-qualified keys over
@@ -235,6 +161,86 @@ pub trait Metadata {
     }
 }
 
+impl<T: Display + Debug + Send + Sync + 'static> MetadataValue for T {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn as_display(&self) -> &dyn Display {
+        self
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+/// The universal metadata carrier: the one entry type every [`Metadata`] record
+/// yields.
+///
+/// Owns its key. Holds its value behind [`Arc`] so the entry is `Clone` (needed
+/// by [`Metadata::snapshot`] and by hand-built records) while the concrete
+/// value type stays reachable through [`value_any`](ErasedEntry::value_any).
+#[derive(Debug, Clone)]
+pub struct OwnedEntry {
+    key: String,
+    value: Arc<dyn MetadataValue>,
+}
+
+impl OwnedEntry {
+    /// Build an entry from a key and any owned [`MetadataValue`].
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(key, value)))]
+    pub fn new(key: impl Into<String>, value: impl MetadataValue) -> Self {
+        Self {
+            key: key.into(),
+            value: Arc::new(value),
+        }
+    }
+
+    /// Replace this entry's key, keeping the value [`Arc`].
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, key)))]
+    pub fn with_key(self, key: impl Into<String>) -> Self {
+        Self {
+            key: key.into(),
+            value: self.value,
+        }
+    }
+
+    /// Namespace this entry under a parent field: `"max_rpm"` becomes
+    /// `"motor.max_rpm"`. Applied to every entry of an `#[entry(nested)]` field
+    /// during assembly; the value [`Arc`] is moved through untouched.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self)))]
+    pub fn prefixed(self, parent: &str) -> Self {
+        let key = format!("{parent}.{}", self.key);
+        self.with_key(key)
+    }
+}
+
+impl ErasedEntry for OwnedEntry {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn key(&self) -> &str {
+        &self.key
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn value(&self) -> &dyn Display {
+        self.value.as_display()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn value_any(&self) -> &dyn Any {
+        self.value.as_any()
+    }
+}
+
+/// Freeze any live entry into a [`MetadataEntry`] snapshot: the rendered,
+/// `Clone + Ord + Hash` form a `Certificate` stores. The structured value is
+/// not preserved — that is the point of a snapshot.
+impl<E: ErasedEntry + ?Sized> From<&E> for MetadataEntry {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(entry)))]
+    fn from(entry: &E) -> Self {
+        MetadataEntry::new(entry.key(), entry.value().to_string())
+    }
+}
+
 /// A hand-assembled or merged [`Metadata`] record.
 ///
 /// Not what `#[derive(Metadata)]` produces — that implements [`Metadata`]
@@ -247,17 +253,20 @@ pub struct MetadataRecord {
 
 impl MetadataRecord {
     /// An empty record.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Append one entry.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, entry)))]
     pub fn push(&mut self, entry: OwnedEntry) {
         self.entries.push(entry);
     }
 }
 
 impl FromIterator<OwnedEntry> for MetadataRecord {
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(iter)))]
     fn from_iter<I: IntoIterator<Item = OwnedEntry>>(iter: I) -> Self {
         Self {
             entries: iter.into_iter().collect(),
@@ -266,16 +275,19 @@ impl FromIterator<OwnedEntry> for MetadataRecord {
 }
 
 impl Extend<OwnedEntry> for MetadataRecord {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, iter)))]
     fn extend<I: IntoIterator<Item = OwnedEntry>>(&mut self, iter: I) {
         self.entries.extend(iter);
     }
 }
 
 impl Metadata for MetadataRecord {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn snapshot(&self) -> Vec<OwnedEntry> {
         self.entries.clone()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn get(&self, key: &str) -> Option<OwnedEntry> {
         self.entries
             .iter()
@@ -283,6 +295,7 @@ impl Metadata for MetadataRecord {
             .cloned()
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn len(&self) -> usize {
         self.entries.len()
     }
@@ -312,6 +325,7 @@ impl<M> Display for MetadataReport<'_, M>
 where
     M: Metadata + ?Sized,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut entries = self.metadata.snapshot().into_iter();
 
@@ -353,6 +367,7 @@ impl<M> Display for OwnedMetadataReport<M>
 where
     M: Metadata,
 {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(&MetadataReport::new(&self.metadata), f)
     }
@@ -360,9 +375,10 @@ where
 
 /// Leaf `Metadata` for scalar carriers: one entry keyed `"value"`.
 ///
-/// `#[derive(Provenance)]` walks every field's `Metadata::snapshot()`, so a
-/// struct with a plain `String` / `u32` / `bool` field needs the field type to
-/// be `Metadata`. The parent re-keys the `"value"` entry to the field name.
+/// A field with no `#[entry(..)]` attribute on a `#[derive(Metadata)]` type is
+/// projected by walking its `Metadata::snapshot()`; a plain `String` / `u32` /
+/// `bool` field needs the field type to be `Metadata` for that. The parent
+/// re-keys the `"value"` entry to the field name. `#[entry]` sidesteps this.
 macro_rules! impl_scalar_metadata {
     ($($ty:ty),* $(,)?) => {
         $(

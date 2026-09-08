@@ -11,11 +11,15 @@ use std::fmt::{self, Display, Formatter};
 
 /// One metadata fact frozen as a rendered key/value pair.
 ///
-/// This is the audit snapshot, not the live interface: a [`Certificate`](crate::
-/// Certificate) stores `Vec<MetadataEntry>` because it wants cheap comparison
-/// and hashing and never needs the structured value back. Live, typed metadata
-/// is [`Metadata`](crate::Metadata) / [`OwnedEntry`](crate::OwnedEntry); freeze
-/// one into a `MetadataEntry` with the `From<&E>` bridge.
+/// This is the audit snapshot, not the live interface: a `Certificate` stores
+/// `Vec<MetadataEntry>` because it wants cheap comparison and hashing and never
+/// needs the structured value back. Live, typed metadata is `Metadata` /
+/// `OwnedEntry` (in `metadata.rs`, not visible from this `#[path]`-shared
+/// file); freeze one into a `MetadataEntry` with the `From<&E>` bridge.
+///
+/// No intra-doc links in this file: it is `#[path]`-included into
+/// `amenable_verus` too, and a link that resolves in `amenable_core` need not
+/// resolve there.
 ///
 /// Hand-written `new`/`key`/`value` instead of `derive_new`/`derive_getters`,
 /// despite otherwise matching that exact shape: `amenable_verus`

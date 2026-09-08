@@ -9,6 +9,7 @@ use syn::{Data, Error, Field, Fields, LitStr, Path, Type, parse_quote};
 /// Whether an attribute is one of the two interchangeable schema attributes
 /// (`#[metadata(..)]` on a `#[derive(Metadata)]`, `#[provenance(..)]` on a
 /// `#[derive(Provenance)]`).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(attr), ret))]
 fn is_schema_attr(attr: &syn::Attribute) -> bool {
     attr.path().is_ident("metadata") || attr.path().is_ident("provenance")
 }

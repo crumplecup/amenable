@@ -120,12 +120,14 @@ impl Entry for AuthorityKind {
     const KEY: &'static str = "authority_kind";
     type Value = AuthorityKind;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn value(&self) -> &AuthorityKind {
         self
     }
 }
 
 impl Metadata for AuthorityKind {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     fn snapshot(&self) -> Vec<OwnedEntry> {
         vec![OwnedEntry::new("authority_kind", *self)]
     }
