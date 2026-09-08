@@ -13,7 +13,28 @@
 
 mod calendar;
 mod definitions;
+mod duration_units;
 mod time_of_day;
+
+pub use duration_units::{
+    CalendarDayDurationMayBeModifiedByLeapSecondsOrLocalTimeShifts,
+    CalendarDayIsIntervalOfSingleCalendarDateAdvance,
+    CalendarMonthIsNamedIntervalWithinCalendarYear,
+    CalendarWeekIsSevenDayIntervalBeginningOnMonday,
+    CalendarYearIsIntervalOfSuccessiveCalendarMonths,
+    DayDurationMaySpanSameTimeOfDayOnAdjacentCalendarDays, DayEqualsTwentyFourHours,
+    DurationEqualsDifferenceBetweenIntervalEndpoints, HourEqualsSixtyMinutes,
+    MinuteEqualsSixtySeconds, MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
+    MonthDurationMayRequireAgreedEndingCalendarDay,
+    MonthMayBeConsideredThirtyCalendarDaysInCertainApplications,
+    NominalDayDurationMayDifferFromExactElapsedTime, NominalDurationDependsOnCalendarContext,
+    NominalMonthDurationDependsOnCalendarContext,
+    NominalWeekDurationIsDistinctFromExactElapsedTime, NominalYearDurationDependsOnCalendarContext,
+    SecondIsBaseUnitForExpressingDuration, SecondIsSiBaseUnitOfTime,
+    WeekDurationMaySpanSameTimeOfDayInNextCalendarWeek,
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
+    YearDurationMayRequireAgreedEndingCalendarDate,
+};
 
 pub use calendar::{
     CalendarDateHasYearMonthDay, CalendarDateUsesGregorianCalendar, CalendarDayWithinMonthBounds,

@@ -21,7 +21,7 @@ capability queries).
 | module (`elicit_temporal`) | count | ported | establish | kani | creusot | verus |
 |---|---:|:--:|:--:|:--:|:--:|:--:|
 | `contracts/precision` | 5 | ✅ 5/5 | — | — | — | — |
-| `contracts/iso_8601` | 109 | 53/109 (definitions + calendar + time-of-day) | — | — | — | — |
+| `contracts/iso_8601` | 109 | 78/109 (+ duration-units) | — | — | — | — |
 | `contracts/extended` (→ `iso_8601_2`) | 48 | — | — | — | — | — |
 | `contracts/rfc3339` | 20 | — | — | — | — | — |
 | `contracts/rfc9557` | 38 | — | — | — | — | — |
