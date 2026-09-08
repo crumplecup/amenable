@@ -29,8 +29,11 @@ mod traits;
 mod types;
 
 pub use contracts::{
-    FractionalSecondDigitsAreContiguous, FractionalSecondPrecisionDeclared,
-    PrecisionReductionDeclared, RoundingModeDeclared, SubsecondDigitsPreserved,
+    DateIdentifiesPositionWithinCalendar, FractionalSecondDigitsAreContiguous,
+    FractionalSecondPrecisionDeclared, InstantIsPointOnTimeAxis, PrecisionReductionDeclared,
+    RoundingModeDeclared, SubsecondDigitsPreserved, TimeAxisOrdersTimePointsByTemporalPosition,
+    TimeIsMarkOnSpecifiedTimeScale, TimeOfDayOccursWithinCalendarDay,
+    TimeScaleAssociatesTimePointsWithOrderedMeasure,
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use provenance::TemporalProvenance;

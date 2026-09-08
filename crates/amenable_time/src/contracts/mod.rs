@@ -9,8 +9,14 @@
 //! [`Evidence`](amenable_core::Evidence) in `contracts::proof_composition`
 //! (plan Phase 3).
 
+mod iso_8601;
 mod precision;
 
+pub use iso_8601::{
+    DateIdentifiesPositionWithinCalendar, InstantIsPointOnTimeAxis,
+    TimeAxisOrdersTimePointsByTemporalPosition, TimeIsMarkOnSpecifiedTimeScale,
+    TimeOfDayOccursWithinCalendarDay, TimeScaleAssociatesTimePointsWithOrderedMeasure,
+};
 pub use precision::{
     FractionalSecondDigitsAreContiguous, FractionalSecondPrecisionDeclared,
     PrecisionReductionDeclared, RoundingModeDeclared, SubsecondDigitsPreserved,
