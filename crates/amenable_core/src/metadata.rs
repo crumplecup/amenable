@@ -241,6 +241,21 @@ impl<E: ErasedEntry + ?Sized> From<&E> for MetadataEntry {
     }
 }
 
+/// A frozen entry is a one-entry [`Metadata`] record: `snapshot` thaws its
+/// rendered pair back into an [`OwnedEntry`] with a `String` value.
+///
+/// The impl lives here, not in `metadata_entry.rs`, because that file is
+/// `#[path]`-shared into `amenable_verus` and must not see [`OwnedEntry`].
+impl Metadata for MetadataEntry {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn snapshot(&self) -> Vec<OwnedEntry> {
+        vec![OwnedEntry::new(
+            self.key().to_owned(),
+            self.value().to_owned(),
+        )]
+    }
+}
+
 /// A hand-assembled or merged [`Metadata`] record.
 ///
 /// Not what `#[derive(Metadata)]` produces — that implements [`Metadata`]

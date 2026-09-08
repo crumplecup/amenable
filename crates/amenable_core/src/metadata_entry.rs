@@ -1,11 +1,13 @@
-//! The frozen key/value metadata snapshot a [`Certificate`](crate::Certificate)
-//! stores.
+//! The frozen key/value metadata snapshot a `Certificate` stores.
 //!
 //! Split out of `provenance.rs` so it can be `#[path]`-included into
 //! `amenable_verus` on its own: the raw `verus` compiler needs `MetadataEntry`
-//! (for `cert.rs`'s certificate surface) but must not see the live [`Metadata`]
-//! (crate::Metadata) trait layer, which now lives in `metadata.rs` and uses
-//! `Arc<dyn ...>` / `Any`.
+//! (for `cert.rs`'s certificate surface) but must not see the live `Metadata`
+//! trait layer, which lives in `metadata.rs` and uses `Arc<dyn ...>` / `Any`.
+//!
+//! No intra-doc links in this file: it is `#[path]`-included into
+//! `amenable_verus` too, and a link that resolves in `amenable_core` need not
+//! resolve there.
 
 use std::fmt::{self, Display, Formatter};
 
@@ -13,13 +15,10 @@ use std::fmt::{self, Display, Formatter};
 ///
 /// This is the audit snapshot, not the live interface: a `Certificate` stores
 /// `Vec<MetadataEntry>` because it wants cheap comparison and hashing and never
-/// needs the structured value back. Live, typed metadata is `Metadata` /
-/// `OwnedEntry` (in `metadata.rs`, not visible from this `#[path]`-shared
-/// file); freeze one into a `MetadataEntry` with the `From<&E>` bridge.
-///
-/// No intra-doc links in this file: it is `#[path]`-included into
-/// `amenable_verus` too, and a link that resolves in `amenable_core` need not
-/// resolve there.
+/// needs the structured value back. It is still a one-entry `Metadata` record
+/// (`impl` in `metadata.rs`) — `snapshot()` thaws it back to an `OwnedEntry`
+/// with a `String` value. Freeze a live entry into one with the `From<&E>`
+/// bridge.
 ///
 /// Hand-written `new`/`key`/`value` instead of `derive_new`/`derive_getters`,
 /// despite otherwise matching that exact shape: `amenable_verus`

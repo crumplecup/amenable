@@ -105,6 +105,13 @@ fn metadata_entry_freezes_a_live_entry() {
     assert_eq!(frozen[0].key(), "max_rpm");
     assert_eq!(frozen[0].value(), "12000 rpm");
     assert_eq!(frozen[1], MetadataEntry::new("part_number", "M-17"));
+
+    // a frozen entry is itself a one-entry `Metadata` record
+    assert_eq!(frozen[1].keys(), vec!["part_number"]);
+    assert_eq!(
+        frozen[1].get_as::<String>("part_number"),
+        Some("M-17".to_string())
+    );
 }
 
 /// A `HashMap`-backed record: proves `Metadata` is pluggable and that a
