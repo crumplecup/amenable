@@ -13,9 +13,22 @@ mod iso_8601;
 mod precision;
 
 pub use iso_8601::{
-    DateIdentifiesPositionWithinCalendar, InstantIsPointOnTimeAxis,
+    CalendarDateHasYearMonthDay, CalendarDateUsesGregorianCalendar, CalendarDayWithinMonthBounds,
+    CalendarMonthInRangeOneToTwelve, CalendarWeekNumberUsesFirstThursdayRule,
+    CalendarWeekStartsOnMonday, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CalendarYearThrough1582RequiresMutualAgreement, CentennialYearDivisibleByOneHundred,
+    CenturyOrdinalInRangeZeroToNinetyNine, CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    DateIdentifiesPositionWithinCalendar, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException, InstantIsPointOnTimeAxis,
+    LeapDayOccursOnlyInLeapYear, LeapYearHasThreeHundredSixtySixCalendarDays,
+    OrdinalDateHasYearAndDayOfYear, OrdinalDayInRangeOneToThreeHundredSixtySix,
+    OrdinalDayOfYearUsesThreeDigits, ProlepticGregorianDatesBefore1583RequireMutualAgreement,
+    ReducedAccuracyWeekDateOmitsWeekdayComponent, ReducedCalendarDateHasYearComponent,
+    ReducedCalendarDateOmitsLowerOrderDigitsFromExtremeRight,
+    ReducedCalendarDateUsesYearMonthRepresentation, ReducedCalendarDateUsesYearOnlyRepresentation,
     TimeAxisOrdersTimePointsByTemporalPosition, TimeIsMarkOnSpecifiedTimeScale,
     TimeOfDayOccursWithinCalendarDay, TimeScaleAssociatesTimePointsWithOrderedMeasure,
+    WeekDateHasWeekYearWeekAndWeekday, WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 pub use precision::{
     FractionalSecondDigitsAreContiguous, FractionalSecondPrecisionDeclared,

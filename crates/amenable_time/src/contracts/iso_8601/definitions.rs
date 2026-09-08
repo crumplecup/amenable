@@ -1,15 +1,12 @@
-//! ISO 8601 temporal propositions — the largest contract module (109 in
-//! `elicit_temporal`).
+//! ISO 8601 §3.1.1 conceptual definitions — time axis, time scale, time,
+//! instant, date, time of day.
 //!
-//! Sources: ISO 8601-1:2019 (+ Amd 1:2022), ISO 8601-2:2019, and the
-//! publicly-circulated working draft ISO/WD 8601-1:2016(E). All three are
-//! tier C (`docs/AMENABLE_TIME_PLAN.md`): paywalled or draft, so
-//! `NormativeQuotation::ParaphraseOnly` — no ISO prose is reproduced.
-//! Contracts citing the published standard carry `status: Normative`;
-//! those citing only the working draft carry `status: OpenTextCrossCheck`.
-//!
-//! Ported group by group (`docs/AMENABLE_TIME_COVERAGE.md`). This file
-//! grows as the groups land.
+//! Tier C (`docs/AMENABLE_TIME_PLAN.md`): every `iso_8601` source is
+//! paywalled or a draft, so `NormativeQuotation::ParaphraseOnly` and no
+//! ISO prose is reproduced — the `summary` is a genuine reword of the
+//! clause. Contracts citing the published standard carry `status:
+//! Normative`; those citing only the working draft ISO/WD 8601-1:2016(E)
+//! carry `status: OpenTextCrossCheck`.
 
 use crate::NormativeQuotation;
 

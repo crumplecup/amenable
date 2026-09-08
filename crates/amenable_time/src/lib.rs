@@ -29,11 +29,25 @@ mod traits;
 mod types;
 
 pub use contracts::{
-    DateIdentifiesPositionWithinCalendar, FractionalSecondDigitsAreContiguous,
-    FractionalSecondPrecisionDeclared, InstantIsPointOnTimeAxis, PrecisionReductionDeclared,
+    CalendarDateHasYearMonthDay, CalendarDateUsesGregorianCalendar, CalendarDayWithinMonthBounds,
+    CalendarMonthInRangeOneToTwelve, CalendarWeekNumberUsesFirstThursdayRule,
+    CalendarWeekStartsOnMonday, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CalendarYearThrough1582RequiresMutualAgreement, CentennialYearDivisibleByOneHundred,
+    CenturyOrdinalInRangeZeroToNinetyNine, CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    DateIdentifiesPositionWithinCalendar, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    FractionalSecondDigitsAreContiguous, FractionalSecondPrecisionDeclared,
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException, InstantIsPointOnTimeAxis,
+    LeapDayOccursOnlyInLeapYear, LeapYearHasThreeHundredSixtySixCalendarDays,
+    OrdinalDateHasYearAndDayOfYear, OrdinalDayInRangeOneToThreeHundredSixtySix,
+    OrdinalDayOfYearUsesThreeDigits, PrecisionReductionDeclared,
+    ProlepticGregorianDatesBefore1583RequireMutualAgreement,
+    ReducedAccuracyWeekDateOmitsWeekdayComponent, ReducedCalendarDateHasYearComponent,
+    ReducedCalendarDateOmitsLowerOrderDigitsFromExtremeRight,
+    ReducedCalendarDateUsesYearMonthRepresentation, ReducedCalendarDateUsesYearOnlyRepresentation,
     RoundingModeDeclared, SubsecondDigitsPreserved, TimeAxisOrdersTimePointsByTemporalPosition,
     TimeIsMarkOnSpecifiedTimeScale, TimeOfDayOccursWithinCalendarDay,
-    TimeScaleAssociatesTimePointsWithOrderedMeasure,
+    TimeScaleAssociatesTimePointsWithOrderedMeasure, WeekDateHasWeekYearWeekAndWeekday,
+    WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use provenance::TemporalProvenance;

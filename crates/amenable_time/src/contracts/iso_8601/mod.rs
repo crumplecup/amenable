@@ -1,0 +1,37 @@
+//! ISO 8601 temporal propositions — the largest contract module (109 in
+//! `elicit_temporal`). Split by group to stay under the 500-LOC cap.
+//!
+//! Sources: ISO 8601-1:2019 (+ Amd 1:2022), ISO 8601-2:2019, and the
+//! publicly-circulated working draft ISO/WD 8601-1:2016(E). All tier C
+//! (`docs/AMENABLE_TIME_PLAN.md`): paywalled or draft, so every contract
+//! carries `NormativeQuotation::ParaphraseOnly` and no ISO prose is
+//! reproduced. Published-standard citations are `status: Normative`;
+//! working-draft-only citations are `status: OpenTextCrossCheck`.
+//!
+//! Groups land one at a time — see `docs/AMENABLE_TIME_COVERAGE.md` for
+//! the live count.
+
+mod calendar;
+mod definitions;
+
+pub use calendar::{
+    CalendarDateHasYearMonthDay, CalendarDateUsesGregorianCalendar, CalendarDayWithinMonthBounds,
+    CalendarMonthInRangeOneToTwelve, CalendarWeekNumberUsesFirstThursdayRule,
+    CalendarWeekStartsOnMonday, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CalendarYearThrough1582RequiresMutualAgreement, CentennialYearDivisibleByOneHundred,
+    CenturyOrdinalInRangeZeroToNinetyNine, CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException, LeapDayOccursOnlyInLeapYear,
+    LeapYearHasThreeHundredSixtySixCalendarDays, OrdinalDateHasYearAndDayOfYear,
+    OrdinalDayInRangeOneToThreeHundredSixtySix, OrdinalDayOfYearUsesThreeDigits,
+    ProlepticGregorianDatesBefore1583RequireMutualAgreement,
+    ReducedAccuracyWeekDateOmitsWeekdayComponent, ReducedCalendarDateHasYearComponent,
+    ReducedCalendarDateOmitsLowerOrderDigitsFromExtremeRight,
+    ReducedCalendarDateUsesYearMonthRepresentation, ReducedCalendarDateUsesYearOnlyRepresentation,
+    WeekDateHasWeekYearWeekAndWeekday, WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
+};
+pub use definitions::{
+    DateIdentifiesPositionWithinCalendar, InstantIsPointOnTimeAxis,
+    TimeAxisOrdersTimePointsByTemporalPosition, TimeIsMarkOnSpecifiedTimeScale,
+    TimeOfDayOccursWithinCalendarDay, TimeScaleAssociatesTimePointsWithOrderedMeasure,
+};
