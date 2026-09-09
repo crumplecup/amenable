@@ -7,8 +7,9 @@
 
 use amenable_core::{Evidence, EvidenceLink, ProofToken};
 use amenable_time::{
-    CalendarDateValid, CalendarDateValidToken, LocalDateTimeProof, RawInput, RawTemporalText,
-    Rfc3339TimestampProof, TemporalInputReceived, TemporalInputToken,
+    CalendarDateExtendedFormatted, CalendarDateValid, CalendarDateValidToken,
+    FormattedCalendarDateExtended, FormattedTemporalText, LocalDateTimeProof, RawInput,
+    RawTemporalText, Rfc3339TimestampProof, TemporalInputReceived, TemporalInputToken,
 };
 
 #[test]
@@ -69,6 +70,31 @@ fn every_output_token_registers_an_establish_edge_from_the_input_token() {
         minted >= 24,
         "expected >=24 temporal establish edges, got {minted}"
     );
+}
+
+#[test]
+fn the_formatter_output_family_exists() {
+    amenable_core::init_tracing();
+
+    // `format_calendar_date_extended` output: `FormattedCalendarDateExtended`
+    // (primary = the emitted text) over the `CalendarDateExtendedFormatted`
+    // emission-proof composite.
+    let () = CalendarDateExtendedFormatted::default().audit();
+    assert!(<CalendarDateExtendedFormatted as Evidence>::is_root());
+    assert!(<FormattedTemporalText as Evidence>::is_root());
+
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<amenable_time::CalendarDateExtendedFormattedToken, CalendarDateExtendedFormatted>(
+    );
+
+    // a compile-time reference is enough to prove the sidecar type is there
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<Option<FormattedCalendarDateExtended>>;
 }
 
 #[test]

@@ -56,19 +56,31 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 
 ## Exchange surface (`src/exchange/`)
 
-**Phase 4 Steps 1 + 2 done (2026-09-09).** `RawInput` input sidecar
-(`Sidecar<V>` for every `V`). `TemporalParser<V>` — a trait whose
-supertrait bundle *is* the 24 parse exchanges (`impl TemporalParser<V> ⇔
-impl all 24 Exchange<RawInput, ParsedX, V>`), plus 24 `where <Prop>:
-Witness<V>` bounds (the honest precondition — a generic consumer must
-restate them; a helper macro is a follow-on). `src/exchange/parse.rs` (24
-`ParsedX` `#[derive(Sidecar)]` outputs — the `elicit_temporal` return
-tuples, named), `parse_props.rs` (12 per-method composite propositions
-folding the multi-proof methods' 2–9 sidecars), `establish.rs` (24
-`#[amenable_derive::establish]` tokens). **No `Exchange` impl in
-`amenable_time`** — the orphan rule keeps those in the backend crate
-(`#[capture_exchange_body]` generates them). `amenable_derive::Sidecar`
-fixed (restate `Proposition: Witness<V>`; doc the generated `new`).
+**Phase 4 Steps 1 + 2 + 3 done (2026-09-09).** `RawInput` input sidecar
+(`Sidecar<V>` for every `V`). `TemporalParser<V>` / `TemporalFormatter<V>`
+— traits whose supertrait bundle *is* the parse / format exchanges (`impl
+TemporalParser<V> ⇔ impl all 24 Exchange<RawInput, ParsedX, V>`; `impl
+TemporalFormatter<V> ⇔ impl all 36 Exchange<ParsedX, FormattedY, V>`),
+plus `where <Prop>: Witness<V>` bounds for every input + output
+proposition (the honest precondition — a generic consumer must restate
+them; a helper macro is a follow-on).
+
+- `src/exchange/parse.rs` — 24 + 3 `ParsedX` `#[derive(Sidecar)]` outputs
+  (the `elicit_temporal` return tuples, named; the +3 are formatter-only
+  inputs — `ParsedDuration` etc.)
+- `src/exchange/parse_props.rs` — 12 + 1 per-method composite propositions
+  folding the multi-proof parse methods' 2–9 sidecars
+- `src/exchange/format.rs` — 36 `Formatted*` `#[derive(Sidecar)]` outputs
+  (`FormattedTemporalText` primary + a `<Method>FormattedToken`)
+- `src/exchange/format_props.rs` — 36 `<Method>Formatted` emission-proof
+  composites (same fold)
+- `src/exchange/establish.rs` — 24 parse + 3 input + 36 format
+  `#[amenable_derive::establish]` tokens
+
+**No `Exchange` impl in `amenable_time`** — the orphan rule keeps those in
+the backend crate (`#[capture_exchange_body]` generates them).
+`amenable_derive::Sidecar` fixed (restate `Proposition: Witness<V>`; doc
+the generated `new`).
 
 ## Traits (`traits/`, ~35 traits / ~175 methods)
 
@@ -76,7 +88,7 @@ fixed (restate `Proposition: Witness<V>`; doc the generated `new`).
 |---|---:|:--:|---|
 | `TemporalReporter` | 7 | ✅ | plain trait (not an `Exchange` — capability query) |
 | `TemporalParser<V>` | 24 | ✅ 24/24 | supertrait bundle of `Exchange<RawInput, ParsedX, V>` (`src/exchange/`; the `Exchange` impls are a backend concern) |
-| `TemporalFormatter` | 36 | — | `Exchange` per method (Phase 4) |
+| `TemporalFormatter<V>` | 36 | ✅ 36/36 | supertrait bundle of `Exchange<ParsedX, FormattedY, V>` — a proven descriptor sidecar in, a `Formatted*` sidecar out (`src/exchange/format*.rs`) |
 | `TemporalZoneFactory` | 5 | — | Phase 4 |
 | `TemporalConversionFactory` | 4 | — | Phase 4 |
 | `TemporalIntervalFactory` | 4 | — | Phase 4 |

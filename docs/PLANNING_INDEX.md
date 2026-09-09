@@ -65,22 +65,27 @@ members' proofs. Generated from `elicit_temporal` by script.
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
 (`proof_composition/proof_branches.rs`).
 
-**Phase 4 Steps 1–2 complete (2026-09-09)** — the exchange surface in
+**Phase 4 Steps 1–3 complete (2026-09-09)** — the exchange surface in
 `src/exchange/`. **Design (user-confirmed after several corrections):
 every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
 descriptor, `#[sidecar(token)]` proof token). **`amenable_time` ships no
 `Exchange` impl** — the orphan rule forbids `impl<T: …, V> Exchange<
-RawInput, …, V> for T` (tested). Instead it ships `TemporalParser<V>` — a
-trait whose supertrait bundle *is* the 24 `Exchange<RawInput, ParsedX,
-V>` — and the backend writes the inherent parse methods
-(`#[capture_exchange_body]` generates the `Exchange` impls). Step 2a: 23
-top-level descriptors + their transitive enums gain `Default`/`Evidence`.
-Step 2b: all 24 `ParsedX` sidecars, 12 per-method composite propositions
-(multi-proof folding), 24 `#[establish]` tokens, the full trait —
-generated from `elicit_temporal`. Two earlier sketches
-(`Proven`/`Proven::prove`, then a standalone `TemporalExchange`) were
-reverted. Next: Phase 4 Step 2c (a codegen macro for the backend's
-`Exchange` impls) / `TemporalFormatter`.
+RawInput, …, V> for T` (tested). Instead it ships `TemporalParser<V>` /
+`TemporalFormatter<V>` — traits whose supertrait bundle *is* the 24
+`Exchange<RawInput, ParsedX, V>` / 36 `Exchange<ParsedX, FormattedY, V>` —
+and the backend writes the inherent methods (`#[capture_exchange_body]`
+generates the `Exchange` impls). Step 2a: 23 top-level descriptors + their
+transitive enums gain `Default`/`Evidence`. Step 2b: all 24 `ParsedX`
+sidecars, 12 per-method composite propositions (multi-proof folding), 24
+`#[establish]` tokens, the parser trait. **Step 3 (2026-09-09):**
+`TemporalFormatter<V>` — 36 `Formatted*` output sidecars
+(`FormattedTemporalText` primary), 36 `<Method>Formatted` emission-proof
+composites, 3 formatter-only `Parsed*` inputs, 36+3 `#[establish]` tokens.
+Two earlier sketches (`Proven`/`Proven::prove`, then a standalone
+`TemporalExchange`) were reverted. Next: `TemporalZoneFactory` (5),
+`TemporalConversionFactory` (4), `TemporalIntervalFactory` (4),
+`TemporalCalConnectFactory` (19); then Step 2c (a codegen macro for the
+backend's `Exchange` impls).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

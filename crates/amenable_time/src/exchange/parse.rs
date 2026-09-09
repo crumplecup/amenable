@@ -8,20 +8,22 @@
 use crate::{
     CalendarDateDescriptor, CalendarDateValidToken, CenturyDescriptor, CenturyValidToken,
     DateTimeFormulaDescriptor, DateTimeFormulaProofToken, DateWithShiftDescriptor,
-    DateWithShiftValidToken, DecadeDescriptor, DecadeValidToken, ExtendedYearDescriptor,
-    ExtendedYearValidToken, GroupedTimeScaleUnitDescriptor, GroupedTimeScaleUnitProofToken,
-    IxdtfTimestampDescriptor, IxdtfTimestampProofToken, LocalDateTimeDescriptor,
+    DateWithShiftValidToken, DecadeDescriptor, DecadeValidToken, DurationDescriptor,
+    DurationFormValidToken, ExtendedYearDescriptor, ExtendedYearValidToken,
+    GroupedTimeScaleUnitDescriptor, GroupedTimeScaleUnitProofToken, IxdtfTimestampDescriptor,
+    IxdtfTimestampProofToken, IxdtfZonedTimestampProofToken, LocalDateTimeDescriptor,
     LocalDateTimeProofToken, LocalTimeDescriptor, LocalTimeValidToken, OffsetDateTimeDescriptor,
     OffsetDateTimeProofToken, OrdinalDateDescriptor, OrdinalDateValidToken,
     QualifiedTemporalValueDescriptor, QualifiedTemporalValueProofToken,
-    ReducedCalendarDateDescriptor, ReducedCalendarDateValidToken, ReducedLocalTimeDescriptor,
-    ReducedLocalTimeValidToken, Rfc3339TimestampProofToken, SeasonalTemporalExpressionDescriptor,
+    RecurringIntervalDescriptor, RecurringIntervalFormValidToken, ReducedCalendarDateDescriptor,
+    ReducedCalendarDateValidToken, ReducedLocalTimeDescriptor, ReducedLocalTimeValidToken,
+    Rfc3339TimestampProofToken, SeasonalTemporalExpressionDescriptor,
     SeasonalTemporalExpressionProofToken, SubYearGroupingExpressionDescriptor,
     SubYearGroupingExpressionProofToken, TemporalSetDescriptor, TemporalSetProofToken,
     TimeIntervalDescriptor, TimeIntervalProofToken, TimeOfDayWithShiftDescriptor,
     TimeOfDayWithShiftValidToken, UnspecifiedComponentExpressionDescriptor,
     UnspecifiedComponentExpressionProofToken, UtcOffsetDescriptor, UtcOffsetValidToken,
-    WeekDateDescriptor, WeekDateValidToken,
+    WeekDateDescriptor, WeekDateValidToken, ZonedDateTimeDescriptor,
 };
 
 /// Output sidecar for the `parse_calendar_date` exchange: [`CalendarDateDescriptor`](crate::CalendarDateDescriptor)
@@ -488,6 +490,60 @@ impl ParsedTimeInterval {
     /// Borrow the parsed descriptor.
     #[must_use]
     pub fn descriptor(&self) -> &TimeIntervalDescriptor {
+        &self.descriptor
+    }
+}
+
+/// Proven-descriptor input sidecar for the matching formatter method(s).
+#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[sidecar(proposition = "crate::IxdtfZonedTimestampProof", constructor = "pub")]
+pub struct ParsedIxdtfZonedTimestamp {
+    #[sidecar(primary)]
+    descriptor: ZonedDateTimeDescriptor,
+    #[sidecar(token)]
+    token: IxdtfZonedTimestampProofToken,
+}
+
+impl ParsedIxdtfZonedTimestamp {
+    /// Borrow the descriptor.
+    #[must_use]
+    pub fn descriptor(&self) -> &ZonedDateTimeDescriptor {
+        &self.descriptor
+    }
+}
+
+/// Proven-descriptor input sidecar for the matching formatter method(s).
+#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[sidecar(proposition = "crate::DurationFormValid", constructor = "pub")]
+pub struct ParsedDuration {
+    #[sidecar(primary)]
+    descriptor: DurationDescriptor,
+    #[sidecar(token)]
+    token: DurationFormValidToken,
+}
+
+impl ParsedDuration {
+    /// Borrow the descriptor.
+    #[must_use]
+    pub fn descriptor(&self) -> &DurationDescriptor {
+        &self.descriptor
+    }
+}
+
+/// Proven-descriptor input sidecar for the matching formatter method(s).
+#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[sidecar(proposition = "crate::RecurringIntervalFormValid", constructor = "pub")]
+pub struct ParsedRecurringInterval {
+    #[sidecar(primary)]
+    descriptor: RecurringIntervalDescriptor,
+    #[sidecar(token)]
+    token: RecurringIntervalFormValidToken,
+}
+
+impl ParsedRecurringInterval {
+    /// Borrow the descriptor.
+    #[must_use]
+    pub fn descriptor(&self) -> &RecurringIntervalDescriptor {
         &self.descriptor
     }
 }

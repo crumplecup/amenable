@@ -83,7 +83,20 @@ pub struct LocalTimeZoneResolutionAuthorityDescriptor {
 
 /// A zoned timestamp descriptor pairing a fixed-instant form with a named
 /// zone.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into))]
 pub struct ZonedDateTimeDescriptor {
     /// Offset timestamp representation.

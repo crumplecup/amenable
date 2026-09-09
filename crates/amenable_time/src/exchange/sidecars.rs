@@ -1,6 +1,5 @@
 //! [`RawInput`] — every temporal method's input sidecar: a raw string
-//! coupled to the trivial "input received" token. Verifier-less
-//! `#[derive(Sidecar)]` — the crate is backend-neutral, so no per-backend
+//! coupled to the "input received" token. Verifier-less `#[derive(Sidecar)]` — the crate is backend-neutral, so no per-backend
 //! mirror is needed (`project_creusot_translator_dependency_scope`).
 //!
 //! Output sidecars are per-method `#[derive(Sidecar)]` structs (one per

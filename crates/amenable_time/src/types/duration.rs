@@ -9,7 +9,20 @@ use crate::{
 };
 
 /// A neutral ISO 8601 duration descriptor.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option), default)]
 pub struct DurationDescriptor {
     /// Whole years component.

@@ -117,7 +117,20 @@ pub struct TimeIntervalDescriptor {
 }
 
 /// A neutral ISO 8601 recurring interval descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct RecurringIntervalDescriptor {
     /// Bounded repetition count; `None` denotes unbounded recurrence.

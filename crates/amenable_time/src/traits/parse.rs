@@ -26,7 +26,7 @@ use crate::{
     ParsedUtcOffset, ParsedWeekDate, QualifiedTemporalValueProof, RawInput,
     ReducedCalendarDateValid, ReducedLocalTimeValid, Rfc3339TimestampProof,
     SeasonalTemporalExpressionProof, SubYearGroupingExpressionProof, TemporalError,
-    TemporalSetProof, TimeIntervalProof, TimeOfDayWithShiftValid,
+    TemporalInputReceived, TemporalSetProof, TimeIntervalProof, TimeOfDayWithShiftValid,
     UnspecifiedComponentExpressionProof, UtcOffsetValid, WeekDateValid,
 };
 
@@ -60,6 +60,7 @@ pub trait TemporalParser<V: Verifier>:
     + Exchange<RawInput, ParsedDateTimeFormula, V, Error = TemporalError>
     + Exchange<RawInput, ParsedTimeInterval, V, Error = TemporalError>
 where
+    TemporalInputReceived: Witness<V>,
     CalendarDateValid: Witness<V>,
     ReducedCalendarDateValid: Witness<V>,
     ExtendedYearValid: Witness<V>,
@@ -90,6 +91,7 @@ where
 impl<T, V> TemporalParser<V> for T
 where
     V: Verifier,
+    TemporalInputReceived: Witness<V>,
     CalendarDateValid: Witness<V>,
     ReducedCalendarDateValid: Witness<V>,
     ExtendedYearValid: Witness<V>,

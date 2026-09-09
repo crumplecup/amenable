@@ -18,15 +18,16 @@ use crate::{
     IxdtfTimeZoneAnnotationProofBranch, IxdtfTimestampValid,
     LevelOneUnspecifiedDigitsOccupyRightmostPositions,
     LevelTwoUnspecifiedDigitsMayAppearWithinComponent, LocalDateTimeDoesNotIdentifyFixedInstant,
-    LocalDateTimeValid, OffsetDateTimeValid, QualificationPlacementEvidence,
-    QualifiedTemporalExpressionValid, QualifiedTemporalValueValid, Rfc3339TimestampValid,
-    SeasonCodeDeclaresNamedSeason, SeasonCodeDeclaresSeasonScope,
+    LocalDateTimeValid, OffsetConsistentWithNamedZone, OffsetDateTimeValid,
+    QualificationPlacementEvidence, QualifiedTemporalExpressionValid, QualifiedTemporalValueValid,
+    Rfc3339TimestampValid, SeasonCodeDeclaresNamedSeason, SeasonCodeDeclaresSeasonScope,
     SeasonalExpressionUsesSeasonCodeInMonthSlot, SeasonalExpressionUsesYearAndSeasonForm,
     SeasonalTemporalExpressionValid, SubYearGroupingExpressionUsesGroupingCodeInMonthSlot,
     SubYearGroupingExpressionUsesYearAndGroupingForm, SubYearGroupingExpressionValid,
     SubYearGroupingKindEvidence, TemporalSetExpressionValid, TemporalSetRangeSemanticsValid,
     TimeIntervalValid, TimestampRepresentsFixedInstant, UnspecifiedComponentExpressionValid,
     UnspecifiedDigitUsesUppercaseXPlaceholder, UnspecifiedDigitsDeclareUnknownValue,
+    ZonedDateTimeHasNamedZone,
 };
 
 /// Proof for [`ParsedQualifiedTemporalValue`](crate::ParsedQualifiedTemporalValue) — the 3 proof sidecars `elicit_temporal`'s `parse_qualified_temporal_value` returns, folded into one composite proposition.
@@ -322,4 +323,26 @@ pub struct TimeIntervalProof {
     interval_zone_inheritance_proof_branch: IntervalZoneInheritanceProofBranch,
     /// The `complete_interval_substitution_proof_branch` sub-claim.
     complete_interval_substitution_proof_branch: CompleteIntervalSubstitutionProofBranch,
+}
+
+/// Composite input proposition for the matching formatter method(s).
+#[derive(
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    amenable_derive::Witness,
+    derive_getters::Getters,
+)]
+#[evidence(basis = "Self")]
+pub struct IxdtfZonedTimestampProof {
+    /// The `timestamp_represents_fixed_instant` sub-claim.
+    timestamp_represents_fixed_instant: TimestampRepresentsFixedInstant,
+    /// The `zoned_date_time_has_named_zone` sub-claim.
+    zoned_date_time_has_named_zone: ZonedDateTimeHasNamedZone,
+    /// The `offset_consistent_with_named_zone` sub-claim.
+    offset_consistent_with_named_zone: OffsetConsistentWithNamedZone,
 }
