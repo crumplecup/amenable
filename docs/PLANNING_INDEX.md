@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Steps 1–4
+**Status:** 🔲 Phases 0–5 complete (contracts + descriptors + composites + the full exchange surface + carriers/bridges); Phase 6 (real per-backend proofs) next
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
@@ -120,8 +120,16 @@ of the 22 gets a `<Bundle>Token` `#[establish]`-swapped from the token
 that produced it, and the carrier is keyed on the token (proposition =
 `<STok as ProofToken>::Proposition` via a new
 `#[sidecar(proposition_from_token)]` derive flag). 14 `Proven*Carrier<T>`
-aliases. Next: Phase 5 Step 4b (the 8 `*_native` carrier→carrier factory
-analogs), which finishes Phase 5; then Phase 6 (real per-backend proofs). (Step 2c — the backend
+aliases. **Step 4b (2026-09-09):** the 9 `*_native` factory analogs →
+carrier↔carrier `Exchange`s (`traits/native_factory.rs`); multi-input
+methods fold runtime values into a `<M>NativeRequest<B>` primary
+(`#[evidence(basis = "NativeCarrierRequest")]` marker, so the generic
+compound needs no `Default`). **Phase 5 is complete** — contracts,
+descriptors, composites, the full exchange surface (parser / formatter /
+factories / CalConnect), the semantic bundles, the carriers and the
+descriptor↔carrier bridges are all ported. Next: Phase 6 — replace the
+trivial Phase-3 `Witness<V>` placeholders with real per-backend proofs
+(Kani / Creusot / Verus) where a checkable predicate exists. (Step 2c — the backend
 `Exchange`-impl codegen macro — is deferred until there is a backend
 crate to target; `#[capture_exchange_body]` is the working per-method
 form.)

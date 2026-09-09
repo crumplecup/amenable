@@ -77,6 +77,27 @@ impl TemporalDateTimeFormulaProps for FakeBackend {
 }
 
 #[test]
+fn a_native_factory_input_fold_carries_its_runtime_values() {
+    amenable_core::init_tracing();
+
+    // `resolve_local_date_time_native` folds 2 native carriers + 2
+    // sidecars into a `<M>NativeRequest<B>` primary (basis = the
+    // `NativeCarrierRequest` marker, so the compound needs no `Default`).
+    use amenable_time::{
+        NativeCarrierRequest, ResolveLocalDateTimeNativeInput, ResolveLocalDateTimeNativeOutput,
+    };
+    assert!(<NativeCarrierRequest as Evidence>::is_root());
+
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<
+        Option<(
+            ResolveLocalDateTimeNativeInput<FakeBackend>,
+            ResolveLocalDateTimeNativeOutput<FakeBackend>,
+        )>,
+    >;
+}
+
+#[test]
 fn the_aggregate_blankets_compose_from_the_leaf_families() {
     amenable_core::init_tracing();
 

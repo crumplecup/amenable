@@ -18,6 +18,7 @@ mod conversion;
 mod format;
 mod interval;
 mod native_bridge;
+mod native_factory;
 mod native_props;
 mod parse;
 mod report;
@@ -35,6 +36,10 @@ pub use native_bridge::{
     TemporalNativeSpanBridge, TemporalQualifiedTemporalValueNativeBridge,
     TemporalRecurringIntervalNativeBridge, TemporalSetNativeBridge,
     TemporalTimeIntervalNativeBridge, TemporalZoneNativeBridge,
+};
+pub use native_factory::{
+    TemporalNativeConversionFactory, TemporalNativeDateTimeFormulaFactory,
+    TemporalNativeIntervalFactory, TemporalNativeZoneFactory,
 };
 pub use native_props::{
     TemporalCivilProps, TemporalDateTimeFormulaProps, TemporalDurationProps,

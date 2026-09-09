@@ -2,7 +2,10 @@
 
 ## Status
 
-Phase 5 Steps 1–4 (2026-09-09) — Step 4: the 14 `realize_*`/`reflect_*`
+Phase 5 COMPLETE (2026-09-09) — Step 4b: the 9 `*_native` factory
+analogs → `traits/native_factory.rs` (carrier↔carrier `Exchange`s;
+multi-input folds via a `NativeCarrierRequest`-based marker basis).
+Step 4: the 14 `realize_*`/`reflect_*`
 bridge pairs → `traits/native_bridge.rs`, each per-family bridge's
 supertrait bundle *is* its exchange pair (`Exchange<Reflected<X>,
 Proven<X>Carrier<Self::X>, V>` + inverse); 14 `Reflected<X>` sidecars in
@@ -865,10 +868,21 @@ token — so each `Parsed*Result` alias becomes a named
       / `...SpanBridge` / `...ExtensionBridge`) + blanket impls carried
       over (their where-clauses accumulate every sub-family's
       `<Bundle>: Witness<V>`). Generated. 1 test.
-- [ ] **Step 4b:** the 8 `*_native` factory analogs
-      (`normalize_to_utc_native`, `resolve_local_date_time_native`, …) →
-      carrier→carrier `Exchange`s (the native-carrier versions of the
-      already-ported descriptor-side factory transitions).
+- [x] **Step 4b (2026-09-09):** the 9 `*_native` factory analogs
+      (`normalize_to_utc_native`, `strip_named_zone_native`,
+      `adjust_precision_losslessly_native`, `truncate_subseconds_native`,
+      `resolve_local_date_time_native`, `attach_named_zone_native`,
+      `confirm_named_zone_revision_native`, `order_offset_endpoints_native`,
+      `evaluate_date_time_formula_native`) → carrier→carrier `Exchange`s in
+      `traits/native_factory.rs` (the 4 elicit `Temporal*Native*Factory`
+      bridge traits). Single-carrier-in/out reuse the carrier sidecars;
+      multi-input methods fold their runtime values into a
+      `<M>NativeRequest<B>` primary (`#[evidence(basis = "NativeCarrierRequest")]`
+      — an abstract marker basis, so the generic compound needs no
+      `Default`); a method with an extra output proof folds it into a
+      `<M>NativeEstablished` composite behind a `<M>NativeToken`; a
+      pure-proof result gets a dedicated `<M>NativeOutput` bundle sidecar.
+      `src/exchange/native.rs`. Generated. 1 test. **Phase 5 done.**
 
 ### Phase 6 — real proofs for the genuinely-checkable contracts
 

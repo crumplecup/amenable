@@ -30,6 +30,7 @@ mod format;
 mod format_props;
 mod interval;
 mod markers;
+mod native;
 mod parse;
 mod parse_props;
 mod reflect;
@@ -138,6 +139,20 @@ pub use interval::{
     OrderOffsetEndpointsPreconditions, OrderOffsetEndpointsRequest,
 };
 pub use markers::{FormattedTemporalText, RawTemporalText, TemporalInputReceived};
+pub use native::{
+    AdjustPrecisionLosslesslyNativeEstablished, AdjustPrecisionLosslesslyNativeInput,
+    AdjustPrecisionLosslesslyNativeOutput, AdjustPrecisionLosslesslyNativeRequest,
+    AdjustPrecisionLosslesslyNativeToken, AttachNamedZoneNativeInput, AttachNamedZoneNativeRequest,
+    ConfirmNamedZoneRevisionNativeOutput, EvaluateDateTimeFormulaNativeEstablished,
+    EvaluateDateTimeFormulaNativeOutput, EvaluateDateTimeFormulaNativeToken, NativeCarrierRequest,
+    NormalizeToUtcNativeEstablished, NormalizeToUtcNativeOutput, NormalizeToUtcNativeToken,
+    OrderOffsetEndpointsNativeInput, OrderOffsetEndpointsNativeOutput,
+    OrderOffsetEndpointsNativeRequest, ResolveLocalDateTimeNativeEstablished,
+    ResolveLocalDateTimeNativeInput, ResolveLocalDateTimeNativeOutput,
+    ResolveLocalDateTimeNativeRequest, ResolveLocalDateTimeNativeToken,
+    TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
+    TruncateSubsecondsNativeOutput, TruncateSubsecondsNativeRequest, TruncateSubsecondsNativeToken,
+};
 pub use parse::{
     ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade,
     ParsedDuration, ParsedExtendedYear, ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp,
