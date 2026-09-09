@@ -56,14 +56,29 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 
 ## Exchange surface (`src/exchange/`)
 
-**Phase 4 Steps 1 + 2 + 3 done (2026-09-09).** `RawInput` input sidecar
+**Phase 4 Steps 1–4 done (2026-09-09).** `RawInput` input sidecar
 (`Sidecar<V>` for every `V`). `TemporalParser<V>` / `TemporalFormatter<V>`
-— traits whose supertrait bundle *is* the parse / format exchanges (`impl
-TemporalParser<V> ⇔ impl all 24 Exchange<RawInput, ParsedX, V>`; `impl
-TemporalFormatter<V> ⇔ impl all 36 Exchange<ParsedX, FormattedY, V>`),
-plus `where <Prop>: Witness<V>` bounds for every input + output
-proposition (the honest precondition — a generic consumer must restate
-them; a helper macro is a follow-on).
+/ `TemporalZoneFactory<V>` / `TemporalConversionFactory<V>` /
+`TemporalIntervalFactory<V>` — traits whose supertrait bundle *is* the
+per-seam exchanges (`impl TemporalParser<V> ⇔ impl all 24
+Exchange<RawInput, ParsedX, V>`; the formatter and factory bundles the
+same way), plus `where <Prop>: Witness<V>` bounds for every input +
+output proposition (the honest precondition — a generic consumer must
+restate them; a helper macro is a follow-on).
+
+**Step 4** — the 3 factory seams. Each transition method's descriptors
+fold into a `*Request` primary, its `Established<_>` preconditions into a
+`*Preconditions` proposition, and its return-tuple proofs into a
+`*Established` proposition (the `proof_composition` fold). `*Input` /
+`*Output` `#[derive(Sidecar)]` structs; two `#[establish]` edges each
+(`*PreconditionsToken` from `TemporalInputToken`, `*EstablishedToken`
+from `*PreconditionsToken`), all in
+`src/exchange/{zone,conversion,interval,factory_establish}.rs`. The 4
+parser-style factory methods (`resolve_named_zone`, `parse_duration`,
+`parse_recurring_interval`, `parse_interval`) reuse `RawInput` and the
+parser output sidecars.
+`NamedTimeZoneDescriptor` / `LocalTimeZoneResolutionAuthorityDescriptor`
+/ `PrecisionDescriptor` gained `Evidence`.
 
 - `src/exchange/parse.rs` — 24 + 3 `ParsedX` `#[derive(Sidecar)]` outputs
   (the `elicit_temporal` return tuples, named; the +3 are formatter-only
@@ -89,9 +104,9 @@ the generated `new`).
 | `TemporalReporter` | 7 | ✅ | plain trait (not an `Exchange` — capability query) |
 | `TemporalParser<V>` | 24 | ✅ 24/24 | supertrait bundle of `Exchange<RawInput, ParsedX, V>` (`src/exchange/`; the `Exchange` impls are a backend concern) |
 | `TemporalFormatter<V>` | 36 | ✅ 36/36 | supertrait bundle of `Exchange<ParsedX, FormattedY, V>` — a proven descriptor sidecar in, a `Formatted*` sidecar out (`src/exchange/format*.rs`) |
-| `TemporalZoneFactory` | 5 | — | Phase 4 |
-| `TemporalConversionFactory` | 4 | — | Phase 4 |
-| `TemporalIntervalFactory` | 4 | — | Phase 4 |
+| `TemporalZoneFactory<V>` | 5 | ✅ 5/5 | supertrait bundle: 1 `Exchange<RawInput, ResolvedNamedTimeZone, V>` + 4 transitions (`*Input` → `*Output`, `src/exchange/zone.rs`) |
+| `TemporalConversionFactory<V>` | 4 | ✅ 4/4 | supertrait bundle of 4 transitions (`src/exchange/conversion.rs`) |
+| `TemporalIntervalFactory<V>` | 4 | ✅ 4/4 | supertrait bundle: 3 `Exchange<RawInput, Parsed*, V>` (reused parser outputs) + `order_offset_endpoints` transition (`src/exchange/interval.rs`) |
 | `TemporalCalConnectFactory` | 19 | — | Phase 4 |
 | native-carrier families (16) | 0 | — | associated types (Phase 5) |
 | native bridges (`realize_*`/`reflect_*`) | ~30 | — | `Exchange` (Phase 5) |

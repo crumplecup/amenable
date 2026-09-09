@@ -4,9 +4,11 @@
 //!
 //! `amenable_time` owns the *shape* — the sidecar types, the boundary
 //! tokens, the [`Establish`](amenable_core::Establish) edges, and the
-//! [`TemporalParser<V>`](crate::TemporalParser) bundle (whose contract
-//! *is* "be the 24 parse exchanges"). The `Exchange` **impls** live in
-//! the backend crate: a downstream `Jiff` writes one inherent
+//! per-seam trait bundles ([`TemporalParser<V>`](crate::TemporalParser),
+//! [`TemporalFormatter<V>`](crate::TemporalFormatter), and the zone /
+//! conversion / interval factories) whose contract *is* "be these
+//! exchanges". The `Exchange` **impls** live in the backend crate: a
+//! downstream `Jiff` writes one inherent
 //! `fn parse_x(&self, RawInput) -> Result<ParsedX, TemporalError>` per
 //! method and `#[amenable_derive::capture_exchange_body]` generates its
 //! `impl<V> Exchange<..> for Jiff`. `amenable_time` cannot provide those
@@ -14,20 +16,35 @@
 //! T` (foreign trait, uncovered `Self`).
 //!
 //! - [`markers`] / [`tokens`] — boundary `Evidence` markers, root input token.
-//! - [`establish`] — the 24 output tokens + their `Establish` edges.
+//! - [`establish`] / [`factory_establish`] — output tokens + their `Establish` edges.
 //! - [`sidecars`] — [`RawInput`], the shared input sidecar.
 //! - [`parse_props`] — per-method composite propositions (multi-proof methods).
-//! - [`parse`] — the 24 per-method output sidecars.
+//! - [`parse`] / [`format`] — the per-method parse / format output sidecars.
+//! - [`zone`] / [`conversion`] / [`interval`] — the factory transition sidecars.
 
+mod conversion;
 mod establish;
+mod factory_establish;
 mod format;
 mod format_props;
+mod interval;
 mod markers;
 mod parse;
 mod parse_props;
 mod sidecars;
 mod tokens;
+mod zone;
 
+pub use conversion::{
+    AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyInput,
+    AdjustPrecisionLosslesslyOutput, AdjustPrecisionLosslesslyPreconditions,
+    AdjustPrecisionLosslesslyRequest, NormalizeToUtcEstablished, NormalizeToUtcInput,
+    NormalizeToUtcOutput, NormalizeToUtcPreconditions, NormalizeToUtcRequest,
+    StripNamedZoneEstablished, StripNamedZoneInput, StripNamedZoneOutput,
+    StripNamedZonePreconditions, StripNamedZoneRequest, TruncateSubsecondsEstablished,
+    TruncateSubsecondsInput, TruncateSubsecondsOutput, TruncateSubsecondsPreconditions,
+    TruncateSubsecondsRequest,
+};
 pub use establish::{
     CalendarDateBasicFormattedToken, CalendarDateExtendedFormattedToken, CalendarDateValidToken,
     CenturyFormattedToken, CenturyValidToken, DateTimeFormulaFormattedToken,
@@ -53,6 +70,18 @@ pub use establish::{
     UnspecifiedComponentExpressionFormattedToken, UnspecifiedComponentExpressionProofToken,
     UtcOffsetBasicFormattedToken, UtcOffsetExtendedFormattedToken, UtcOffsetValidToken,
     WeekDateBasicFormattedToken, WeekDateExtendedFormattedToken, WeekDateValidToken,
+};
+pub use factory_establish::{
+    AdjustPrecisionLosslesslyEstablishedToken, AdjustPrecisionLosslesslyPreconditionsToken,
+    AttachNamedZoneEstablishedToken, AttachNamedZonePreconditionsToken,
+    ConfirmNamedZoneRevisionEstablishedToken, ConfirmNamedZoneRevisionPreconditionsToken,
+    ConfirmZoneAuthorityEstablishedToken, ConfirmZoneAuthorityPreconditionsToken,
+    NamedTimeZoneIdentityValidToken, NormalizeToUtcEstablishedToken,
+    NormalizeToUtcPreconditionsToken, OrderOffsetEndpointsEstablishedToken,
+    OrderOffsetEndpointsPreconditionsToken, ResolveLocalDateTimeEstablishedToken,
+    ResolveLocalDateTimePreconditionsToken, StripNamedZoneEstablishedToken,
+    StripNamedZonePreconditionsToken, TruncateSubsecondsEstablishedToken,
+    TruncateSubsecondsPreconditionsToken,
 };
 pub use format::{
     FormattedCalendarDateBasic, FormattedCalendarDateExtended, FormattedCentury,
@@ -84,6 +113,10 @@ pub use format_props::{
     UtcOffsetBasicFormatted, UtcOffsetExtendedFormatted, WeekDateBasicFormatted,
     WeekDateExtendedFormatted,
 };
+pub use interval::{
+    OrderOffsetEndpointsEstablished, OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput,
+    OrderOffsetEndpointsPreconditions, OrderOffsetEndpointsRequest,
+};
 pub use markers::{FormattedTemporalText, RawTemporalText, TemporalInputReceived};
 pub use parse::{
     ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade,
@@ -103,3 +136,13 @@ pub use parse_props::{
 };
 pub use sidecars::RawInput;
 pub use tokens::TemporalInputToken;
+pub use zone::{
+    AttachNamedZoneEstablished, AttachNamedZoneInput, AttachNamedZoneOutput,
+    AttachNamedZonePreconditions, AttachNamedZoneRequest, ConfirmNamedZoneRevisionEstablished,
+    ConfirmNamedZoneRevisionInput, ConfirmNamedZoneRevisionOutput,
+    ConfirmNamedZoneRevisionPreconditions, ConfirmNamedZoneRevisionRequest,
+    ConfirmZoneAuthorityEstablished, ConfirmZoneAuthorityInput, ConfirmZoneAuthorityOutput,
+    ConfirmZoneAuthorityPreconditions, ConfirmZoneAuthorityRequest,
+    ResolveLocalDateTimeEstablished, ResolveLocalDateTimeInput, ResolveLocalDateTimeOutput,
+    ResolveLocalDateTimePreconditions, ResolveLocalDateTimeRequest, ResolvedNamedTimeZone,
+};

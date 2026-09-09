@@ -98,6 +98,55 @@ fn the_formatter_output_family_exists() {
 }
 
 #[test]
+fn the_factory_transitions_fold_preconditions_and_re_issued_proofs() {
+    amenable_core::init_tracing();
+
+    // `resolve_local_date_time`: 3 descriptors + 4 `Established<_>`
+    // preconditions in, a `ZonedDateTimeDescriptor` + 6 re-issued proofs
+    // out — each side folded into one proposition.
+    use amenable_time::{
+        ResolveLocalDateTimeEstablished, ResolveLocalDateTimeOutput,
+        ResolveLocalDateTimePreconditions,
+    };
+    let () = ResolveLocalDateTimePreconditions::default().audit();
+    let () = ResolveLocalDateTimeEstablished::default().audit();
+    assert!(<ResolveLocalDateTimePreconditions as Evidence>::is_root());
+    assert!(<ResolveLocalDateTimeEstablished as Evidence>::is_root());
+
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<
+        amenable_time::ResolveLocalDateTimeEstablishedToken,
+        ResolveLocalDateTimeEstablished,
+    >();
+
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<Option<ResolveLocalDateTimeOutput>>;
+}
+
+#[test]
+fn every_factory_established_token_chains_from_its_preconditions_token() {
+    amenable_core::init_tracing();
+
+    // Each transition mints two edges: `*PreconditionsToken` from the
+    // input token, `*EstablishedToken` from `*PreconditionsToken`.
+    let chained: usize = inventory::iter::<amenable_core::ProofTokenMintRecord>()
+        .filter(|r| {
+            r.credential()
+                .is_some_and(|c| c.replace(' ', "").ends_with("PreconditionsToken"))
+        })
+        .count();
+    assert!(
+        chained >= 9,
+        "expected >=9 factory established-from-preconditions edges, got {chained}"
+    );
+}
+
+#[test]
 fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
     amenable_core::init_tracing();
 

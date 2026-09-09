@@ -9,7 +9,20 @@ use strum::EnumIter;
 use crate::{OffsetDateTimeDescriptor, UtcOffsetDescriptor};
 
 /// A named time-zone identity.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct NamedTimeZoneDescriptor {
     /// IANA time-zone identifier.
@@ -71,7 +84,21 @@ pub enum ZoneGapResolutionDescriptor {
 
 /// An explicit authority bundle for resolving local wall-clock timestamps
 /// against a named zone.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct LocalTimeZoneResolutionAuthorityDescriptor {
     /// Authority for repeated local times during backward transitions.
     #[getter(copy)]

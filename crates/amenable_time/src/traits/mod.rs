@@ -13,10 +13,16 @@
 //! - **reporters** — capability queries that mint no proofs. [`TemporalReporter`]
 //!   is the one seam that stays a plain trait (`docs/AMENABLE_TIME_PLAN.md`).
 
+mod conversion;
 mod format;
+mod interval;
 mod parse;
 mod report;
+mod zone;
 
+pub use conversion::TemporalConversionFactory;
 pub use format::TemporalFormatter;
+pub use interval::TemporalIntervalFactory;
 pub use parse::TemporalParser;
 pub use report::TemporalReporter;
+pub use zone::TemporalZoneFactory;

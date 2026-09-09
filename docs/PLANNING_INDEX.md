@@ -65,7 +65,7 @@ members' proofs. Generated from `elicit_temporal` by script.
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
 (`proof_composition/proof_branches.rs`).
 
-**Phase 4 Steps 1–3 complete (2026-09-09)** — the exchange surface in
+**Phase 4 Steps 1–4 complete (2026-09-09)** — the exchange surface in
 `src/exchange/`. **Design (user-confirmed after several corrections):
 every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
 descriptor, `#[sidecar(token)]` proof token). **`amenable_time` ships no
@@ -81,11 +81,18 @@ sidecars, 12 per-method composite propositions (multi-proof folding), 24
 `TemporalFormatter<V>` — 36 `Formatted*` output sidecars
 (`FormattedTemporalText` primary), 36 `<Method>Formatted` emission-proof
 composites, 3 formatter-only `Parsed*` inputs, 36+3 `#[establish]` tokens.
-Two earlier sketches (`Proven`/`Proven::prove`, then a standalone
-`TemporalExchange`) were reverted. Next: `TemporalZoneFactory` (5),
-`TemporalConversionFactory` (4), `TemporalIntervalFactory` (4),
-`TemporalCalConnectFactory` (19); then Step 2c (a codegen macro for the
-backend's `Exchange` impls).
+**Step 4 (2026-09-09):** `TemporalZoneFactory<V>` (5) /
+`TemporalConversionFactory<V>` (4) / `TemporalIntervalFactory<V>` (4) —
+9 transition methods fold descriptors → a `*Request` primary,
+`Established<_>` preconditions → a `*Preconditions` proposition, and
+return-tuple proofs → a `*Established` proposition; `*Input` / `*Output`
+`#[derive(Sidecar)]` structs + paired `#[establish]` edges
+(`*PreconditionsToken` ← `TemporalInputToken`, `*EstablishedToken` ←
+`*PreconditionsToken`) in `factory_establish.rs`; the 4 parser-style
+factory methods reuse `RawInput`. Two earlier sketches
+(`Proven`/`Proven::prove`, then a standalone `TemporalExchange`) were
+reverted. Next: `TemporalCalConnectFactory` (19); then Step 2c (a codegen
+macro for the backend's `Exchange` impls).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

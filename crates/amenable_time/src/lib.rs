@@ -253,6 +253,34 @@ pub use contracts::{
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use exchange::{
+    AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyEstablishedToken,
+    AdjustPrecisionLosslesslyInput, AdjustPrecisionLosslesslyOutput,
+    AdjustPrecisionLosslesslyPreconditions, AdjustPrecisionLosslesslyPreconditionsToken,
+    AdjustPrecisionLosslesslyRequest, AttachNamedZoneEstablished, AttachNamedZoneEstablishedToken,
+    AttachNamedZoneInput, AttachNamedZoneOutput, AttachNamedZonePreconditions,
+    AttachNamedZonePreconditionsToken, AttachNamedZoneRequest, ConfirmNamedZoneRevisionEstablished,
+    ConfirmNamedZoneRevisionEstablishedToken, ConfirmNamedZoneRevisionInput,
+    ConfirmNamedZoneRevisionOutput, ConfirmNamedZoneRevisionPreconditions,
+    ConfirmNamedZoneRevisionPreconditionsToken, ConfirmNamedZoneRevisionRequest,
+    ConfirmZoneAuthorityEstablished, ConfirmZoneAuthorityEstablishedToken,
+    ConfirmZoneAuthorityInput, ConfirmZoneAuthorityOutput, ConfirmZoneAuthorityPreconditions,
+    ConfirmZoneAuthorityPreconditionsToken, ConfirmZoneAuthorityRequest,
+    NamedTimeZoneIdentityValidToken, NormalizeToUtcEstablished, NormalizeToUtcEstablishedToken,
+    NormalizeToUtcInput, NormalizeToUtcOutput, NormalizeToUtcPreconditions,
+    NormalizeToUtcPreconditionsToken, NormalizeToUtcRequest, OrderOffsetEndpointsEstablished,
+    OrderOffsetEndpointsEstablishedToken, OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput,
+    OrderOffsetEndpointsPreconditions, OrderOffsetEndpointsPreconditionsToken,
+    OrderOffsetEndpointsRequest, ResolveLocalDateTimeEstablished,
+    ResolveLocalDateTimeEstablishedToken, ResolveLocalDateTimeInput, ResolveLocalDateTimeOutput,
+    ResolveLocalDateTimePreconditions, ResolveLocalDateTimePreconditionsToken,
+    ResolveLocalDateTimeRequest, ResolvedNamedTimeZone, StripNamedZoneEstablished,
+    StripNamedZoneEstablishedToken, StripNamedZoneInput, StripNamedZoneOutput,
+    StripNamedZonePreconditions, StripNamedZonePreconditionsToken, StripNamedZoneRequest,
+    TruncateSubsecondsEstablished, TruncateSubsecondsEstablishedToken, TruncateSubsecondsInput,
+    TruncateSubsecondsOutput, TruncateSubsecondsPreconditions,
+    TruncateSubsecondsPreconditionsToken, TruncateSubsecondsRequest,
+};
+pub use exchange::{
     CalendarDateBasicFormatted, CalendarDateBasicFormattedToken, CalendarDateExtendedFormatted,
     CalendarDateExtendedFormattedToken, CalendarDateValidToken, CenturyFormatted,
     CenturyFormattedToken, CenturyValidToken, DateTimeFormulaFormatted,
@@ -378,7 +406,10 @@ pub use provenance_vocab::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,
     StandardsBody,
 };
-pub use traits::{TemporalFormatter, TemporalParser, TemporalReporter};
+pub use traits::{
+    TemporalConversionFactory, TemporalFormatter, TemporalIntervalFactory, TemporalParser,
+    TemporalReporter, TemporalZoneFactory,
+};
 pub use types::{
     CalendarDateDescriptor, CenturyDescriptor, CenturyDescriptorBuilder, CompleteDateDescriptor,
     DateDescriptor, DateTimeFormulaDescriptor, DateTimeFormulaEvaluationKindDescriptor,

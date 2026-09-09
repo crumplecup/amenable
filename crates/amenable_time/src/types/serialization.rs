@@ -36,7 +36,20 @@ pub enum RoundingModeDescriptor {
 
 /// The declared precision target for temporal conversions or
 /// serializations.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct PrecisionDescriptor {
     /// Smallest retained temporal component.
