@@ -17,6 +17,7 @@ mod composites_a;
 mod composites_b;
 mod composites_c;
 mod composites_d;
+mod proof_branches;
 
 pub use branches_a::{
     CombinedDateTimeDateEvidence, CompleteDateEvidence,
@@ -81,4 +82,14 @@ pub use composites_d::{
     ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
     ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone,
     ZuluTimeZoneInconsistencyAvoidanceValid,
+};
+pub use proof_branches::{
+    CompleteIntervalSubstitutionProofBranch, DurationRepresentationProofBranch,
+    ExplicitIntervalDurationSubstitutionProofBranch,
+    ExplicitIntervalEndComponentInheritanceProofBranch,
+    ExplicitIntervalShiftPropagationProofBranch, IntervalEndComponentInheritanceProofBranch,
+    IntervalZoneInheritanceProofBranch, IxdtfAdditionalInformationProofBranch,
+    IxdtfCalendarAnnotationProofBranch, IxdtfTimeZoneAnnotationProofBranch,
+    LocalTimeZoneResolutionProofBranch, RecurringIntervalRepresentationProofBranch,
+    RecurringIntervalWithRepeatRuleIntervalProofBranch,
 };

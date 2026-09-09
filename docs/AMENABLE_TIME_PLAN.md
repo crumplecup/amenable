@@ -18,8 +18,10 @@ Phase 3 Step 1 (2026-09-08) — all 93 aggregate `*Valid` propositions +
 Witness)]` structs / enums (fields = the `elicit_temporal` `*Evidence`
 bundle's sub-claims; aggregation is `#[derive(Witness)]` structural
 closure, no proof-token bag). Generated from `elicit_temporal`.
-`src/proof_composition/{composites_a..d,branches_a,branches_b}.rs`. Next:
-Phase 3 Step 2 (the 13 `*ProofBranch` enums).
+`src/proof_composition/{composites_a..d,branches_a,branches_b}.rs`.
+Phase 3 Step 2 (2026-09-09) — the 13 `*ProofBranch` enums →
+`proof_composition/proof_branches.rs`. Next: Phase 3 Step 3 (the 116
+`*Result` aliases) / Phase 4.
 
 Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
 `Standard`s with a real `TemporalProvenance`, across 9 normative
@@ -619,9 +621,15 @@ reserved for genuine *transitions* (Phase 4), not structural composition.
       `amenable_time`; it only *resolves* once a backend provides the
       leaf `Witness<V>` impls. 3 tests. `just check-all-package
       amenable_time` clean.
-- [ ] **Step 2:** the 13 `*ProofBranch` enums from `types.rs` (deferred
-      from Phase 2) → `#[derive(Evidence, Witness)]` enums whose variants
-      hold the relevant `*Valid` composites.
+- [x] **Step 2 (2026-09-09):** the 13 `*ProofBranch` enums from `types.rs`
+      (deferred from Phase 2) → `src/proof_composition/proof_branches.rs`,
+      `#[derive(Evidence, Witness)]` enums whose variants hold the folded
+      `*Valid` composites / branch types (`Established<X>` → `X`). The
+      `elicit_temporal` `evidence:` sidecar field is dropped where it is
+      type-identical to the aggregate it accompanies (the composite
+      already carries its own decomposition). 10 default to a unit
+      `None`/`Unambiguous`/`NotApplicable` first variant via
+      `#[derive(Default)]`; 3 get a hand `impl Default`. 1 test.
 - [ ] **Step 3:** the 116 `*Result` type aliases — most collapse into the
       Phase-4 `Proven<D, P>` sidecar output types; the plain `Result`
       ones stay as aliases.

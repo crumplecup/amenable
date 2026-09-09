@@ -61,7 +61,9 @@ closure, **not** a bag of proof tokens — each `elicit_temporal`
 so the composite `Witness<V>` proof is the structural product of its
 members' proofs. Generated from `elicit_temporal` by script.
 `Establish`/`Exchange` are reserved for genuine transitions (Phase 4).
-Next: Phase 3 Step 2 (the 13 `*ProofBranch` enums).
+**Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
+(`proof_composition/proof_branches.rs`). Next: Phase 3 Step 3 (116
+`*Result` aliases) / Phase 4.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

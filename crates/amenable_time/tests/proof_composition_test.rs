@@ -6,7 +6,10 @@
 //! resolution is not exercised here.
 
 use amenable_core::{Evidence, EvidenceLink};
-use amenable_time::{CalendarDateValid, DateValid, ZonedDateTimeHasNamedZone};
+use amenable_time::{
+    CalendarDateValid, DateValid, IxdtfTimeZoneAnnotationProofBranch,
+    RecurringIntervalWithRepeatRuleIntervalProofBranch, ZonedDateTimeHasNamedZone,
+};
 
 #[test]
 fn a_folded_aggregate_is_a_composite_evidence_root() {
@@ -40,18 +43,36 @@ fn a_multi_credential_aggregate_is_an_enum_over_its_decompositions() {
 }
 
 #[test]
+fn proof_branches_default_to_the_absent_or_first_case() {
+    amenable_core::init_tracing();
+
+    // A `*ProofBranch` with a unit `None`/`Unambiguous`/`NotApplicable`
+    // first variant defaults there via `#[derive(Default)]`.
+    assert!(matches!(
+        IxdtfTimeZoneAnnotationProofBranch::default(),
+        IxdtfTimeZoneAnnotationProofBranch::None
+    ));
+    // One with no unit variant gets a hand `impl Default` on the first.
+    assert!(matches!(
+        RecurringIntervalWithRepeatRuleIntervalProofBranch::default(),
+        RecurringIntervalWithRepeatRuleIntervalProofBranch::IsoComplete { .. }
+    ));
+    assert!(<IxdtfTimeZoneAnnotationProofBranch as Evidence>::is_root());
+}
+
+#[test]
 fn every_aggregate_self_registers_an_evidence_link() {
     amenable_core::init_tracing();
 
-    let registered: Vec<&str> = inventory::iter::<EvidenceLink>()
+    let composites: usize = inventory::iter::<EvidenceLink>()
         .map(EvidenceLink::name)
         .filter(|name| name.contains("proof_composition::composites"))
-        .collect();
+        .count();
+    let proof_branches: usize = inventory::iter::<EvidenceLink>()
+        .map(EvidenceLink::name)
+        .filter(|name| name.contains("proof_composition::proof_branches::"))
+        .count();
 
-    assert_eq!(
-        registered.len(),
-        93,
-        "got {}: {registered:?}",
-        registered.len()
-    );
+    assert_eq!(composites, 93, "composites: {composites}");
+    assert_eq!(proof_branches, 13, "proof branches: {proof_branches}");
 }

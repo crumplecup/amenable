@@ -50,7 +50,7 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 | 50 descriptor structs | private fields + `Getters` + `new`/`Builder` | `#[derive(Evidence)]` deferred to Phase 3/4 |
 | 21 closed enums | `EnumIter` + `Display` | `Default` only where `elicit_temporal` had it (`UtcOffsetSign`, `UtcOffsetRelationship`, `DurationDescriptor`) |
 | 22 data-carrying enums | `Debug`/`Clone`/`PartialEq`/`Eq`/`Hash`/`Ord` | umbrella + boundary families |
-| 13 `*ProofBranch` enums | — | Phase 3 — carry `Established<T>` / `*Evidence` |
+| 13 `*ProofBranch` enums | ✅ `proof_composition::proof_branches` — `#[derive(Evidence, Witness)]` enums, `Established<T>` → `T`, redundant `evidence:` field dropped | Phase 3 Step 2 |
 | `*SemanticBundle` (23), `ProvenTemporalCarrier`, `Proven*Carrier` aliases (14) | — | Phase 5 |
 | `*Result` type aliases (116) | — | Phase 3/4 |
 
