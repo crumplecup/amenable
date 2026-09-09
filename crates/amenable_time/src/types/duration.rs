@@ -39,11 +39,22 @@ pub struct DurationDescriptor {
 
 /// The signedness carried by a CalConnect explicit duration.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum ExplicitDurationSignDescriptor {
     /// The duration advances forward in time.
     #[display("positive")]
+    #[default]
     Positive,
     /// The duration advances backward in time.
     #[display("negative")]
@@ -52,11 +63,22 @@ pub enum ExplicitDurationSignDescriptor {
 
 /// The representation family carried by a CalConnect explicit duration.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum ExplicitDurationRepresentationKindDescriptor {
     /// A simple duration expression with a single ordered component sequence.
     #[display("simple")]
+    #[default]
     Simple,
     /// A composite duration expression.
     #[display("composite")]
@@ -68,11 +90,22 @@ pub enum ExplicitDurationRepresentationKindDescriptor {
 
 /// The semantics family declared for a CalConnect explicit duration.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum ExplicitDurationSemanticKindDescriptor {
     /// The duration denotes an exact span independent of placement context.
     #[display("exact")]
+    #[default]
     Exact,
     /// The duration's realized span depends on placement on the time scale.
     #[display("context-dependent")]
@@ -84,7 +117,7 @@ pub enum ExplicitDurationSemanticKindDescriptor {
 
 /// A CalConnect explicit duration descriptor preserving sign, order, and
 /// semantic family.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitDurationDescriptor {
     /// Whether the duration advances forward or backward in time.

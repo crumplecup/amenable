@@ -13,11 +13,22 @@ use crate::{
 
 /// The declared evaluation family for a date-time formula.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum DateTimeFormulaEvaluationKindDescriptor {
     /// Simple-duration evaluation.
     #[display("simple")]
+    #[default]
     Simple,
     /// Composite-duration evaluation.
     #[display("composite")]
@@ -29,7 +40,20 @@ pub enum DateTimeFormulaEvaluationKindDescriptor {
 
 /// An explicit temporal value plus a duration under the CalConnect
 /// formula model.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct DateTimeFormulaDescriptor {
     /// The explicit date or time value being resolved.
     value: ExplicitTemporalValueDescriptor,
@@ -72,7 +96,7 @@ pub enum SelectionRuleDescriptor {
 
 /// A full CalConnect selection expression with optional single-instance
 /// semantics.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct SelectionExpressionDescriptor {
     /// Selection rules in lexical order.
@@ -86,7 +110,7 @@ pub struct SelectionExpressionDescriptor {
 
 /// Eligible time intervals used as the repeating cycle for repeat-rule
 /// evaluation.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct EligibleTimeIntervalsDescriptor {
     /// One or more eligible interval unit declarations.
@@ -96,7 +120,7 @@ pub struct EligibleTimeIntervalsDescriptor {
 
 /// A repeat-rule payload joining eligible intervals to a selection
 /// expression.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct RepeatRuleDescriptor {
     /// Repeating cycle that defines eligible intervals.
     eligible_intervals: EligibleTimeIntervalsDescriptor,
@@ -116,7 +140,7 @@ pub enum RecurringIntervalWithRepeatRuleIntervalDescriptor {
 
 /// A complete recurring-interval representation extended with a repeat
 /// rule.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct RecurringIntervalWithRepeatRuleDescriptor {
     /// Bounded repetition count; `None` denotes unbounded recurrence.
@@ -127,4 +151,18 @@ pub struct RecurringIntervalWithRepeatRuleDescriptor {
     interval: RecurringIntervalWithRepeatRuleIntervalDescriptor,
     /// Repeat-rule refinement applied to the recurrence.
     repeat_rule: RepeatRuleDescriptor,
+}
+
+impl core::default::Default for SelectionRuleDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Months(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for RecurringIntervalWithRepeatRuleIntervalDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::IsoComplete(core::default::Default::default())
+    }
 }

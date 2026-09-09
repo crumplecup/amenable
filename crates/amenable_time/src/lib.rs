@@ -253,8 +253,25 @@ pub use contracts::{
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use exchange::{
-    CalendarDateValidToken, ParsedCalendarDate, RawInput, RawTemporalText, TemporalInputReceived,
-    TemporalInputToken,
+    CalendarDateValidToken, CenturyValidToken, DateTimeFormulaProof, DateTimeFormulaProofToken,
+    DateWithShiftValidToken, DecadeValidToken, ExtendedYearValidToken, GroupedTimeScaleUnitProof,
+    GroupedTimeScaleUnitProofToken, IxdtfTimestampProof, IxdtfTimestampProofToken,
+    LocalDateTimeProof, LocalDateTimeProofToken, LocalTimeValidToken, OffsetDateTimeProof,
+    OffsetDateTimeProofToken, OrdinalDateValidToken, ParsedCalendarDate, ParsedCentury,
+    ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade, ParsedExtendedYear,
+    ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp, ParsedLocalDateTime, ParsedLocalTime,
+    ParsedOffsetDateTime, ParsedOrdinalDate, ParsedQualifiedTemporalValue,
+    ParsedReducedCalendarDate, ParsedReducedLocalTime, ParsedRfc3339Timestamp,
+    ParsedSeasonalTemporalExpression, ParsedSubYearGroupingExpression, ParsedTemporalSet,
+    ParsedTimeInterval, ParsedTimeOfDayWithShift, ParsedUnspecifiedComponentExpression,
+    ParsedUtcOffset, ParsedWeekDate, QualifiedTemporalValueProof, QualifiedTemporalValueProofToken,
+    RawInput, RawTemporalText, ReducedCalendarDateValidToken, ReducedLocalTimeValidToken,
+    Rfc3339TimestampProof, Rfc3339TimestampProofToken, SeasonalTemporalExpressionProof,
+    SeasonalTemporalExpressionProofToken, SubYearGroupingExpressionProof,
+    SubYearGroupingExpressionProofToken, TemporalInputReceived, TemporalInputToken,
+    TemporalSetProof, TemporalSetProofToken, TimeIntervalProof, TimeIntervalProofToken,
+    TimeOfDayWithShiftValidToken, UnspecifiedComponentExpressionProof,
+    UnspecifiedComponentExpressionProofToken, UtcOffsetValidToken, WeekDateValidToken,
 };
 pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,

@@ -8,11 +8,22 @@ use crate::{QualifiedOrBareTemporalValueDescriptor, QualifiedTemporalExpressionD
 
 /// The membership semantics for an ISO 8601-2 temporal set expression.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum TemporalSetSemanticsDescriptor {
     /// Square-bracket one-of semantics.
     #[display("alternatives")]
+    #[default]
     Alternatives,
     /// Curly-brace inclusive all-members semantics.
     #[display("inclusive")]
@@ -34,7 +45,20 @@ pub enum TemporalSetMemberDescriptor {
 }
 
 /// A neutral ISO 8601-2 temporal set descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct TemporalSetDescriptor {
     /// Whether the set denotes alternatives or inclusive membership.
@@ -47,4 +71,11 @@ pub struct TemporalSetDescriptor {
     #[builder(default)]
     #[getter(copy)]
     qualification: Option<QualifiedTemporalExpressionDescriptor>,
+}
+
+impl core::default::Default for TemporalSetMemberDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Value(core::default::Default::default())
+    }
 }

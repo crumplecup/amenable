@@ -47,37 +47,35 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 
 | set | ported as | note |
 |---|---|---|
-| 50 descriptor structs | private fields + `Getters` + `new`/`Builder` | `#[derive(Evidence)]` deferred to Phase 3/4 |
-| 21 closed enums | `EnumIter` + `Display` | `Default` only where `elicit_temporal` had it (`UtcOffsetSign`, `UtcOffsetRelationship`, `DurationDescriptor`) |
-| 22 data-carrying enums | `Debug`/`Clone`/`PartialEq`/`Eq`/`Hash`/`Ord` | umbrella + boundary families |
+| 50 descriptor structs | private fields + `Getters` + `new`/`Builder`; the 23 top-level ones `#[derive(Default, Evidence)]` (Phase 4 Step 2a) | rest gain `Evidence` in Phase 5 |
+| 21 closed enums | `EnumIter` + `Display`; `Default` on all (`#[default]` first variant) | Phase 4 Step 2a |
+| 22 data-carrying enums | plain derives + a hand `impl Default` on the first variant | Phase 4 Step 2a |
 | 13 `*ProofBranch` enums | ✅ `proof_composition::proof_branches` — `#[derive(Evidence, Witness)]` enums, `Established<T>` → `T`, redundant `evidence:` field dropped | Phase 3 Step 2 |
 | `*SemanticBundle` (23), `ProvenTemporalCarrier`, `Proven*Carrier` aliases (14) | — | Phase 5 |
-| `*Result` type aliases (116) | — | Phase 3/4 |
-
-Deferred `#[derive(Evidence)]`: forcing `Evidence` (hence `Default`) onto
-every data-only enum here is meaningless; Phase 3/4's `Sidecar<V>` wiring
-shows exactly which descriptors become a `Primary` and need it.
+| `*Result` type aliases (116) | → the 24 `Parsed*` sidecar structs (parse) so far | rest in Phase 4/5 |
 
 ## Exchange surface (`src/exchange/`)
 
-**Phase 4 Step 1 done (2026-09-09)** — `RawInput` input sidecar
-(`Sidecar<V>` for every `V`) and the `parse_calendar_date` canary:
-`ParsedCalendarDate` `#[derive(Sidecar)]` output (the return tuple,
-named), `CalendarDateValidToken` via real `#[amenable_derive::establish]`,
-and `TemporalParser<V>` — a trait whose supertrait bundle *is* the parse
-exchanges (`impl TemporalParser<V> ⇔ impl all 24 Exchange<RawInput,
-ParsedX, V>`). **No `Exchange` impl in `amenable_time`** — the orphan
-rule keeps those in the backend crate (`#[capture_exchange_body]`
-generates them). `CalendarDateDescriptor` is the first descriptor with
-`#[derive(Evidence)]`. `amenable_derive::Sidecar` fixed (restate
-`Proposition: Witness<V>`; doc the generated `new`).
+**Phase 4 Steps 1 + 2 done (2026-09-09).** `RawInput` input sidecar
+(`Sidecar<V>` for every `V`). `TemporalParser<V>` — a trait whose
+supertrait bundle *is* the 24 parse exchanges (`impl TemporalParser<V> ⇔
+impl all 24 Exchange<RawInput, ParsedX, V>`), plus 24 `where <Prop>:
+Witness<V>` bounds (the honest precondition — a generic consumer must
+restate them; a helper macro is a follow-on). `src/exchange/parse.rs` (24
+`ParsedX` `#[derive(Sidecar)]` outputs — the `elicit_temporal` return
+tuples, named), `parse_props.rs` (12 per-method composite propositions
+folding the multi-proof methods' 2–9 sidecars), `establish.rs` (24
+`#[amenable_derive::establish]` tokens). **No `Exchange` impl in
+`amenable_time`** — the orphan rule keeps those in the backend crate
+(`#[capture_exchange_body]` generates them). `amenable_derive::Sidecar`
+fixed (restate `Proposition: Witness<V>`; doc the generated `new`).
 
 ## Traits (`traits/`, ~35 traits / ~175 methods)
 
 | trait | methods | ported | as |
 |---|---:|:--:|---|
 | `TemporalReporter` | 7 | ✅ | plain trait (not an `Exchange` — capability query) |
-| `TemporalParser<V>` | 24 | 1/24 | supertrait bundle of `Exchange<RawInput, ParsedX, V>` (canary done; Step 2 = rest) |
+| `TemporalParser<V>` | 24 | ✅ 24/24 | supertrait bundle of `Exchange<RawInput, ParsedX, V>` (`src/exchange/`; the `Exchange` impls are a backend concern) |
 | `TemporalFormatter` | 36 | — | `Exchange` per method (Phase 4) |
 | `TemporalZoneFactory` | 5 | — | Phase 4 |
 | `TemporalConversionFactory` | 4 | — | Phase 4 |

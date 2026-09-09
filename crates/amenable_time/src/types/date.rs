@@ -39,7 +39,8 @@ pub struct CalendarDateDescriptor {
 }
 
 /// A reduced-precision Gregorian calendar date.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
 pub enum ReducedCalendarDateDescriptor {
     /// Year-only calendar date form.
     Year {
@@ -56,7 +57,21 @@ pub enum ReducedCalendarDateDescriptor {
 }
 
 /// A Gregorian calendar decade.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct DecadeDescriptor {
     /// Three-digit ordinal number for the Gregorian calendar decade.
@@ -69,7 +84,21 @@ pub struct DecadeDescriptor {
 }
 
 /// A Gregorian calendar century.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct CenturyDescriptor {
     /// Two-digit ordinal number for the Gregorian calendar century.
@@ -105,7 +134,21 @@ pub enum ExtendedYearBaseDescriptor {
 }
 
 /// A neutral ISO 8601-2 extended year descriptor.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExtendedYearDescriptor {
     /// The base year form carried by the expression.
@@ -118,7 +161,21 @@ pub struct ExtendedYearDescriptor {
 }
 
 /// A complete ordinal date.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct OrdinalDateDescriptor {
     /// Signed calendar year.
     #[getter(copy)]
@@ -129,7 +186,21 @@ pub struct OrdinalDateDescriptor {
 }
 
 /// A complete week date.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct WeekDateDescriptor {
     /// ISO week-based year.
     #[getter(copy)]
@@ -163,4 +234,34 @@ pub enum DateDescriptor {
     Ordinal(OrdinalDateDescriptor),
     /// A week date.
     Week(WeekDateDescriptor),
+}
+
+impl core::default::Default for ReducedCalendarDateDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Year { year: 0 }
+    }
+}
+
+impl core::default::Default for ExtendedYearBaseDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::FourDigit {
+            year: core::default::Default::default(),
+        }
+    }
+}
+
+impl core::default::Default for CompleteDateDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Calendar(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for DateDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Calendar(core::default::Default::default())
+    }
 }

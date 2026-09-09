@@ -9,7 +9,7 @@ use strum::EnumIter;
 use crate::{OffsetDateTimeDescriptor, UtcOffsetDescriptor};
 
 /// A named time-zone identity.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct NamedTimeZoneDescriptor {
     /// IANA time-zone identifier.
@@ -22,11 +22,22 @@ pub struct NamedTimeZoneDescriptor {
 /// The declared authority for resolving an ambiguous repeated local
 /// wall-clock time.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum ZoneAmbiguityResolutionDescriptor {
     /// Prefer the earlier matching fixed instant.
     #[display("prefer-earlier")]
+    #[default]
     PreferEarlier,
     /// Prefer the later matching fixed instant.
     #[display("prefer-later")]
@@ -36,11 +47,22 @@ pub enum ZoneAmbiguityResolutionDescriptor {
 /// The declared authority for resolving a skipped local wall-clock time
 /// inside a gap.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum ZoneGapResolutionDescriptor {
     /// Advance to the first valid instant after the gap.
     #[display("shift-forward")]
+    #[default]
     ShiftForward,
     /// Retreat to the last valid instant before the gap.
     #[display("shift-backward")]
@@ -49,7 +71,7 @@ pub enum ZoneGapResolutionDescriptor {
 
 /// An explicit authority bundle for resolving local wall-clock timestamps
 /// against a named zone.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct LocalTimeZoneResolutionAuthorityDescriptor {
     /// Authority for repeated local times during backward transitions.
     #[getter(copy)]
@@ -61,7 +83,7 @@ pub struct LocalTimeZoneResolutionAuthorityDescriptor {
 
 /// A zoned timestamp descriptor pairing a fixed-instant form with a named
 /// zone.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into))]
 pub struct ZonedDateTimeDescriptor {
     /// Offset timestamp representation.
@@ -72,7 +94,7 @@ pub struct ZonedDateTimeDescriptor {
 
 /// An additional IXDTF annotation carried after the base RFC 3339
 /// timestamp.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct IxdtfAnnotationDescriptor {
     /// Annotation key.
@@ -88,7 +110,7 @@ pub struct IxdtfAnnotationDescriptor {
 
 /// A preferred-presentation calendar annotation carried by RFC 9557
 /// `u-ca`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct IxdtfCalendarAnnotationDescriptor {
     /// Unicode calendar identifier carried by the `u-ca` suffix key.
@@ -106,4 +128,11 @@ pub enum IxdtfTimeZoneAnnotationDescriptor {
     Named(NamedTimeZoneDescriptor),
     /// An offset time-zone annotation used for compatibility.
     Offset(UtcOffsetDescriptor),
+}
+
+impl core::default::Default for IxdtfTimeZoneAnnotationDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Named(core::default::Default::default())
+    }
 }

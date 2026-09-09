@@ -19,7 +19,7 @@ pub enum UnspecifiedDigitDescriptor {
 
 /// A neutral digit-vector descriptor for ISO 8601-2 masked numeric
 /// components.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct MaskedNumericComponentDescriptor {
     /// Component digits in lexical order, preserving any `X` placeholders.
@@ -30,11 +30,22 @@ pub struct MaskedNumericComponentDescriptor {
 /// The declared public-profile masking regime for unspecified-digit
 /// expressions.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum UnspecifiedPrecisionProfileDescriptor {
     /// Level 1 rightmost-only masking.
     #[display("level-1-rightmost")]
+    #[default]
     LevelOneRightmost,
     /// Level 2 masking that may appear anywhere within a component.
     #[display("level-2-any-position")]
@@ -73,7 +84,20 @@ pub enum UnspecifiedTemporalShapeDescriptor {
 }
 
 /// A neutral ISO 8601-2 unspecified-component expression descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct UnspecifiedComponentExpressionDescriptor {
     /// Underlying masked temporal shape.
@@ -85,4 +109,22 @@ pub struct UnspecifiedComponentExpressionDescriptor {
     #[builder(default)]
     #[getter(copy)]
     qualification: Option<QualifiedTemporalExpressionDescriptor>,
+}
+
+impl core::default::Default for UnspecifiedDigitDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Digit(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for UnspecifiedTemporalShapeDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::CalendarDate {
+            year: core::default::Default::default(),
+            month: core::default::Default::default(),
+            day: core::default::Default::default(),
+        }
+    }
 }

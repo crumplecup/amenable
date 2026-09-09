@@ -11,10 +11,11 @@ use crate::{
 };
 
 /// The declared rounding mode for precision-reducing conversions.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, derive_more::Display)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, derive_more::Display, Default)]
 pub enum RoundingModeDescriptor {
     /// Truncate the discarded digits.
     #[display("truncate")]
+    #[default]
     Truncate,
     /// Round to nearest, ties away from zero.
     #[display("half-up")]
@@ -35,7 +36,7 @@ pub enum RoundingModeDescriptor {
 
 /// The declared precision target for temporal conversions or
 /// serializations.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct PrecisionDescriptor {
     /// Smallest retained temporal component.
@@ -53,11 +54,22 @@ pub struct PrecisionDescriptor {
 /// The named serialization profiles exposed by the branch-level temporal
 /// accord.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum SerializationProfile {
     /// ISO 8601 basic form, without separators.
     #[display("ISO 8601 basic")]
+    #[default]
     Iso8601Basic,
     /// ISO 8601 extended form, with separators.
     #[display("ISO 8601 extended")]
@@ -71,7 +83,7 @@ pub enum SerializationProfile {
 }
 
 /// A neutral serialization descriptor for temporal emitters.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct TemporalSerializationDescriptor {
     /// Governing serialization profile.
@@ -105,7 +117,20 @@ pub struct TemporalSerializationDescriptor {
 }
 
 /// A neutral RFC 9557 IXDTF timestamp descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct IxdtfTimestampDescriptor {
     /// Base RFC 3339 timestamp payload.

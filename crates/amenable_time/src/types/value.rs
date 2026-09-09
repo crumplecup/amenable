@@ -54,7 +54,20 @@ pub enum TemporalValueDescriptor {
 
 /// A top-level temporal value plus an explicit ISO 8601-2 qualification
 /// sidecar.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct QualifiedTemporalValueDescriptor {
     /// Underlying temporal value.
     value: TemporalValueDescriptor,
@@ -104,7 +117,7 @@ pub enum ExplicitTemporalValueDescriptor {
 }
 
 /// Explicit temporal form metadata preserved across CalConnect exchanges.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitTemporalFormDescriptor {
     /// The explicit temporal value carried by the representation.
@@ -119,7 +132,20 @@ pub struct ExplicitTemporalFormDescriptor {
 
 /// A grouped time-scale unit expression, including its coefficient and
 /// trailing lower-order units.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct GroupedTimeScaleUnitDescriptor {
     /// Coefficient attached to the grouped unit value.
@@ -131,4 +157,25 @@ pub struct GroupedTimeScaleUnitDescriptor {
     /// Lower-order units that apply within the grouped unit.
     #[builder(default)]
     lower_order_units: Vec<TimeScaleUnitValueDescriptor>,
+}
+
+impl core::default::Default for TemporalValueDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::CalendarDate(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for QualifiedOrBareTemporalValueDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Bare(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for ExplicitTemporalValueDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::CalendarDate(core::default::Default::default())
+    }
 }

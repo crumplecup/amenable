@@ -12,7 +12,20 @@ use crate::{FractionalSecondDescriptor, TimeScaleUnitDescriptor, TimeScaleUnitFr
 ///
 /// Rust uses the shorter `LocalTime` name for the ISO 8601
 /// local-time-of-day family.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct LocalTimeDescriptor {
     /// Hour of day.
@@ -30,7 +43,8 @@ pub struct LocalTimeDescriptor {
 }
 
 /// A reduced-accuracy local time-of-day.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
 pub enum ReducedLocalTimeDescriptor {
     /// Hour-only local time form.
     Hour {
@@ -51,7 +65,7 @@ pub enum ReducedLocalTimeDescriptor {
 }
 
 /// An explicit-form local time-of-day used by the CalConnect `timeE` family.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitTimeOfDayDescriptor {
     /// Hour of day.
@@ -126,7 +140,21 @@ pub enum UtcOffsetRelationship {
 }
 
 /// A UTC-offset relationship descriptor for an offset-aware timestamp.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct UtcOffsetDescriptor {
     /// Offset sign when the UTC relationship is carried numerically.
@@ -150,16 +178,27 @@ pub struct UtcOffsetDescriptor {
 
 /// A descriptor for the UTC reference time scale.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum UtcTimeScaleDescriptor {
     /// Coordinated Universal Time.
     #[display("UTC")]
+    #[default]
     Utc,
 }
 
 /// A UTC-of-day descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct UtcOfDayDescriptor {
     /// Time-of-day payload carried on the UTC time scale.
     time: LocalTimeDescriptor,
@@ -169,7 +208,7 @@ pub struct UtcOfDayDescriptor {
 }
 
 /// A standard-time descriptor derived from UTC by a local shift.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct StandardTimeDescriptor {
     /// Explicit UTC reference time scale from which the standard time is derived.
     #[getter(copy)]
@@ -180,7 +219,7 @@ pub struct StandardTimeDescriptor {
 }
 
 /// A standard-time-of-day descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct StandardTimeOfDayDescriptor {
     /// Local wall-clock time of day.
     time: LocalTimeDescriptor,
@@ -214,7 +253,7 @@ pub enum TimeDescriptor {
 
 /// An explicit-form time-shift descriptor used by the CalConnect `shiftE`
 /// family.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitTimeShiftDescriptor {
     /// Shift sign. Positive or zero shifts omit an explicit plus sign in lexical form.
@@ -226,4 +265,28 @@ pub struct ExplicitTimeShiftDescriptor {
     /// with zero shift.
     #[builder(default)]
     time: Option<ExplicitTimeOfDayDescriptor>,
+}
+
+impl core::default::Default for ReducedLocalTimeDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Hour {
+            hour: 0,
+            fractional_component: None,
+        }
+    }
+}
+
+impl core::default::Default for LocalTimeScaleDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Standard(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for TimeDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Local(core::default::Default::default())
+    }
 }

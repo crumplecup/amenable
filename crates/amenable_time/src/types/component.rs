@@ -7,11 +7,22 @@ use strum::EnumIter;
 
 /// The smallest named temporal unit relevant to ISO 8601 precision rules.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum TemporalComponent {
     /// Calendar year.
     #[display("year")]
+    #[default]
     Year,
     /// Calendar decade.
     #[display("decade")]
@@ -40,11 +51,22 @@ pub enum TemporalComponent {
 /// standards family (ISO 8601 plus CalConnect), which admit a calendar
 /// week alongside the [`TemporalComponent`] set.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum TimeScaleUnitDescriptor {
     /// Calendar year.
     #[display("year")]
+    #[default]
     Year,
     /// Calendar decade.
     #[display("decade")]
@@ -74,11 +96,22 @@ pub enum TimeScaleUnitDescriptor {
 
 /// Lexical placement family for ISO 8601-2 qualification markers.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, EnumIter, derive_more::Display,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    EnumIter,
+    derive_more::Display,
+    Default,
 )]
 pub enum QualificationPlacementDescriptor {
     /// The qualification marker appears immediately to the right of the marked component.
     #[display("group-right")]
+    #[default]
     GroupRight,
     /// The qualification marker appears immediately to the left of the marked component.
     #[display("component-left")]
@@ -95,7 +128,7 @@ pub enum QualificationScopeDescriptor {
 }
 
 /// Explicit ISO 8601-2 uncertainty or approximation qualification metadata.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct QualifiedTemporalExpressionDescriptor {
     /// Whether uncertainty is explicitly declared.
     #[getter(copy)]
@@ -112,7 +145,7 @@ pub struct QualifiedTemporalExpressionDescriptor {
 }
 
 /// Fractional-second digits preserved as a lexical decimal suffix.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct FractionalSecondDescriptor {
     /// Decimal digits appearing after the fractional separator.
     #[new(into)]
@@ -120,7 +153,7 @@ pub struct FractionalSecondDescriptor {
 }
 
 /// One valued time-scale unit within grouped-unit or recurrence semantics.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct TimeScaleUnitValueDescriptor {
     /// The unit family being counted.
     #[getter(copy)]
@@ -131,7 +164,7 @@ pub struct TimeScaleUnitValueDescriptor {
 }
 
 /// A fractional time-scale unit represented lexically for explicit-duration forms.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct TimeScaleUnitFractionDescriptor {
     /// Lowest-order unit to which the fraction applies.
     #[getter(copy)]
@@ -142,7 +175,7 @@ pub struct TimeScaleUnitFractionDescriptor {
 }
 
 /// A fractional duration component represented lexically.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct DurationFractionDescriptor {
     /// Lowest-order component to which the fraction applies.
     #[getter(copy)]
@@ -150,4 +183,11 @@ pub struct DurationFractionDescriptor {
     /// Decimal digits appearing after the fractional separator.
     #[new(into)]
     digits: String,
+}
+
+impl core::default::Default for QualificationScopeDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::ThroughComponent(core::default::Default::default())
+    }
 }

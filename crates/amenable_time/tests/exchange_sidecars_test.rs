@@ -1,14 +1,14 @@
 //! `exchange` — spot-checks the exchange-surface *shape* `amenable_time`
-//! owns: `RawInput` input sidecar, the boundary token, the output sidecar
-//! `ParsedCalendarDate`, its `Establish` edge, and the `TemporalParser<V>`
-//! bundle (whose contract is "be the parse exchanges"). The `Exchange`
-//! impls live in the backend crate, so running an exchange is not
-//! exercised here.
+//! owns: `RawInput` input sidecar, the boundary token, the 24 per-method
+//! output sidecars, and their `Establish` edges. The `Exchange` impls and
+//! the `TemporalParser<V>` bundle's `Witness<V>` obligations are a
+//! backend concern, so they are not exercised here — the library
+//! compiling is the proof the bundle is well-formed.
 
-use amenable_core::{Establish, Evidence, Exchange, ProofToken, Verifier, Witness};
+use amenable_core::{Evidence, EvidenceLink, ProofToken};
 use amenable_time::{
-    CalendarDateValid, CalendarDateValidToken, ParsedCalendarDate, RawInput, RawTemporalText,
-    TemporalError, TemporalInputReceived, TemporalInputToken, TemporalParser,
+    CalendarDateValid, CalendarDateValidToken, LocalDateTimeProof, RawInput, RawTemporalText,
+    Rfc3339TimestampProof, TemporalInputReceived, TemporalInputToken,
 };
 
 #[test]
@@ -31,33 +31,53 @@ fn the_input_token_is_a_freely_minted_root() {
 }
 
 #[test]
-fn the_output_token_justifies_its_composite_proposition() {
+fn an_output_token_justifies_its_proposition() {
     amenable_core::init_tracing();
 
-    fn assert_token<Tok: ProofToken<Proposition = CalendarDateValid>>() {}
-    assert_token::<CalendarDateValidToken>();
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<CalendarDateValidToken, CalendarDateValid>();
 }
 
-/// The `Establish` edge and the `TemporalParser<V>` bundle line up: given
-/// a verifier that witnesses `CalendarDateValid`, its output token is
-/// establishable from the input token, and any type that is the calendar
-/// parse exchange is a `TemporalParser<V>`.
 #[test]
-fn the_exchange_wiring_type_checks() {
-    fn _assert_establish<V>()
-    where
-        V: Verifier,
-        CalendarDateValid:
-            Witness<V> + Establish<TemporalInputToken, V, Token = CalendarDateValidToken>,
-    {
-    }
+fn multi_proof_methods_fold_into_a_composite_proposition() {
+    amenable_core::init_tracing();
 
-    fn _assert_bundle<T, V>()
-    where
-        V: Verifier,
-        CalendarDateValid: Witness<V>,
-        T: Exchange<RawInput, ParsedCalendarDate, V, Error = TemporalError> + Send + Sync,
-        T: TemporalParser<V>,
-    {
-    }
+    // `parse_local_date_time` returns two proofs → one `#[derive(Evidence,
+    // Witness)]` composite; `parse_rfc3339_timestamp` returns three.
+    let () = LocalDateTimeProof::default().audit();
+    let () = Rfc3339TimestampProof::default().audit();
+    assert!(<LocalDateTimeProof as Evidence>::is_root());
+    assert!(<Rfc3339TimestampProof as Evidence>::is_root());
+}
+
+#[test]
+fn every_output_token_registers_an_establish_edge_from_the_input_token() {
+    amenable_core::init_tracing();
+
+    let minted: usize = inventory::iter::<amenable_core::ProofTokenMintRecord>()
+        .filter(|r| {
+            r.credential()
+                .is_some_and(|c| c.replace(' ', "").ends_with("::TemporalInputToken"))
+        })
+        .count();
+    assert!(
+        minted >= 24,
+        "expected >=24 temporal establish edges, got {minted}"
+    );
+}
+
+#[test]
+fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
+    amenable_core::init_tracing();
+
+    let composites: usize = inventory::iter::<EvidenceLink>()
+        .map(EvidenceLink::name)
+        .filter(|n| n.contains("proof_composition::composites"))
+        .count();
+    assert_eq!(composites, 93);
 }

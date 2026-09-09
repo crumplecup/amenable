@@ -8,8 +8,8 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3 Steps 1–2, Phase 4 Step 1 complete
-(2026-09-09). A
+**Status:** 🔲 Phases 0–2, Phase 3 Steps 1–2, Phase 4 Steps 1–2
+complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
 ~175 trait methods) into `amenable_time` — **not a probe**; whether the
@@ -65,24 +65,22 @@ members' proofs. Generated from `elicit_temporal` by script.
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
 (`proof_composition/proof_branches.rs`).
 
-**Phase 4 Step 1 complete (2026-09-09)** — the exchange surface in
-`src/exchange/`. **Design (user-confirmed after two course corrections):
+**Phase 4 Steps 1–2 complete (2026-09-09)** — the exchange surface in
+`src/exchange/`. **Design (user-confirmed after several corrections):
 every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
-descriptor, `#[sidecar(token)]` proof token) — so each `Parsed*Result`
-alias becomes a named `#[derive(Sidecar)]` struct; input `&str` →
-`RawInput`; tokens minted through **real `Establish`**
-(`#[amenable_derive::establish]`, the gaap pattern — no parallel mint
-path). **`amenable_time` ships no `Exchange` impl** — the orphan rule
-forbids `impl<T: …, V> Exchange<RawInput, …, V> for T` (tested, E0210),
-and a `: Exchange` supertrait / a standalone parallel trait don't get
-around it. Instead `amenable_time` ships `TemporalParser<V>` — a trait
-whose supertrait bundle *is* the 24 `Exchange<RawInput, ParsedX, V>` — and
-the backend writes the inherent parse methods (`#[capture_exchange_body]`
-generates its `Exchange` impls). Canary `parse_calendar_date` wired. Also
-fixed `amenable_derive::Sidecar` (restate `Proposition: Witness<V>`; doc
-the generated `new`). Two earlier sketches (`Proven`/`Proven::prove`,
-then a standalone `TemporalExchange`) were reverted. Next: Phase 4
-Step 2 (the other 23 `TemporalParser` methods, incl. multi-proof folding).
+descriptor, `#[sidecar(token)]` proof token). **`amenable_time` ships no
+`Exchange` impl** — the orphan rule forbids `impl<T: …, V> Exchange<
+RawInput, …, V> for T` (tested). Instead it ships `TemporalParser<V>` — a
+trait whose supertrait bundle *is* the 24 `Exchange<RawInput, ParsedX,
+V>` — and the backend writes the inherent parse methods
+(`#[capture_exchange_body]` generates the `Exchange` impls). Step 2a: 23
+top-level descriptors + their transitive enums gain `Default`/`Evidence`.
+Step 2b: all 24 `ParsedX` sidecars, 12 per-method composite propositions
+(multi-proof folding), 24 `#[establish]` tokens, the full trait —
+generated from `elicit_temporal`. Two earlier sketches
+(`Proven`/`Proven::prove`, then a standalone `TemporalExchange`) were
+reverted. Next: Phase 4 Step 2c (a codegen macro for the backend's
+`Exchange` impls) / `TemporalFormatter`.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

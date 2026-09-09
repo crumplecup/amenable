@@ -10,7 +10,20 @@ use crate::{
 };
 
 /// A combined complete ISO date and local clock time.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into))]
 pub struct LocalDateTimeDescriptor {
     /// Complete date component.
@@ -21,7 +34,20 @@ pub struct LocalDateTimeDescriptor {
 }
 
 /// An offset-aware timestamp.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into))]
 pub struct OffsetDateTimeDescriptor {
     /// Local civil timestamp fields.
@@ -32,7 +58,7 @@ pub struct OffsetDateTimeDescriptor {
 }
 
 /// An explicit-form complete date plus explicit-form local time of day.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into))]
 pub struct ExplicitDateTimeDescriptor {
     /// Complete date component.
@@ -43,7 +69,7 @@ pub struct ExplicitDateTimeDescriptor {
 }
 
 /// An explicit-form complete date plus local time of day and time shift.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into))]
 pub struct ExplicitDateTimeWithShiftDescriptor {
     /// Complete local date-and-time component.
@@ -53,7 +79,20 @@ pub struct ExplicitDateTimeWithShiftDescriptor {
 }
 
 /// A complete explicit-form date carrying a time shift.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into))]
 pub struct DateWithShiftDescriptor {
     /// Complete date component.
@@ -64,7 +103,20 @@ pub struct DateWithShiftDescriptor {
 }
 
 /// A complete explicit-form local time of day carrying a time shift.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into))]
 pub struct TimeOfDayWithShiftDescriptor {
     /// Explicit local time-of-day component.

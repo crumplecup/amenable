@@ -52,7 +52,7 @@ pub enum ExplicitTimeIntervalRepresentation {
 }
 
 /// A neutral CalConnect explicit time-interval descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
 pub struct ExplicitTimeIntervalDescriptor {
     /// One of the legal CalConnect explicit interval top-level forms.
     representation: ExplicitTimeIntervalRepresentation,
@@ -97,14 +97,27 @@ pub enum TimeIntervalRepresentation {
 }
 
 /// A neutral ISO 8601 interval descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct TimeIntervalDescriptor {
     /// One of the legal ISO 8601 interval top-level forms.
     representation: TimeIntervalRepresentation,
 }
 
 /// A neutral ISO 8601 recurring interval descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct RecurringIntervalDescriptor {
     /// Bounded repetition count; `None` denotes unbounded recurrence.
@@ -113,4 +126,38 @@ pub struct RecurringIntervalDescriptor {
     repetitions: Option<u32>,
     /// Repeated interval payload.
     interval: TimeIntervalDescriptor,
+}
+
+impl core::default::Default for ExplicitTimeIntervalEndpointDescriptor {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::DateTime(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for ExplicitTimeIntervalRepresentation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::StartEnd {
+            start: core::default::Default::default(),
+            end: core::default::Default::default(),
+        }
+    }
+}
+
+impl core::default::Default for TimeIntervalEndpoint {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Value(core::default::Default::default())
+    }
+}
+
+impl core::default::Default for TimeIntervalRepresentation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::StartEnd {
+            start: core::default::Default::default(),
+            end: core::default::Default::default(),
+        }
+    }
 }
