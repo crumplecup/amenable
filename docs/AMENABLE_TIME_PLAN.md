@@ -2,7 +2,10 @@
 
 ## Status
 
-Phase 5 Steps 1–2 (2026-09-09) — Step 1: the 22 `elicit_temporal`
+Phase 5 Steps 1–3 (2026-09-09) — Step 3: the 16 `native_props`
+associated-type families → `traits/native_props.rs`, one-to-one with
+`elicit_temporal` but every `type X: Evidence` (so a native carrier can
+be a `ProvenTemporalCarrier` primary). Step 1: the 22 `elicit_temporal`
 `*Bundle` aggregate proof bundles ported as folded `#[derive(Evidence,
 Witness)]` composites (`proof_composition/semantic_bundles.rs`), same
 structural closure as the rest of `proof_composition`. Step 2:
@@ -836,10 +839,20 @@ token — so each `Parsed*Result` alias becomes a named
       truth; the proposition is `<STok as ProofToken>::Proposition` via a
       new `#[sidecar(proposition_from_token)]` derive flag. 14
       `Proven*Carrier<T>` aliases. Generated. 2 tests.
-- [ ] The 16 `native_props.rs` associated-type families → the
-      `amenable_time` backend trait's associated types (unchanged shape).
-- [ ] The `realize_*` / `reflect_*` bridge method pairs → `Exchange`
-      impls between descriptor and carrier sidecars.
+- [x] **Step 3 (2026-09-09):** the 16 `native_props` associated-type
+      families → `traits/native_props.rs`, one-to-one with
+      `elicit_temporal` — same trait structure and supertrait graph
+      (`TemporalRecurringIntervalProps: TemporalTimeIntervalProps`; the 3
+      aggregate traits `TemporalSpanProps` / `TemporalExtensionProps` /
+      `TemporalNativeProps` with blanket impls). Amenable change: every
+      `type X` is bound `: amenable_core::Evidence` so a native carrier
+      can be a `ProvenTemporalCarrier` primary (a thin `#[derive(Evidence)]`
+      newtype, not a synthetic replacement). 1 test.
+- [ ] **Step 4:** the `realize_*` / `reflect_*` bridge method pairs (14
+      realize/reflect + 8 `*_native` factory analogs) → `Exchange`s
+      between a `Parsed*` descriptor sidecar and a `ProvenTemporalCarrier`
+      carrier sidecar (+ a `Reflected*` sidecar for the reflect
+      direction, carrying the bundle token through).
 
 ### Phase 6 — real proofs for the genuinely-checkable contracts
 

@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Step 1
+**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Steps 1–3
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
@@ -98,7 +98,11 @@ reuse the parser / formatter sidecars. **Phase 4 exchange surface
 complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
 standalone `TemporalExchange`) were reverted.
 
-**Phase 5 Steps 1–2 complete (2026-09-09)** — Step 1: the 22
+**Phase 5 Steps 1–3 complete (2026-09-09)** — Step 3: the 16
+`native_props` associated-type families → `traits/native_props.rs`,
+one-to-one with `elicit_temporal` (same supertrait graph + 3 aggregate
+blanket traits), every `type X` bound `: Evidence` so a native carrier
+can be a `ProvenTemporalCarrier` primary. Step 1: the 22
 `elicit_temporal` `*Bundle` aggregate proof bundles (15 `*SemanticBundle`
 plus 7 single-proof `*Bundle`) ported as folded `#[derive(Evidence,
 Witness)]` composites (`proof_composition/semantic_bundles.rs`). Step 2:
@@ -110,8 +114,7 @@ of the 22 gets a `<Bundle>Token` `#[establish]`-swapped from the token
 that produced it, and the carrier is keyed on the token (proposition =
 `<STok as ProofToken>::Proposition` via a new
 `#[sidecar(proposition_from_token)]` derive flag). 14 `Proven*Carrier<T>`
-aliases. Next: the 16 `native_props` associated-type families, then the
-`realize_*` / `reflect_*` bridge `Exchange`s. (Step 2c — the backend
+aliases. Next: the `realize_*` / `reflect_*` bridge `Exchange`s (Step 4). (Step 2c — the backend
 `Exchange`-impl codegen macro — is deferred until there is a backend
 crate to target; `#[capture_exchange_body]` is the working per-method
 form.)

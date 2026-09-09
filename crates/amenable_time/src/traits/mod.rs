@@ -17,6 +17,7 @@ mod calconnect;
 mod conversion;
 mod format;
 mod interval;
+mod native_props;
 mod parse;
 mod report;
 mod zone;
@@ -25,6 +26,14 @@ pub use calconnect::TemporalCalConnectFactory;
 pub use conversion::TemporalConversionFactory;
 pub use format::TemporalFormatter;
 pub use interval::TemporalIntervalFactory;
+pub use native_props::{
+    TemporalCivilProps, TemporalDateTimeFormulaProps, TemporalDurationProps,
+    TemporalExplicitDurationProps, TemporalExplicitTemporalFormProps,
+    TemporalExplicitTimeIntervalProps, TemporalExtensionProps, TemporalGroupedTimeScaleUnitProps,
+    TemporalInstantProps, TemporalNativeProps, TemporalQualifiedTemporalValueProps,
+    TemporalRecurringIntervalProps, TemporalSetProps, TemporalSpanProps, TemporalTimeIntervalProps,
+    TemporalZoneProps,
+};
 pub use parse::TemporalParser;
 pub use report::TemporalReporter;
 pub use zone::TemporalZoneFactory;

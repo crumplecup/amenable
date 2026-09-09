@@ -117,7 +117,7 @@ the generated `new`).
 | `TemporalConversionFactory<V>` | 4 | ✅ 4/4 | supertrait bundle of 4 transitions (`src/exchange/conversion.rs`) |
 | `TemporalIntervalFactory<V>` | 4 | ✅ 4/4 | supertrait bundle: 3 `Exchange<RawInput, Parsed*, V>` (reused parser outputs) + `order_offset_endpoints` transition (`src/exchange/interval.rs`) |
 | `TemporalCalConnectFactory<V>` | 19 | ✅ 19/19 | supertrait bundle: 6 new parse + 6 new emit (`Exchange<Parsed*, Formatted*, V>`) + `evaluate_date_time_formula` transition + 6 shared families reusing parser/formatter sidecars (`src/exchange/calconnect.rs`) |
-| native-carrier families (16) | 0 | — | associated types (Phase 5) |
+| native-carrier families (16) | — | ✅ 16/16 | `traits/native_props.rs` — associated-type traits, each `type X: Evidence` (so a carrier can be a `ProvenTemporalCarrier` primary); the 3 aggregate traits get blanket impls (Phase 5 Step 3) |
 | native bridges (`realize_*`/`reflect_*`) | ~30 | — | `Exchange` (Phase 5) |
 
 ## Licensing gate

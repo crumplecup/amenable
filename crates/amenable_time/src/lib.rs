@@ -456,8 +456,14 @@ pub use provenance_vocab::{
     StandardsBody,
 };
 pub use traits::{
-    TemporalCalConnectFactory, TemporalConversionFactory, TemporalFormatter,
-    TemporalIntervalFactory, TemporalParser, TemporalReporter, TemporalZoneFactory,
+    TemporalCalConnectFactory, TemporalCivilProps, TemporalConversionFactory,
+    TemporalDateTimeFormulaProps, TemporalDurationProps, TemporalExplicitDurationProps,
+    TemporalExplicitTemporalFormProps, TemporalExplicitTimeIntervalProps, TemporalExtensionProps,
+    TemporalFormatter, TemporalGroupedTimeScaleUnitProps, TemporalInstantProps,
+    TemporalIntervalFactory, TemporalNativeProps, TemporalParser,
+    TemporalQualifiedTemporalValueProps, TemporalRecurringIntervalProps, TemporalReporter,
+    TemporalSetProps, TemporalSpanProps, TemporalTimeIntervalProps, TemporalZoneFactory,
+    TemporalZoneProps,
 };
 pub use types::{
     CalendarDateDescriptor, CenturyDescriptor, CenturyDescriptorBuilder, CompleteDateDescriptor,
