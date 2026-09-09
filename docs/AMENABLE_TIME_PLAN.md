@@ -2,14 +2,22 @@
 
 ## Status
 
-🔲 **Phase 1 complete (2026-09-08)** — all 345 citation-only contracts
-ported as `Standard`s with a real `TemporalProvenance`, across 9
-normative authorities; `just check-all-package amenable_time` clean.
-Next: Phase 2 (descriptors). All 7 decisions settled. `crates/amenable_time` has the error layer, `provenance_vocab`,
-`TemporalProvenance`, the `temporal_standard!` macro, `contracts::precision`
-(5 real contracts, 6 passing tests), `TemporalReporter`, and
-`TemporalComponent` / `SerializationProfile` — all faithful ports, `just
-check-all-package amenable_time` clean.
+🔲 **Phase 2 complete (2026-09-08)** — 93 descriptor definitions (50
+structs + 43 enums) ported into `src/types/` (13 modules), house-style:
+private fields + `derive_getters::Getters` + `derive_new::new` /
+`derive_builder::Builder` (`FooDescriptorBuilder::default()`, 33 of them),
+`strum::EnumIter` + `derive_more::Display` on closed enums, no serde /
+`JsonSchema`, no construction-time validation. `#[derive(Evidence)]` is
+**deferred to Phase 3/4** — the `Sidecar<V>` wiring there shows which
+descriptors actually become a `Primary`, rather than forcing a
+meaningless `Default` onto every data-only enum now. 5 new tests.
+`just check-all-package amenable_time` clean.
+
+Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
+`Standard`s with a real `TemporalProvenance`, across 9 normative
+authorities. All 7 decisions settled. Next: Phase 3 (the `ProvableFrom`
+graph → `Establish` + `Evidence`; brings in the 93 `proof_composition`
+types and the 13 `*ProofBranch` enums).
 
 Phase 0 no longer includes an Exchange edge — that was probe thinking
 (a synthetic `Received -> Preserved` typestate machine was built in
@@ -553,16 +561,29 @@ enumerated `pub use` at three module levels; a wildcard-`pub use`
 carve-out for generated contract vocabularies would remove it.
 (3) `just temporal-coverage` — deferred to Phase 7.
 
-### Phase 2 — descriptors as `Evidence` payloads
+### Phase 2 — descriptors — **done (2026-09-08)**
 
-- [ ] Port all 259 `types.rs` definitions. Structs already
-      `#[derive(Builder)]`; add `#[derive(Evidence)] #[evidence(basis =
-      "Self")]`. Closed enums: plain derives + `strum` per house policy.
-- [ ] Port the `*Result` type aliases (rename to `amenable`'s
-      `Sidecar`-shaped output types where they carry proofs; keep as
-      plain `Result` aliases where they don't).
-- [ ] `*ProofBranch` enums → keep as enums; they become
-      `Sidecar::Proposition` discriminants in Phase 5.
+- [x] Ported the 93 pure-data `types.rs` definitions (50 structs + 43
+      enums) into `src/types/` (13 modules). House style: private fields +
+      `derive_getters::Getters` accessors, `derive_new::new` for
+      all-required structs, `derive_builder::Builder`
+      (`FooDescriptorBuilder::default()`, 33 structs) for
+      optional/multi-field, `strum::EnumIter` + `derive_more::Display` on
+      closed enums, data-carrying enums plain. **No serde / `JsonSchema`**
+      (house policy — these are interface descriptors, not persisted).
+      **No construction-time validation** (decision 5).
+- [x] `#[derive(Evidence)]` **deferred to Phase 3/4**. It requires
+      `Self: Default`, which cascades a meaningless `Default` onto ~10
+      data-only enums with no natural default (`CompleteDateDescriptor`,
+      `TemporalValueDescriptor`, …). Phase 3/4's `Sidecar<V>` wiring shows
+      exactly which descriptors become a `Primary` and genuinely need
+      `Evidence` — and lets us relax the derive's `Default` requirement
+      (a `basis_ctor` builder expression) instead. This is an
+      edge-at-scale, logged not worked-around.
+- [ ] `*Result` type aliases (116) — Phase 3/4, alongside the proof
+      types they carry.
+- [ ] `*ProofBranch` enums (13) — Phase 3; they carry `Established<T>` /
+      `*Evidence`, so they need `proof_composition` first.
 
 ### Phase 3 — the `ProvableFrom` graph → `Establish` + `Evidence`
 

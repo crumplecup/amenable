@@ -35,12 +35,28 @@ capability queries).
 | `contracts/conversion` | 7 | ✅ 7/7 | — | — | — | — |
 | `contracts/proof_composition` | 93 | — | — | — | — | — |
 
-## Descriptors (`types.rs`, 259 defs)
+## Descriptors (`types.rs`)
+
+**Phase 2 complete — 93 descriptor definitions ported** (50 structs + 43
+enums) into `src/types/` (13 modules). Structs: private fields +
+`derive_getters::Getters` accessors + `derive_new::new` (all-required) or
+`derive_builder::Builder` (`FooDescriptorBuilder::default()`, 33 of them)
+for optional/multi-field. Closed enums: `strum::EnumIter` +
+`derive_more::Display`; data-carrying enums plain. No serde / `JsonSchema`
+(house policy). No construction-time validation.
 
 | set | ported as | note |
 |---|---|---|
-| `TemporalComponent`, `SerializationProfile` | plain enums | Phase 0 minimal set |
-| everything else | — | Phase 2; structs gain `#[derive(Evidence)]` then |
+| 50 descriptor structs | private fields + `Getters` + `new`/`Builder` | `#[derive(Evidence)]` deferred to Phase 3/4 |
+| 21 closed enums | `EnumIter` + `Display` | `Default` only where `elicit_temporal` had it (`UtcOffsetSign`, `UtcOffsetRelationship`, `DurationDescriptor`) |
+| 22 data-carrying enums | `Debug`/`Clone`/`PartialEq`/`Eq`/`Hash`/`Ord` | umbrella + boundary families |
+| 13 `*ProofBranch` enums | — | Phase 3 — carry `Established<T>` / `*Evidence` |
+| `*SemanticBundle` (23), `ProvenTemporalCarrier`, `Proven*Carrier` aliases (14) | — | Phase 5 |
+| `*Result` type aliases (116) | — | Phase 3/4 |
+
+Deferred `#[derive(Evidence)]`: forcing `Evidence` (hence `Default`) onto
+every data-only enum here is meaningless; Phase 3/4's `Sidecar<V>` wiring
+shows exactly which descriptors become a `Primary` and need it.
 
 ## Traits (`traits/`, ~35 traits / ~175 methods)
 

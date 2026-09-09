@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phase 0 complete, Phase 1 in progress (2026-09-08). A
+**Status:** 🔲 Phases 0–2 complete (2026-09-08). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
 ~175 trait methods) into `amenable_time` — **not a probe**; whether the
@@ -41,7 +41,18 @@ authorities: `iso_8601` (109) / `extended` (48) tier C; `rfc3339` (20) /
 deep links); `calconnect` (61) tier B; `interval` (25) / `instant` (6) /
 `serialization` (5) / `conversion` (7) mixed. Directories where the
 500-LOC cap forced a split: `iso_8601/` ×6, `extended/` ×3, `rfc9557/`
-×3, `calconnect/` ×3. Next: Phase 2 (the 259 `types.rs` descriptors).
+×3, `calconnect/` ×3.
+
+**Phase 2 complete — 93 descriptor definitions ported** (50 structs + 43
+enums) into `src/types/` (13 modules): private fields +
+`derive_getters::Getters` + `derive_new::new` / `derive_builder::Builder`
+(`FooDescriptorBuilder::default()`, 33 structs), `strum::EnumIter` +
+`derive_more::Display` on closed enums, no serde / `JsonSchema`, no
+construction-time validation. `#[derive(Evidence)]` deferred to Phase 3/4
+(its `Default` requirement would cascade meaninglessly onto data-only
+enums; the `Sidecar<V>` wiring there settles which descriptors need it).
+Next: Phase 3 (`proof_composition` → `Establish` + `Evidence`, plus the
+13 `*ProofBranch` enums).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
