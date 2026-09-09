@@ -96,7 +96,20 @@ pub enum SelectionRuleDescriptor {
 
 /// A full CalConnect selection expression with optional single-instance
 /// semantics.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct SelectionExpressionDescriptor {
     /// Selection rules in lexical order.
@@ -120,7 +133,20 @@ pub struct EligibleTimeIntervalsDescriptor {
 
 /// A repeat-rule payload joining eligible intervals to a selection
 /// expression.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct RepeatRuleDescriptor {
     /// Repeating cycle that defines eligible intervals.
     eligible_intervals: EligibleTimeIntervalsDescriptor,
@@ -140,7 +166,20 @@ pub enum RecurringIntervalWithRepeatRuleIntervalDescriptor {
 
 /// A complete recurring-interval representation extended with a repeat
 /// rule.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct RecurringIntervalWithRepeatRuleDescriptor {
     /// Bounded repetition count; `None` denotes unbounded recurrence.

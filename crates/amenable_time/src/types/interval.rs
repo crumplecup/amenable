@@ -52,7 +52,20 @@ pub enum ExplicitTimeIntervalRepresentation {
 }
 
 /// A neutral CalConnect explicit time-interval descriptor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    new,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 pub struct ExplicitTimeIntervalDescriptor {
     /// One of the legal CalConnect explicit interval top-level forms.
     representation: ExplicitTimeIntervalRepresentation,

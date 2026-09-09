@@ -130,7 +130,20 @@ pub enum ExplicitDurationSemanticKindDescriptor {
 
 /// A CalConnect explicit duration descriptor preserving sign, order, and
 /// semantic family.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitDurationDescriptor {
     /// Whether the duration advances forward or backward in time.

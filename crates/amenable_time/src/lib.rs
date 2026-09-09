@@ -343,6 +343,24 @@ pub use exchange::{
     UtcOffsetValidToken, WeekDateBasicFormatted, WeekDateBasicFormattedToken,
     WeekDateExtendedFormatted, WeekDateExtendedFormattedToken, WeekDateValidToken,
 };
+pub use exchange::{
+    EvaluateDateTimeFormulaEstablished, EvaluateDateTimeFormulaEstablishedToken,
+    EvaluateDateTimeFormulaInput, EvaluateDateTimeFormulaOutput,
+    EvaluateDateTimeFormulaPreconditions, EvaluateDateTimeFormulaPreconditionsToken,
+    EvaluateDateTimeFormulaRequest, ExplicitDurationFormatted, ExplicitDurationFormattedToken,
+    ExplicitDurationProof, ExplicitDurationProofToken, ExplicitTemporalFormFormatted,
+    ExplicitTemporalFormFormattedToken, ExplicitTemporalFormProof, ExplicitTemporalFormProofToken,
+    ExplicitTimeIntervalFormatted, ExplicitTimeIntervalFormattedToken, ExplicitTimeIntervalProof,
+    ExplicitTimeIntervalProofToken, FormattedExplicitDuration, FormattedExplicitTemporalForm,
+    FormattedExplicitTimeInterval, FormattedRecurringIntervalWithRepeatRule, FormattedRepeatRule,
+    FormattedSelectionExpression, ParsedExplicitDuration, ParsedExplicitTemporalForm,
+    ParsedExplicitTimeInterval, ParsedRecurringIntervalWithRepeatRule, ParsedRepeatRule,
+    ParsedSelectionExpression, RecurringIntervalWithRepeatRuleFormatted,
+    RecurringIntervalWithRepeatRuleFormattedToken, RecurringIntervalWithRepeatRuleProof,
+    RecurringIntervalWithRepeatRuleProofToken, RepeatRuleFormatted, RepeatRuleFormattedToken,
+    RepeatRuleProof, RepeatRuleProofToken, SelectionExpressionFormatted,
+    SelectionExpressionFormattedToken, SelectionExpressionProof, SelectionExpressionProofToken,
+};
 pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,
     CompleteDateEvidence, CompleteDurationEndIntervalSubstitutionEvidence,
@@ -407,8 +425,8 @@ pub use provenance_vocab::{
     StandardsBody,
 };
 pub use traits::{
-    TemporalConversionFactory, TemporalFormatter, TemporalIntervalFactory, TemporalParser,
-    TemporalReporter, TemporalZoneFactory,
+    TemporalCalConnectFactory, TemporalConversionFactory, TemporalFormatter,
+    TemporalIntervalFactory, TemporalParser, TemporalReporter, TemporalZoneFactory,
 };
 pub use types::{
     CalendarDateDescriptor, CenturyDescriptor, CenturyDescriptorBuilder, CompleteDateDescriptor,

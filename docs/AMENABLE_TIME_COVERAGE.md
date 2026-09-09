@@ -56,7 +56,7 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 
 ## Exchange surface (`src/exchange/`)
 
-**Phase 4 Steps 1–4 done (2026-09-09).** `RawInput` input sidecar
+**Phase 4 Steps 1–5 done (2026-09-09).** `RawInput` input sidecar
 (`Sidecar<V>` for every `V`). `TemporalParser<V>` / `TemporalFormatter<V>`
 / `TemporalZoneFactory<V>` / `TemporalConversionFactory<V>` /
 `TemporalIntervalFactory<V>` — traits whose supertrait bundle *is* the
@@ -91,6 +91,14 @@ parser output sidecars.
   composites (same fold)
 - `src/exchange/establish.rs` — 24 parse + 3 input + 36 format
   `#[amenable_derive::establish]` tokens
+- `src/exchange/{zone,conversion,interval,factory_establish}.rs` — the 3
+  factory seams (Step 4)
+- `src/exchange/calconnect.rs` — `TemporalCalConnectFactory` (Step 5),
+  self-contained: 6 CalConnect-only parse methods + their 6 emit
+  counterparts (folded to `<X>Proof` / `<X>Formatted`), the
+  `evaluate_date_time_formula` transition, and their tokens. The 6 shared
+  families (qualified value, grouped unit, date-time formula) reuse the
+  parser / formatter sidecars.
 
 **No `Exchange` impl in `amenable_time`** — the orphan rule keeps those in
 the backend crate (`#[capture_exchange_body]` generates them).
@@ -107,7 +115,7 @@ the generated `new`).
 | `TemporalZoneFactory<V>` | 5 | ✅ 5/5 | supertrait bundle: 1 `Exchange<RawInput, ResolvedNamedTimeZone, V>` + 4 transitions (`*Input` → `*Output`, `src/exchange/zone.rs`) |
 | `TemporalConversionFactory<V>` | 4 | ✅ 4/4 | supertrait bundle of 4 transitions (`src/exchange/conversion.rs`) |
 | `TemporalIntervalFactory<V>` | 4 | ✅ 4/4 | supertrait bundle: 3 `Exchange<RawInput, Parsed*, V>` (reused parser outputs) + `order_offset_endpoints` transition (`src/exchange/interval.rs`) |
-| `TemporalCalConnectFactory` | 19 | — | Phase 4 |
+| `TemporalCalConnectFactory<V>` | 19 | ✅ 19/19 | supertrait bundle: 6 new parse + 6 new emit (`Exchange<Parsed*, Formatted*, V>`) + `evaluate_date_time_formula` transition + 6 shared families reusing parser/formatter sidecars (`src/exchange/calconnect.rs`) |
 | native-carrier families (16) | 0 | — | associated types (Phase 5) |
 | native bridges (`realize_*`/`reflect_*`) | ~30 | — | `Exchange` (Phase 5) |
 

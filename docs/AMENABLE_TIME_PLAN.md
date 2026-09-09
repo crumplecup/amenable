@@ -22,7 +22,7 @@ closure, no proof-token bag). Generated from `elicit_temporal`.
 Phase 3 Step 2 (2026-09-09) — the 13 `*ProofBranch` enums →
 `proof_composition/proof_branches.rs`.
 
-Phase 4 Steps 1–4 (2026-09-09) — the exchange surface, in
+Phase 4 Steps 1–5 (2026-09-09) — the exchange surface, in
 `src/exchange/`. Every `elicit_temporal` return tuple *is* a sidecar;
 `amenable_time` ships the sidecar types + `Establish` edges + a per-seam
 trait whose supertrait bundle *is* the exchanges (`TemporalParser<V>`,
@@ -40,11 +40,15 @@ backend-provided). Step 4: the 3 factory seams — 9 transition methods
 fold to a `*Preconditions` proposition in + a `*Established` proposition
 out, `*Input` / `*Output` sidecars, paired `#[establish]` edges
 (`factory_establish.rs`); the 4 parser-style factory methods reuse
-`RawInput`. All generated from `elicit_temporal`.
-`amenable_derive::Sidecar` fixed en route. Two earlier sketches
-(`Proven`/`Proven::prove`, then a standalone `TemporalExchange` parallel
-trait) were reverted. Next: `TemporalCalConnectFactory` (19), then Step
-2c (a codegen macro for a backend's `Exchange` impls).
+`RawInput`. Step 5: `TemporalCalConnectFactory<V>` (19) — 6 CalConnect-only
+parse methods + their 6 emit counterparts + `evaluate_date_time_formula`,
+self-contained in `src/exchange/calconnect.rs`; the 6 shared families
+reuse the parser / formatter sidecars. All generated from
+`elicit_temporal`. `amenable_derive::Sidecar` fixed en route. Two earlier
+sketches (`Proven`/`Proven::prove`, then a standalone `TemporalExchange`
+parallel trait) were reverted. **Phase 4 exchange surface is now
+complete.** Next: Step 2c (a codegen macro for a backend's `Exchange`
+impls); then Phase 5.
 
 Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
 `Standard`s with a real `TemporalProvenance`, across 9 normative
@@ -772,7 +776,19 @@ token — so each `Parsed*Result` alias becomes a named
       `Exchange<RawInput, …, V>` reusing the parser machinery.
       `traits/{zone,conversion,interval}.rs` carry the supertrait bundles.
       3 descriptors gained `Evidence`. Generated. 9 tests.
-- [ ] `TemporalCalConnectFactory` (19).
+- [x] **Step 5 (2026-09-09):** `TemporalCalConnectFactory<V>` (19).
+      `src/exchange/calconnect.rs`, self-contained: 6 CalConnect-only
+      parse methods (`parse_explicit_temporal_form`,
+      `parse_explicit_duration`, `parse_explicit_time_interval`,
+      `parse_selection_expression`, `parse_repeat_rule`,
+      `parse_recurring_interval_with_repeat_rule`) → `Parsed<X>` sidecar +
+      `<X>Proof` folded composite + a token from `TemporalInputToken`;
+      their 6 emit counterparts → `Formatted<X>` sidecar + `<X>Formatted`
+      folded composite + a token from `<X>ProofToken`;
+      `evaluate_date_time_formula` as a transition (`*Request` /
+      `*Preconditions` / `*Established`). The 6 shared families (qualified
+      value, grouped unit, date-time formula) reuse the parser / formatter
+      sidecars. 7 descriptors gained `Evidence`. Generated. 11 tests.
 - [ ] `TemporalBackend` aggregate supertrait + its blanket impl.
 - [ ] Each method → an `Exchange<In, Out, V>` impl + an
       `ExchangeEdgeRecord` (the codegen input for Phase 5–6 companions).

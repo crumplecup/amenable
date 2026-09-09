@@ -147,6 +147,54 @@ fn every_factory_established_token_chains_from_its_preconditions_token() {
 }
 
 #[test]
+fn calconnect_parse_and_emit_sidecars_share_one_folded_proof_shape() {
+    amenable_core::init_tracing();
+
+    // `parse_selection_expression` folds 16 proof sidecars into
+    // `SelectionExpressionProof`; `format_selection_expression` folds the
+    // matching emission proofs into `SelectionExpressionFormatted`.
+    use amenable_time::{
+        FormattedSelectionExpression, ParsedSelectionExpression, SelectionExpressionFormatted,
+        SelectionExpressionProof,
+    };
+    let () = SelectionExpressionProof::default().audit();
+    let () = SelectionExpressionFormatted::default().audit();
+    assert!(<SelectionExpressionProof as Evidence>::is_root());
+    assert!(<SelectionExpressionFormatted as Evidence>::is_root());
+
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<amenable_time::SelectionExpressionProofToken, SelectionExpressionProof>();
+    assert_token::<amenable_time::SelectionExpressionFormattedToken, SelectionExpressionFormatted>(
+    );
+
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<Option<(ParsedSelectionExpression, FormattedSelectionExpression)>>;
+}
+
+#[test]
+fn calconnect_emit_tokens_chain_from_the_matching_parse_token() {
+    amenable_core::init_tracing();
+
+    // Each CalConnect emit token is established from its parse token, not
+    // from `TemporalInputToken`.
+    let chained: usize = inventory::iter::<amenable_core::ProofTokenMintRecord>()
+        .filter(|r| {
+            r.credential()
+                .is_some_and(|c| c.replace(' ', "").ends_with("ProofToken"))
+        })
+        .count();
+    assert!(
+        chained >= 6,
+        "expected >=6 CalConnect emit-from-parse edges, got {chained}"
+    );
+}
+
+#[test]
 fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
     amenable_core::init_tracing();
 

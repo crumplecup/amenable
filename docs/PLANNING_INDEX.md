@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3 Steps 1–2, Phase 4 Steps 1–2
+**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 Steps 1–5
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
@@ -65,7 +65,7 @@ members' proofs. Generated from `elicit_temporal` by script.
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
 (`proof_composition/proof_branches.rs`).
 
-**Phase 4 Steps 1–4 complete (2026-09-09)** — the exchange surface in
+**Phase 4 Steps 1–5 complete (2026-09-09)** — the exchange surface in
 `src/exchange/`. **Design (user-confirmed after several corrections):
 every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
 descriptor, `#[sidecar(token)]` proof token). **`amenable_time` ships no
@@ -89,10 +89,15 @@ return-tuple proofs → a `*Established` proposition; `*Input` / `*Output`
 `#[derive(Sidecar)]` structs + paired `#[establish]` edges
 (`*PreconditionsToken` ← `TemporalInputToken`, `*EstablishedToken` ←
 `*PreconditionsToken`) in `factory_establish.rs`; the 4 parser-style
-factory methods reuse `RawInput`. Two earlier sketches
-(`Proven`/`Proven::prove`, then a standalone `TemporalExchange`) were
-reverted. Next: `TemporalCalConnectFactory` (19); then Step 2c (a codegen
-macro for the backend's `Exchange` impls).
+factory methods reuse `RawInput`. **Step 5 (2026-09-09):**
+`TemporalCalConnectFactory<V>` (19) — 6 CalConnect-only parse methods +
+their 6 emit counterparts (`Parsed<X>` → `Formatted<X>`, folded to
+`<X>Proof` / `<X>Formatted`) + `evaluate_date_time_formula` transition,
+self-contained in `src/exchange/calconnect.rs`; the 6 shared families
+reuse the parser / formatter sidecars. **Phase 4 exchange surface
+complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
+standalone `TemporalExchange`) were reverted. Next: Step 2c (a codegen
+macro for the backend's `Exchange` impls); then Phase 5.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

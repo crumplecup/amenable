@@ -22,6 +22,7 @@
 //! - [`parse`] / [`format`] — the per-method parse / format output sidecars.
 //! - [`zone`] / [`conversion`] / [`interval`] — the factory transition sidecars.
 
+mod calconnect;
 mod conversion;
 mod establish;
 mod factory_establish;
@@ -35,6 +36,24 @@ mod sidecars;
 mod tokens;
 mod zone;
 
+pub use calconnect::{
+    EvaluateDateTimeFormulaEstablished, EvaluateDateTimeFormulaEstablishedToken,
+    EvaluateDateTimeFormulaInput, EvaluateDateTimeFormulaOutput,
+    EvaluateDateTimeFormulaPreconditions, EvaluateDateTimeFormulaPreconditionsToken,
+    EvaluateDateTimeFormulaRequest, ExplicitDurationFormatted, ExplicitDurationFormattedToken,
+    ExplicitDurationProof, ExplicitDurationProofToken, ExplicitTemporalFormFormatted,
+    ExplicitTemporalFormFormattedToken, ExplicitTemporalFormProof, ExplicitTemporalFormProofToken,
+    ExplicitTimeIntervalFormatted, ExplicitTimeIntervalFormattedToken, ExplicitTimeIntervalProof,
+    ExplicitTimeIntervalProofToken, FormattedExplicitDuration, FormattedExplicitTemporalForm,
+    FormattedExplicitTimeInterval, FormattedRecurringIntervalWithRepeatRule, FormattedRepeatRule,
+    FormattedSelectionExpression, ParsedExplicitDuration, ParsedExplicitTemporalForm,
+    ParsedExplicitTimeInterval, ParsedRecurringIntervalWithRepeatRule, ParsedRepeatRule,
+    ParsedSelectionExpression, RecurringIntervalWithRepeatRuleFormatted,
+    RecurringIntervalWithRepeatRuleFormattedToken, RecurringIntervalWithRepeatRuleProof,
+    RecurringIntervalWithRepeatRuleProofToken, RepeatRuleFormatted, RepeatRuleFormattedToken,
+    RepeatRuleProof, RepeatRuleProofToken, SelectionExpressionFormatted,
+    SelectionExpressionFormattedToken, SelectionExpressionProof, SelectionExpressionProofToken,
+};
 pub use conversion::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyInput,
     AdjustPrecisionLosslesslyOutput, AdjustPrecisionLosslesslyPreconditions,

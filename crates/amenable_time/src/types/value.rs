@@ -88,7 +88,8 @@ pub enum QualifiedOrBareTemporalValueDescriptor {
 
 /// The explicit temporal values governed by CalConnect explicit-form
 /// rules.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
 pub enum ExplicitTemporalValueDescriptor {
     /// Explicit calendar date.
     CalendarDate(CalendarDateDescriptor),
@@ -117,7 +118,20 @@ pub enum ExplicitTemporalValueDescriptor {
 }
 
 /// Explicit temporal form metadata preserved across CalConnect exchanges.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, Builder, Default)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Getters,
+    Builder,
+    Default,
+    amenable_derive::Evidence,
+)]
+#[evidence(basis = "Self")]
 #[builder(pattern = "owned", setter(into, strip_option))]
 pub struct ExplicitTemporalFormDescriptor {
     /// The explicit temporal value carried by the representation.
