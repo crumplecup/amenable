@@ -20,8 +20,6 @@
 
 #[macro_use]
 mod standard_macro;
-#[macro_use]
-mod evidence_macro;
 
 mod contracts;
 mod error;
@@ -254,20 +252,27 @@ pub use contracts::{
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use proof_composition::{
-    BackendConversionSemanticsValid, CalendarDateValid, CenturyValid,
-    CompleteIntervalSubstitutionSemanticsValid,
-    CompleteRecurringIntervalRepresentationSemanticsValid, ConversionLossless,
-    ConversionTruncatesSubseconds, CriticalTimeZoneInconsistencyHandlingValid,
+    BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,
+    CompleteDateEvidence, CompleteDurationEndIntervalSubstitutionEvidence,
+    CompleteIntervalDurationRepresentationEvidence, CompleteIntervalSubstitutionSemanticsValid,
+    CompleteRecurringIntervalRepresentationSemanticsValid,
+    CompleteStartDurationIntervalSubstitutionEvidence,
+    CompleteStartEndIntervalSubstitutionEvidence, CompleteTimePointDateRepresentationEvidence,
+    CompleteTimePointRepresentationEvidence, CompleteTimePointTimeRepresentationEvidence,
+    ConversionLossless, ConversionTruncatesSubseconds, CriticalTimeZoneInconsistencyHandlingValid,
     DateTimeFormulaEvaluationResultValid, DateTimeFormulaEvaluationSemanticsValid,
-    DateTimeFormulaValid, DateValid, DateWithShiftValid, DecadeValid, DurationFormValid,
-    DurationRepresentationSemanticsValid, ElectiveTimeZoneInconsistencyHandlingValid,
-    EnhancedIntervalLevelOneSemanticsValid, EnhancedIntervalLevelTwoSemanticsValid,
-    ExplicitDateTimeValid, ExplicitDateTimeWithShiftValid, ExplicitDurationValid,
-    ExplicitIntervalDurationSubstitutionSemanticsValid,
+    DateTimeFormulaValid, DateValid, DateWithShiftValid, DecadeValid,
+    DurationAlternativeFormEvidence, DurationDesignatorRepresentationEvidence, DurationFormValid,
+    DurationRepresentationSemanticsValid, DurationWeekFormEvidence,
+    ElectiveTimeZoneInconsistencyHandlingValid, EnhancedIntervalLevelOneSemanticsValid,
+    EnhancedIntervalLevelTwoSemanticsValid, ExplicitDateTimeValid, ExplicitDateTimeWithShiftValid,
+    ExplicitDurationRepresentationEvidence, ExplicitDurationSemanticEvidence,
+    ExplicitDurationValid, ExplicitIntervalDurationSubstitutionSemanticsValid,
     ExplicitIntervalEndComponentInheritanceSemanticsValid,
     ExplicitIntervalShiftPropagationSemanticsValid, ExplicitTemporalFormValid,
     ExplicitTimeIntervalValid, ExplicitTimeOfDayValid, ExplicitTimeShiftValid,
-    ExtendedIntervalBoundarySemanticsValid, ExtendedYearValid, GroupedTimeScaleUnitValid,
+    ExtendedIntervalBoundarySemanticsValid, ExtendedYearBaseEvidence,
+    ExtendedYearSignificantDigitsEvidence, ExtendedYearValid, GroupedTimeScaleUnitValid,
     InheritedIntervalEndComponentsSemanticsValid, InheritedIntervalZoneSemanticsValid,
     IntervalEndpointsOrdered, IxdtfAdditionalInformationSemanticsValid,
     IxdtfCalendarKeyRegistrySemanticsValid, IxdtfPermanentSuffixKeyRegistrationSemanticsValid,
@@ -275,23 +280,25 @@ pub use proof_composition::{
     IxdtfSuffixKeyRegistryPolicySemanticsValid, IxdtfTimestampHasPreferredPresentationCalendar,
     IxdtfTimestampValid, LocalDateTimeDoesNotIdentifyFixedInstant, LocalDateTimeValid,
     LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid, LossyConversionAuthorityValid,
-    MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
-    NamedTimeZoneInterpretationTracksTzdbRevision, OffsetConsistentWithNamedZone,
-    OffsetDateTimeValid, OffsetOnlyZoneSemanticsLimited,
-    OffsetTimeZoneAnnotationConsistentWithTimestamp, OrdinalDateValid,
-    OtherThanCompleteRecurringIntervalRepresentationSemanticsValid, PrecisionPreserved,
-    QualifiedTemporalExpressionValid, QualifiedTemporalValueValid, RecurringIntervalFormValid,
-    RecurringIntervalWithRepeatRuleValid, ReducedCalendarDateValid, ReducedLocalTimeValid,
-    RepeatRuleValid, Rfc3339DisplayGuidanceValid, Rfc3339GenerationGuidanceValid,
+    MutualAgreementAuthorityScopeEvidence, MutualAgreementAuthorityValid,
+    NamedTimeZoneIdentityValid, NamedTimeZoneInterpretationTracksTzdbRevision,
+    NamedZoneAttachmentEvidence, OffsetConsistentWithNamedZone, OffsetDateTimeValid,
+    OffsetOnlyZoneSemanticsLimited, OffsetTimeZoneAnnotationConsistentWithTimestamp,
+    OrdinalDateValid, OtherThanCompleteRecurringIntervalRepresentationSemanticsValid,
+    PrecisionPreserved, QualificationPlacementEvidence, QualifiedTemporalExpressionValid,
+    QualifiedTemporalValueValid, RecurringIntervalFormValid, RecurringIntervalWithRepeatRuleValid,
+    ReducedCalendarDatePrecisionEvidence, ReducedCalendarDateValid,
+    ReducedLocalTimePrecisionEvidence, ReducedLocalTimeValid, RepeatRuleValid,
+    Rfc3339DisplayGuidanceValid, Rfc3339GenerationGuidanceValid,
     Rfc3339LexicalOrderingSemanticsValid, Rfc3339TimestampValid, SeasonalTemporalExpressionValid,
     SelectionExpressionValid, StandardTimeOfDayValid, StandardTimeValid,
-    SubYearGroupingExpressionValid, TemporalOrderingPreserved, TemporalSetExpressionValid,
-    TemporalSetRangeSemanticsValid, TimeIntervalValid, TimeOfDayWithShiftValid, TimeValid,
-    TimestampRepresentsFixedInstant, UnspecifiedComponentExpressionValid, UtcOfDayValid,
-    UtcOffsetKnown, UtcOffsetValid, UtcTimeScaleValid, WeekDateValid,
-    ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
-    ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone,
-    ZuluTimeZoneInconsistencyAvoidanceValid,
+    SubYearGroupingExpressionValid, SubYearGroupingKindEvidence, TemporalOrderingPreserved,
+    TemporalSetExpressionValid, TemporalSetRangeSemanticsValid, TimeIntervalValid,
+    TimeOfDayWithShiftValid, TimeValid, TimestampRepresentsFixedInstant,
+    UnspecifiedComponentExpressionValid, UtcOfDayValid, UtcOffsetKnown, UtcOffsetPrecisionEvidence,
+    UtcOffsetValid, UtcTimeScaleValid, WeekDateValid, ZoneTransitionAmbiguitySemanticsValid,
+    ZoneTransitionGapSemanticsValid, ZoneTransitionResolutionAuthorityValid,
+    ZonedDateTimeHasNamedZone, ZonedTimestampEvidence, ZuluTimeZoneInconsistencyAvoidanceValid,
 };
 pub use provenance::TemporalProvenance;
 pub use provenance_vocab::{

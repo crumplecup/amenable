@@ -33,7 +33,7 @@ capability queries).
 | `contracts/instant` | 6 | ✅ 6/6 | — | — | — | — |
 | `contracts/serialization` | 5 | ✅ 5/5 | — | — | — | — |
 | `contracts/conversion` | 7 | ✅ 7/7 | — | — | — | — |
-| `contracts/proof_composition` (aggregates) | 93 | ✅ 93/93 (`Evidence`) | — | — | — | — |
+| `contracts/proof_composition` (aggregates) | 93 | ✅ 93/93 composite `Evidence`+`Witness` (+ 24 shared branch types) | — | — | — | — |
 
 ## Descriptors (`types.rs`)
 

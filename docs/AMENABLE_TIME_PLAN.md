@@ -13,10 +13,13 @@ descriptors actually become a `Primary`, rather than forcing a
 meaningless `Default` onto every data-only enum now. 5 new tests.
 `just check-all-package amenable_time` clean.
 
-Phase 3 Step 1 (2026-09-08) — the 93 aggregate `*Valid` propositions
-ported as `#[derive(Evidence)]` ZSTs via a new `temporal_evidence!` macro
-(`src/proof_composition/aggregates.rs`). Next: Phase 3 Step 2 (the ~97
-`*Evidence` credential bundles → `#[derive(ProofToken)]`).
+Phase 3 Step 1 (2026-09-08) — all 93 aggregate `*Valid` propositions +
+24 shared branch types folded into composite `#[derive(Evidence,
+Witness)]` structs / enums (fields = the `elicit_temporal` `*Evidence`
+bundle's sub-claims; aggregation is `#[derive(Witness)]` structural
+closure, no proof-token bag). Generated from `elicit_temporal`.
+`src/proof_composition/{composites_a..d,branches_a,branches_b}.rs`. Next:
+Phase 3 Step 2 (the 13 `*ProofBranch` enums).
 
 Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
 `Standard`s with a real `TemporalProvenance`, across 9 normative
@@ -583,38 +586,51 @@ carve-out for generated contract vocabularies would remove it.
       `Evidence` — and lets us relax the derive's `Default` requirement
       (a `basis_ctor` builder expression) instead. This is an
       edge-at-scale, logged not worked-around.
-- [ ] `*Result` type aliases (116) — Phase 3/4, alongside the proof
-      types they carry.
-- [ ] `*ProofBranch` enums (13) — Phase 3; they carry `Established<T>` /
-      `*Evidence`, so they need `proof_composition` first.
+- [ ] `*Result` type aliases (116) — Phase 3 Step 3 / Phase 4.
+- [ ] `*ProofBranch` enums (13) — Phase 3 Step 2; they carry
+      `Established<T>` / `*Evidence`, so they need the composites first.
 
-### Phase 3 — the `ProvableFrom` graph → `Establish` + `Evidence`
+### Phase 3 — `proof_composition` → composite `Evidence` / `Witness`
 
-- [x] **Step 1 (2026-09-08):** Ported `proof_composition.rs`'s 93
-      aggregate `*Valid` propositions via a new `temporal_evidence!`
-      macro (`src/evidence_macro.rs`) → `src/proof_composition/
-      aggregates.rs`. Each a `#[derive(Evidence)]` ZST (`basis = "Self"`,
-      `Audit = ()`, auto `EvidenceLink`) — the composed half of the
-      `Standard` / `Evidence` split, no `Provenance` (a provable claim
-      has no citation). 3 tests. `just check-all-package amenable_time`
-      clean.
-- [ ] **Step 2:** Port the ~97 `*Evidence` credential bundles (structs +
-      18 branch enums carrying `Established<Standard>` sub-claims) →
-      `#[derive(ProofToken)]` credentials. Needs a per-contract root
-      `ProofToken` story first (each Phase-1 `Standard` is citation-only,
-      so its "establishment" is a free root mint).
-- [ ] **Step 3:** Port the ~98 `impl ProvableFrom<C> for P {}` lines as one
-      `impl<V: Verifier> Establish<C, V> for P where Self: Witness<V>` per
-      edge — generic over `V`, not per-backend (decision 3). `C` becomes
-      a `#[derive(ProofToken)]` credential; `establish()` is the lawful
-      mint path. Multi-credential `*Valid` types get one `Establish` impl
-      per credential.
-- [ ] Stand up `Witness<V>` for every `*Valid` / `*Evidence` prop in all
-      three backend crates (`amenable_{kani,creusot,verus}::time`) —
-      deliberately trivial / `#[trusted]`-shielded here, the honest
-      "cited, not yet checked" representation. This is the cost decision 3
-      accepts: `Establish<C, V>`'s `Self: Witness<V>` bound must be
-      satisfiable for all `V` from Phase 3, not Phase 6.
+**Design (settled 2026-09-08, user-confirmed):** aggregation is
+`#[derive(Witness)]` structural closure, not a bag of proof tokens. Each
+`elicit_temporal` `*Evidence` bundle is *folded into the fields of* its
+`*Valid` aggregate — the `ProvableFrom<FooEvidence> for FooValid` edge
+becomes field containment, and `FooValid`'s derived `Witness<V>` proof is
+the structural product of its members' proofs. Sub-decompositions with no
+`*Valid` of their own (branch enums, shared helper bundles) stay named
+`*Evidence` and are used as field types. `Establish` / `Exchange` are
+reserved for genuine *transitions* (Phase 4), not structural composition.
+
+- [x] **Step 1 (2026-09-08):** Ported all 93 aggregate `*Valid`
+      propositions + 24 shared branch types (117 total) as
+      `#[derive(Debug, Clone, [Default,] PartialEq, Eq, Hash,
+      amenable_derive::Evidence, amenable_derive::Witness[,
+      derive_getters::Getters])]` structs / enums (`basis = "Self"`, auto
+      `EvidenceLink`), fields folded from the `elicit_temporal`
+      `*Evidence` bundles (`Established<X>` → `X`). The 2 multi-credential
+      aggregates (`ZonedDateTimeHasNamedZone`,
+      `CompleteIntervalSubstitutionSemanticsValid`) → enums, one variant
+      per decomposition. Enums get a hand `impl Default` (first variant).
+      Generated from `elicit_temporal` by script → `src/proof_composition/
+      {composites_a..d,branches_a,branches_b}.rs`. The derived
+      `impl<__Verifier> Witness<__Verifier> for FooValid where <members>:
+      Witness<__Verifier>` compiles as a conditional blanket in
+      `amenable_time`; it only *resolves* once a backend provides the
+      leaf `Witness<V>` impls. 3 tests. `just check-all-package
+      amenable_time` clean.
+- [ ] **Step 2:** the 13 `*ProofBranch` enums from `types.rs` (deferred
+      from Phase 2) → `#[derive(Evidence, Witness)]` enums whose variants
+      hold the relevant `*Valid` composites.
+- [ ] **Step 3:** the 116 `*Result` type aliases — most collapse into the
+      Phase-4 `Proven<D, P>` sidecar output types; the plain `Result`
+      ones stay as aliases.
+- [ ] **Step 4 (backends):** leaf `Witness<V>` impls for the ~345
+      contract `Standard`s + the aggregate composites, in
+      `amenable_{kani,creusot,verus}::time` — deliberately trivial /
+      `#[trusted]`-shielded, the honest "cited, not yet checked"
+      representation. Not blocking Phase 4 (the blanket impls compile
+      without them).
 
 ### Phase 4 — trait methods → `Exchange` (no proofs yet)
 

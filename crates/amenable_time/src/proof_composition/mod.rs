@@ -1,16 +1,42 @@
 //! Temporal proof composition — the composed (`Evidence`) half of the
-//! contract graph, ported from
-//! `elicit_temporal::contracts::proof_composition`.
+//! contract graph, ported from `elicit_temporal::contracts::proof_composition`.
 //!
-//! - [`aggregates`] — the 93 aggregate proof propositions, each an
-//!   `Evidence` claim (`temporal_evidence!`).
-//! - `*Evidence` credential bundles and the `Establish` edges that mint
-//!   the aggregates from lower-order `Standard`s land here in later
-//!   Phase 3 steps.
+//! Each aggregate `*Valid` proposition is folded with its
+//! `elicit_temporal` `*Evidence` bundle: the aggregate's fields ARE its
+//! sub-claims (a `ProvableFrom<FooEvidence> for FooValid` edge becomes
+//! field containment), and `#[derive(Evidence, Witness)]` makes the
+//! composite `Witness<V>` proof the structural product of its members'
+//! proofs. No proof tokens are carried — the aggregate is *named*, its
+//! decomposition lives in its fields. Leaf `Witness<V>` impls for the
+//! member `Standard`s land in the backend crates (orphan rules); genuine
+//! *transitions* become `Establish` / `Exchange` edges in Phase 4.
 
-mod aggregates;
+mod branches_a;
+mod branches_b;
+mod composites_a;
+mod composites_b;
+mod composites_c;
+mod composites_d;
 
-pub use aggregates::{
+pub use branches_a::{
+    CombinedDateTimeDateEvidence, CompleteDateEvidence,
+    CompleteDurationEndIntervalSubstitutionEvidence,
+    CompleteIntervalDurationRepresentationEvidence,
+    CompleteStartDurationIntervalSubstitutionEvidence,
+    CompleteStartEndIntervalSubstitutionEvidence, CompleteTimePointDateRepresentationEvidence,
+    CompleteTimePointRepresentationEvidence, CompleteTimePointTimeRepresentationEvidence,
+    DurationAlternativeFormEvidence, DurationDesignatorRepresentationEvidence,
+    DurationWeekFormEvidence,
+};
+pub use branches_b::{
+    ExplicitDurationRepresentationEvidence, ExplicitDurationSemanticEvidence,
+    ExtendedYearBaseEvidence, ExtendedYearSignificantDigitsEvidence,
+    MutualAgreementAuthorityScopeEvidence, NamedZoneAttachmentEvidence,
+    QualificationPlacementEvidence, ReducedCalendarDatePrecisionEvidence,
+    ReducedLocalTimePrecisionEvidence, SubYearGroupingKindEvidence, UtcOffsetPrecisionEvidence,
+    ZonedTimestampEvidence,
+};
+pub use composites_a::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid,
     CompleteIntervalSubstitutionSemanticsValid,
     CompleteRecurringIntervalRepresentationSemanticsValid, ConversionLossless,
@@ -22,6 +48,8 @@ pub use aggregates::{
     ExplicitDateTimeValid, ExplicitDateTimeWithShiftValid, ExplicitDurationValid,
     ExplicitIntervalDurationSubstitutionSemanticsValid,
     ExplicitIntervalEndComponentInheritanceSemanticsValid,
+};
+pub use composites_b::{
     ExplicitIntervalShiftPropagationSemanticsValid, ExplicitTemporalFormValid,
     ExplicitTimeIntervalValid, ExplicitTimeOfDayValid, ExplicitTimeShiftValid,
     ExtendedIntervalBoundarySemanticsValid, ExtendedYearValid, GroupedTimeScaleUnitValid,
@@ -31,8 +59,10 @@ pub use aggregates::{
     IxdtfProvisionalSuffixKeyRegistrationSemanticsValid, IxdtfSuffixKeyRegistryEntryValid,
     IxdtfSuffixKeyRegistryPolicySemanticsValid, IxdtfTimestampHasPreferredPresentationCalendar,
     IxdtfTimestampValid, LocalDateTimeDoesNotIdentifyFixedInstant, LocalDateTimeValid,
-    LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid, LossyConversionAuthorityValid,
-    MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
+    LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid,
+};
+pub use composites_c::{
+    LossyConversionAuthorityValid, MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
     NamedTimeZoneInterpretationTracksTzdbRevision, OffsetConsistentWithNamedZone,
     OffsetDateTimeValid, OffsetOnlyZoneSemanticsLimited,
     OffsetTimeZoneAnnotationConsistentWithTimestamp, OrdinalDateValid,
@@ -41,6 +71,8 @@ pub use aggregates::{
     RecurringIntervalWithRepeatRuleValid, ReducedCalendarDateValid, ReducedLocalTimeValid,
     RepeatRuleValid, Rfc3339DisplayGuidanceValid, Rfc3339GenerationGuidanceValid,
     Rfc3339LexicalOrderingSemanticsValid, Rfc3339TimestampValid, SeasonalTemporalExpressionValid,
+};
+pub use composites_d::{
     SelectionExpressionValid, StandardTimeOfDayValid, StandardTimeValid,
     SubYearGroupingExpressionValid, TemporalOrderingPreserved, TemporalSetExpressionValid,
     TemporalSetRangeSemanticsValid, TimeIntervalValid, TimeOfDayWithShiftValid, TimeValid,

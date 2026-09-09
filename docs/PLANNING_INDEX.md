@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2 complete (2026-09-08). A
+**Status:** 🔲 Phases 0–2 + Phase 3 Step 1 complete (2026-09-08). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
 ~175 trait methods) into `amenable_time` — **not a probe**; whether the
@@ -51,8 +51,17 @@ enums) into `src/types/` (13 modules): private fields +
 construction-time validation. `#[derive(Evidence)]` deferred to Phase 3/4
 (its `Default` requirement would cascade meaninglessly onto data-only
 enums; the `Sidecar<V>` wiring there settles which descriptors need it).
-Next: Phase 3 (`proof_composition` → `Establish` + `Evidence`, plus the
-13 `*ProofBranch` enums).
+
+**Phase 3 Step 1 complete (2026-09-08)** — the 93 `proof_composition`
+aggregate `*Valid` propositions + 24 shared branch types (117 total)
+ported as composite `#[derive(Evidence, Witness)]` structs / enums. The
+design (user-confirmed): aggregation is `#[derive(Witness)]` structural
+closure, **not** a bag of proof tokens — each `elicit_temporal`
+`*Evidence` bundle is folded into the *fields* of its `*Valid` aggregate,
+so the composite `Witness<V>` proof is the structural product of its
+members' proofs. Generated from `elicit_temporal` by script.
+`Establish`/`Exchange` are reserved for genuine transitions (Phase 4).
+Next: Phase 3 Step 2 (the 13 `*ProofBranch` enums).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
