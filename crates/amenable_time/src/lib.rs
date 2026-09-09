@@ -362,6 +362,17 @@ pub use exchange::{
     SelectionExpressionFormattedToken, SelectionExpressionProof, SelectionExpressionProofToken,
 };
 pub use proof_composition::{
+    BackendConversionSemanticBundle, DateTimeFormulaEvaluationResultBundle,
+    DateTimeFormulaSemanticBundle, DurationSemanticBundle, ExplicitDurationSemanticBundle,
+    ExplicitTemporalFormSemanticBundle, ExplicitTimeIntervalSemanticBundle,
+    GroupedTimeScaleUnitSemanticBundle, IntervalEndpointOrderingBundle,
+    LocalDateTimeSemanticBundle, LosslessConversionBundle, LossyConversionAuthorityBundle,
+    NamedTimeZoneRevisionBundle, NamedTimeZoneSemanticBundle, OffsetDateTimeSemanticBundle,
+    QualifiedTemporalValueSemanticBundle, RecurringIntervalSemanticBundle,
+    SubsecondTruncationBundle, TemporalSetSemanticBundle, TimeIntervalSemanticBundle,
+    ZoneTransitionResolutionAuthorityBundle, ZonedDateTimeSemanticBundle,
+};
+pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,
     CompleteDateEvidence, CompleteDurationEndIntervalSubstitutionEvidence,
     CompleteIntervalDurationRepresentationEvidence, CompleteIntervalSubstitutionProofBranch,

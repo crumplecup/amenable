@@ -7,7 +7,8 @@
 
 use amenable_core::{Evidence, EvidenceLink};
 use amenable_time::{
-    CalendarDateValid, DateValid, IxdtfTimeZoneAnnotationProofBranch,
+    BackendConversionSemanticBundle, CalendarDateValid, DateValid,
+    IxdtfTimeZoneAnnotationProofBranch, LocalDateTimeSemanticBundle,
     RecurringIntervalWithRepeatRuleIntervalProofBranch, ZonedDateTimeHasNamedZone,
 };
 
@@ -58,6 +59,22 @@ fn proof_branches_default_to_the_absent_or_first_case() {
         RecurringIntervalWithRepeatRuleIntervalProofBranch::IsoComplete { .. }
     ));
     assert!(<IxdtfTimeZoneAnnotationProofBranch as Evidence>::is_root());
+}
+
+#[test]
+fn semantic_bundles_fold_the_shared_backend_conversion_sub_bundle() {
+    amenable_core::init_tracing();
+
+    // `LocalDateTimeSemanticBundle` embeds `BackendConversionSemanticBundle`
+    // as a field (structural closure), not a token bag.
+    let bundle = LocalDateTimeSemanticBundle::default();
+    let () = bundle.audit();
+    let () = BackendConversionSemanticBundle::default().audit();
+    assert!(<LocalDateTimeSemanticBundle as Evidence>::is_root());
+    assert_eq!(
+        bundle.backend_conversion(),
+        &BackendConversionSemanticBundle::default()
+    );
 }
 
 #[test]

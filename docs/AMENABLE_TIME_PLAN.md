@@ -2,6 +2,14 @@
 
 ## Status
 
+Phase 5 Step 1 (2026-09-09) — the 22 `elicit_temporal` `*Bundle`
+aggregate proof bundles ported as folded `#[derive(Evidence, Witness)]`
+composites (`proof_composition/semantic_bundles.rs`), same structural
+closure as the rest of `proof_composition`. Step 2
+(`ProvenTemporalCarrier` → `Sidecar`) has an open design question: the
+native carrier `T` is not `Evidence` and the wrapper carries a bundle,
+not a token.
+
 🔲 **Phase 2 complete (2026-09-08)** — 93 descriptor definitions (50
 structs + 43 enums) ported into `src/types/` (13 modules), house-style:
 private fields + `derive_getters::Getters` + `derive_new::new` /
@@ -800,10 +808,21 @@ token — so each `Parsed*Result` alias becomes a named
 
 ### Phase 5 — semantic bundles + native carriers
 
-- [ ] The ~25 `*SemanticBundle` types → composed `Witness<V>` via the
-      derive-witness composition machinery
-      (`VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md`).
-- [ ] `ProvenTemporalCarrier<T, S>` → a generic `Sidecar<V>`.
+- [x] **Step 1 (2026-09-09):** the 22 `*Bundle` aggregate proof bundles
+      (15 `*SemanticBundle` + 7 single-proof `*Bundle`) → folded
+      `#[derive(Evidence, Witness)]` composites in
+      `proof_composition/semantic_bundles.rs` — the same structural
+      closure as the rest of `proof_composition` (`Established<X>` → `X`;
+      a `<Foo>Evidence` field already merged into its `*Valid` sibling is
+      dropped; `*ProofBranch` + standalone `*Evidence` kept;
+      `BackendConversionSemanticBundle` embedded as a field). Parsed
+      straight out of `elicit_temporal/src/types.rs`. 1 test.
+- [ ] **Step 2:** `ProvenTemporalCarrier<T, S>` → a generic `Sidecar<V>`.
+      **Open:** the native carrier `T` is backend-owned and not
+      `Evidence`, and the pair carries a bundle `S` rather than a
+      `ProofToken` — so the standard `#[derive(Sidecar)]` (primary +
+      token) shape does not fit. Needs a design decision before the
+      `realize_*` / `reflect_*` bridges can be `Exchange`s.
 - [ ] The 16 `native_props.rs` associated-type families → the
       `amenable_time` backend trait's associated types (unchanged shape).
 - [ ] The `realize_*` / `reflect_*` bridge method pairs → `Exchange`

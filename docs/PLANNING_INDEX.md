@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 Steps 1–5
+**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Step 1
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
@@ -96,8 +96,19 @@ their 6 emit counterparts (`Parsed<X>` → `Formatted<X>`, folded to
 self-contained in `src/exchange/calconnect.rs`; the 6 shared families
 reuse the parser / formatter sidecars. **Phase 4 exchange surface
 complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
-standalone `TemporalExchange`) were reverted. Next: Step 2c (a codegen
-macro for the backend's `Exchange` impls); then Phase 5.
+standalone `TemporalExchange`) were reverted.
+
+**Phase 5 Step 1 complete (2026-09-09)** — the 22 `elicit_temporal`
+`*Bundle` aggregate proof bundles (15 `*SemanticBundle` + 7 single-proof
+`*Bundle`) ported as folded `#[derive(Evidence, Witness)]` composites
+(`proof_composition/semantic_bundles.rs`) — same structural closure as
+the rest of `proof_composition`. Next: Phase 5 Step 2
+(`ProvenTemporalCarrier<T, S>` → `Sidecar`), which has an open design
+question — the native carrier `T` isn't `Evidence` and the wrapper
+carries a bundle rather than a `ProofToken`. (Step 2c — the backend
+`Exchange`-impl codegen macro — is deferred until there is a backend
+crate to target; `#[capture_exchange_body]` is the working per-method
+form.)
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
