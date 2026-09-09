@@ -24,7 +24,7 @@ capability queries).
 | `contracts/iso_8601` | 109 | ✅ 109/109 | — | — | — | — |
 | `contracts/extended` (ISO 8601-2) | 48 | ✅ 48/48 | — | — | — | — |
 | `contracts/rfc3339` | 20 | ✅ 20/20 (tier A — verbatim) | — | — | — | — |
-| `contracts/rfc9557` | 38 | — | — | — | — | — |
+| `contracts/rfc9557` | 38 | ✅ 38/38 (tier A — verbatim) | — | — | — | — |
 | `contracts/calconnect` | 61 | — | — | — | — | — |
 | `contracts/interval` | 25 | — | — | — | — | — |
 | `contracts/zone` | 21 | — | — | — | — | — |
