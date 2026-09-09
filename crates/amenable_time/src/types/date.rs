@@ -6,7 +6,26 @@ use derive_getters::Getters;
 use derive_new::new;
 
 /// A complete Gregorian calendar date.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Getters, new)]
+///
+/// `Evidence` (the first descriptor to carry it): it appears as a
+/// [`Proven`](crate::Proven) exchange payload, and every
+/// `Sidecar::Primary` must be `Evidence`. The rest of the descriptor set
+/// gains `Evidence` as each becomes an exchange output (Phase 4).
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    amenable_derive::Evidence,
+    Getters,
+    new,
+)]
+#[evidence(basis = "Self")]
 pub struct CalendarDateDescriptor {
     /// Signed calendar year.
     #[getter(copy)]

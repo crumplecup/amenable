@@ -8,7 +8,8 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2 + Phase 3 Step 1 complete (2026-09-08). A
+**Status:** 🔲 Phases 0–2, Phase 3 Steps 1–2, Phase 4 Step 1 complete
+(2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
 ~175 trait methods) into `amenable_time` — **not a probe**; whether the
@@ -62,8 +63,17 @@ so the composite `Witness<V>` proof is the structural product of its
 members' proofs. Generated from `elicit_temporal` by script.
 `Establish`/`Exchange` are reserved for genuine transitions (Phase 4).
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
-(`proof_composition/proof_branches.rs`). Next: Phase 3 Step 3 (116
-`*Result` aliases) / Phase 4.
+(`proof_composition/proof_branches.rs`).
+
+**Phase 4 Step 1 complete (2026-09-09)** — the generic sidecar carriers
+in `src/exchange/`: `RawInput` (a raw string + the trivial "input
+received" marker, `Sidecar<V>` for every `V`), `Proven<D, P>` (descriptor
+`D` + `ProvenToken<P>` for a `proof_composition` composite `P`),
+`Proven::prove` as the honest Phase-4 stand-in for `Establish::establish`
+(consumes the input token, asserts `P`; Phase 6 swaps in real
+`Establish`). `CalendarDateDescriptor` is the first descriptor with
+`#[derive(Evidence)]`. Next: Phase 4 Step 2 (`TemporalParser`, 24 methods
+→ per-method composite proposition + `Exchange` impl).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

@@ -642,14 +642,27 @@ reserved for genuine *transitions* (Phase 4), not structural composition.
 
 ### Phase 4 — trait methods → `Exchange` (no proofs yet)
 
-Generic sidecar wrappers first: `RawInput<T>` (`Primary = T`,
-`Proposition = InputReceived`, a trivial `Standard`) and `Proven<D, P>`
-(`Primary = D`, `Proposition = P`), both verifier-less `#[derive(Sidecar)]`
-in `amenable_time` — neutral crate, so no per-backend mirror
-(`project_creusot_translator_dependency_scope`). Then, per trait, commit
-per method-group:
-
-- [ ] `TemporalParser` (24 methods).
+- [x] **Step 1 (2026-09-09):** the generic sidecar carriers, in
+      `src/exchange/`. `RawInput` — `Primary = RawTemporalText` (an
+      `Evidence` newtype over `String`), `Proposition =
+      TemporalInputReceived` (a boundary marker with a trivial
+      **unconditional** `impl<V: Verifier> Witness<V>` — asserted at the
+      seam, not checkable, so `RawInput: Sidecar<V>` holds for every
+      `V`), token `TemporalInputToken` (root, `pub fn new()`).
+      `Proven<D: Evidence, P: Evidence>` — `Primary = D`, `Proposition =
+      P` (a `proof_composition` composite), token `ProvenToken<P>`
+      (`pub(crate)` mint). `Proven::prove(descriptor, credential:
+      TemporalInputToken)` is Phase 4's honest stand-in for
+      `Establish::establish` — consumes the input token (no replay),
+      asserts `P` (Phase 6 swaps in `P::establish`). `CalendarDateDescriptor`
+      is the first descriptor to gain `#[derive(Evidence)]` (canary; the
+      rest gain it as they become exchange outputs). 3 tests.
+- [ ] **Step 2:** `TemporalParser` (24 methods). Each method →
+      `TemporalResult<Descriptor>` on the trait + a per-method composite
+      proposition (folding the 1–4 `Established`/`*ProofBranch` proofs the
+      elicit `Parsed*Result` alias carries) + an `Exchange<RawInput,
+      Proven<D, CompositeProp>, V>` impl. Descriptors gain `Evidence` +
+      `Default` here.
 - [ ] `TemporalFormatter` (36).
 - [ ] `TemporalZoneFactory` (5), `TemporalConversionFactory` (4),
       `TemporalIntervalFactory` (4).

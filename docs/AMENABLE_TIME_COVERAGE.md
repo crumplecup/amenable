@@ -58,12 +58,21 @@ Deferred `#[derive(Evidence)]`: forcing `Evidence` (hence `Default`) onto
 every data-only enum here is meaningless; Phase 3/4's `Sidecar<V>` wiring
 shows exactly which descriptors become a `Primary` and need it.
 
+## Exchange surface (`src/exchange/`)
+
+**Phase 4 Step 1 done (2026-09-09)** — the generic carriers: `RawInput`
+(`Sidecar<V>` for every `V`, unconditionally), `Proven<D, P>`
+(`Sidecar<V>` when `P: Witness<V>`), `Proven::prove` (the honest Phase-4
+stand-in for `Establish::establish`), `TemporalInputToken` /
+`ProvenToken<P>`. `CalendarDateDescriptor` is the first descriptor with
+`#[derive(Evidence)]`.
+
 ## Traits (`traits/`, ~35 traits / ~175 methods)
 
 | trait | methods | ported | as |
 |---|---:|:--:|---|
 | `TemporalReporter` | 7 | ✅ | plain trait (not an `Exchange` — capability query) |
-| `TemporalParser` | 24 | — | `Exchange` per method (Phase 4) |
+| `TemporalParser` | 24 | — | `Exchange` per method (Phase 4 Step 2) |
 | `TemporalFormatter` | 36 | — | `Exchange` per method (Phase 4) |
 | `TemporalZoneFactory` | 5 | — | Phase 4 |
 | `TemporalConversionFactory` | 4 | — | Phase 4 |

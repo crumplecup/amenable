@@ -23,6 +23,7 @@ mod standard_macro;
 
 mod contracts;
 mod error;
+mod exchange;
 mod proof_composition;
 mod provenance;
 mod provenance_vocab;
@@ -251,6 +252,9 @@ pub use contracts::{
     ZuluTimeZoneSuffixAvoidsOffsetInconsistency,
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
+pub use exchange::{
+    Proven, ProvenToken, RawInput, RawTemporalText, TemporalInputReceived, TemporalInputToken,
+};
 pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,
     CompleteDateEvidence, CompleteDurationEndIntervalSubstitutionEvidence,
