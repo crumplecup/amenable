@@ -12,11 +12,13 @@
 mod conversion;
 mod extended;
 mod instant;
+mod interval;
 mod iso_8601;
 mod precision;
 mod rfc3339;
 mod rfc9557;
 mod serialization;
+mod zone;
 
 pub use conversion::{
     ConversionDropsNamedZoneIdentity, ConversionDropsSubsecondPrecision,
@@ -28,6 +30,27 @@ pub use instant::{
     LocalDateTimeMayBeAmbiguousAtZoneTransition, LocalDateTimeMayFallInZoneTransitionGap,
     LocalDateTimeRequiresZoneOrOffsetForInstant, OffsetDateTimeIdentifiesSingleInstant,
     TimestampHasExplicitUtcOffset, UtcTimelineOrderingAppliesToFixedInstants,
+};
+pub use interval::{
+    CompleteIntervalCalendarDateMayBeSubstitutedByOrdinalDate,
+    CompleteIntervalCalendarDateMayBeSubstitutedByWeekDate,
+    CompleteIntervalDurationMaySubstituteWeekForm,
+    CompleteIntervalLocalTimeMayBeSubstitutedByLocalTimeAndUtcDifference,
+    CompleteIntervalLocalTimeMayBeSubstitutedByUtcOfDay,
+    DurationAlternativeFormCarriesCompleteCalendarAndClockComponents,
+    DurationAlternativeFormRequiresPartnerAgreement,
+    DurationAlternativeFormUsesDateAndTimeComponentSlots,
+    DurationTimeComponentsFollowTimeDesignator, DurationUsesPeriodDesignator,
+    DurationWeekFormNotMixedWithCalendarOrClockUnits, DurationWeekFormUsesSingleWeekUnit,
+    IntervalDurationIsNonNegative, IntervalEndOmittedHigherOrderComponentsInheritFromStart,
+    IntervalStartPrecedesEnd,
+    IntervalTrailingComponentInheritsZoneOrUtcFromLeadingComponentWhenOmitted,
+    RecurringIntervalCarriesIntervalComponent, RecurringIntervalCountIsNonNegativeWhenBounded,
+    RecurringIntervalOmittedCountDenotesUnboundedOccurrences,
+    RecurringIntervalUsesCompleteTimeIntervalRepresentation,
+    RecurringIntervalUsesOtherThanCompleteTimeIntervalRepresentation,
+    RecurringIntervalUsesRepeatDesignator, TimeIntervalBoundaryOrDurationFormDeclared,
+    TimeIntervalHasTwoComponents, TimeIntervalUsesSolidusSeparator,
 };
 pub use rfc3339::{
     Rfc3339ApplicationsMayAllowSpaceDateTimeSeparator,
@@ -77,6 +100,19 @@ pub use serialization::{
     Iso8601BasicFormUsesCompactRepresentation, Iso8601ExtendedFormUsesSeparators,
     IxdtfSerializationCarriesNamedZoneAnnotation, SerializationCarriesExplicitUtcRelationship,
     SerializationProfileDeclared,
+};
+pub use zone::{
+    CriticalTimeZoneSuffixInconsistencyRequiresAction,
+    ElectiveTimeZoneSuffixInconsistencyMayBeHandled, NamedTimeZoneAnnotationPresent,
+    NamedTimeZoneIdentifierExcludesDotSegments, NamedTimeZoneIdentifierIsCaseSensitive,
+    NamedTimeZoneIsNotNumericOffsetAlias, NamedTimeZoneMeaningUsesCurrentTzdbRules,
+    NamedTimeZoneRetainsCivilRuleIdentity, NamedTimeZoneUsesIanaIdentifier,
+    NumericOffsetDoesNotIdentifyNamedZone, OffsetTimeZoneAnnotationPresent,
+    OffsetTimeZoneMustNotBeSynthesizedFromTimestampOffset, OffsetTimeZoneRepeatsTimestampOffset,
+    OffsetTimeZoneUseIsStronglyDiscouraged, UnknownNamedTimeZoneIdentifierTreatedAsInconsistency,
+    ZoneOffsetResolvedForRepresentedInstant, ZoneTransitionAmbiguityDeclared,
+    ZoneTransitionDisambiguationAuthorityDeclared, ZoneTransitionGapDeclared,
+    ZoneTransitionGapHandlingAuthorityDeclared, ZuluTimeZoneSuffixAvoidsOffsetInconsistency,
 };
 
 pub use extended::{

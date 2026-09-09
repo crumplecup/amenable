@@ -26,8 +26,8 @@ capability queries).
 | `contracts/rfc3339` | 20 | ✅ 20/20 (tier A — verbatim) | — | — | — | — |
 | `contracts/rfc9557` | 38 | ✅ 38/38 (tier A — verbatim) | — | — | — | — |
 | `contracts/calconnect` | 61 | — | — | — | — | — |
-| `contracts/interval` | 25 | — | — | — | — | — |
-| `contracts/zone` | 21 | — | — | — | — | — |
+| `contracts/interval` | 25 | ✅ 25/25 | — | — | — | — |
+| `contracts/zone` | 21 | ✅ 21/21 (tier A — verbatim) | — | — | — | — |
 | `contracts/instant` | 6 | ✅ 6/6 | — | — | — | — |
 | `contracts/serialization` | 5 | ✅ 5/5 | — | — | — | — |
 | `contracts/conversion` | 7 | ✅ 7/7 | — | — | — | — |
