@@ -20,9 +20,12 @@
 
 #[macro_use]
 mod standard_macro;
+#[macro_use]
+mod evidence_macro;
 
 mod contracts;
 mod error;
+mod proof_composition;
 mod provenance;
 mod provenance_vocab;
 mod traits;
@@ -250,6 +253,46 @@ pub use contracts::{
     ZuluTimeZoneSuffixAvoidsOffsetInconsistency,
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
+pub use proof_composition::{
+    BackendConversionSemanticsValid, CalendarDateValid, CenturyValid,
+    CompleteIntervalSubstitutionSemanticsValid,
+    CompleteRecurringIntervalRepresentationSemanticsValid, ConversionLossless,
+    ConversionTruncatesSubseconds, CriticalTimeZoneInconsistencyHandlingValid,
+    DateTimeFormulaEvaluationResultValid, DateTimeFormulaEvaluationSemanticsValid,
+    DateTimeFormulaValid, DateValid, DateWithShiftValid, DecadeValid, DurationFormValid,
+    DurationRepresentationSemanticsValid, ElectiveTimeZoneInconsistencyHandlingValid,
+    EnhancedIntervalLevelOneSemanticsValid, EnhancedIntervalLevelTwoSemanticsValid,
+    ExplicitDateTimeValid, ExplicitDateTimeWithShiftValid, ExplicitDurationValid,
+    ExplicitIntervalDurationSubstitutionSemanticsValid,
+    ExplicitIntervalEndComponentInheritanceSemanticsValid,
+    ExplicitIntervalShiftPropagationSemanticsValid, ExplicitTemporalFormValid,
+    ExplicitTimeIntervalValid, ExplicitTimeOfDayValid, ExplicitTimeShiftValid,
+    ExtendedIntervalBoundarySemanticsValid, ExtendedYearValid, GroupedTimeScaleUnitValid,
+    InheritedIntervalEndComponentsSemanticsValid, InheritedIntervalZoneSemanticsValid,
+    IntervalEndpointsOrdered, IxdtfAdditionalInformationSemanticsValid,
+    IxdtfCalendarKeyRegistrySemanticsValid, IxdtfPermanentSuffixKeyRegistrationSemanticsValid,
+    IxdtfProvisionalSuffixKeyRegistrationSemanticsValid, IxdtfSuffixKeyRegistryEntryValid,
+    IxdtfSuffixKeyRegistryPolicySemanticsValid, IxdtfTimestampHasPreferredPresentationCalendar,
+    IxdtfTimestampValid, LocalDateTimeDoesNotIdentifyFixedInstant, LocalDateTimeValid,
+    LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid, LossyConversionAuthorityValid,
+    MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
+    NamedTimeZoneInterpretationTracksTzdbRevision, OffsetConsistentWithNamedZone,
+    OffsetDateTimeValid, OffsetOnlyZoneSemanticsLimited,
+    OffsetTimeZoneAnnotationConsistentWithTimestamp, OrdinalDateValid,
+    OtherThanCompleteRecurringIntervalRepresentationSemanticsValid, PrecisionPreserved,
+    QualifiedTemporalExpressionValid, QualifiedTemporalValueValid, RecurringIntervalFormValid,
+    RecurringIntervalWithRepeatRuleValid, ReducedCalendarDateValid, ReducedLocalTimeValid,
+    RepeatRuleValid, Rfc3339DisplayGuidanceValid, Rfc3339GenerationGuidanceValid,
+    Rfc3339LexicalOrderingSemanticsValid, Rfc3339TimestampValid, SeasonalTemporalExpressionValid,
+    SelectionExpressionValid, StandardTimeOfDayValid, StandardTimeValid,
+    SubYearGroupingExpressionValid, TemporalOrderingPreserved, TemporalSetExpressionValid,
+    TemporalSetRangeSemanticsValid, TimeIntervalValid, TimeOfDayWithShiftValid, TimeValid,
+    TimestampRepresentsFixedInstant, UnspecifiedComponentExpressionValid, UtcOfDayValid,
+    UtcOffsetKnown, UtcOffsetValid, UtcTimeScaleValid, WeekDateValid,
+    ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
+    ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone,
+    ZuluTimeZoneInconsistencyAvoidanceValid,
+};
 pub use provenance::TemporalProvenance;
 pub use provenance_vocab::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,

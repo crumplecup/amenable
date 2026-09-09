@@ -13,11 +13,14 @@ descriptors actually become a `Primary`, rather than forcing a
 meaningless `Default` onto every data-only enum now. 5 new tests.
 `just check-all-package amenable_time` clean.
 
+Phase 3 Step 1 (2026-09-08) — the 93 aggregate `*Valid` propositions
+ported as `#[derive(Evidence)]` ZSTs via a new `temporal_evidence!` macro
+(`src/proof_composition/aggregates.rs`). Next: Phase 3 Step 2 (the ~97
+`*Evidence` credential bundles → `#[derive(ProofToken)]`).
+
 Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
 `Standard`s with a real `TemporalProvenance`, across 9 normative
-authorities. All 7 decisions settled. Next: Phase 3 (the `ProvableFrom`
-graph → `Establish` + `Evidence`; brings in the 93 `proof_composition`
-types and the 13 `*ProofBranch` enums).
+authorities. All 7 decisions settled.
 
 Phase 0 no longer includes an Exchange edge — that was probe thinking
 (a synthetic `Received -> Preserved` typestate machine was built in
@@ -587,9 +590,20 @@ carve-out for generated contract vocabularies would remove it.
 
 ### Phase 3 — the `ProvableFrom` graph → `Establish` + `Evidence`
 
-- [ ] Port `proof_composition.rs`'s 93 `*Valid` / `*Evidence` types via
-      `temporal_evidence!` — `#[derive(Evidence)]`, `EvidenceLink`.
-- [ ] Port the ~98 `impl ProvableFrom<C> for P {}` lines as one
+- [x] **Step 1 (2026-09-08):** Ported `proof_composition.rs`'s 93
+      aggregate `*Valid` propositions via a new `temporal_evidence!`
+      macro (`src/evidence_macro.rs`) → `src/proof_composition/
+      aggregates.rs`. Each a `#[derive(Evidence)]` ZST (`basis = "Self"`,
+      `Audit = ()`, auto `EvidenceLink`) — the composed half of the
+      `Standard` / `Evidence` split, no `Provenance` (a provable claim
+      has no citation). 3 tests. `just check-all-package amenable_time`
+      clean.
+- [ ] **Step 2:** Port the ~97 `*Evidence` credential bundles (structs +
+      18 branch enums carrying `Established<Standard>` sub-claims) →
+      `#[derive(ProofToken)]` credentials. Needs a per-contract root
+      `ProofToken` story first (each Phase-1 `Standard` is citation-only,
+      so its "establishment" is a free root mint).
+- [ ] **Step 3:** Port the ~98 `impl ProvableFrom<C> for P {}` lines as one
       `impl<V: Verifier> Establish<C, V> for P where Self: Witness<V>` per
       edge — generic over `V`, not per-backend (decision 3). `C` becomes
       a `#[derive(ProofToken)]` credential; `establish()` is the lawful
