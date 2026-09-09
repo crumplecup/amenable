@@ -195,6 +195,62 @@ fn calconnect_emit_tokens_chain_from_the_matching_parse_token() {
 }
 
 #[test]
+fn a_proven_carrier_is_a_token_keyed_sidecar() {
+    amenable_core::init_tracing();
+
+    // The bundle token is the single source of truth: `ProvenTemporalCarrier`
+    // is keyed on it, and the proposition is recovered as
+    // `<Tok as ProofToken>::Proposition`.
+    use amenable_time::{LocalDateTimeSemanticBundle, LocalDateTimeSemanticBundleToken};
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<LocalDateTimeSemanticBundleToken, LocalDateTimeSemanticBundle>();
+
+    #[derive(Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+    #[evidence(basis = "Self")]
+    struct FakeNative;
+
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<Option<amenable_time::ProvenLocalDateTimeCarrier<FakeNative>>>;
+}
+
+#[test]
+fn every_semantic_bundle_token_swaps_from_a_real_credential() {
+    amenable_core::init_tracing();
+
+    // Each `<Bundle>Token` gets a root record (`#[derive(ProofToken)]`)
+    // and an `#[establish]` record naming the credential it swaps from —
+    // assert every distinct bundle token has the swap edge.
+    use std::collections::{HashMap, HashSet};
+    let mut has_swap: HashMap<&str, bool> = HashMap::new();
+    for r in inventory::iter::<amenable_core::ProofTokenMintRecord>() {
+        let name = r.token().rsplit("::").next().unwrap_or(r.token());
+        if name.ends_with("BundleToken") {
+            *has_swap.entry(name).or_insert(false) |= r.credential().is_some();
+        }
+    }
+    let names: HashSet<_> = has_swap.keys().copied().collect();
+    assert!(
+        names.len() >= 22,
+        "expected >=22 distinct semantic-bundle tokens, got {}",
+        names.len()
+    );
+    let no_swap: Vec<_> = has_swap
+        .iter()
+        .filter(|(_, ok)| !**ok)
+        .map(|(n, _)| *n)
+        .collect();
+    assert!(
+        no_swap.is_empty(),
+        "these bundle tokens have no establish edge: {no_swap:?}"
+    );
+}
+
+#[test]
 fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
     amenable_core::init_tracing();
 

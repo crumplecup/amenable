@@ -41,6 +41,15 @@
 //! members' -- without the restated assumption the derived `Sidecar<V>`
 //! impl would try to prove it eagerly and fail. `Primary: Evidence` is
 //! restated too whenever primary and proposition differ.
+//!
+//! `#[sidecar(proposition_from_token)]` (mutually exclusive with
+//! `proposition`) sets the proposition to `<TokenField as
+//! ProofToken>::Proposition` -- for a `Sidecar` generic over its *token*
+//! type (`amenable_time`'s `ProvenTemporalCarrier<T, STok>`), so the
+//! token stays the single source of truth. The generated impl then bounds
+//! the token as plain `STok: ProofToken` rather than `ProofToken<
+//! Proposition = <STok as ProofToken>::Proposition>` -- that equality is
+//! tautological and sends trait resolution into an overflow (`E0275`).
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -51,6 +60,13 @@ use syn::{
 struct SidecarArgs {
     verifier: Option<Type>,
     proposition: Option<Type>,
+    /// `#[sidecar(proposition_from_token)]` -- the proposition is exactly
+    /// the token field's own `<Tok as ProofToken>::Proposition`, so the
+    /// token stays the single source of truth and the generated impl must
+    /// *not* also restate `Tok: ProofToken<Proposition = ..>` (that
+    /// equality is tautological and sends trait resolution into an
+    /// overflow). Used by a `Sidecar` generic over its token type.
+    proposition_from_token: bool,
     constructor: Visibility,
 }
 
@@ -87,10 +103,13 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
         .as_ref()
         .ok_or_else(|| Error::new_spanned(token_field, "named field"))?;
     let token_ty = &token_field.ty;
-    let proposition_ty = args
-        .proposition
-        .clone()
-        .unwrap_or_else(|| primary_ty.clone());
+    let proposition_ty: Type = if args.proposition_from_token {
+        parse_quote!(<#token_ty as ::amenable_core::ProofToken>::Proposition)
+    } else {
+        args.proposition
+            .clone()
+            .unwrap_or_else(|| primary_ty.clone())
+    };
 
     // Verifier-less mode adds a fresh generic parameter `V: Verifier`
     // rather than naming any concrete verifier -- see this module's own
@@ -117,7 +136,15 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
             .push(parse_quote!(V: ::amenable_core::Verifier));
     }
     let evidence_predicates = evidence_bounds(primary_ty, &proposition_ty, verifier);
-    let token_predicate: WherePredicate = parse_quote!(#token_ty: ::amenable_core::ProofToken<Proposition = #proposition_ty> + ::std::clone::Clone);
+    // When the proposition *is* `<#token_ty as ProofToken>::Proposition`,
+    // restating `#token_ty: ProofToken<Proposition = <#token_ty as
+    // ProofToken>::Proposition>` is a tautology that overflows trait
+    // resolution -- bound the token on the plain trait instead.
+    let token_predicate: WherePredicate = if args.proposition_from_token {
+        parse_quote!(#token_ty: ::amenable_core::ProofToken + ::std::clone::Clone)
+    } else {
+        parse_quote!(#token_ty: ::amenable_core::ProofToken<Proposition = #proposition_ty> + ::std::clone::Clone)
+    };
     {
         let where_clause = generics.make_where_clause();
         where_clause.predicates.extend(evidence_predicates);
@@ -349,6 +376,7 @@ fn require_phantom_data(field: &Field) -> syn::Result<()> {
 fn parse_sidecar_args(attrs: &[syn::Attribute]) -> syn::Result<SidecarArgs> {
     let mut verifier = None;
     let mut proposition = None;
+    let mut proposition_from_token = false;
     let mut constructor = None;
 
     for attr in attrs.iter().filter(|attr| attr.path().is_ident("sidecar")) {
@@ -363,6 +391,10 @@ fn parse_sidecar_args(attrs: &[syn::Attribute]) -> syn::Result<SidecarArgs> {
                 proposition = Some(value.parse()?);
                 return Ok(());
             }
+            if meta.path.is_ident("proposition_from_token") {
+                proposition_from_token = true;
+                return Ok(());
+            }
             if meta.path.is_ident("constructor") {
                 let value: LitStr = meta.value()?.parse()?;
                 constructor = Some(value.parse()?);
@@ -373,9 +405,17 @@ fn parse_sidecar_args(attrs: &[syn::Attribute]) -> syn::Result<SidecarArgs> {
         })?;
     }
 
+    if proposition_from_token && proposition.is_some() {
+        return Err(Error::new_spanned(
+            attrs.first(),
+            "sidecar: `proposition` and `proposition_from_token` are mutually exclusive",
+        ));
+    }
+
     Ok(SidecarArgs {
         verifier,
         proposition,
+        proposition_from_token,
         constructor: constructor.unwrap_or(Visibility::Public(Default::default())),
     })
 }

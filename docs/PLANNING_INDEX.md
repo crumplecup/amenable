@@ -98,14 +98,20 @@ reuse the parser / formatter sidecars. **Phase 4 exchange surface
 complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
 standalone `TemporalExchange`) were reverted.
 
-**Phase 5 Step 1 complete (2026-09-09)** — the 22 `elicit_temporal`
-`*Bundle` aggregate proof bundles (15 `*SemanticBundle` + 7 single-proof
-`*Bundle`) ported as folded `#[derive(Evidence, Witness)]` composites
-(`proof_composition/semantic_bundles.rs`) — same structural closure as
-the rest of `proof_composition`. Next: Phase 5 Step 2
-(`ProvenTemporalCarrier<T, S>` → `Sidecar`), which has an open design
-question — the native carrier `T` isn't `Evidence` and the wrapper
-carries a bundle rather than a `ProofToken`. (Step 2c — the backend
+**Phase 5 Steps 1–2 complete (2026-09-09)** — Step 1: the 22
+`elicit_temporal` `*Bundle` aggregate proof bundles (15 `*SemanticBundle`
+plus 7 single-proof `*Bundle`) ported as folded `#[derive(Evidence,
+Witness)]` composites (`proof_composition/semantic_bundles.rs`). Step 2:
+`ProvenTemporalCarrier<T, STok>` (`src/carrier.rs`) — a token-keyed
+`#[derive(Sidecar)]`. The "open question" resolved: the native carrier
+`T` becomes a backend `Evidence` newtype (thin wrapper) and is the
+primary; a `*SemanticBundle` is a *named aggregate proposition*, so each
+of the 22 gets a `<Bundle>Token` `#[establish]`-swapped from the token
+that produced it, and the carrier is keyed on the token (proposition =
+`<STok as ProofToken>::Proposition` via a new
+`#[sidecar(proposition_from_token)]` derive flag). 14 `Proven*Carrier<T>`
+aliases. Next: the 16 `native_props` associated-type families, then the
+`realize_*` / `reflect_*` bridge `Exchange`s. (Step 2c — the backend
 `Exchange`-impl codegen macro — is deferred until there is a backend
 crate to target; `#[capture_exchange_body]` is the working per-method
 form.)

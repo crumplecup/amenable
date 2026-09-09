@@ -52,7 +52,7 @@ for optional/multi-field. Closed enums: `strum::EnumIter` +
 | 22 data-carrying enums | plain derives + a hand `impl Default` on the first variant | Phase 4 Step 2a |
 | 13 `*ProofBranch` enums | ✅ `proof_composition::proof_branches` — `#[derive(Evidence, Witness)]` enums, `Established<T>` → `T`, redundant `evidence:` field dropped | Phase 3 Step 2 |
 | 22 `*Bundle` aggregate proof bundles | ✅ `proof_composition::semantic_bundles` — folded `#[derive(Evidence, Witness)]` composites (`Established<X>` → `X`, redundant `*Evidence` dropped, `BackendConversionSemanticBundle` embedded as a field) | Phase 5 Step 1 |
-| `ProvenTemporalCarrier<T, S>` + 14 `Proven*Carrier` aliases | — | Phase 5 Step 2 (native carrier `T` isn't `Evidence` — open design question) |
+| `ProvenTemporalCarrier<T, STok>` + 14 `Proven*Carrier<T>` aliases + 22 `<Bundle>Token`s | ✅ `src/carrier.rs` — a token-keyed `#[derive(Sidecar)]` (`carrier: T` primary where `T: Evidence`; `semantics: STok` token; proposition = `<STok as ProofToken>::Proposition`). Each `<Bundle>Token` `#[establish]`-swaps from the token that produced it. | Phase 5 Step 2 |
 | `*Result` type aliases (116) | → the 24 `Parsed*` sidecar structs (parse) so far | rest in Phase 4/5 |
 
 ## Exchange surface (`src/exchange/`)

@@ -21,6 +21,7 @@
 #[macro_use]
 mod standard_macro;
 
+mod carrier;
 mod contracts;
 mod error;
 mod exchange;
@@ -30,6 +31,25 @@ mod provenance_vocab;
 mod traits;
 mod types;
 
+pub use carrier::{
+    BackendConversionSemanticBundleToken, DateTimeFormulaEvaluationResultBundleToken,
+    DateTimeFormulaSemanticBundleToken, DurationSemanticBundleToken,
+    ExplicitDurationSemanticBundleToken, ExplicitTemporalFormSemanticBundleToken,
+    ExplicitTimeIntervalSemanticBundleToken, GroupedTimeScaleUnitSemanticBundleToken,
+    IntervalEndpointOrderingBundleToken, LocalDateTimeSemanticBundleToken,
+    LosslessConversionBundleToken, LossyConversionAuthorityBundleToken,
+    NamedTimeZoneRevisionBundleToken, NamedTimeZoneSemanticBundleToken,
+    OffsetDateTimeSemanticBundleToken, ProvenDateTimeFormulaCarrier, ProvenDurationCarrier,
+    ProvenExplicitDurationCarrier, ProvenExplicitTemporalFormCarrier,
+    ProvenExplicitTimeIntervalCarrier, ProvenGroupedTimeScaleUnitCarrier,
+    ProvenLocalDateTimeCarrier, ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier,
+    ProvenQualifiedTemporalValueCarrier, ProvenRecurringIntervalCarrier, ProvenTemporalCarrier,
+    ProvenTemporalSetCarrier, ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier,
+    QualifiedTemporalValueSemanticBundleToken, RecurringIntervalSemanticBundleToken,
+    SubsecondTruncationBundleToken, TemporalSetSemanticBundleToken,
+    TimeIntervalSemanticBundleToken, ZoneTransitionResolutionAuthorityBundleToken,
+    ZonedDateTimeSemanticBundleToken,
+};
 pub use contracts::{
     ApproximationQualificationDeclared, BasicFormatUsesMinimumComponentsForRequiredAccuracy,
     BeforeOrAfterQualificationIsLevelTwoOnly, BeforeOrOnDateUsesLeadingDoubleDotQualifier,

@@ -2,13 +2,16 @@
 
 ## Status
 
-Phase 5 Step 1 (2026-09-09) — the 22 `elicit_temporal` `*Bundle`
-aggregate proof bundles ported as folded `#[derive(Evidence, Witness)]`
-composites (`proof_composition/semantic_bundles.rs`), same structural
-closure as the rest of `proof_composition`. Step 2
-(`ProvenTemporalCarrier` → `Sidecar`) has an open design question: the
-native carrier `T` is not `Evidence` and the wrapper carries a bundle,
-not a token.
+Phase 5 Steps 1–2 (2026-09-09) — Step 1: the 22 `elicit_temporal`
+`*Bundle` aggregate proof bundles ported as folded `#[derive(Evidence,
+Witness)]` composites (`proof_composition/semantic_bundles.rs`), same
+structural closure as the rest of `proof_composition`. Step 2:
+`ProvenTemporalCarrier<T, STok>` is a token-keyed `#[derive(Sidecar)]`
+(`src/carrier.rs`) — `carrier: T` (a backend `Evidence` newtype) is the
+primary, `semantics: STok` is the token, and each `*Bundle` gets a
+`<Bundle>Token` `#[establish]`-swapped from the token that produced it.
+New `#[sidecar(proposition_from_token)]` derive flag recovers the
+proposition as `<STok as ProofToken>::Proposition`.
 
 🔲 **Phase 2 complete (2026-09-08)** — 93 descriptor definitions (50
 structs + 43 enums) ported into `src/types/` (13 modules), house-style:
@@ -817,12 +820,22 @@ token — so each `Parsed*Result` alias becomes a named
       dropped; `*ProofBranch` + standalone `*Evidence` kept;
       `BackendConversionSemanticBundle` embedded as a field). Parsed
       straight out of `elicit_temporal/src/types.rs`. 1 test.
-- [ ] **Step 2:** `ProvenTemporalCarrier<T, S>` → a generic `Sidecar<V>`.
-      **Open:** the native carrier `T` is backend-owned and not
-      `Evidence`, and the pair carries a bundle `S` rather than a
-      `ProofToken` — so the standard `#[derive(Sidecar)]` (primary +
-      token) shape does not fit. Needs a design decision before the
-      `realize_*` / `reflect_*` bridges can be `Exchange`s.
+- [x] **Step 2 (2026-09-09):** `ProvenTemporalCarrier<T, STok>` → a
+      token-keyed generic `#[derive(Sidecar)]` (`src/carrier.rs`).
+      Resolution of the "open" question: the native carrier `T` *does*
+      pair with a proof — you only ever get a `T` from a factory that
+      produced it under proof — so `T` becomes a backend `Evidence`
+      newtype (a thin wrapper, not an invented replacement) and is the
+      `Sidecar::Primary`. And a `*SemanticBundle` is a *named aggregate
+      proposition*, so (per Phase 3/4) we carry **one token that stands
+      for it**, not the bundle value: each of the 22 `*Bundle`s gets a
+      `<Bundle>Token` `#[establish]`-swapped from the token that produced
+      it (the parse token for a carrier bundle, the factory established
+      token for a result/authority bundle). `ProvenTemporalCarrier<T,
+      STok>` is keyed on `STok` — the token is the single source of
+      truth; the proposition is `<STok as ProofToken>::Proposition` via a
+      new `#[sidecar(proposition_from_token)]` derive flag. 14
+      `Proven*Carrier<T>` aliases. Generated. 2 tests.
 - [ ] The 16 `native_props.rs` associated-type families → the
       `amenable_time` backend trait's associated types (unchanged shape).
 - [ ] The `realize_*` / `reflect_*` bridge method pairs → `Exchange`
