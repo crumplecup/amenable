@@ -2,7 +2,12 @@
 
 ## Status
 
-Phase 5 Steps 1–3 (2026-09-09) — Step 3: the 16 `native_props`
+Phase 5 Steps 1–4 (2026-09-09) — Step 4: the 14 `realize_*`/`reflect_*`
+bridge pairs → `traits/native_bridge.rs`, each per-family bridge's
+supertrait bundle *is* its exchange pair (`Exchange<Reflected<X>,
+Proven<X>Carrier<Self::X>, V>` + inverse); 14 `Reflected<X>` sidecars in
+`src/exchange/reflect.rs` (`<X>Descriptor` + the bundle token, ridden
+through from the carrier). Step 3: the 16 `native_props`
 associated-type families → `traits/native_props.rs`, one-to-one with
 `elicit_temporal` but every `type X: Evidence` (so a native carrier can
 be a `ProvenTemporalCarrier` primary). Step 1: the 22 `elicit_temporal`
@@ -848,11 +853,22 @@ token — so each `Parsed*Result` alias becomes a named
       `type X` is bound `: amenable_core::Evidence` so a native carrier
       can be a `ProvenTemporalCarrier` primary (a thin `#[derive(Evidence)]`
       newtype, not a synthetic replacement). 1 test.
-- [ ] **Step 4:** the `realize_*` / `reflect_*` bridge method pairs (14
-      realize/reflect + 8 `*_native` factory analogs) → `Exchange`s
-      between a `Parsed*` descriptor sidecar and a `ProvenTemporalCarrier`
-      carrier sidecar (+ a `Reflected*` sidecar for the reflect
-      direction, carrying the bundle token through).
+- [x] **Step 4 (2026-09-09):** the 14 `realize_*` / `reflect_*` bridge
+      pairs (28 methods) → `traits/native_bridge.rs`. Each per-family
+      bridge trait's supertrait bundle *is* its exchange pair:
+      `realize_x` = `Exchange<Reflected<X>, Proven<X>Carrier<Self::X>, V>`,
+      `reflect_x` = the inverse. `Reflected<X>` (14 new sidecars in
+      `src/exchange/reflect.rs`) is `<X>Descriptor` +
+      `<X>SemanticBundleToken` — the carrier holds the same token, so
+      reflect is a genuine inverse and no new `#[establish]` edge is
+      minted. `elicit_temporal`'s aggregate bridges (`TemporalNativeBridge`
+      / `...SpanBridge` / `...ExtensionBridge`) + blanket impls carried
+      over (their where-clauses accumulate every sub-family's
+      `<Bundle>: Witness<V>`). Generated. 1 test.
+- [ ] **Step 4b:** the 8 `*_native` factory analogs
+      (`normalize_to_utc_native`, `resolve_local_date_time_native`, …) →
+      carrier→carrier `Exchange`s (the native-carrier versions of the
+      already-ported descriptor-side factory transitions).
 
 ### Phase 6 — real proofs for the genuinely-checkable contracts
 

@@ -32,6 +32,7 @@ mod interval;
 mod markers;
 mod parse;
 mod parse_props;
+mod reflect;
 mod sidecars;
 mod tokens;
 mod zone;
@@ -152,6 +153,13 @@ pub use parse_props::{
     LocalDateTimeProof, OffsetDateTimeProof, QualifiedTemporalValueProof, Rfc3339TimestampProof,
     SeasonalTemporalExpressionProof, SubYearGroupingExpressionProof, TemporalSetProof,
     TimeIntervalProof, UnspecifiedComponentExpressionProof,
+};
+pub use reflect::{
+    ReflectedDateTimeFormula, ReflectedDuration, ReflectedExplicitDuration,
+    ReflectedExplicitTemporalForm, ReflectedExplicitTimeInterval, ReflectedGroupedTimeScaleUnit,
+    ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
+    ReflectedQualifiedTemporalValue, ReflectedRecurringInterval, ReflectedTemporalSet,
+    ReflectedTimeInterval, ReflectedZonedDateTime,
 };
 pub use sidecars::RawInput;
 pub use tokens::TemporalInputToken;

@@ -251,6 +251,33 @@ fn every_semantic_bundle_token_swaps_from_a_real_credential() {
 }
 
 #[test]
+fn a_reflected_sidecar_pairs_a_descriptor_with_its_bundle_token() {
+    amenable_core::init_tracing();
+
+    // `Reflected<X>` = `<X>Descriptor` + `<X>SemanticBundleToken` — the
+    // shape `realize_x` consumes and `reflect_x` produces, the genuine
+    // inverse of the carrier sidecar (same token rides through).
+    use amenable_time::{
+        LocalDateTimeSemanticBundle, LocalDateTimeSemanticBundleToken, ReflectedLocalDateTime,
+    };
+    fn assert_token<Tok, Prop>()
+    where
+        Prop: Evidence,
+        Tok: ProofToken<Proposition = Prop>,
+    {
+    }
+    assert_token::<LocalDateTimeSemanticBundleToken, LocalDateTimeSemanticBundle>();
+
+    fn _sink<T>(_: T) {}
+    let _ = _sink::<
+        Option<(
+            ReflectedLocalDateTime,
+            amenable_time::ReflectedDateTimeFormula,
+        )>,
+    >;
+}
+
+#[test]
 fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
     amenable_core::init_tracing();
 

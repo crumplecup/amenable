@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Steps 1–3
+**Status:** 🔲 Phases 0–2, Phase 3, Phase 4 (exchange surface complete), Phase 5 Steps 1–4
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
@@ -98,11 +98,17 @@ reuse the parser / formatter sidecars. **Phase 4 exchange surface
 complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
 standalone `TemporalExchange`) were reverted.
 
-**Phase 5 Steps 1–3 complete (2026-09-09)** — Step 3: the 16
-`native_props` associated-type families → `traits/native_props.rs`,
-one-to-one with `elicit_temporal` (same supertrait graph + 3 aggregate
-blanket traits), every `type X` bound `: Evidence` so a native carrier
-can be a `ProvenTemporalCarrier` primary. Step 1: the 22
+**Phase 5 Steps 1–4 complete (2026-09-09)** — Step 4: the 14
+`realize_*`/`reflect_*` bridge pairs → `traits/native_bridge.rs`, each
+per-family bridge's supertrait bundle *is* its exchange pair
+(`Exchange<Reflected<X>, Proven<X>Carrier<Self::X>, V>` + inverse); 14
+`Reflected<X>` sidecars (`<X>Descriptor` + the semantic-bundle token,
+ridden through from the carrier) in `src/exchange/reflect.rs`; elicit's
+aggregate bridges + blankets. Step 3: the 16 `native_props`
+associated-type families → `traits/native_props.rs`, one-to-one with
+`elicit_temporal` (same supertrait graph + 3 aggregate blanket traits),
+every `type X` bound `: Evidence` so a native carrier can be a
+`ProvenTemporalCarrier` primary. Step 1: the 22
 `elicit_temporal` `*Bundle` aggregate proof bundles (15 `*SemanticBundle`
 plus 7 single-proof `*Bundle`) ported as folded `#[derive(Evidence,
 Witness)]` composites (`proof_composition/semantic_bundles.rs`). Step 2:
@@ -114,7 +120,8 @@ of the 22 gets a `<Bundle>Token` `#[establish]`-swapped from the token
 that produced it, and the carrier is keyed on the token (proposition =
 `<STok as ProofToken>::Proposition` via a new
 `#[sidecar(proposition_from_token)]` derive flag). 14 `Proven*Carrier<T>`
-aliases. Next: the `realize_*` / `reflect_*` bridge `Exchange`s (Step 4). (Step 2c — the backend
+aliases. Next: Phase 5 Step 4b (the 8 `*_native` carrier→carrier factory
+analogs), which finishes Phase 5; then Phase 6 (real per-backend proofs). (Step 2c — the backend
 `Exchange`-impl codegen macro — is deferred until there is a backend
 crate to target; `#[capture_exchange_body]` is the working per-method
 form.)

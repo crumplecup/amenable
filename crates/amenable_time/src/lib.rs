@@ -381,6 +381,13 @@ pub use exchange::{
     RepeatRuleProof, RepeatRuleProofToken, SelectionExpressionFormatted,
     SelectionExpressionFormattedToken, SelectionExpressionProof, SelectionExpressionProofToken,
 };
+pub use exchange::{
+    ReflectedDateTimeFormula, ReflectedDuration, ReflectedExplicitDuration,
+    ReflectedExplicitTemporalForm, ReflectedExplicitTimeInterval, ReflectedGroupedTimeScaleUnit,
+    ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
+    ReflectedQualifiedTemporalValue, ReflectedRecurringInterval, ReflectedTemporalSet,
+    ReflectedTimeInterval, ReflectedZonedDateTime,
+};
 pub use proof_composition::{
     BackendConversionSemanticBundle, DateTimeFormulaEvaluationResultBundle,
     DateTimeFormulaSemanticBundle, DurationSemanticBundle, ExplicitDurationSemanticBundle,
@@ -456,14 +463,20 @@ pub use provenance_vocab::{
     StandardsBody,
 };
 pub use traits::{
-    TemporalCalConnectFactory, TemporalCivilProps, TemporalConversionFactory,
-    TemporalDateTimeFormulaProps, TemporalDurationProps, TemporalExplicitDurationProps,
-    TemporalExplicitTemporalFormProps, TemporalExplicitTimeIntervalProps, TemporalExtensionProps,
-    TemporalFormatter, TemporalGroupedTimeScaleUnitProps, TemporalInstantProps,
-    TemporalIntervalFactory, TemporalNativeProps, TemporalParser,
-    TemporalQualifiedTemporalValueProps, TemporalRecurringIntervalProps, TemporalReporter,
-    TemporalSetProps, TemporalSpanProps, TemporalTimeIntervalProps, TemporalZoneFactory,
-    TemporalZoneProps,
+    TemporalCalConnectFactory, TemporalCivilNativeBridge, TemporalCivilProps,
+    TemporalConversionFactory, TemporalDateTimeFormulaNativeBridge, TemporalDateTimeFormulaProps,
+    TemporalDurationNativeBridge, TemporalDurationProps, TemporalExplicitDurationNativeBridge,
+    TemporalExplicitDurationProps, TemporalExplicitTemporalFormNativeBridge,
+    TemporalExplicitTemporalFormProps, TemporalExplicitTimeIntervalNativeBridge,
+    TemporalExplicitTimeIntervalProps, TemporalExtensionProps, TemporalFormatter,
+    TemporalGroupedTimeScaleUnitNativeBridge, TemporalGroupedTimeScaleUnitProps,
+    TemporalInstantNativeBridge, TemporalInstantProps, TemporalIntervalFactory,
+    TemporalNativeBridge, TemporalNativeExtensionBridge, TemporalNativeProps,
+    TemporalNativeSpanBridge, TemporalParser, TemporalQualifiedTemporalValueNativeBridge,
+    TemporalQualifiedTemporalValueProps, TemporalRecurringIntervalNativeBridge,
+    TemporalRecurringIntervalProps, TemporalReporter, TemporalSetNativeBridge, TemporalSetProps,
+    TemporalSpanProps, TemporalTimeIntervalNativeBridge, TemporalTimeIntervalProps,
+    TemporalZoneFactory, TemporalZoneNativeBridge, TemporalZoneProps,
 };
 pub use types::{
     CalendarDateDescriptor, CenturyDescriptor, CenturyDescriptorBuilder, CompleteDateDescriptor,

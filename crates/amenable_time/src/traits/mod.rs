@@ -17,6 +17,7 @@ mod calconnect;
 mod conversion;
 mod format;
 mod interval;
+mod native_bridge;
 mod native_props;
 mod parse;
 mod report;
@@ -26,6 +27,15 @@ pub use calconnect::TemporalCalConnectFactory;
 pub use conversion::TemporalConversionFactory;
 pub use format::TemporalFormatter;
 pub use interval::TemporalIntervalFactory;
+pub use native_bridge::{
+    TemporalCivilNativeBridge, TemporalDateTimeFormulaNativeBridge, TemporalDurationNativeBridge,
+    TemporalExplicitDurationNativeBridge, TemporalExplicitTemporalFormNativeBridge,
+    TemporalExplicitTimeIntervalNativeBridge, TemporalGroupedTimeScaleUnitNativeBridge,
+    TemporalInstantNativeBridge, TemporalNativeBridge, TemporalNativeExtensionBridge,
+    TemporalNativeSpanBridge, TemporalQualifiedTemporalValueNativeBridge,
+    TemporalRecurringIntervalNativeBridge, TemporalSetNativeBridge,
+    TemporalTimeIntervalNativeBridge, TemporalZoneNativeBridge,
+};
 pub use native_props::{
     TemporalCivilProps, TemporalDateTimeFormulaProps, TemporalDurationProps,
     TemporalExplicitDurationProps, TemporalExplicitTemporalFormProps,
