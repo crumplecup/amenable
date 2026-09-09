@@ -28,9 +28,9 @@ capability queries).
 | `contracts/calconnect` | 61 | — | — | — | — | — |
 | `contracts/interval` | 25 | — | — | — | — | — |
 | `contracts/zone` | 21 | — | — | — | — | — |
-| `contracts/instant` | 6 | — | — | — | — | — |
-| `contracts/serialization` | 5 | — | — | — | — | — |
-| `contracts/conversion` | 7 | — | — | — | — | — |
+| `contracts/instant` | 6 | ✅ 6/6 | — | — | — | — |
+| `contracts/serialization` | 5 | ✅ 5/5 | — | — | — | — |
+| `contracts/conversion` | 7 | ✅ 7/7 | — | — | — | — |
 | `contracts/proof_composition` | 93 | — | — | — | — | — |
 
 ## Descriptors (`types.rs`, 259 defs)

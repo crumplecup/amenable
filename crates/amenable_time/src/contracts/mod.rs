@@ -9,12 +9,26 @@
 //! [`Evidence`](amenable_core::Evidence) in `contracts::proof_composition`
 //! (plan Phase 3).
 
+mod conversion;
 mod extended;
+mod instant;
 mod iso_8601;
 mod precision;
 mod rfc3339;
 mod rfc9557;
+mod serialization;
 
+pub use conversion::{
+    ConversionDropsNamedZoneIdentity, ConversionDropsSubsecondPrecision,
+    ConversionPreservesRepresentedInstant, ConversionPreservesTemporalOrdering,
+    ConversionRequiresExplicitAuthorityWhenLossy, ConversionSourceSemanticKindDeclared,
+    ConversionTargetSemanticKindDeclared,
+};
+pub use instant::{
+    LocalDateTimeMayBeAmbiguousAtZoneTransition, LocalDateTimeMayFallInZoneTransitionGap,
+    LocalDateTimeRequiresZoneOrOffsetForInstant, OffsetDateTimeIdentifiesSingleInstant,
+    TimestampHasExplicitUtcOffset, UtcTimelineOrderingAppliesToFixedInstants,
+};
 pub use rfc3339::{
     Rfc3339ApplicationsMayAllowSpaceDateTimeSeparator,
     Rfc3339ClientsShouldTransformDatesForLocalityDisplay, Rfc3339FractionUsesDotSeparator,
@@ -58,6 +72,11 @@ pub use rfc9557::{
     IxdtfUCaRegistryEntryIsPermanent, IxdtfUCaRegistryEntryReferencesSectionFive,
     IxdtfUCaRegistryEntryUsesIetfChangeController,
     IxdtfUCaRegistryEntryUsesPreferredCalendarForPresentationDescription,
+};
+pub use serialization::{
+    Iso8601BasicFormUsesCompactRepresentation, Iso8601ExtendedFormUsesSeparators,
+    IxdtfSerializationCarriesNamedZoneAnnotation, SerializationCarriesExplicitUtcRelationship,
+    SerializationProfileDeclared,
 };
 
 pub use extended::{
