@@ -65,15 +65,19 @@ members' proofs. Generated from `elicit_temporal` by script.
 **Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
 (`proof_composition/proof_branches.rs`).
 
-**Phase 4 Step 1 complete (2026-09-09)** — the generic sidecar carriers
-in `src/exchange/`: `RawInput` (a raw string + the trivial "input
-received" marker, `Sidecar<V>` for every `V`), `Proven<D, P>` (descriptor
-`D` + `ProvenToken<P>` for a `proof_composition` composite `P`),
-`Proven::prove` as the honest Phase-4 stand-in for `Establish::establish`
-(consumes the input token, asserts `P`; Phase 6 swaps in real
-`Establish`). `CalendarDateDescriptor` is the first descriptor with
-`#[derive(Evidence)]`. Next: Phase 4 Step 2 (`TemporalParser`, 24 methods
-→ per-method composite proposition + `Exchange` impl).
+**Phase 4 Step 1 complete (2026-09-09)** — the exchange surface in
+`src/exchange/`. **Design (user-confirmed): every `elicit_temporal`
+return tuple IS a sidecar** (`#[sidecar(primary)]` descriptor,
+`#[sidecar(token)]` proof token) — so each `Parsed*Result` alias becomes
+a named `#[derive(Sidecar)]` struct; input `&str` → `RawInput`; tokens
+minted through **real `Establish`** (`#[amenable_derive::establish]`, the
+gaap pattern — no parallel mint path). The `Exchange` interface is
+`TemporalExchange`, a standalone `Exchange`-shaped trait (the orphan rule
+forbids the `impl<T: TemporalParser> Exchange<…> for T` blanket — tested).
+Canary `parse_calendar_date` wired end to end. Also fixed
+`amenable_derive::Sidecar` (restate `Proposition: Witness<V>`). The
+earlier `Proven` / `Proven::prove` sketch was reverted. Next: Phase 4
+Step 2 (the other 23 `TemporalParser` methods, incl. multi-proof folding).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

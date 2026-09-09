@@ -253,7 +253,8 @@ pub use contracts::{
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use exchange::{
-    Proven, ProvenToken, RawInput, RawTemporalText, TemporalInputReceived, TemporalInputToken,
+    CalendarDateValidToken, ParsedCalendarDate, RawInput, RawTemporalText, TemporalExchange,
+    TemporalInputReceived, TemporalInputToken,
 };
 pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,
@@ -318,7 +319,7 @@ pub use provenance_vocab::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,
     StandardsBody,
 };
-pub use traits::TemporalReporter;
+pub use traits::{TemporalParser, TemporalReporter};
 pub use types::{
     CalendarDateDescriptor, CenturyDescriptor, CenturyDescriptorBuilder, CompleteDateDescriptor,
     DateDescriptor, DateTimeFormulaDescriptor, DateTimeFormulaEvaluationKindDescriptor,

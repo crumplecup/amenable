@@ -20,8 +20,16 @@ bundle's sub-claims; aggregation is `#[derive(Witness)]` structural
 closure, no proof-token bag). Generated from `elicit_temporal`.
 `src/proof_composition/{composites_a..d,branches_a,branches_b}.rs`.
 Phase 3 Step 2 (2026-09-09) — the 13 `*ProofBranch` enums →
-`proof_composition/proof_branches.rs`. Next: Phase 3 Step 3 (the 116
-`*Result` aliases) / Phase 4.
+`proof_composition/proof_branches.rs`.
+
+Phase 4 Step 1 (2026-09-09) — the exchange surface, in `src/exchange/`:
+`RawInput` input sidecar, `TemporalExchange` (standalone `Exchange`-shaped
+wrapper trait — orphan rule), and the `parse_calendar_date` canary end to
+end (`TemporalParser` raw trait, `CalendarDateValidToken` via real
+`#[establish]`, `ParsedCalendarDate` `#[derive(Sidecar)]`, blanket
+`TemporalExchange` impl). No `Proven` / parallel mint path. Fixed
+`amenable_derive::Sidecar` en route (restate `Proposition: Witness<V>`).
+Next: Phase 4 Step 2 (the other 23 `TemporalParser` methods).
 
 Phase 1 (2026-09-08) — all 345 citation-only contracts ported as
 `Standard`s with a real `TemporalProvenance`, across 9 normative
@@ -178,7 +186,7 @@ fields — **does not** follow this workspace's error conventions (owned
 | `impl ProvableFrom<C> for P {}` | `impl Establish<C, V> for P` | `Establish` is `amenable`'s deliberate rename of `ProvableFrom` (memory `project_...`, `PROVABLE_FROM_PLAN.md`); `C: ProofToken`, consumed by value |
 | `proof_credential! { C => P; }` | `#[derive(ProofToken)]` + an `establish` wiring | |
 | descriptor struct (`CalendarDateDescriptor`) | `Sidecar::Primary` payload; also `#[derive(Evidence)] #[evidence(basis = "Self")]` so it can flow through a sidecar | already `#[derive(Builder)]` |
-| trait method `fn parse_x(&self, s: &str) -> Result<(Desc, Established<P>)>` | **`Exchange<InRaw, OutProven, V>`** where `InRaw: Sidecar<V>` (payload `&str`/an `Unvalidated` newtype, trivial precondition) and `OutProven: Sidecar<V>` (payload `Desc`, proposition `P`) | "every trait method is an Exchange" |
+| trait method `fn parse_x(&self, s: &str) -> Result<(Desc, Established<P>)>` | **`TemporalExchange<RawInput, ParsedX, V>`** — the return tuple IS the output `Sidecar` (`#[sidecar(primary)]` desc, `#[sidecar(token)]` token) | "every trait method is an Exchange" |
 | `SemanticBundle { validity: Established<A>, …, local_semantics: Established<B>, … }` | a composed `Witness<V>` via the derive-witness composition machinery (`VERUS_DERIVE_WITNESS_COMPOSITION_PLAN.md`), surfaced as one `Sidecar<V>::Proposition` | the conjunction-of-leaves case the composition derive exists for |
 | `ProvenTemporalCarrier<T, S> { carrier, semantics }` | `Sidecar<V>` with `Primary = T`, `Proposition` = the composed bundle | |
 | `TemporalCivilProps { type CalendarDate; … }` | unchanged — associated types on the `amenable_time` backend trait | native carriers stay backend-owned |
@@ -216,36 +224,47 @@ them to be the same trait).
 
 ## "Every trait method is an `Exchange`"
 
-Each descriptor-factory method becomes an `Exchange` impl. Concretely,
-for `TemporalParser::parse_calendar_date`:
+**Every `elicit_temporal` return tuple `(Descriptor, Established<Valid>,
+…)` already *is* a sidecar** — field 1 is the primary data, field 2 is a
+proof token. So each `Parsed*Result` alias becomes a named
+`#[derive(Sidecar)]` struct; the raw `&str` input becomes `RawInput`.
 
-```text
-// payload newtype — the raw, not-yet-lawful input
-struct UnvalidatedCalendarDate(String);   // Evidence (basis = Self), trivial
+```rust
+// input sidecar — raw text + the trivial "input received" token
+struct RawInput  : Sidecar<V> { Primary = RawTemporalText; Proposition = TemporalInputReceived; }
 
-// input sidecar: raw text + a trivial "this is well-formed UTF-8 we were handed" token
-struct RawInput<T>          : Sidecar<V> { Primary = T; Proposition = InputReceived; }
+// output sidecar — the descriptor + the real proposition's token
+#[derive(Sidecar)] #[sidecar(proposition = "CalendarDateValid")]
+struct ParsedCalendarDate { #[sidecar(primary)] descriptor: CalendarDateDescriptor,
+                            #[sidecar(token)]   token: CalendarDateValidToken }
 
-// output sidecar: the descriptor + the real proposition
-struct Proven<D, P>         : Sidecar<V> { Primary = D; Proposition = P; }
+// the token + its Establish edge (amenable_gaap::tokens pattern)
+#[derive(ProofToken)] #[proof_token(proposition = "CalendarDateValid")]
+#[amenable_derive::establish(credential = "TemporalInputToken", proposition = "CalendarDateValid")]
+struct CalendarDateValidToken(());
 
-impl Exchange<RawInput<UnvalidatedCalendarDate>,
-              Proven<CalendarDateDescriptor, CalendarDateValid>,
-              V>
-    for TemporalParserImpl { … }
+// the Exchange-shaped surface, blanket over the raw trait
+impl<T: TemporalParser, V: Verifier> TemporalExchange<RawInput, ParsedCalendarDate, V> for T
+where CalendarDateValid: Witness<V>
+{ fn exchange(&self, i) { … Establish::establish(i.sidecar()) … } }
 ```
 
-Methods returning *several* `Established<P>` sidecars
-(`parse_local_date_time` returns three) map to an `Output` whose
-`Proposition` is a composed `Witness<V>` (the derive-witness conjunction),
-so `Exchange`'s single-`Output`-sidecar shape still holds.
+`TemporalExchange` is a standalone `Exchange`-shaped trait, **not**
+`: Exchange`: the orphan rule forbids `impl<T: TemporalParser, V>
+Exchange<RawInput, …, V> for T` (tested — `T` uncovered before the first
+local type). A concrete backend still gets a real `amenable_core::
+Exchange` impl; the reusable blanket lives here.
 
-`TemporalFormatter` methods run the other direction (descriptor + its
-validity proof in, wire `String` + an emission-conformance proof out) —
-still an `Exchange`, just `Proven<Descriptor, Valid>` → `Proven<String,
-Iso8601ExtendedFormUsesSeparators>`.
+Methods returning *several* `Established<P>`/`*ProofBranch` sidecars
+(`parse_local_date_time` returns three) fold them into one per-method
+composite proposition (the Phase-3 `#[derive(Witness)]` conjunction), so
+the sidecar's single-`token` shape holds.
 
-The `realize_*` / `reflect_*` native-bridge pairs are `Exchange`s
+`TemporalFormatter` methods run the other direction (an already-proven
+descriptor sidecar in, `String` + an emission-conformance proof out) —
+still `TemporalExchange`.
+
+The `realize_*` / `reflect_*` native-bridge pairs are `TemporalExchange`s
 between a descriptor sidecar and a `ProvenTemporalCarrier` sidecar.
 
 `TemporalReporter` is the exception: capability reporting mints nothing,
@@ -631,7 +650,7 @@ reserved for genuine *transitions* (Phase 4), not structural composition.
       `None`/`Unambiguous`/`NotApplicable` first variant via
       `#[derive(Default)]`; 3 get a hand `impl Default`. 1 test.
 - [ ] **Step 3:** the 116 `*Result` type aliases — most collapse into the
-      Phase-4 `Proven<D, P>` sidecar output types; the plain `Result`
+      Phase-4 per-method `Parsed*` sidecar structs; the plain `Result`
       ones stay as aliases.
 - [ ] **Step 4 (backends):** leaf `Witness<V>` impls for the ~345
       contract `Standard`s + the aggregate composites, in
@@ -642,27 +661,45 @@ reserved for genuine *transitions* (Phase 4), not structural composition.
 
 ### Phase 4 — trait methods → `Exchange` (no proofs yet)
 
-- [x] **Step 1 (2026-09-09):** the generic sidecar carriers, in
-      `src/exchange/`. `RawInput` — `Primary = RawTemporalText` (an
-      `Evidence` newtype over `String`), `Proposition =
-      TemporalInputReceived` (a boundary marker with a trivial
-      **unconditional** `impl<V: Verifier> Witness<V>` — asserted at the
-      seam, not checkable, so `RawInput: Sidecar<V>` holds for every
-      `V`), token `TemporalInputToken` (root, `pub fn new()`).
-      `Proven<D: Evidence, P: Evidence>` — `Primary = D`, `Proposition =
-      P` (a `proof_composition` composite), token `ProvenToken<P>`
-      (`pub(crate)` mint). `Proven::prove(descriptor, credential:
-      TemporalInputToken)` is Phase 4's honest stand-in for
-      `Establish::establish` — consumes the input token (no replay),
-      asserts `P` (Phase 6 swaps in `P::establish`). `CalendarDateDescriptor`
-      is the first descriptor to gain `#[derive(Evidence)]` (canary; the
-      rest gain it as they become exchange outputs). 3 tests.
-- [ ] **Step 2:** `TemporalParser` (24 methods). Each method →
-      `TemporalResult<Descriptor>` on the trait + a per-method composite
-      proposition (folding the 1–4 `Established`/`*ProofBranch` proofs the
-      elicit `Parsed*Result` alias carries) + an `Exchange<RawInput,
-      Proven<D, CompositeProp>, V>` impl. Descriptors gain `Evidence` +
-      `Default` here.
+**Design (settled 2026-09-09, user-confirmed): every method's return
+tuple IS a sidecar** — field 1 = `#[sidecar(primary)]` descriptor, field
+2 = `#[sidecar(token)]` proof token — so each `Parsed*Result` alias
+becomes a named `#[derive(Sidecar)]` struct. Input `&str` → `RawInput`.
+Tokens minted **through real `Establish`** (`#[amenable_derive::establish]`,
+the `amenable_gaap::tokens` pattern) — no parallel mint path.
+
+- The `Exchange` interface is [`TemporalExchange`], a standalone
+  `Exchange`-shaped trait (same method + `Sidecar<V>` bounds), **not**
+  `: Exchange` — tested: the orphan rule forbids `impl<T: TemporalParser,
+  V> Exchange<RawInput, …, V> for T` (`T` uncovered before the first
+  local type), and a `TemporalExchange: Exchange` supertrait doesn't
+  rescue it. A concrete backend type still gets a real
+  `amenable_core::Exchange` impl (legal); the reusable blanket lives here
+  as `TemporalExchange`.
+- Fixed `amenable_derive::Sidecar` en route: its concrete-non-matching-
+  proposition branch didn't restate `Proposition: Evidence + Witness<V>`,
+  so a `#[derive(Witness)]` composite proposition failed to resolve.
+
+- [x] **Step 1 (2026-09-09):** `src/exchange/`. `RawInput` (`Primary =
+      RawTemporalText`, `Proposition = TemporalInputReceived` — a
+      boundary marker with a trivial **unconditional** `impl<V> Witness<V>`,
+      so `RawInput: Sidecar<V>` for every `V`), root token
+      `TemporalInputToken`. `TemporalExchange` trait. Canary
+      `parse_calendar_date`: `TemporalParser` trait (`&str →
+      CalendarDateDescriptor`), `CalendarDateValidToken` via
+      `#[establish(credential = "TemporalInputToken", proposition =
+      "CalendarDateValid")]`, `ParsedCalendarDate` `#[derive(Sidecar)]`,
+      and the blanket `impl<T: TemporalParser, V> TemporalExchange<
+      RawInput, ParsedCalendarDate, V> for T where CalendarDateValid:
+      Witness<V>` whose body mints the token via `Establish::establish`.
+      `CalendarDateDescriptor` gains `#[derive(Evidence)]` (canary). 5
+      tests. Supersedes the reverted `Proven`/`Proven::prove` sketch.
+- [ ] **Step 2:** the other 23 `TemporalParser` methods, same canary
+      shape. Multi-proof methods fold their 1–4
+      `Established`/`*ProofBranch` proofs (from the elicit `Parsed*Result`
+      alias) into one per-method composite proposition (Phase-3 folding)
+      → one token. Descriptors gain `#[derive(Evidence, Default)]` as
+      they become primaries.
 - [ ] `TemporalFormatter` (36).
 - [ ] `TemporalZoneFactory` (5), `TemporalConversionFactory` (4),
       `TemporalIntervalFactory` (4).

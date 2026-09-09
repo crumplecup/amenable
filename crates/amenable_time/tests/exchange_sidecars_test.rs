@@ -1,12 +1,16 @@
-//! `exchange` — spot-checks the generic sidecar carriers: `RawInput`
-//! wraps a raw string at the boundary, `Proven<D, P>` couples a parsed
-//! descriptor to a proof token for `P`, and `Proven::prove` is the only
-//! external mint path (it consumes the input's boundary credential).
+//! `exchange` — spot-checks the exchange surface wiring: `RawInput` wraps
+//! a raw string at the boundary, output tokens are `ProofToken`s for
+//! their composite proposition, and the `TemporalExchange` blanket over
+//! `TemporalParser` type-checks (its `exchange` body mints the output
+//! token through `Establish`). Actually *running* an exchange needs a
+//! backend `Witness<V>` proof for `CalendarDateValid`, so that is left to
+//! the backend crates.
 
-use amenable_core::{Evidence, ProofToken};
+use amenable_core::{Establish, Evidence, ProofToken, Verifier, Witness};
 use amenable_time::{
-    CalendarDateDescriptor, CalendarDateValid, Proven, ProvenToken, RawInput, RawTemporalText,
-    TemporalInputReceived, TemporalInputToken,
+    CalendarDateDescriptor, CalendarDateValid, CalendarDateValidToken, ParsedCalendarDate,
+    RawInput, RawTemporalText, TemporalExchange, TemporalInputReceived, TemporalInputToken,
+    TemporalParser, TemporalResult,
 };
 
 #[test]
@@ -16,36 +20,60 @@ fn raw_input_carries_the_boundary_text_and_marker() {
     let input = RawInput::received("2026-09-09");
     assert_eq!(input.as_str(), "2026-09-09");
 
-    // The primary payload is `Evidence`; the proposition is the trivial
-    // "input received" marker.
     assert!(<RawTemporalText as Evidence>::is_root());
     assert_eq!(RawTemporalText::basis(), RawTemporalText::default());
     assert!(<TemporalInputReceived as Evidence>::is_root());
 }
 
 #[test]
-fn proven_couples_a_descriptor_to_a_proof_token() {
-    amenable_core::init_tracing();
-
-    let descriptor = CalendarDateDescriptor::new(2026, 9, 9);
-    let proven: Proven<CalendarDateDescriptor, CalendarDateValid> =
-        Proven::prove(descriptor, TemporalInputToken::new());
-
-    assert_eq!(proven.descriptor().year(), 2026);
-    assert_eq!(proven.descriptor().day(), 9);
-
-    // `ProvenToken<CalendarDateValid>` justifies exactly that proposition.
-    fn assert_proposition<T: ProofToken<Proposition = CalendarDateValid>>() {}
-    assert_proposition::<ProvenToken<CalendarDateValid>>();
-}
-
-#[test]
 fn the_input_token_is_a_freely_minted_root() {
     amenable_core::init_tracing();
 
-    // "Input received" is asserted at the boundary — the token needs no
-    // prior credential.
     let a = TemporalInputToken::new();
     let b = TemporalInputToken::default();
     assert_eq!(a, b);
+}
+
+#[test]
+fn output_tokens_justify_their_composite_proposition() {
+    amenable_core::init_tracing();
+
+    fn assert_token<T: ProofToken<Proposition = CalendarDateValid>>() {}
+    assert_token::<CalendarDateValidToken>();
+}
+
+/// The `TemporalExchange` blanket over `TemporalParser` type-checks — its
+/// body mints `CalendarDateValidToken` via
+/// `<CalendarDateValid as Establish<TemporalInputToken, V>>::establish`,
+/// gated on the backend's `Witness<V>` proof.
+#[test]
+fn the_parser_exchange_blanket_is_wired() {
+    fn _assert_blanket<T, V>()
+    where
+        T: TemporalParser,
+        V: Verifier,
+        CalendarDateValid: Witness<V> + Establish<TemporalInputToken, V>,
+        T: TemporalExchange<RawInput, ParsedCalendarDate, V, Error = amenable_time::TemporalError>,
+    {
+    }
+}
+
+/// A trivial in-test parser confirms the raw trait method is the only
+/// thing a backend has to implement.
+struct StubParser;
+
+impl TemporalParser for StubParser {
+    fn parse_calendar_date(&self, _input: &str) -> TemporalResult<CalendarDateDescriptor> {
+        Ok(CalendarDateDescriptor::new(2026, 9, 9))
+    }
+}
+
+#[test]
+fn a_backend_only_implements_the_raw_method() {
+    amenable_core::init_tracing();
+
+    let parsed = StubParser
+        .parse_calendar_date("2026-09-09")
+        .expect("stub always parses");
+    assert_eq!(parsed.year(), 2026);
 }

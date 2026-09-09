@@ -31,19 +31,21 @@
 //!
 //! `proposition` defaults to the primary field's own type (`Established<T,
 //! Token>`'s shape, where a state IS its whole payload); set
-//! `#[sidecar(proposition = "S")]` when the proposition is a separate,
-//! phantom generic parameter instead (`Transfer<S, Token>`'s shape, where
-//! `S` never appears as data). Either way, a `Evidence`/`Witness<V>` bound
-//! is only added to the where-clause for generic parameters actually
-//! declared on the struct -- a *concrete* primary type (`TransferPayload`)
-//! needs no such bound restated here; its own `Evidence` impl already
-//! exists unconditionally.
+//! `#[sidecar(proposition = "S")]` when the proposition is a separate
+//! type instead -- a phantom generic parameter (`Transfer<S, Token>`) or
+//! a concrete `#[derive(Witness)]` composite (`amenable_time`'s
+//! `ParsedCalendarDate` over `CalendarDateValid`). The generated impl
+//! always restates `Proposition: Evidence + Witness<V>` in its where
+//! clause: that is exactly `Sidecar::Proposition`'s own bound, and a
+//! composite proposition's `Witness<V>` is *conditional* on its leaf
+//! members' -- without the restated assumption the derived `Sidecar<V>`
+//! impl would try to prove it eagerly and fail. `Primary: Evidence` is
+//! restated too whenever primary and proposition differ.
 
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-    DeriveInput, Error, Field, Fields, GenericParam, Ident, LitStr, Type, Visibility,
-    WherePredicate, parse_quote,
+    DeriveInput, Error, Field, Fields, Ident, LitStr, Type, Visibility, WherePredicate, parse_quote,
 };
 
 struct SidecarArgs {
@@ -114,11 +116,11 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
             .params
             .push(parse_quote!(V: ::amenable_core::Verifier));
     }
-    let evidence_predicate = evidence_bound(&generics, primary_ty, &proposition_ty, verifier);
+    let evidence_predicates = evidence_bounds(primary_ty, &proposition_ty, verifier);
     let token_predicate: WherePredicate = parse_quote!(#token_ty: ::amenable_core::ProofToken<Proposition = #proposition_ty> + ::std::clone::Clone);
     {
         let where_clause = generics.make_where_clause();
-        where_clause.predicates.push(evidence_predicate);
+        where_clause.predicates.extend(evidence_predicates);
         where_clause.predicates.push(token_predicate);
     }
     let (impl_generics, _, where_clause) = generics.split_for_impl();
@@ -225,38 +227,36 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
 /// Only add an `Evidence`/`Witness<V>` bound for a type that's actually a
 /// generic parameter of this struct -- a concrete primary type
 /// (`TransferPayload`) needs no bound restated here at all.
+///
+/// The proposition always gets `Evidence + Witness<V>` restated, whether
+/// concrete or generic: `Sidecar::Proposition`'s own bound is exactly
+/// that, and a `#[derive(Witness)]` composite proposition
+/// (`CalendarDateValid`) has a *conditional* `Witness<V>` -- without the
+/// restated where-clause assumption the derived `Sidecar<V>` impl would
+/// try to prove it eagerly and fail on the composite's own leaf members.
 #[cfg_attr(
     not(kani),
-    tracing::instrument(level = "debug", skip(generics, primary_ty, proposition_ty, verifier))
+    tracing::instrument(level = "debug", skip(primary_ty, proposition_ty, verifier))
 )]
-fn evidence_bound(
-    generics: &syn::Generics,
+fn evidence_bounds(
     primary_ty: &Type,
     proposition_ty: &Type,
     verifier: &Type,
-) -> WherePredicate {
-    let is_generic = |ty: &Type| {
-        generics.params.iter().any(|param| match param {
-            GenericParam::Type(type_param) => {
-                matches!(ty, Type::Path(path) if path.path.is_ident(&type_param.ident))
-            }
-            _ => false,
-        })
-    };
+) -> Vec<WherePredicate> {
+    let mut predicates: Vec<WherePredicate> = vec![parse_quote!(
+        #proposition_ty: ::amenable_core::Evidence + ::amenable_core::Witness<#verifier>
+    )];
 
-    if types_match(primary_ty, proposition_ty) {
-        // Established<T, Token>'s shape: one generic parameter plays both
-        // roles, so it needs both bounds together.
-        parse_quote!(#proposition_ty: ::amenable_core::Evidence + ::amenable_core::Witness<#verifier>)
-    } else if is_generic(proposition_ty) {
-        // Transfer<S, Token>'s shape: the proposition is a separate,
-        // phantom generic parameter -- the (possibly concrete) primary
-        // type only needs `Evidence` via its own real impl, not restated
-        // here.
-        parse_quote!(#proposition_ty: ::amenable_core::Evidence + ::amenable_core::Witness<#verifier>)
-    } else {
-        parse_quote!(#primary_ty: ::amenable_core::Evidence)
+    // When primary and proposition are the same type the predicate above
+    // already covers it; otherwise restate `Primary: Evidence` too. Both
+    // are always-true obligations of a valid `Sidecar` impl, so stating
+    // them as where-clause assumptions only defers resolution to the use
+    // site -- exactly what a conditional blanket impl needs.
+    if !types_match(primary_ty, proposition_ty) {
+        predicates.push(parse_quote!(#primary_ty: ::amenable_core::Evidence));
     }
+
+    predicates
 }
 
 /// `syn::Type` carries no `PartialEq` impl without the `extra-traits`

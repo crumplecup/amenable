@@ -60,19 +60,23 @@ shows exactly which descriptors become a `Primary` and need it.
 
 ## Exchange surface (`src/exchange/`)
 
-**Phase 4 Step 1 done (2026-09-09)** — the generic carriers: `RawInput`
-(`Sidecar<V>` for every `V`, unconditionally), `Proven<D, P>`
-(`Sidecar<V>` when `P: Witness<V>`), `Proven::prove` (the honest Phase-4
-stand-in for `Establish::establish`), `TemporalInputToken` /
-`ProvenToken<P>`. `CalendarDateDescriptor` is the first descriptor with
-`#[derive(Evidence)]`.
+**Phase 4 Step 1 done (2026-09-09)** — `RawInput` input sidecar
+(`Sidecar<V>` for every `V`), `TemporalExchange` (standalone
+`Exchange`-shaped wrapper trait — the orphan rule blocks the `Exchange`
+blanket here), and the `parse_calendar_date` canary end to end:
+`ParsedCalendarDate` `#[derive(Sidecar)]` output (the return tuple,
+named), `CalendarDateValidToken` via real `#[amenable_derive::establish]`,
+`TemporalParser` raw trait, blanket `TemporalExchange` impl minting the
+token through `Establish`. `CalendarDateDescriptor` is the first
+descriptor with `#[derive(Evidence)]`. `amenable_derive::Sidecar` fixed to
+restate `Proposition: Witness<V>`.
 
 ## Traits (`traits/`, ~35 traits / ~175 methods)
 
 | trait | methods | ported | as |
 |---|---:|:--:|---|
 | `TemporalReporter` | 7 | ✅ | plain trait (not an `Exchange` — capability query) |
-| `TemporalParser` | 24 | — | `Exchange` per method (Phase 4 Step 2) |
+| `TemporalParser` | 24 | 1/24 | `TemporalExchange` per method (canary done; Step 2 = rest) |
 | `TemporalFormatter` | 36 | — | `Exchange` per method (Phase 4) |
 | `TemporalZoneFactory` | 5 | — | Phase 4 |
 | `TemporalConversionFactory` | 4 | — | Phase 4 |

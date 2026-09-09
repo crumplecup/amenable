@@ -1,21 +1,29 @@
-//! The temporal exchange surface — trait methods re-expressed as
-//! [`Exchange`](amenable_core::Exchange)s.
+//! The temporal exchange surface — every `elicit_temporal` trait method
+//! re-expressed with the [`Exchange`](amenable_core::Exchange) shape: a
+//! proven [`Sidecar`](amenable_core::Sidecar) in, a proven `Sidecar` out.
 //!
-//! - [`markers`] / [`tokens`] — the boundary `Evidence` markers and proof
-//!   tokens.
-//! - [`sidecars`] — [`RawInput`] (every method's input) and
-//!   [`Proven<D, P>`](Proven) (every method's output).
-//!
-//! Per-method `Exchange<RawInput, Proven<D, P>, V>` impls +
-//! `ExchangeEdgeRecord`s land alongside per trait (`TemporalParser`,
-//! `TemporalFormatter`, …) in later Phase 4 steps — no `Witness` /
-//! `Ensures` proof there, only the wiring (`docs/AMENABLE_TIME_PLAN.md`,
-//! Phase 4).
+//! - [`markers`] / [`tokens`] — the boundary `Evidence` markers and the
+//!   root input token.
+//! - [`establish`] — the output tokens and their
+//!   [`Establish`](amenable_core::Establish) edges (`<P as Establish<
+//!   TemporalInputToken, V>>::establish` is the one lawful mint path).
+//! - [`wrapper`] — [`TemporalExchange`], the backend-neutral exchange
+//!   trait (`Exchange`-shaped; a standalone trait only because the orphan
+//!   rule forbids the blanket `Exchange` impl here).
+//! - [`sidecars`] — [`RawInput`], the shared input sidecar.
+//! - [`parse`] — the per-method output sidecars + the `TemporalExchange`
+//!   blanket over [`TemporalParser`](crate::TemporalParser).
 
+mod establish;
 mod markers;
+mod parse;
 mod sidecars;
 mod tokens;
+mod wrapper;
 
+pub use establish::CalendarDateValidToken;
 pub use markers::{RawTemporalText, TemporalInputReceived};
-pub use sidecars::{Proven, RawInput};
-pub use tokens::{ProvenToken, TemporalInputToken};
+pub use parse::ParsedCalendarDate;
+pub use sidecars::RawInput;
+pub use tokens::TemporalInputToken;
+pub use wrapper::TemporalExchange;
