@@ -22,7 +22,7 @@ capability queries).
 |---|---:|:--:|:--:|:--:|:--:|:--:|
 | `contracts/precision` | 5 | ✅ 5/5 | — | — | — | — |
 | `contracts/iso_8601` | 109 | ✅ 109/109 | — | — | — | — |
-| `contracts/extended` (→ `iso_8601_2`) | 48 | — | — | — | — | — |
+| `contracts/extended` (ISO 8601-2) | 48 | ✅ 48/48 | — | — | — | — |
 | `contracts/rfc3339` | 20 | — | — | — | — | — |
 | `contracts/rfc9557` | 38 | — | — | — | — | — |
 | `contracts/calconnect` | 61 | — | — | — | — | — |

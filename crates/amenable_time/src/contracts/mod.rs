@@ -9,9 +9,41 @@
 //! [`Evidence`](amenable_core::Evidence) in `contracts::proof_composition`
 //! (plan Phase 3).
 
+mod extended;
 mod iso_8601;
 mod precision;
 
+pub use extended::{
+    ApproximationQualificationDeclared, BeforeOrAfterQualificationIsLevelTwoOnly,
+    BeforeOrOnDateUsesLeadingDoubleDotQualifier, BeforeYearOneValueUsesTrailingBSuffix,
+    ComponentQualificationAppliesOnlyToMarkedComponent,
+    ComponentQualificationUsesImmediateLeftPlacement,
+    EnhancedIntervalLevelOnePermitsTerminalBoundaryQualification,
+    EnhancedIntervalLevelTwoPermitsBeforeOrAfterBoundaryQualification,
+    EnhancedIntervalLevelTwoPermitsInternalBoundaryQualification,
+    EnhancedIntervalLevelTwoPermitsInternalBoundaryUnspecifiedDigits,
+    ExponentialYearExponentIsPositiveInteger, ExponentialYearUsesPowerOfTenNotation,
+    GroupQualificationAppliesToMarkedAndMoreSignificantComponents,
+    GroupQualificationUsesImmediateRightPlacement,
+    LetterPrefixedCalendarYearMagnitudeExceedsFourDigits,
+    LetterPrefixedCalendarYearUsesLeadingYDesignator,
+    LevelOneUnspecifiedDigitsOccupyRightmostPositions,
+    LevelTwoUnspecifiedDigitsMayAppearWithinComponent, NegativeCalendarYearUsesLeadingMinusSign,
+    OnOrAfterDateUsesTrailingDoubleDotQualifier, OpenIntervalBoundaryDeclared,
+    QualificationScopeDeclared, SeasonCodeDeclaresNamedSeason, SeasonCodeDeclaresSeasonScope,
+    SeasonalExpressionUsesSeasonCodeInMonthSlot, SeasonalExpressionUsesYearAndSeasonForm,
+    SignificantDigitYearCountIsPositiveInteger, SignificantDigitYearUsesTrailingSSuffix,
+    SubYearGroupingCodeDeclaresQuadrimester, SubYearGroupingCodeDeclaresQuarter,
+    SubYearGroupingCodeDeclaresSemestral, SubYearGroupingExpressionUsesGroupingCodeInMonthSlot,
+    SubYearGroupingExpressionUsesYearAndGroupingForm, TemporalChoiceSetUsesSquareBrackets,
+    TemporalInclusiveSetUsesCurlyBraces, TemporalSetCarriesMultipleMembers,
+    TemporalSetDeclaresAlternativeSemantics, TemporalSetDeclaresInclusiveMemberSemantics,
+    TemporalSetForbidsInternalWhitespace, TemporalSetMemberSeparatorDeclared,
+    TemporalSetOpenRangeUsesBoundaryDoubleDot, TemporalSetRangeNeighborhoodSharesPrecision,
+    TemporalSetRangeUsesInclusiveDoubleDotSemantics, UncertaintyAndApproximationMayBeCombined,
+    UncertaintyQualificationDeclared, UnknownIntervalBoundaryDeclared,
+    UnspecifiedDigitUsesUppercaseXPlaceholder, UnspecifiedDigitsDeclareUnknownValue,
+};
 pub use iso_8601::{
     BasicFormatUsesMinimumComponentsForRequiredAccuracy, CalendarDateHasYearMonthDay,
     CalendarDateUsesGregorianCalendar,
