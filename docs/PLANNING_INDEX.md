@@ -66,17 +66,22 @@ members' proofs. Generated from `elicit_temporal` by script.
 (`proof_composition/proof_branches.rs`).
 
 **Phase 4 Step 1 complete (2026-09-09)** — the exchange surface in
-`src/exchange/`. **Design (user-confirmed): every `elicit_temporal`
-return tuple IS a sidecar** (`#[sidecar(primary)]` descriptor,
-`#[sidecar(token)]` proof token) — so each `Parsed*Result` alias becomes
-a named `#[derive(Sidecar)]` struct; input `&str` → `RawInput`; tokens
-minted through **real `Establish`** (`#[amenable_derive::establish]`, the
-gaap pattern — no parallel mint path). The `Exchange` interface is
-`TemporalExchange`, a standalone `Exchange`-shaped trait (the orphan rule
-forbids the `impl<T: TemporalParser> Exchange<…> for T` blanket — tested).
-Canary `parse_calendar_date` wired end to end. Also fixed
-`amenable_derive::Sidecar` (restate `Proposition: Witness<V>`). The
-earlier `Proven` / `Proven::prove` sketch was reverted. Next: Phase 4
+`src/exchange/`. **Design (user-confirmed after two course corrections):
+every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
+descriptor, `#[sidecar(token)]` proof token) — so each `Parsed*Result`
+alias becomes a named `#[derive(Sidecar)]` struct; input `&str` →
+`RawInput`; tokens minted through **real `Establish`**
+(`#[amenable_derive::establish]`, the gaap pattern — no parallel mint
+path). **`amenable_time` ships no `Exchange` impl** — the orphan rule
+forbids `impl<T: …, V> Exchange<RawInput, …, V> for T` (tested, E0210),
+and a `: Exchange` supertrait / a standalone parallel trait don't get
+around it. Instead `amenable_time` ships `TemporalParser<V>` — a trait
+whose supertrait bundle *is* the 24 `Exchange<RawInput, ParsedX, V>` — and
+the backend writes the inherent parse methods (`#[capture_exchange_body]`
+generates its `Exchange` impls). Canary `parse_calendar_date` wired. Also
+fixed `amenable_derive::Sidecar` (restate `Proposition: Witness<V>`; doc
+the generated `new`). Two earlier sketches (`Proven`/`Proven::prove`,
+then a standalone `TemporalExchange`) were reverted. Next: Phase 4
 Step 2 (the other 23 `TemporalParser` methods, incl. multi-proof folding).
 
 **Description:** MVP-for-proper-testing — the trait interface only

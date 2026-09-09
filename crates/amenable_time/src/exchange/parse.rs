@@ -1,24 +1,27 @@
-//! Parser exchange surface — one `#[derive(Sidecar)]` output struct per
-//! [`TemporalParser`](crate::TemporalParser) method (the
-//! `elicit_temporal` return tuple, named and given the sidecar shape),
-//! and the blanket [`TemporalExchange`](crate::TemporalExchange) impl
-//! over `TemporalParser` that produces it.
+//! Parser exchange output sidecars — one `#[derive(Sidecar)]` struct per
+//! [`TemporalParser`](crate::TemporalParser) method (the `elicit_temporal`
+//! return tuple, named and given the sidecar shape).
 //!
-//! Phase 4 Step 1 wires only `parse_calendar_date`; Step 2 adds the rest
-//! (and folds the multi-proof methods' 2–4 proofs into one per-method
-//! composite proposition).
+//! The `Exchange<RawInput, ParsedX, V>` impls themselves live **in the
+//! backend crate** — a downstream `Jiff` writes one inherent
+//! `fn parse_calendar_date(&self, RawInput) -> Result<ParsedCalendarDate,
+//! TemporalError>` and `#[amenable_derive::capture_exchange_body]`
+//! generates its `impl<V> Exchange<..> for Jiff`. `amenable_time` can't
+//! provide those (orphan rule: `Exchange` is foreign, the backend `Self`
+//! is uncovered). What it provides is the sidecar types, the `Establish`
+//! edges, and the [`TemporalParser<V>`](crate::TemporalParser) bundle.
+//!
+//! Phase 4 Step 1 wires only `parse_calendar_date`; Step 2 adds the rest.
 
-use amenable_core::{Establish, Sidecar, Verifier, Witness};
+use crate::{CalendarDateDescriptor, CalendarDateValidToken};
 
-use crate::{
-    CalendarDateDescriptor, CalendarDateValid, CalendarDateValidToken, RawInput, TemporalError,
-    TemporalExchange, TemporalInputToken, TemporalParser,
-};
-
-/// Output sidecar for [`TemporalParser::parse_calendar_date`]: the neutral
-/// [`CalendarDateDescriptor`] plus a token for [`CalendarDateValid`].
+/// Output sidecar for the calendar-date parse exchange: the neutral
+/// [`CalendarDateDescriptor`] plus a token for
+/// [`CalendarDateValid`](crate::CalendarDateValid). `#[sidecar(primary)]`
+/// is the data, `#[sidecar(token)]` is the proof — the `elicit_temporal`
+/// `(descriptor, Established<CalendarDateValid>)` tuple, named.
 #[derive(Debug, Clone, amenable_derive::Sidecar)]
-#[sidecar(proposition = "crate::CalendarDateValid", constructor = "pub(crate)")]
+#[sidecar(proposition = "crate::CalendarDateValid", constructor = "pub")]
 pub struct ParsedCalendarDate {
     #[sidecar(primary)]
     descriptor: CalendarDateDescriptor,
@@ -31,22 +34,5 @@ impl ParsedCalendarDate {
     #[must_use]
     pub fn descriptor(&self) -> &CalendarDateDescriptor {
         &self.descriptor
-    }
-}
-
-impl<T, V> TemporalExchange<RawInput, ParsedCalendarDate, V> for T
-where
-    T: TemporalParser,
-    V: Verifier,
-    CalendarDateValid: Witness<V>,
-{
-    type Error = TemporalError;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self, input)))]
-    fn exchange(&self, input: RawInput) -> Result<ParsedCalendarDate, TemporalError> {
-        let descriptor = self.parse_calendar_date(input.as_str())?;
-        let credential: TemporalInputToken = <RawInput as Sidecar<V>>::sidecar(&input);
-        let token = <CalendarDateValid as Establish<TemporalInputToken, V>>::establish(credential);
-        Ok(ParsedCalendarDate::new(descriptor, token))
     }
 }

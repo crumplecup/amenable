@@ -1,24 +1,37 @@
-//! [`TemporalParser`] — raw parsing of standards-governed temporal forms
-//! into neutral descriptors.
+//! [`TemporalParser`] — the parse half of the temporal seam, ported from
+//! `elicit_temporal::traits::TemporalParser`.
 //!
-//! Ported from `elicit_temporal::traits::TemporalParser`. Each method
-//! takes a raw `&str` and returns just the descriptor; the proof sidecar
-//! is synthesised by the blanket [`TemporalExchange`](crate::TemporalExchange)
-//! impl over this trait (`src/exchange/parse.rs`), which mints the
-//! output token through [`Establish`](amenable_core::Establish). A
-//! backend implements the raw methods; it gets the exchange surface for
-//! free.
+//! The contract *is* the exchanges: `TemporalParser<V>` is a bundle of
+//! `Exchange<RawInput, ParsedX, V>` supertraits, so a type implements it
+//! exactly when it is all 24 parse exchanges for verifier `V`. The
+//! `where <Valid>: Witness<V>` bounds are the honest precondition —
+//! `TemporalParser<KaniVerifier>` only makes sense once Kani has a proof
+//! for each temporal validity proposition (each output sidecar's
+//! `Proposition`). A backend (`Jiff`, …) writes the inherent parse
+//! methods and lets `#[amenable_derive::capture_exchange_body]` generate
+//! each `impl<V> Exchange<RawInput, ParsedX, V> for Jiff`; the blanket
+//! below then gives it `TemporalParser<V>` for free.
 //!
-//! Phase 4 Step 1 wires only `parse_calendar_date`; the remaining 23
-//! methods land in Step 2.
+//! Phase 4 Step 1 bundles only the `parse_calendar_date` edge; Step 2
+//! adds the other 23.
 
-use crate::{CalendarDateDescriptor, TemporalResult};
+use amenable_core::{Exchange, Verifier, Witness};
 
-/// Parse standards-governed temporal forms into neutral descriptors.
-pub trait TemporalParser: Send + Sync {
-    /// Parse a complete ISO 8601 calendar date (`YYYY-MM-DD` or
-    /// equivalent).
-    ///
-    /// Normative source: ISO 8601-1:2019, 5.2.2.
-    fn parse_calendar_date(&self, input: &str) -> TemporalResult<CalendarDateDescriptor>;
+use crate::{CalendarDateValid, ParsedCalendarDate, RawInput, TemporalError};
+
+/// A backend that provides every standards-governed temporal parse as an
+/// [`Exchange`], for verifier `V`.
+pub trait TemporalParser<V: Verifier>:
+    Send + Sync + Exchange<RawInput, ParsedCalendarDate, V, Error = TemporalError>
+where
+    CalendarDateValid: Witness<V>,
+{
+}
+
+impl<T, V> TemporalParser<V> for T
+where
+    V: Verifier,
+    CalendarDateValid: Witness<V>,
+    T: Send + Sync + Exchange<RawInput, ParsedCalendarDate, V, Error = TemporalError>,
+{
 }

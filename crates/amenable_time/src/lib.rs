@@ -253,8 +253,8 @@ pub use contracts::{
 };
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use exchange::{
-    CalendarDateValidToken, ParsedCalendarDate, RawInput, RawTemporalText, TemporalExchange,
-    TemporalInputReceived, TemporalInputToken,
+    CalendarDateValidToken, ParsedCalendarDate, RawInput, RawTemporalText, TemporalInputReceived,
+    TemporalInputToken,
 };
 pub use proof_composition::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid, CombinedDateTimeDateEvidence,

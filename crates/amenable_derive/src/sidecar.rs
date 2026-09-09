@@ -207,6 +207,10 @@ pub fn expand_sidecar(input: &DeriveInput) -> syn::Result<TokenStream> {
 
     let constructor_impl = quote! {
         impl #struct_impl_generics #name #struct_ty_generics #struct_where_clause {
+            /// Pair the primary payload with its proof token to form this
+            /// `Sidecar`. The token argument cannot be forged, so this is
+            /// lawful by construction — it is minted only by an
+            /// `Establish` impl or an `Exchange` body.
             #creusot_ensures_attr
             #constructor_vis fn new(#primary_ident: #primary_ty, #token_ident: #token_ty) -> Self {
                 Self {
