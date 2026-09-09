@@ -12,6 +12,22 @@
 mod extended;
 mod iso_8601;
 mod precision;
+mod rfc3339;
+
+pub use rfc3339::{
+    Rfc3339ApplicationsMayAllowSpaceDateTimeSeparator,
+    Rfc3339ClientsShouldTransformDatesForLocalityDisplay, Rfc3339FractionUsesDotSeparator,
+    Rfc3339FractionalSecondsAreOnlyRarelyUsedOption, Rfc3339GeneratorsShouldUseUppercaseTAndZ,
+    Rfc3339LeapSecondGenerationRequiresPriorAnnouncement,
+    Rfc3339LexicalOrderingRequiresUniformFractionalSecondDigits,
+    Rfc3339LexicalOrderingRequiresUniformUtcRelationshipEncoding, Rfc3339LocalOffsetNotUnknown,
+    Rfc3339LocalityDisplayMayTranslateUtcToLocalTime, Rfc3339OffsetIsUtcOrNumeric,
+    Rfc3339PositiveZeroOffsetDeclaresPreferredUtcReferencePoint,
+    Rfc3339ProfileMakesMostFieldsAndPunctuationMandatory, Rfc3339RequiresUtcRelationship,
+    Rfc3339TimestampExcludesRedundantWeekdayInformation,
+    Rfc3339UnknownLocalOffsetUsesZuluDesignator, Rfc3339UnqualifiedLocalTimeForbidden,
+    Rfc3339UsesExtendedCalendarDate, Rfc3339UsesFourDigitYear, Rfc3339UsesFullTime,
+};
 
 pub use extended::{
     ApproximationQualificationDeclared, BeforeOrAfterQualificationIsLevelTwoOnly,
