@@ -34,12 +34,14 @@ facade-exported. `just check-all-package amenable_time` clean.
 A synthetic `Received -> Preserved` Exchange edge was built and reverted
 (off-plan — do not clone `Stoplight`/`gaap` typestate shapes).
 
-**Phase 1 (in progress) — 182 contracts ported:** `iso_8601` (109,
-tier C), `extended` (48, ISO 8601-2 tier C), `rfc3339` (20, tier A —
-verbatim clauses + rfc-editor deep links). Remaining: rfc9557 (38),
-calconnect (61), interval (25), zone (21), instant (6), serialization
-(5), conversion (7). See `docs/AMENABLE_TIME_COVERAGE.md` for the live
-count.
+**Phase 1 complete — all 345 citation-only contracts ported as
+`Standard`s** with a real `TemporalProvenance` across 9 normative
+authorities: `iso_8601` (109) / `extended` (48) tier C; `rfc3339` (20) /
+`rfc9557` (38) / `zone` (21) tier A (verbatim RFC clauses + rfc-editor
+deep links); `calconnect` (61) tier B; `interval` (25) / `instant` (6) /
+`serialization` (5) / `conversion` (7) mixed. Directories where the
+500-LOC cap forced a split: `iso_8601/` ×6, `extended/` ×3, `rfc9557/`
+×3, `calconnect/` ×3. Next: Phase 2 (the 259 `types.rs` descriptors).
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.

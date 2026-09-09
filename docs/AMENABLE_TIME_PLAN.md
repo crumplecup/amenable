@@ -2,8 +2,10 @@
 
 ## Status
 
-🔲 Phase 0 complete (2026-09-08); Phase 1 starting. All 7 decisions
-settled. `crates/amenable_time` has the error layer, `provenance_vocab`,
+🔲 **Phase 1 complete (2026-09-08)** — all 345 citation-only contracts
+ported as `Standard`s with a real `TemporalProvenance`, across 9
+normative authorities; `just check-all-package amenable_time` clean.
+Next: Phase 2 (descriptors). All 7 decisions settled. `crates/amenable_time` has the error layer, `provenance_vocab`,
 `TemporalProvenance`, the `temporal_standard!` macro, `contracts::precision`
 (5 real contracts, 6 passing tests), `TemporalReporter`, and
 `TemporalComponent` / `SerializationProfile` — all faithful ports, `just
@@ -519,24 +521,37 @@ carrying a `TemporalProvenance` and an `EvidenceLink` registration works,
 proven by `contracts::precision`. No `Exchange` edge — exchanges are
 Phase 4. Everything after Phase 0 is the port at scale.
 
-### Phase 1 — all citation-only contracts as `Standard`s
+### Phase 1 — all citation-only contracts as `Standard`s — **done**
 
-- [ ] `contracts/iso_8601.rs` (109) — commit per logical group
-      (date / time / duration / week / ordinal / …).
-- [ ] `contracts/iso_8601_2.rs` + `extended.rs` (48).
-- [ ] `contracts/rfc3339.rs` (20).
-- [ ] `contracts/rfc9557.rs` (38).
-- [ ] `contracts/calconnect.rs` (61).
-- [ ] `contracts/interval.rs` (25).
-- [ ] `contracts/zone.rs` (21).
-- [ ] `contracts/instant.rs` (6).
-- [ ] `contracts/serialization.rs` (5).
-- [ ] `contracts/conversion.rs` (7).
-- [ ] cordial gate clean after each file; `just check-all amenable_time`.
+All 345 ported (`docs/AMENABLE_TIME_COVERAGE.md` for the per-module
+count). Directories where the 500-LOC cap forced a split
+(`iso_8601/` ×6, `extended/` ×3, `rfc9557/` ×3, `calconnect/` ×3).
 
-Phase 1 exit: ~345 `Standard`s registered, each with a real
-`TemporalProvenance`. No proofs yet. `just temporal-coverage` shows the
-`Standard ✓` column full.
+- [x] `contracts/iso_8601/` (109) — tier C, `ParaphraseOnly`.
+- [x] `contracts/extended/` (48, ISO 8601-2) — tier C; LOC EDTF + WD as
+      `cross_check`s.
+- [x] `contracts/rfc3339.rs` (20) — tier A, verbatim clauses + rfc-editor
+      deep links.
+- [x] `contracts/rfc9557/` (38) — tier A, verbatim.
+- [x] `contracts/calconnect/` (61) — tier B; `ParaphraseOnly` + CSD URL
+      for now (verbatim single-clause upgrade is a follow-on).
+- [x] `contracts/interval.rs` (25) — tier C.
+- [x] `contracts/zone.rs` (21) — tier A (RFC 9557), verbatim; IANA TZDB
+      naming as informative cross-check.
+- [x] `contracts/instant.rs` (6) — mixed tier.
+- [x] `contracts/serialization.rs` (5) — mixed tier.
+- [x] `contracts/conversion.rs` (7) — mixed tier.
+- [x] `just check-all-package amenable_time` clean after each group; a
+      per-module test spot-checks the tier discipline (ISO →
+      `ParaphraseOnly`, RFC → `Verbatim`).
+
+**Follow-ons noted, not blocking:** (1) the registry-wide
+tier-C-never-`Verbatim` gate — needs the `temporal_standard!` macro to
+register a `(name, body, quotation-kind)` tuple for a test to sweep;
+per-module spot-checks cover it meanwhile. (2) the re-export chore —
+enumerated `pub use` at three module levels; a wildcard-`pub use`
+carve-out for generated contract vocabularies would remove it.
+(3) `just temporal-coverage` — deferred to Phase 7.
 
 ### Phase 2 — descriptors as `Evidence` payloads
 
