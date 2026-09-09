@@ -18,6 +18,8 @@ capability queries).
 
 ## Contracts
 
+**Phase 1 complete — 345/345 citation-only contracts ported as `Standard`s.**
+
 | module (`elicit_temporal`) | count | ported | establish | kani | creusot | verus |
 |---|---:|:--:|:--:|:--:|:--:|:--:|
 | `contracts/precision` | 5 | ✅ 5/5 | — | — | — | — |
@@ -25,7 +27,7 @@ capability queries).
 | `contracts/extended` (ISO 8601-2) | 48 | ✅ 48/48 | — | — | — | — |
 | `contracts/rfc3339` | 20 | ✅ 20/20 (tier A — verbatim) | — | — | — | — |
 | `contracts/rfc9557` | 38 | ✅ 38/38 (tier A — verbatim) | — | — | — | — |
-| `contracts/calconnect` | 61 | — | — | — | — | — |
+| `contracts/calconnect` | 61 | ✅ 61/61 (tier B — ParaphraseOnly; verbatim upgrade deferred) | — | — | — | — |
 | `contracts/interval` | 25 | ✅ 25/25 | — | — | — | — |
 | `contracts/zone` | 21 | ✅ 21/21 (tier A — verbatim) | — | — | — | — |
 | `contracts/instant` | 6 | ✅ 6/6 | — | — | — | — |

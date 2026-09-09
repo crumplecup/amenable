@@ -9,6 +9,7 @@
 //! [`Evidence`](amenable_core::Evidence) in `contracts::proof_composition`
 //! (plan Phase 3).
 
+mod calconnect;
 mod conversion;
 mod extended;
 mod instant;
@@ -20,6 +21,49 @@ mod rfc9557;
 mod serialization;
 mod zone;
 
+pub use calconnect::{
+    ContextDependentDurationSemanticsDeclared, DateTimeFormulaCombinesTemporalValueWithDuration,
+    DateTimeFormulaEvaluationModeDeclared, DateTimeFormulaTruncatesAtComponentBoundaries,
+    DateTimeFormulaUsesCarryOverSemantics, ExactDurationSemanticsDeclared,
+    ExplicitDateTimeTimePortionMayBeReducedPrecision,
+    ExplicitDateTimeUsesDateThenTimeConcatenation,
+    ExplicitDateTimeWithShiftUsesDateTimeThenShiftConcatenation,
+    ExplicitDateWithShiftUsesDateThenShiftConcatenation,
+    ExplicitDurationCompositeRepresentationDeclared, ExplicitDurationMayBeNegative,
+    ExplicitDurationMayUseFractionalLowestOrderUnit,
+    ExplicitDurationPrecedenceRepresentationCarriesEvaluationOrder,
+    ExplicitDurationRepresentationKindDeclared, ExplicitDurationUsesDurationalUnitDesignators,
+    ExplicitTemporalFormMayOmitZeroValuedComponents, ExplicitTemporalFormUsesDesignatorSymbols,
+    ExplicitTemporalPrecisionUsesLowestDenotedComponent,
+    ExplicitTimeIntervalDurationSubstitutionInfersMissingBoundary,
+    ExplicitTimeIntervalLeadingShiftAppliesToTrailingComponentUnlessOverridden,
+    ExplicitTimeIntervalTrailingEndMayInheritHigherOrderComponents,
+    ExplicitTimeIntervalUsesDateTimeEndpointFamily, ExplicitTimeOfDayForbidsEndOfDayRepresentation,
+    ExplicitTimeOfDayUsesHourMinuteSecondUnitDesignators, ExplicitTimeOfDayUsesTimeDesignator,
+    ExplicitTimeOfDayWithShiftUsesTimeThenShiftConcatenation,
+    ExplicitTimeShiftBareZuluRepresentsUtcZero, ExplicitTimeShiftPayloadUsesExplicitTimeOfDay,
+    ExplicitTimeShiftUsesLeadingMinusOnlyWhenBehindUtc, ExplicitTimeShiftUsesZuluDesignator,
+    ExplicitUtcRelationshipUsesZuluOrSignedShift,
+    GroupedTimeScaleUnitCarriesOneOrMoreDurationUnits, GroupedTimeScaleUnitConvertsToTimeInterval,
+    GroupedTimeScaleUnitDateTimeMayCarryExplicitTimeShift,
+    GroupedTimeScaleUnitDefinitionIsContinuous,
+    GroupedTimeScaleUnitLowerOrderUnitsRemainWithinGroupBounds,
+    GroupedTimeScaleUnitTruncatesOutOfBoundsRemainder, GroupedTimeScaleUnitUsesGroupingDesignators,
+    GroupedTimeScaleUnitValueCarriesExplicitCoefficient,
+    RecurringIntervalWithRepeatRuleUsesCompleteRepresentation,
+    RepeatRuleDeclaresEligibleTimeIntervals,
+    RepeatRuleEvaluationInheritsInitialStartComponentInformation,
+    RepeatRuleSelectionAppliesWithinEligibleIntervals, RepeatRuleUsesFrequencyDesignator,
+    SelectionExpressionMaySelectSingleInstance,
+    SelectionExpressionUsesRecognizedSelectionRuleVocabulary,
+    SelectionExpressionUsesSelectionDelimiters, SelectionRuleDayOfMonthUsesDayExpression,
+    SelectionRuleHourUsesHourExpression, SelectionRuleMinuteUsesMinuteExpression,
+    SelectionRuleMonthUsesMonthExpression, SelectionRuleOrdinalDayOfYearUsesOrdinalDayExpression,
+    SelectionRulePositionAppliesLast, SelectionRulePositionUsesInstanceDesignatorSuffix,
+    SelectionRuleSecondUsesSecondExpression, SelectionRuleWeekDayUsesDayOfWeekExpression,
+    SelectionRuleWeekUsesWeekExpression, SelectionRulesApplyWithinSelectedResults,
+    SelectionWithDurationUsesDurationSuffix, SpeculativeDurationSemanticsDeclared,
+};
 pub use conversion::{
     ConversionDropsNamedZoneIdentity, ConversionDropsSubsecondPrecision,
     ConversionPreservesRepresentedInstant, ConversionPreservesTemporalOrdering,
