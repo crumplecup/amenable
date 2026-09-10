@@ -983,9 +983,18 @@ Contract worklist:
         the dated anchors — `100∣y ⟹ 4∣y` and the CRT split are nonlinear
         for an SMT backend, so they live on Kani only. Kani: `passed`.
         Creusot: `Proved (166 files) ✔`. Verus: `502 verified, 0 errors`.
-  - [ ] Year length: `LeapYearHasThreeHundredSixtySixCalendarDays`,
+  - [x] **Year length** (2026-09-10):
+        `LeapYearHasThreeHundredSixtySixCalendarDays`,
         `CommonYearHasThreeHundredSixtyFiveCalendarDays`,
         `YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays`.
+        Model `days_in_year(y) = if leap(y) {366} else {365}`, restricted to
+        `year >= 0`. Kani + Verus carry the full model (has-366 ⟺ leap,
+        has-365 ⟺ ¬leap, the count is always 365 or 366, a leap year is a
+        common year + one day, dated anchors). Creusot carries the
+        leap-predicate biconditionals — the day count lives only as an exec
+        local, no `Int`-typed logic fn. Verus reuses sub-batch A's
+        `gregorian_leap_year_holds` by cross-carrier import. Kani: `passed`.
+        Creusot: `Proved (169 files) ✔`. Verus: `505 verified, 0 errors`.
   - [ ] Month / day bounds: `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays`,
         `CalendarDayWithinMonthBounds`, `LeapDayOccursOnlyInLeapYear`.
 - [ ] The `proof_composition` aggregates whose leaves are now all proven

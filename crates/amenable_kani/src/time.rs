@@ -10,17 +10,35 @@ use amenable_core::Witness;
 use amenable_time::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
     CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+    CommonYearHasThreeHundredSixtyFiveCalendarDays,
     DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
     GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
-    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+    LeapYearHasThreeHundredSixtySixCalendarDays, MinuteInRangeZeroToFiftyNine,
     OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
     UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
     UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
     WeekdayInRangeOneToSeven,
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
 };
 
 use crate::rust_std::kani_ensures;
 use crate::{CalculationProof, KaniVerifier};
+
+/// The Gregorian leap-year rule (ISO 8601-1:2019, 3.1.1.21 note 1),
+/// shared by the year-length and month/day-bound harnesses.
+fn is_gregorian_leap_year(year: i32) -> bool {
+    year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+}
+
+/// A Gregorian calendar year is 366 days when a leap year, else 365.
+fn days_in_year(year: i32) -> i32 {
+    if is_gregorian_leap_year(year) {
+        366
+    } else {
+        365
+    }
+}
 
 // ── CalendarMonthInRangeOneToTwelve ──────────────────────────────────
 //
@@ -882,6 +900,180 @@ amenable_derive::harness! {
             assert!(centennial_of(1900), "1900 is centennial");
             assert!(centennial_of(2000), "2000 is centennial");
             assert!(!centennial_of(2024), "2024 is not centennial");
+        }
+    }
+}
+
+// ── LeapYearHasThreeHundredSixtySixCalendarDays ──────────────────
+
+impl Witness<KaniVerifier> for LeapYearHasThreeHundredSixtySixCalendarDays {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_leap_year_has_three_hundred_sixty_six_calendar_days".to_owned(),
+            VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays",
+        "kani",
+        || <LeapYearHasThreeHundredSixtySixCalendarDays as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    LeapYearHasThreeHundredSixtySixCalendarDays,
+    "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays::ensures",
+    i32,
+    |year| days_in_year(year) == 366
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 — a leap year contains 366 calendar days. Over every non-negative `i32`, `days_in_year(y) == 366` agrees with
+        /// `leap(y)`; a leap year is a common year plus one day; dated anchors.
+        #[kani::proof]
+        fn verify_leap_year_has_three_hundred_sixty_six_calendar_days() {
+            let year: i32 = kani::any();
+            kani::assume(year >= 0);
+
+            let has_366 = <LeapYearHasThreeHundredSixtySixCalendarDays as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures(year);
+
+            assert_eq!(has_366, is_gregorian_leap_year(year));
+            // A leap year is a common year plus exactly one day.
+            assert_eq!(
+                days_in_year(year) - 365,
+                if is_gregorian_leap_year(year) { 1 } else { 0 }
+            );
+
+            let has_366_of = |y: i32| {
+                <LeapYearHasThreeHundredSixtySixCalendarDays as ::amenable_core::Ensures<
+                    KaniVerifier,
+                >>::ensures(y)
+            };
+            assert!(has_366_of(2000), "2000 has 366 days");
+            assert!(has_366_of(2024), "2024 has 366 days");
+            assert!(!has_366_of(2023), "2023 has 365 days");
+            assert!(!has_366_of(1900), "1900 has 365 days");
+        }
+    }
+}
+
+// ── CommonYearHasThreeHundredSixtyFiveCalendarDays ──────────────────
+
+impl Witness<KaniVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_common_year_has_three_hundred_sixty_five_calendar_days".to_owned(),
+            VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays",
+        "kani",
+        || <CommonYearHasThreeHundredSixtyFiveCalendarDays as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays::ensures",
+    i32,
+    |year| days_in_year(year) == 365
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.20 — a common year contains 365 calendar days. Over every non-negative `i32`, `days_in_year(y) == 365` agrees with
+        /// `!leap(y)`; the two lengths are distinct; dated anchors.
+        #[kani::proof]
+        fn verify_common_year_has_three_hundred_sixty_five_calendar_days() {
+            let year: i32 = kani::any();
+            kani::assume(year >= 0);
+
+            let has_365 = <CommonYearHasThreeHundredSixtyFiveCalendarDays as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures(year);
+
+            assert_eq!(has_365, !is_gregorian_leap_year(year));
+            // 365 and 366 are the only two options, and they are distinct.
+            assert!((days_in_year(year) == 365) != (days_in_year(year) == 366));
+
+            let has_365_of = |y: i32| {
+                <CommonYearHasThreeHundredSixtyFiveCalendarDays as ::amenable_core::Ensures<
+                    KaniVerifier,
+                >>::ensures(y)
+            };
+            assert!(has_365_of(2023), "2023 has 365 days");
+            assert!(has_365_of(1900), "1900 has 365 days");
+            assert!(!has_365_of(2000), "2000 has 366 days");
+        }
+    }
+}
+
+// ── YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays ──────────────────
+
+impl Witness<KaniVerifier>
+    for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days".to_owned(),
+            VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays",
+        "kani",
+        || <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
+    "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays::ensures",
+    i32,
+    |year| (365..=366).contains(&days_in_year(year))
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
+        /// ISO 8601-1:2019, 2.2.14 — a year's duration is 365 or 366 calendar days. Over every non-negative `i32`, `days_in_year(y)` is always 365 or
+        /// 366 — the model is well-formed.
+        #[kani::proof]
+        fn verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days() {
+            let year: i32 = kani::any();
+            kani::assume(year >= 0);
+
+            let in_range = <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures(year);
+
+            // The model is well-formed: every year's length is 365 or 366.
+            assert!(in_range);
+            assert!(days_in_year(year) == 365 || days_in_year(year) == 366);
         }
     }
 }

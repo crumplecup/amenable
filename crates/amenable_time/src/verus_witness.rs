@@ -17,13 +17,16 @@ use derive_new::new;
 use crate::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
     CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+    CommonYearHasThreeHundredSixtyFiveCalendarDays,
     DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
     GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
-    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+    LeapYearHasThreeHundredSixtySixCalendarDays, MinuteInRangeZeroToFiftyNine,
     OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
     UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
     UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
     WeekdayInRangeOneToSeven,
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
 };
 
 /// Proof artifact naming an `amenable_verus` Verus spec function that
@@ -642,5 +645,114 @@ inventory::submit! {
         "amenable_time::CentennialYearDivisibleByOneHundred",
         "verus",
         || <CentennialYearDivisibleByOneHundred as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── LeapYearHasThreeHundredSixtySixCalendarDays ──────────────────
+
+const LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/leap_year_has_three_hundred_sixty_six_calendar_days_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for LeapYearHasThreeHundredSixtySixCalendarDays {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_leap_year_has_three_hundred_sixty_six_calendar_days",
+            LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for LeapYearHasThreeHundredSixtySixCalendarDays
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays",
+        "verus",
+        || <LeapYearHasThreeHundredSixtySixCalendarDays as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── CommonYearHasThreeHundredSixtyFiveCalendarDays ──────────────────
+
+const COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/common_year_has_three_hundred_sixty_five_calendar_days_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_common_year_has_three_hundred_sixty_five_calendar_days",
+            COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for CommonYearHasThreeHundredSixtyFiveCalendarDays
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays",
+        "verus",
+        || <CommonYearHasThreeHundredSixtyFiveCalendarDays as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays ──────────────────
+
+const YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_VERUS_SRC: &str =
+    include_str!("../../amenable_verus/src/time/year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_carrier.rs");
+
+impl amenable_core::Witness<VerusVerifier>
+    for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new("verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days", YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_VERUS_SRC)
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays",
+        "verus",
+        || <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }

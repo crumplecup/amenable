@@ -23,13 +23,16 @@ mod not_creusot_mirror {
         CalendarMonthInRangeOneToTwelve,
         CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
         CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+        CommonYearHasThreeHundredSixtyFiveCalendarDays,
         DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
         GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
-        IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+        IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+        LeapYearHasThreeHundredSixtySixCalendarDays, MinuteInRangeZeroToFiftyNine,
         OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
         UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
         UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
         WeekdayInRangeOneToSeven,
+        YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
     };
 
     use crate::CreusotVerifier;
@@ -39,9 +42,11 @@ mod not_creusot_mirror {
         CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
         CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC,
         CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_HOLDS_SRC,
+        COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_HOLDS_SRC,
         DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
         GREGORIAN_LEAP_YEAR_HOLDS_SRC, HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC,
         INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC, INTERVAL_START_PRECEDES_END_HOLDS_SRC,
+        LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC,
         MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
         ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_HOLDS_SRC,
         SECOND_IN_RANGE_ZERO_TO_SIXTY_HOLDS_SRC,
@@ -52,9 +57,11 @@ mod not_creusot_mirror {
         VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC,
         VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC,
         VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC,
+        VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC,
         VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC,
         VERIFY_GREGORIAN_LEAP_YEAR_SRC, VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC,
         VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, VERIFY_INTERVAL_START_PRECEDES_END_SRC,
+        VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC,
         VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
         VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC,
         VERIFY_SECOND_IN_RANGE_ZERO_TO_SIXTY_SRC,
@@ -63,7 +70,9 @@ mod not_creusot_mirror {
         VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC,
         VERIFY_WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_SRC,
         VERIFY_WEEKDAY_IN_RANGE_ONE_TO_SEVEN_SRC,
+        VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC,
         WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_HOLDS_SRC, WEEKDAY_IN_RANGE_ONE_TO_SEVEN_HOLDS_SRC,
+        YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC,
     };
 
     impl amenable_core::Witness<CreusotVerifier> for CalendarMonthInRangeOneToTwelve {
@@ -603,6 +612,103 @@ mod not_creusot_mirror {
             "creusot",
             || {
                 <CentennialYearDivisibleByOneHundred as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for LeapYearHasThreeHundredSixtySixCalendarDays {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_leap_year_has_three_hundred_sixty_six_calendar_days".to_owned(),
+                VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for LeapYearHasThreeHundredSixtySixCalendarDays {
+        type Input = i32;
+        type Bound = &'static str;
+
+        fn ensures(_year: i32) -> Self::Bound {
+            LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays",
+            "creusot",
+            || {
+                <LeapYearHasThreeHundredSixtySixCalendarDays as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_common_year_has_three_hundred_sixty_five_calendar_days".to_owned(),
+                VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
+        type Input = i32;
+        type Bound = &'static str;
+
+        fn ensures(_year: i32) -> Self::Bound {
+            COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays",
+            "creusot",
+            || {
+                <CommonYearHasThreeHundredSixtyFiveCalendarDays as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier>
+        for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+    {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days".to_owned(),
+                VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier>
+        for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+    {
+        type Input = i32;
+        type Bound = &'static str;
+
+        fn ensures(_year: i32) -> Self::Bound {
+            YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays",
+            "creusot",
+            || {
+                <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
             },
         )
     }
@@ -1162,6 +1268,127 @@ amenable_derive::harness! {
         #[ensures(centennial_year_divisible_by_one_hundred_holds(year, result))]
         fn check_centennial_year_divisible_by_one_hundred(year: i32) -> bool {
             year % 100 == 0
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, IS_GREGORIAN_LEAP_YEAR_SRC, {
+        /// The Gregorian leap-year rule (ISO 8601-1:2019, 3.1.1.21 note 1),
+        /// shared by the year-length and month/day-bound checks.
+        #[logic(open)]
+        pub fn is_gregorian_leap_year(year: i32) -> bool {
+            pearlite! { year@ % 4 == 0 && (year@ % 100 != 0 || year@ % 400 == 0) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::is_gregorian_leap_year",
+        "creusot",
+        "logic",
+        || IS_GREGORIAN_LEAP_YEAR_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 — a leap year contains 366 calendar days: the outcome equals `year` being a leap year (a leap year has 366 days).
+        #[logic(open)]
+        pub fn leap_year_has_three_hundred_sixty_six_calendar_days_holds(year: i32, outcome: bool) -> bool {
+            pearlite! { outcome == is_gregorian_leap_year(year) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::leap_year_has_three_hundred_sixty_six_calendar_days_holds",
+        "creusot",
+        "ensures",
+        || LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
+        /// The exec year-length check equals `year` being a leap year, for every non-negative `i32`.
+        #[requires(year@ >= 0)]
+        #[ensures(leap_year_has_three_hundred_sixty_six_calendar_days_holds(year, result))]
+        #[ensures(is_gregorian_leap_year(year) == result)]
+        fn check_leap_year_has_three_hundred_sixty_six_calendar_days(year: i32) -> bool {
+            let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
+            days == 366
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.20 — a common year contains 365 calendar days: the outcome equals `year` not being a leap year (a common year has 365 days).
+        #[logic(open)]
+        pub fn common_year_has_three_hundred_sixty_five_calendar_days_holds(year: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (!is_gregorian_leap_year(year)) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::common_year_has_three_hundred_sixty_five_calendar_days_holds",
+        "creusot",
+        "ensures",
+        || COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC, {
+        /// The exec year-length check equals `year` not being a leap year, for every non-negative `i32`.
+        #[requires(year@ >= 0)]
+        #[ensures(common_year_has_three_hundred_sixty_five_calendar_days_holds(year, result))]
+        #[ensures(is_gregorian_leap_year(year) ==> !result)]
+        fn check_common_year_has_three_hundred_sixty_five_calendar_days(year: i32) -> bool {
+            let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
+            days == 365
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 2.2.14 — a year's duration is 365 or 366 calendar days: the outcome always holds — the length is 365 or 366.
+        #[logic(open)]
+        pub fn year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds(_year: i32, outcome: bool) -> bool {
+            pearlite! { outcome }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds",
+        "creusot",
+        "ensures",
+        || YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
+        /// The exec year-length check is always in `365..=366`, for every non-negative `i32`.
+        #[requires(year@ >= 0)]
+        #[ensures(year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds(year, result))]
+        #[ensures(is_gregorian_leap_year(year) ==> result)]
+        #[ensures(!is_gregorian_leap_year(year) ==> result)]
+        fn check_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days(year: i32) -> bool {
+            let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
+            days >= 365 && days <= 366
         }
     }
 }

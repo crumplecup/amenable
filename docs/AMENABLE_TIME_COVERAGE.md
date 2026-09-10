@@ -142,6 +142,9 @@ the generated `new`).
 | `UtcTimelineOrderingAppliesToFixedInstants` | `<=` on `i32` timeline positions is a total order — reflexive, antisymmetric, total, transitive | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
 | `GregorianLeapYearUsesDivisibleByFourAndFourHundredException` | Kani: `y%4 && (y%100 \|\| y%400)` agrees over every `i32` with the centennial case split + 6 dated anchors. Verus/Creusot: definitional + `leap(y) ⟹ 4∣y` (+ Verus anchors) | ✅ passed | ✅ Proved (166 files) | ✅ 502 verified |
 | `CentennialYearDivisibleByOneHundred` | Kani: `y%100==0` agrees over every `i32` with `y%4==0 && y%25==0` + anchors. Verus: definitional + anchors. Creusot: definitional | ✅ passed | ✅ Proved (166 files) | ✅ 502 verified |
+| `LeapYearHasThreeHundredSixtySixCalendarDays` | over `y ≥ 0`: `days_in_year(y) == 366` ⟺ `leap(y)`; a leap year is a common year + 1 day; count always 365/366 (Creusot: leap-predicate biconditional only) | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
+| `CommonYearHasThreeHundredSixtyFiveCalendarDays` | over `y ≥ 0`: `days_in_year(y) == 365` ⟺ `!leap(y)`; the two lengths are distinct (Creusot: leap-predicate biconditional only) | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
+| `YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays` | over `y ≥ 0`: `days_in_year(y)` is always 365 or 366 — the model is well-formed | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
 
 Some contracts prove different depths on different backends — the
 number theory that is nonlinear for an SMT solver (Verus, Creusot) is

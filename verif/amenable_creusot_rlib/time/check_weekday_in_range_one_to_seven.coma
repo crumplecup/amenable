@@ -1,16 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 844 8 844 67 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 950 8 950 67 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 845 23 845 26
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 845 41 845 44
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 845 12 845 44
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 842 19 842 23
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 843 18 843 70
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 824 24 824 159
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 951 23 951 26
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 951 41 951 44
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 951 12 951 44
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 948 19 948 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 949 18 949 70
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 930 24 930 159
 
 use creusot.int.UInt8
 use creusot.prelude.Any
 
-predicate weekday_in_range_one_to_seven_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 823 8 823 86] (weekday: UInt8.t) (outcome: bool) =
+predicate weekday_in_range_one_to_seven_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 929 8 929 86] (weekday: UInt8.t) (outcome: bool) =
   [%#stime'4] outcome
   = (weekday = (1: UInt8.t)
   \/ weekday = (2: UInt8.t)
@@ -21,7 +21,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_weekday_in_range_one_to_seven [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 844 8 844 67]
+let check_weekday_in_range_one_to_seven [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 950 8 950 67]
   (weekday: UInt8.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- UInt8.ge weekday ([%#stime] (1: UInt8.t)) ] s1

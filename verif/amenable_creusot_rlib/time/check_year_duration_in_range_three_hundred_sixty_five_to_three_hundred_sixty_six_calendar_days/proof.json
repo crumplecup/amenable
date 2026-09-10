@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days": {
+        "prover": "alt-ergo",
+        "time": 0.059
+      }
+    }
+  }
+}

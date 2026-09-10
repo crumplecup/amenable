@@ -1,25 +1,25 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1100 8 1100 96 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1206 8 1206 96 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1094 19 1094 23
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1095 18 1095 85
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1096 18 1096 83
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1097 18 1097 38
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1098 18 1098 51
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1099 18 1099 51
-let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1076 24 1076 55
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1200 19 1200 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1201 18 1201 85
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1202 18 1202 83
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1203 18 1203 38
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1204 18 1204 51
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1205 18 1205 51
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1182 24 1182 55
 
 use creusot.int.Int32
 use creusot.prelude.Any
 use int.Int
 
-predicate utc_timeline_ordering_applies_to_fixed_instants_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1075 8 1075 117] (earlier: Int32.t) (later: Int32.t) (outcome: bool) =
+predicate utc_timeline_ordering_applies_to_fixed_instants_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1181 8 1181 117] (earlier: Int32.t) (later: Int32.t) (outcome: bool) =
   [%#stime'5] outcome = (Int32.to_int earlier <= Int32.to_int later)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_utc_timeline_ordering_applies_to_fixed_instants [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1100 8 1100 96]
+let check_utc_timeline_ordering_applies_to_fixed_instants [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1206 8 1206 96]
   (a: Int32.t) (b: Int32.t) (c: Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int32.le a b ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & a: Int32.t = a | & b: Int32.t = b ])

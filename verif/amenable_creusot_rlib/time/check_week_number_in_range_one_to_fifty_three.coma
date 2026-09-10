@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 875 8 875 74 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 981 8 981 74 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 876 20 876 23
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 876 35 876 39
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 876 12 876 39
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 873 19 873 23
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 874 18 874 77
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 855 24 855 63
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 982 20 982 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 982 35 982 39
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 982 12 982 39
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 979 19 979 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 980 18 980 77
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 961 24 961 63
 
 use creusot.int.UInt8
 use creusot.prelude.Any
@@ -15,14 +15,14 @@ predicate ge_log_u8 [@inline:trivial] (self: UInt8.t) (other: UInt8.t) = [%#sord
 
 meta "rewrite_def" predicate ge_log_u8
 
-predicate week_number_in_range_one_to_fifty_three_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 854 8 854 93] (week: UInt8.t) (outcome: bool) =
+predicate week_number_in_range_one_to_fifty_three_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 960 8 960 93] (week: UInt8.t) (outcome: bool) =
   [%#stime'4] outcome = (ge_log_u8 week (1: UInt8.t) /\ UInt8.lt week (54: UInt8.t))
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_week_number_in_range_one_to_fifty_three [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 875 8 875 74]
+let check_week_number_in_range_one_to_fifty_three [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 981 8 981 74]
   (week: UInt8.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- UInt8.ge week ([%#stime] (1: UInt8.t)) ] s1

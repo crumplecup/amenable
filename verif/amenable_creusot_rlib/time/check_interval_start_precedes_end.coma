@@ -1,17 +1,17 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1032 8 1032 74 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1138 8 1138 74 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1028 19 1028 23
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1029 18 1029 71
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1030 18 1030 54
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1031 18 1031 58
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1010 24 1010 51
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1134 19 1134 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1135 18 1135 71
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1136 18 1136 54
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1137 18 1137 58
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1116 24 1116 51
 
 use creusot.int.Int32
 use creusot.prelude.Any
 use int.Int
 
-predicate interval_start_precedes_end_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1009 8 1009 93] (start: Int32.t) (end': Int32.t) (outcome: bool) =
+predicate interval_start_precedes_end_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1115 8 1115 93] (start: Int32.t) (end': Int32.t) (outcome: bool) =
   [%#stime'3] outcome = (Int32.to_int start <= Int32.to_int end')
 
 predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
@@ -22,7 +22,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_interval_start_precedes_end [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1032 8 1032 74]
+let check_interval_start_precedes_end [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1138 8 1138 74]
   (start: Int32.t) (end': Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int32.le start end' ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & start: Int32.t = start | & end': Int32.t = end' ])
