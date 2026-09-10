@@ -174,13 +174,20 @@ composite's `WitnessSupportSummary` reports the breakdown. Asserted by
 ## Canary backend
 
 `amenable_time::backends::std_time` implements the temporal trait surface
-against real `std::time` types with a `CanaryVerifier` that proves
-nothing — an interface-drift tripwire, not a usable backend. Coverage:
-`TemporalDurationProps` / `TemporalInstantProps` / `TemporalReporter`, and
-`TemporalIntervalFactory<CanaryVerifier>` (one real exchange,
-`order_offset_endpoints`; the three ISO-8601-parse edges report
-unsupported). Calendar, week/ordinal dates, zones, parsing and formatting
-are out of scope — those need a date-time library (`jiff` / `chrono`).
+against real `std::time` types — an interface-drift tripwire *and* a
+runtime oracle over the slice it covers, not a usable backend.
+`CanaryVerifier` runs no formal tool, but the `Exchange` bodies execute
+the contracts: `order_offset_endpoints` resolves both endpoints to epoch
+seconds through real Gregorian calendar arithmetic and returns `Err` for a
+reversed interval; the `TemporalDurationNativeBridge` realize/reflect pair
+round-trips a span through an actual `std::time::Duration` and rejects
+year/month components. Coverage: `TemporalDurationProps` /
+`TemporalInstantProps` / `TemporalReporter`,
+`TemporalIntervalFactory<CanaryVerifier>` (real `order_offset_endpoints`;
+the three ISO-8601-parse edges report unsupported), and
+`TemporalDurationNativeBridge<CanaryVerifier>`. Calendar/week/ordinal
+dates, zones, parsing and formatting are out of scope — those need a
+date-time library (`jiff` / `chrono`).
 
 ## Licensing gate
 

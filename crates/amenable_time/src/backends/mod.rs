@@ -9,12 +9,22 @@
 //!
 //! [`std_time`] is a **canary**, not a usable backend: it implements only
 //! the slice of the interface that `std::time::{Duration, SystemTime}`
-//! can honestly back — durations, fixed instants, and endpoint ordering —
-//! against a [`CanaryVerifier`](std_time::CanaryVerifier) that proves
-//! nothing. Its purpose is to catch interface breakage at `cargo check`
-//! time. Real coverage (calendar dates, week/ordinal dates, time zones,
-//! ISO 8601 / RFC 3339 parsing and formatting) needs a date-time library;
-//! a `jiff` (or `chrono`) backend module would sit alongside this one.
+//! can honestly back — durations, fixed instants, and endpoint ordering.
+//! Two things make it a useful canary rather than a stub:
+//!
+//! - the trait-bound assertions in `tests/std_backend_test.rs`
+//!   (`StdTimeBackend: TemporalIntervalFactory<CanaryVerifier>`, …) fail
+//!   to compile if the interface drifts;
+//! - its `Exchange` bodies *execute* the contracts — `order_offset_endpoints`
+//!   resolves both endpoints through real Gregorian calendar arithmetic
+//!   and returns `Err` for a reversed interval; the duration bridge
+//!   round-trips a span through an actual `std::time::Duration` and
+//!   rejects year/month components. It is a runtime oracle against the
+//!   formal backends over the slice it covers.
+//!
+//! Real coverage of the rest (week/ordinal dates, time zones, ISO 8601 /
+//! RFC 3339 parsing and formatting) needs a date-time library; a `jiff`
+//! (or `chrono`) backend module would sit alongside this one.
 
 mod std_time;
 

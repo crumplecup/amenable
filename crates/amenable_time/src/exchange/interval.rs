@@ -12,7 +12,15 @@ use crate::{
 
 /// Descriptors the `order_offset_endpoints` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    derive_new::new,
 )]
 #[evidence(basis = "Self")]
 pub struct OrderOffsetEndpointsRequest {

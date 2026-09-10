@@ -1038,21 +1038,32 @@ Contract worklist:
 - [ ] `TemporalReporter` → `Amenable::*_surface()` + `RegistryReport`.
 - [ ] `just temporal-coverage` — the umbrella report: per contract,
       which backends prove it, which are citation-only.
-- [~] **`std::time` canary backend** (2026-09-10):
-      `amenable_time::backends::std_time`. `StdTimeBackend` + a
-      `CanaryVerifier` that proves nothing, implementing only the slice
+- [x] **`std::time` canary backend** (2026-09-10):
+      `amenable_time::backends::std_time`. `StdTimeBackend` +
+      `CanaryVerifier` (runs no formal tool), implementing the slice
       `std::time::{Duration, SystemTime}` can honestly back —
       `TemporalDurationProps` / `TemporalInstantProps` on `StdDuration` /
       `StdSystemTime` / `StdUtcOffset`, `TemporalReporter` (the honest
-      capability set: no leap seconds, no zones, no 24:00, `Some(9)`
-      fractional digits), and the four `TemporalIntervalFactory` exchanges
-      — `order_offset_endpoints` real (full sidecar / `Establish` loop),
-      the three ISO-8601-parse edges lawful `Exchange`s that report the
-      operation unsupported. `tests/std_backend_test.rs` asserts
-      `StdTimeBackend: TemporalIntervalFactory<CanaryVerifier>` compiles
-      (the canary) and round-trips one exchange. A `jiff` / `chrono`
-      backend module alongside it would add calendar / zone / parse /
-      format coverage; that is not this.
+      capability set: no leap seconds / zones / 24:00, `Some(9)` fractional
+      digits), the four `TemporalIntervalFactory` exchanges, and the
+      `TemporalDurationNativeBridge` realize/reflect pair. It is a runtime
+      oracle, not a stub: `order_offset_endpoints` resolves both endpoints
+      to epoch seconds through real Gregorian calendar arithmetic
+      (`days_from_civil`) and **returns `Err` for a reversed interval** —
+      an executed `IntervalEndpointsOrdered`; the duration bridge
+      round-trips a span through an actual `std::time::Duration` and
+      rejects year/month components. The three ISO-8601-parse edges are
+      lawful `Exchange`s reporting the operation unsupported.
+      `tests/std_backend_test.rs` (8 tests): the
+      `TemporalIntervalFactory<CanaryVerifier>` /
+      `TemporalDurationNativeBridge<CanaryVerifier>` compile assertions +
+      accept-ordered / reject-reversed / offset-normalisation /
+      duration-round-trip / reject-`P1Y`. Canary finding: the exchange
+      `*Request` primaries had no public constructor —
+      `OrderOffsetEndpointsRequest` gained `derive_new::new`; the other
+      `*Request` types still need the same. A `jiff` / `chrono` backend
+      module alongside this one would add calendar / zone / parse / format
+      coverage.
 - [ ] `tests/` coverage (house rule: no inline `#[cfg(test)]`).
 - [ ] README + module docs as user guide (memory
       `feedback_follow_claudemd_while_writing_not_after` — docs as we go,
