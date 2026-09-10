@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1105 8 1105 105 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1208 8 1208 105 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1106 20 1106 27
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1103 19 1103 23
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1104 18 1104 107
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1085 24 1085 52
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1209 20 1209 27
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1206 19 1206 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1207 18 1207 107
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1188 24 1188 52
 
 use creusot.int.UInt16
 use creusot.prelude.Any
 
-predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1084 8 1084 124] (year: UInt16.t) (outcome: bool) =
+predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1187 8 1187 124] (year: UInt16.t) (outcome: bool) =
   [%#stime'2] outcome = UInt16.lt year (10000: UInt16.t)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1105 8 1105 105]
+let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1208 8 1208 105]
   (year: UInt16.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- UInt16.le year ([%#stime] (9999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & year: UInt16.t = year ])

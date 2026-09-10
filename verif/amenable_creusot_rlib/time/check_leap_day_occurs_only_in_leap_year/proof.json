@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_leap_day_occurs_only_in_leap_year": {
+        "prover": "alt-ergo",
+        "time": 0.113
+      }
+    }
+  }
+}

@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1043 8 1043 82 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1146 8 1146 82 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1044 23 1044 27
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1041 19 1041 23
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1042 18 1042 85
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1023 24 1023 52
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1147 23 1147 27
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1144 19 1144 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1145 18 1145 85
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1126 24 1126 52
 
 use creusot.int.UInt8
 use creusot.prelude.Any
 
-predicate century_ordinal_in_range_zero_to_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1022 8 1022 101] (ordinal: UInt8.t) (outcome: bool) =
+predicate century_ordinal_in_range_zero_to_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1125 8 1125 101] (ordinal: UInt8.t) (outcome: bool) =
   [%#stime'2] outcome = UInt8.lt ordinal (100: UInt8.t)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_century_ordinal_in_range_zero_to_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1043 8 1043 82]
+let check_century_ordinal_in_range_zero_to_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1146 8 1146 82]
   (ordinal: UInt8.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- UInt8.le ordinal ([%#stime] (99: UInt8.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & ordinal: UInt8.t = ordinal ])

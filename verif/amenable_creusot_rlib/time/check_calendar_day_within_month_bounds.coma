@@ -1,0 +1,157 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1569 8 1569 88 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1570 38 1570 39
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 26 1571 27
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 19 1571 27
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 31 1571 32
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 44 1571 47
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 37 1571 47
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 51 1571 52
+let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 63 1571 66
+let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 56 1571 66
+let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 70 1571 71
+let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 75 1571 77
+let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 87 1571 89
+let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 31 1572 32
+let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 45 1572 46
+let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 59 1572 60
+let%span stime'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 73 1572 75
+let%span stime'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1573 16 1573 18
+let%span stime'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1575 16 1575 18
+let%span stime'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1577 19 1577 20
+let%span stime'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1577 12 1577 34
+let%span stime'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1566 19 1566 46
+let%span stime'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1567 18 1567 82
+let%span stime'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1568 18 1568 86
+let%span stime'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1542 24 1548 15
+let%span stime'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1384 24 1384 80
+
+use creusot.int.UInt8
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.ComputerDivision
+use int.Int
+
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate is_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1383 8 1383 56] (year: Int32.t) =
+  [%#stime'23] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+
+predicate calendar_day_within_month_bounds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1541 8 1541 107] (year: Int32.t) (month: UInt8.t) (day: UInt8.t) (outcome: bool) =
+  [%#stime'22] outcome
+  = (ge_log_Int (UInt8.t'int day) 1
+  /\ UInt8.t'int day
+  <= (if UInt8.t'int month = 2 then
+    if is_gregorian_leap_year year then 29 else 28
+  else
+    if UInt8.t'int month = 4 \/ UInt8.t'int month = 6 \/ UInt8.t'int month = 9 \/ UInt8.t'int month = 11 then 30 else 31
+  ))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_calendar_day_within_month_bounds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1569 8 1569 88]
+  (year: Int32.t) (month: UInt8.t) (day: UInt8.t) (return (x: bool)) =
+{[@stop_split] [@expl:check_calendar_day_within_month_bounds requires] [%#stime'19] ge_log_Int (UInt8.t'int month) 1
+  /\ UInt8.t'int month <= 12}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_15 <- month = ([%#stime] (2: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_15 = false} (! bb17) | br1 -> {_15} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = [ &_19 <- year ] s1
+    | s1 = [ &_20 <- ([%#stime'0] (4: Int32.t)) = ([%#stime'1] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'1] not _20} s3
+    | s3 = [ &_21 <- ([%#stime'0] (4: Int32.t)) = ([%#stime'1] (-1: Int32.t)) ] s4
+    | s4 = [ &_22 <- _19 = ([%#stime'1] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_23 <- Bool.bw_and _21 _22 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'1] not _23} s7
+    | s7 = Int32.rem [%#stime'1] {_19} {[%#stime'0] (4: Int32.t)} (fun (_x: Int32.t) -> [ &_18 <- _x ] s8)
+    | s8 = [ &_17 <- _18 = ([%#stime'2] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_17 = false} (! bb15) | br1 -> {_17} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = [ &_26 <- year ] s1
+    | s1 = [ &_27 <- ([%#stime'3] (100: Int32.t)) = ([%#stime'4] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'4] not _27} s3
+    | s3 = [ &_28 <- ([%#stime'3] (100: Int32.t)) = ([%#stime'4] (-1: Int32.t)) ] s4
+    | s4 = [ &_29 <- _26 = ([%#stime'4] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_30 <- Bool.bw_and _28 _29 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'4] not _30} s7
+    | s7 = Int32.rem [%#stime'4] {_26} {[%#stime'3] (100: Int32.t)} (fun (_x: Int32.t) -> [ &_25 <- _x ] s8)
+    | s8 = [ &_24 <- _25 <> ([%#stime'5] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_24 = false} (! bb8) | br1 -> {_24} (! bb12) ] ]
+  | bb8 = s0
+    [ s0 = [ &_33 <- year ] s1
+    | s1 = [ &_34 <- ([%#stime'6] (400: Int32.t)) = ([%#stime'7] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'7] not _34} s3
+    | s3 = [ &_35 <- ([%#stime'6] (400: Int32.t)) = ([%#stime'7] (-1: Int32.t)) ] s4
+    | s4 = [ &_36 <- _33 = ([%#stime'7] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_37 <- Bool.bw_and _35 _36 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'7] not _37} s7
+    | s7 = Int32.rem [%#stime'7] {_33} {[%#stime'6] (400: Int32.t)} (fun (_x: Int32.t) -> [ &_32 <- _x ] s8)
+    | s8 = [ &_31 <- _32 = ([%#stime'8] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_31 = false} (! bb15) | br1 -> {_31} (! bb12) ] ]
+  | bb12 = s0 [ s0 = [ &dim <- [%#stime'9] (29: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb15 = s0 [ s0 = [ &dim <- [%#stime'10] (28: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb17 = s0
+    [ s0 = [ &_38 <- month = ([%#stime'11] (4: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_38 = false} (! bb19) | br1 -> {_38} (! bb25) ] ]
+  | bb19 = s0
+    [ s0 = [ &_40 <- month = ([%#stime'12] (6: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_40 = false} (! bb21) | br1 -> {_40} (! bb25) ] ]
+  | bb21 = s0
+    [ s0 = [ &_42 <- month = ([%#stime'13] (9: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_42 = false} (! bb23) | br1 -> {_42} (! bb25) ] ]
+  | bb23 = s0
+    [ s0 = [ &_44 <- month = ([%#stime'14] (11: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_44 = false} (! bb26) | br1 -> {_44} (! bb25) ] ]
+  | bb25 = s0 [ s0 = [ &dim <- [%#stime'15] (30: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb26 = s0 [ s0 = [ &dim <- [%#stime'16] (31: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb28 = s0
+    [ s0 = [ &_46 <- UInt8.ge day ([%#stime'17] (1: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_46 = false} (! bb30) | br1 -> {_46} (! bb29) ] ]
+  | bb29 = s0 [ s0 = [ &_ret <- UInt8.le day dim ] s1 | s1 = return {_ret} ]
+  | bb30 = s0 [ s0 = [ &_ret <- [%#stime'18] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & month: UInt8.t = month
+  | & day: UInt8.t = day
+  | & dim: UInt8.t = Any.any_l ()
+  | & _15: bool = Any.any_l ()
+  | & _17: bool = Any.any_l ()
+  | & _18: Int32.t = Any.any_l ()
+  | & _19: Int32.t = Any.any_l ()
+  | & _20: bool = Any.any_l ()
+  | & _21: bool = Any.any_l ()
+  | & _22: bool = Any.any_l ()
+  | & _23: bool = Any.any_l ()
+  | & _24: bool = Any.any_l ()
+  | & _25: Int32.t = Any.any_l ()
+  | & _26: Int32.t = Any.any_l ()
+  | & _27: bool = Any.any_l ()
+  | & _28: bool = Any.any_l ()
+  | & _29: bool = Any.any_l ()
+  | & _30: bool = Any.any_l ()
+  | & _31: bool = Any.any_l ()
+  | & _32: Int32.t = Any.any_l ()
+  | & _33: Int32.t = Any.any_l ()
+  | & _34: bool = Any.any_l ()
+  | & _35: bool = Any.any_l ()
+  | & _36: bool = Any.any_l ()
+  | & _37: bool = Any.any_l ()
+  | & _38: bool = Any.any_l ()
+  | & _40: bool = Any.any_l ()
+  | & _42: bool = Any.any_l ()
+  | & _44: bool = Any.any_l ()
+  | & _46: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_calendar_day_within_month_bounds ensures] ([@stop_split] [@expl:check_calendar_day_within_month_bounds ensures #0] [%#stime'20] calendar_day_within_month_bounds_holds year month day result)
+    /\ ([@stop_split] [@expl:check_calendar_day_within_month_bounds ensures #1] [%#stime'21] UInt8.t'int month = 2
+      /\ UInt8.t'int day = 29 /\ result -> is_gregorian_leap_year year)}
+    (! return {result}) ]

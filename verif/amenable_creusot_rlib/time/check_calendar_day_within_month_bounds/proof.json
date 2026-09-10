@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_calendar_day_within_month_bounds": {
+        "prover": "alt-ergo",
+        "time": 0.184
+      }
+    }
+  }
+}

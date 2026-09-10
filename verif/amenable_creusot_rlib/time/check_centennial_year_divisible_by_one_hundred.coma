@@ -1,25 +1,25 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1269 8 1269 76 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1372 8 1372 76 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1270 19 1270 22
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1270 12 1270 22
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1270 26 1270 27
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1267 19 1267 23
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1268 18 1268 78
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1249 24 1249 53
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1373 19 1373 22
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1373 12 1373 22
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1373 26 1373 27
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1370 19 1370 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1371 18 1371 78
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1352 24 1352 53
 
 use creusot.int.Int32
 use creusot.prelude.Bool
 use creusot.prelude.Any
 use int.ComputerDivision
 
-predicate centennial_year_divisible_by_one_hundred_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1248 8 1248 95] (year: Int32.t) (outcome: bool) =
+predicate centennial_year_divisible_by_one_hundred_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1351 8 1351 95] (year: Int32.t) (outcome: bool) =
   [%#stime'4] outcome = (ComputerDivision.mod (Int32.to_int year) 100 = 0)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_centennial_year_divisible_by_one_hundred [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1269 8 1269 76]
+let check_centennial_year_divisible_by_one_hundred [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1372 8 1372 76]
   (year: Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_6 <- year ] s1

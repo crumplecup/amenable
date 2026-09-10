@@ -636,6 +636,7 @@ amenable_kani::stoplight::verify_full_cycle_composes,1788637936,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788637946,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788637957,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788637967,passed
+amenable_kani::time::verify_calendar_day_within_month_bounds,1789068200,passed
 amenable_kani::time::verify_calendar_month_in_range,1788994320,passed
 amenable_kani::time::verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine,1789013387,passed
 amenable_kani::time::verify_centennial_year_divisible_by_one_hundred,1789064128,passed
@@ -646,8 +647,10 @@ amenable_kani::time::verify_gregorian_leap_year,1789064117,passed
 amenable_kani::time::verify_hour_in_range_zero_to_twenty_four,1789004870,passed
 amenable_kani::time::verify_interval_duration_is_non_negative,1789058588,passed
 amenable_kani::time::verify_interval_start_precedes_end,1789058579,passed
+amenable_kani::time::verify_leap_day_occurs_only_in_leap_year,1789068270,passed
 amenable_kani::time::verify_leap_year_has_three_hundred_sixty_six_calendar_days,1789067109,passed
 amenable_kani::time::verify_minute_in_range_zero_to_fifty_nine,1789004879,passed
+amenable_kani::time::verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days,1789068178,passed
 amenable_kani::time::verify_ordinal_day_in_range_one_to_three_hundred_sixty_six,1789013362,passed
 amenable_kani::time::verify_second_in_range_zero_to_sixty,1789004889,passed
 amenable_kani::time::verify_utc_offset_hour_in_range_zero_to_twenty_three,1789004898,passed

@@ -5,6 +5,7 @@
 //! so `amenable_time::verus_witness` can `include_str!` a single file as
 //! that contract's whole `claim`.
 
+mod calendar_day_within_month_bounds_carrier;
 mod calendar_month_carrier;
 mod calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_carrier;
 mod centennial_year_divisible_by_one_hundred_carrier;
@@ -15,8 +16,10 @@ mod gregorian_leap_year_carrier;
 mod hour_in_range_zero_to_twenty_four_carrier;
 mod interval_duration_is_non_negative_carrier;
 mod interval_start_precedes_end_carrier;
+mod leap_day_occurs_only_in_leap_year_carrier;
 mod leap_year_has_three_hundred_sixty_six_calendar_days_carrier;
 mod minute_in_range_zero_to_fifty_nine_carrier;
+mod month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_carrier;
 mod ordinal_day_in_range_one_to_three_hundred_sixty_six_carrier;
 mod second_in_range_zero_to_sixty_carrier;
 mod utc_offset_hour_in_range_zero_to_twenty_three_carrier;
@@ -85,3 +88,18 @@ pub use common_year_has_three_hundred_sixty_five_calendar_days_carrier::common_y
 pub use year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_carrier::verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days;
 #[cfg(verus_keep_ghost)]
 pub use year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_carrier::year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds;
+pub use month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_carrier::verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days;
+#[cfg(verus_keep_ghost)]
+pub use month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_carrier::month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds;
+pub use calendar_day_within_month_bounds_carrier::verify_calendar_day_within_month_bounds;
+#[cfg(verus_keep_ghost)]
+pub use calendar_day_within_month_bounds_carrier::calendar_day_within_month_bounds_holds;
+pub use leap_day_occurs_only_in_leap_year_carrier::verify_leap_day_occurs_only_in_leap_year;
+#[cfg(verus_keep_ghost)]
+pub use leap_day_occurs_only_in_leap_year_carrier::leap_day_occurs_only_in_leap_year_holds;
+#[cfg(verus_keep_ghost)]
+pub use leap_year_has_three_hundred_sixty_six_calendar_days_carrier::days_in_year;
+#[cfg(verus_keep_ghost)]
+pub use month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_carrier::{
+    days_in_month, valid_calendar_day,
+};

@@ -995,8 +995,20 @@ Contract worklist:
         local, no `Int`-typed logic fn. Verus reuses sub-batch A's
         `gregorian_leap_year_holds` by cross-carrier import. Kani: `passed`.
         Creusot: `Proved (169 files) ✔`. Verus: `505 verified, 0 errors`.
-  - [ ] Month / day bounds: `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays`,
+  - [x] **Month / day bounds** (2026-09-10):
+        `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays`,
         `CalendarDayWithinMonthBounds`, `LeapDayOccursOnlyInLeapYear`.
+        Model `days_in_month(y, m)` (m∈1..=12; Feb → 29 if leap else 28),
+        `valid_calendar_day(y,m,d) = 1 ≤ d ≤ days_in_month`. Kani + Verus
+        carry the full model: the duration is always 28..=31, each length
+        characterised exactly, **the twelve months sum to
+        `days_in_year(y)`** (closes the loop with the year-length batch),
+        a valid February 29 forces a leap year, and Feb 29 is a valid
+        calendar date exactly in a leap year; plus dated anchors. Creusot
+        carries the definitional bounds check (the day count as an inline
+        pearlite `if`-expr, no `Int` logic fn) + the Feb-29 ⟹ leap
+        implication. Kani: `passed`. Creusot: `Proved (172 files) ✔`.
+        Verus: `508 verified, 0 errors`.
 - [ ] The `proof_composition` aggregates whose leaves are now all proven
       → composed `Witness<V>` conjunctions (real, not tautological).
 - [ ] Each real proof: injected-regression check per backend (memory

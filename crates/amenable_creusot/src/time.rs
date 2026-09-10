@@ -20,14 +20,15 @@ use creusot_std::macros::{ensures, logic, requires};
 #[cfg(not(creusot))]
 mod not_creusot_mirror {
     use amenable_time::{
-        CalendarMonthInRangeOneToTwelve,
+        CalendarDayWithinMonthBounds, CalendarMonthInRangeOneToTwelve,
         CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
         CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
         CommonYearHasThreeHundredSixtyFiveCalendarDays,
         DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
         GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
-        IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+        IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, LeapDayOccursOnlyInLeapYear,
         LeapYearHasThreeHundredSixtySixCalendarDays, MinuteInRangeZeroToFiftyNine,
+        MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
         OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
         UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
         UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
@@ -38,7 +39,7 @@ mod not_creusot_mirror {
     use crate::CreusotVerifier;
 
     use super::{
-        CALENDAR_MONTH_IN_RANGE_HOLDS_SRC,
+        CALENDAR_DAY_WITHIN_MONTH_BOUNDS_HOLDS_SRC, CALENDAR_MONTH_IN_RANGE_HOLDS_SRC,
         CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
         CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC,
         CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_HOLDS_SRC,
@@ -46,14 +47,16 @@ mod not_creusot_mirror {
         DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
         GREGORIAN_LEAP_YEAR_HOLDS_SRC, HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC,
         INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC, INTERVAL_START_PRECEDES_END_HOLDS_SRC,
+        LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_HOLDS_SRC,
         LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC,
         MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
+        MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_HOLDS_SRC,
         ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_HOLDS_SRC,
         SECOND_IN_RANGE_ZERO_TO_SIXTY_HOLDS_SRC,
         UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_HOLDS_SRC,
         UTC_OFFSET_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
         UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC,
-        VERIFY_CALENDAR_MONTH_IN_RANGE_SRC,
+        VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC, VERIFY_CALENDAR_MONTH_IN_RANGE_SRC,
         VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC,
         VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC,
         VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC,
@@ -61,8 +64,10 @@ mod not_creusot_mirror {
         VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC,
         VERIFY_GREGORIAN_LEAP_YEAR_SRC, VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC,
         VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, VERIFY_INTERVAL_START_PRECEDES_END_SRC,
+        VERIFY_LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_SRC,
         VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC,
         VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
+        VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC,
         VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC,
         VERIFY_SECOND_IN_RANGE_ZERO_TO_SIXTY_SRC,
         VERIFY_UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_SRC,
@@ -709,6 +714,104 @@ mod not_creusot_mirror {
             "creusot",
             || {
                 <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier>
+        for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays
+    {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days".to_owned(),
+                VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC
+                    .to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier>
+        for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays
+    {
+        type Input = (i32, u8);
+        type Bound = &'static str;
+
+        fn ensures(_input: (i32, u8)) -> Self::Bound {
+            MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::MonthDurationInRangeTwentyEightToThirtyOneCalendarDays",
+            "creusot",
+            || {
+                <MonthDurationInRangeTwentyEightToThirtyOneCalendarDays as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for CalendarDayWithinMonthBounds {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_calendar_day_within_month_bounds".to_owned(),
+                VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for CalendarDayWithinMonthBounds {
+        type Input = (i32, u8, u8);
+        type Bound = &'static str;
+
+        fn ensures(_input: (i32, u8, u8)) -> Self::Bound {
+            CALENDAR_DAY_WITHIN_MONTH_BOUNDS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::CalendarDayWithinMonthBounds",
+            "creusot",
+            || {
+                <CalendarDayWithinMonthBounds as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for LeapDayOccursOnlyInLeapYear {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_leap_day_occurs_only_in_leap_year".to_owned(),
+                VERIFY_LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for LeapDayOccursOnlyInLeapYear {
+        type Input = (i32, u8, u8);
+        type Bound = &'static str;
+
+        fn ensures(_input: (i32, u8, u8)) -> Self::Bound {
+            LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::LeapDayOccursOnlyInLeapYear",
+            "creusot",
+            || {
+                <LeapDayOccursOnlyInLeapYear as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
             },
         )
     }
@@ -1389,6 +1492,120 @@ amenable_derive::harness! {
         fn check_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days(year: i32) -> bool {
             let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
             days >= 365 && days <= 366
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 2.2.12 — a month's duration is 28, 29, 30, or 31 calendar days according to the month and year: the outcome always holds — the duration is 28, 29, 30, or 31.
+        #[logic(open)]
+        pub fn month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds(_year: i32, _month: u8, outcome: bool) -> bool {
+            pearlite! { outcome }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds",
+        "creusot",
+        "ensures",
+        || MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC, {
+        /// The exec month-duration check is always in `28..=31`, for every year and month `1..=12`.
+        #[requires(month@ >= 1 && month@ <= 12)]
+        #[ensures(month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds(year, month, result))]
+        fn check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days(year: i32, month: u8) -> bool {
+            let dim: u8 = if month == 2 {
+                if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 29 } else { 28 }
+            } else if month == 4 || month == 6 || month == 9 || month == 11 {
+                30
+            } else {
+                31
+            };
+            dim >= 28 && dim <= 31
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, CALENDAR_DAY_WITHIN_MONTH_BOUNDS_HOLDS_SRC, {
+        /// ISO/WD 8601-1:2016(E), 3.2.1 / 4.1.2.1 — a calendar-date day component is within the valid day count for that month and year: the outcome equals `day` lying in `1..=days_in_month(year, month)`.
+        #[logic(open)]
+        pub fn calendar_day_within_month_bounds_holds(year: i32, month: u8, day: u8, outcome: bool) -> bool {
+            pearlite! { outcome == (day@ >= 1 && day@ <= (if month@ == 2 {
+                if is_gregorian_leap_year(year) { 29 } else { 28 }
+            } else if month@ == 4 || month@ == 6 || month@ == 9 || month@ == 11 {
+                30
+            } else {
+                31
+            })) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::calendar_day_within_month_bounds_holds",
+        "creusot",
+        "ensures",
+        || CALENDAR_DAY_WITHIN_MONTH_BOUNDS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC, {
+        /// The exec bounds check equals `day` lying in month bounds, and a valid February 29 forces a leap year.
+        #[requires(month@ >= 1 && month@ <= 12)]
+        #[ensures(calendar_day_within_month_bounds_holds(year, month, day, result))]
+        #[ensures(month@ == 2 && day@ == 29 && result ==> is_gregorian_leap_year(year))]
+        fn check_calendar_day_within_month_bounds(year: i32, month: u8, day: u8) -> bool {
+            let dim: u8 = if month == 2 {
+                if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 29 } else { 28 }
+            } else if month == 4 || month == 6 || month == 9 || month == 11 {
+                30
+            } else {
+                31
+            };
+            day >= 1 && day <= dim
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 note 1 — the 29th of February is a valid calendar date only when the year is a leap year: the outcome equals: if the date is February 29, the year is a leap year.
+        #[logic(open)]
+        pub fn leap_day_occurs_only_in_leap_year_holds(year: i32, month: u8, day: u8, outcome: bool) -> bool {
+            pearlite! { outcome == (!(month@ == 2 && day@ == 29) || is_gregorian_leap_year(year)) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::leap_day_occurs_only_in_leap_year_holds",
+        "creusot",
+        "ensures",
+        || LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_SRC, {
+        /// The exec predicate equals: a February-29 date forces a leap year.
+        #[requires(true)]
+        #[ensures(leap_day_occurs_only_in_leap_year_holds(year, month, day, result))]
+        fn check_leap_day_occurs_only_in_leap_year(year: i32, month: u8, day: u8) -> bool {
+            !(month == 2 && day == 29) || (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
         }
     }
 }

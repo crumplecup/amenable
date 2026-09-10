@@ -145,6 +145,9 @@ the generated `new`).
 | `LeapYearHasThreeHundredSixtySixCalendarDays` | over `y ≥ 0`: `days_in_year(y) == 366` ⟺ `leap(y)`; a leap year is a common year + 1 day; count always 365/366 (Creusot: leap-predicate biconditional only) | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
 | `CommonYearHasThreeHundredSixtyFiveCalendarDays` | over `y ≥ 0`: `days_in_year(y) == 365` ⟺ `!leap(y)`; the two lengths are distinct (Creusot: leap-predicate biconditional only) | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
 | `YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays` | over `y ≥ 0`: `days_in_year(y)` is always 365 or 366 — the model is well-formed | ✅ passed | ✅ Proved (169 files) | ✅ 505 verified |
+| `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays` | Kani/Verus: over every year and month `1..=12`, the duration is always `28..=31`, each length characterised exactly, and the twelve months sum to `days_in_year(y)`. Creusot: always in range | ✅ passed | ✅ Proved (172 files) | ✅ 508 verified |
+| `CalendarDayWithinMonthBounds` | Kani/Verus: a valid day is in `1..=31` and a valid February 29 forces a leap year. Creusot: definitional + Feb-29 ⟹ leap | ✅ passed | ✅ Proved (172 files) | ✅ 508 verified |
+| `LeapDayOccursOnlyInLeapYear` | February 29 is a valid calendar date exactly when the year is a leap year | ✅ passed | ✅ Proved (172 files) | ✅ 508 verified |
 
 Some contracts prove different depths on different backends — the
 number theory that is nonlinear for an SMT solver (Verus, Creusot) is

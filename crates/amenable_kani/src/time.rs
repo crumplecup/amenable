@@ -8,13 +8,15 @@
 
 use amenable_core::Witness;
 use amenable_time::{
-    CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CalendarDayWithinMonthBounds, CalendarMonthInRangeOneToTwelve,
+    CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
     CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
     CommonYearHasThreeHundredSixtyFiveCalendarDays,
     DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
     GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
-    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, LeapDayOccursOnlyInLeapYear,
     LeapYearHasThreeHundredSixtySixCalendarDays, MinuteInRangeZeroToFiftyNine,
+    MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
     OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
     UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
     UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
@@ -38,6 +40,25 @@ fn days_in_year(year: i32) -> i32 {
     } else {
         365
     }
+}
+
+/// The number of calendar days in month `m` of year `y` (m in 1..=12;
+/// months outside that range yield 0).
+fn days_in_month(year: i32, month: u8) -> u8 {
+    if month == 2 {
+        if is_gregorian_leap_year(year) { 29 } else { 28 }
+    } else if month == 4 || month == 6 || month == 9 || month == 11 {
+        30
+    } else if matches!(month, 1 | 3 | 5 | 7 | 8 | 10 | 12) {
+        31
+    } else {
+        0
+    }
+}
+
+/// Whether `day` is a valid day-of-month for month `m` of year `y`.
+fn is_valid_calendar_day(year: i32, month: u8, day: u8) -> bool {
+    (1..=days_in_month(year, month)).contains(&day)
 }
 
 // ── CalendarMonthInRangeOneToTwelve ──────────────────────────────────
@@ -1074,6 +1095,201 @@ amenable_derive::harness! {
             // The model is well-formed: every year's length is 365 or 366.
             assert!(in_range);
             assert!(days_in_year(year) == 365 || days_in_year(year) == 366);
+        }
+    }
+}
+
+// ── MonthDurationInRangeTwentyEightToThirtyOneCalendarDays ──────────────────
+
+impl Witness<KaniVerifier> for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days"
+                .to_owned(),
+            VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::MonthDurationInRangeTwentyEightToThirtyOneCalendarDays",
+        "kani",
+        || <MonthDurationInRangeTwentyEightToThirtyOneCalendarDays as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
+    "amenable_time::MonthDurationInRangeTwentyEightToThirtyOneCalendarDays::ensures",
+    (i32, u8),
+    |(year, month)| (28..=31).contains(&days_in_month(year, month))
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC, {
+        /// ISO 8601-1:2019, 2.2.12 — a month's duration is 28, 29, 30, or 31 calendar days according to the month and year. Over every `i32` year and month `1..=12`: the duration is always
+        /// 28..=31, each length characterised exactly, and the twelve months
+        /// sum to `days_in_year(year)`.
+        #[kani::proof]
+        fn verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days() {
+            let year: i32 = kani::any();
+            let month: u8 = kani::any();
+            kani::assume(1 <= month && month <= 12);
+
+            let in_range = <MonthDurationInRangeTwentyEightToThirtyOneCalendarDays as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures((year, month));
+            assert!(in_range);
+
+            let dim = days_in_month(year, month);
+            assert!(dim == 28 || dim == 29 || dim == 30 || dim == 31);
+            assert_eq!(dim == 31, matches!(month, 1 | 3 | 5 | 7 | 8 | 10 | 12));
+            assert_eq!(dim == 30, matches!(month, 4 | 6 | 9 | 11));
+            assert_eq!(dim < 30, month == 2);
+            assert_eq!(dim == 29, month == 2 && is_gregorian_leap_year(year));
+
+            // The twelve months partition the year.
+            let total = days_in_month(year, 1) as i32
+                + days_in_month(year, 2) as i32
+                + days_in_month(year, 3) as i32
+                + days_in_month(year, 4) as i32
+                + days_in_month(year, 5) as i32
+                + days_in_month(year, 6) as i32
+                + days_in_month(year, 7) as i32
+                + days_in_month(year, 8) as i32
+                + days_in_month(year, 9) as i32
+                + days_in_month(year, 10) as i32
+                + days_in_month(year, 11) as i32
+                + days_in_month(year, 12) as i32;
+            assert_eq!(total, days_in_year(year));
+        }
+    }
+}
+
+// ── CalendarDayWithinMonthBounds ──────────────────
+
+impl Witness<KaniVerifier> for CalendarDayWithinMonthBounds {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_calendar_day_within_month_bounds".to_owned(),
+            VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::CalendarDayWithinMonthBounds",
+        "kani",
+        || <CalendarDayWithinMonthBounds as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    CalendarDayWithinMonthBounds,
+    "amenable_time::CalendarDayWithinMonthBounds::ensures",
+    (i32, u8, u8),
+    |(year, month, day)| is_valid_calendar_day(year, month, day)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC, {
+        /// ISO/WD 8601-1:2016(E), 3.2.1 / 4.1.2.1 — a calendar-date day component is within the valid day count for that month and year. Over every `i32` year, month `1..=12` and `u8` day: a valid day is in
+        /// `1..=31`, and February 29 is valid exactly in a leap year; anchors.
+        #[kani::proof]
+        fn verify_calendar_day_within_month_bounds() {
+            let year: i32 = kani::any();
+            let month: u8 = kani::any();
+            let day: u8 = kani::any();
+            kani::assume(1 <= month && month <= 12);
+
+            let valid = <CalendarDayWithinMonthBounds as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures((year, month, day));
+
+            // Every valid day lies in 1..=31.
+            if valid {
+                assert!((1..=31).contains(&day));
+            }
+            // February 29 is a valid date exactly in a leap year.
+            if month == 2 && day == 29 {
+                assert_eq!(valid, is_gregorian_leap_year(year));
+            }
+
+            let v = |y: i32, m: u8, d: u8| {
+                <CalendarDayWithinMonthBounds as ::amenable_core::Ensures<KaniVerifier>>::ensures((y, m, d))
+            };
+            assert!(v(2020, 2, 29), "2020-02-29 is a valid date");
+            assert!(!v(2021, 2, 29), "2021-02-29 is not");
+            assert!(!v(2021, 4, 31), "April has 30 days");
+            assert!(v(2021, 1, 31), "January has 31 days");
+            assert!(!v(2021, 1, 0), "day 0 is invalid");
+        }
+    }
+}
+
+// ── LeapDayOccursOnlyInLeapYear ──────────────────
+
+impl Witness<KaniVerifier> for LeapDayOccursOnlyInLeapYear {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_leap_day_occurs_only_in_leap_year".to_owned(),
+            VERIFY_LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::LeapDayOccursOnlyInLeapYear",
+        "kani",
+        || <LeapDayOccursOnlyInLeapYear as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    LeapDayOccursOnlyInLeapYear,
+    "amenable_time::LeapDayOccursOnlyInLeapYear::ensures",
+    (i32, u8, u8),
+    |(year, month, day)| !(month == 2 && day == 29) || is_gregorian_leap_year(year)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 note 1 — the 29th of February is a valid calendar date only when the year is a leap year. Over every `i32` year, month `1..=12` and `u8` day: February 29 is a
+        /// valid calendar date exactly when the year is a leap year.
+        #[kani::proof]
+        fn verify_leap_day_occurs_only_in_leap_year() {
+            let year: i32 = kani::any();
+            let month: u8 = kani::any();
+            let day: u8 = kani::any();
+            kani::assume(1 <= month && month <= 12);
+
+            let ok = <LeapDayOccursOnlyInLeapYear as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures((year, month, day));
+
+            // Feb 29 as a calendar date is valid exactly when the year is a leap year.
+            assert_eq!(is_valid_calendar_day(year, 2, 29), is_gregorian_leap_year(year));
+
+            if month == 2 && day == 29 {
+                assert_eq!(ok, is_gregorian_leap_year(year));
+            } else {
+                assert!(ok);
+            }
         }
     }
 }
