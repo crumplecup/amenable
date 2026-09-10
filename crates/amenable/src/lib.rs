@@ -103,6 +103,6 @@ pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, 
 /// descriptor, and trait names, and callers reach for them by full path.
 pub use amenable_time;
 pub use amenable_time::{
-    CanaryVerifier, StdTimeBackend, TemporalCoverage, TemporalCoverageRow, TemporalError,
-    TemporalErrorKind, TemporalReporter,
+    CanaryVerifier, StdTimeBackend, TemporalCapabilities, TemporalCoverage, TemporalCoverageRow,
+    TemporalError, TemporalErrorKind, TemporalReporter,
 };

@@ -84,7 +84,15 @@ pub(super) fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
 /// so run this with `--features creusot,verus`).
 #[instrument(level = "debug", err(level = "warn"))]
 pub(super) fn run_temporal_coverage() -> AmenableResult<()> {
+    use amenable_time::TemporalReporter;
+
     crate::write_stdout_line(amenable_time::TemporalCoverage::snapshot().to_string())?;
+    crate::write_stdout_line(format!(
+        "\nreference backend capabilities (std::time canary)\n\
+         {:-<72}\n{}",
+        "",
+        amenable_time::StdTimeBackend.capabilities(),
+    ))?;
     Ok(())
 }
 

@@ -487,7 +487,7 @@ pub use provenance_vocab::{
     StandardsBody,
 };
 pub use traits::{
-    TemporalCalConnectFactory, TemporalCivilNativeBridge, TemporalCivilProps,
+    TemporalCalConnectFactory, TemporalCapabilities, TemporalCivilNativeBridge, TemporalCivilProps,
     TemporalConversionFactory, TemporalDateTimeFormulaNativeBridge, TemporalDateTimeFormulaProps,
     TemporalDurationNativeBridge, TemporalDurationProps, TemporalExplicitDurationNativeBridge,
     TemporalExplicitDurationProps, TemporalExplicitTemporalFormNativeBridge,

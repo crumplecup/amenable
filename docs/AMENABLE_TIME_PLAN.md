@@ -1046,9 +1046,13 @@ Contract worklist:
       backend's records link). Current: **345 atomic contracts, 23
       machine-checked (all on all three backends), 322 citation-only.**
       `amenable/tests/temporal_coverage_test.rs`.
-- [ ] `TemporalReporter` → a capability-surface renderer (the plan's
-      `Amenable::*_surface()` was removed; fold into a `Display` wrapper or
-      the coverage report).
+- [x] **`TemporalReporter` capability surface** (2026-09-10) —
+      `TemporalReporter::capabilities()` returns a `Display`-able
+      `TemporalCapabilities<'_>` rendering all seven queries as a block
+      (the plan's `Amenable::*_surface()` no longer exists in the
+      codebase). `amenable temporal-coverage` prints the `std::time`
+      canary's declaration under the table as the reference example;
+      `std_backend_test` covers the rendering.
 - [x] **`std::time` canary backend** (2026-09-10):
       `amenable_time::backends::std_time`. `StdTimeBackend` +
       `CanaryVerifier` (runs no formal tool), implementing the slice

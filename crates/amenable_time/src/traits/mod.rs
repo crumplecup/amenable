@@ -50,5 +50,5 @@ pub use native_props::{
     TemporalZoneProps,
 };
 pub use parse::TemporalParser;
-pub use report::TemporalReporter;
+pub use report::{TemporalCapabilities, TemporalReporter};
 pub use zone::TemporalZoneFactory;

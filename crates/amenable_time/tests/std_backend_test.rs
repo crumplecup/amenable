@@ -96,6 +96,12 @@ fn reporter_declares_the_std_time_capability_slice() {
     assert!(!backend.supports_end_of_day_twenty_four());
     assert!(!backend.supports_unknown_local_offset());
     assert_eq!(backend.current_tzdb_revision(), None);
+
+    // The `capabilities()` surface renders every query in one block.
+    let rendered = backend.capabilities().to_string();
+    assert!(rendered.contains("max fractional-sec digits  : 9"));
+    assert!(rendered.contains("leap seconds               : no"));
+    assert!(rendered.contains("serialization profiles     : (none)"));
 }
 
 #[test]
