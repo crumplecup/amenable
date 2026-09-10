@@ -23,9 +23,10 @@ mod not_creusot_mirror {
         CalendarMonthInRangeOneToTwelve,
         CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
         CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-        HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
-        OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
-        UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+        HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+        MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
+        SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
+        UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
         WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
     };
 
@@ -36,21 +37,24 @@ mod not_creusot_mirror {
         CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
         CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_HOLDS_SRC,
         DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
-        HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC, MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
+        HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC, INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC,
+        INTERVAL_START_PRECEDES_END_HOLDS_SRC, MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
         ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_HOLDS_SRC,
         SECOND_IN_RANGE_ZERO_TO_SIXTY_HOLDS_SRC,
         UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_HOLDS_SRC,
         UTC_OFFSET_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
+        UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC,
         VERIFY_CALENDAR_MONTH_IN_RANGE_SRC,
         VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC,
         VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC,
         VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC,
-        VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC,
-        VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
+        VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC, VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC,
+        VERIFY_INTERVAL_START_PRECEDES_END_SRC, VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
         VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC,
         VERIFY_SECOND_IN_RANGE_ZERO_TO_SIXTY_SRC,
         VERIFY_UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_SRC,
         VERIFY_UTC_OFFSET_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
+        VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC,
         VERIFY_WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_SRC,
         VERIFY_WEEKDAY_IN_RANGE_ONE_TO_SEVEN_SRC,
         WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_HOLDS_SRC, WEEKDAY_IN_RANGE_ONE_TO_SEVEN_HOLDS_SRC,
@@ -434,6 +438,99 @@ mod not_creusot_mirror {
             "creusot",
             || {
                 <CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for IntervalStartPrecedesEnd {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_interval_start_precedes_end".to_owned(),
+                VERIFY_INTERVAL_START_PRECEDES_END_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for IntervalStartPrecedesEnd {
+        type Input = (i32, i32);
+        type Bound = &'static str;
+
+        fn ensures(_endpoints: (i32, i32)) -> Self::Bound {
+            INTERVAL_START_PRECEDES_END_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::IntervalStartPrecedesEnd",
+            "creusot",
+            || {
+                <IntervalStartPrecedesEnd as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for IntervalDurationIsNonNegative {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_interval_duration_is_non_negative".to_owned(),
+                VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for IntervalDurationIsNonNegative {
+        type Input = (i32, i32);
+        type Bound = &'static str;
+
+        fn ensures(_endpoints: (i32, i32)) -> Self::Bound {
+            INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::IntervalDurationIsNonNegative",
+            "creusot",
+            || {
+                <IntervalDurationIsNonNegative as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_utc_timeline_ordering_applies_to_fixed_instants".to_owned(),
+                VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
+        type Input = (i32, i32);
+        type Bound = &'static str;
+
+        fn ensures(_endpoints: (i32, i32)) -> Self::Bound {
+            UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::UtcTimelineOrderingAppliesToFixedInstants",
+            "creusot",
+            || {
+                <UtcTimelineOrderingAppliesToFixedInstants as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
             },
         )
     }
@@ -829,6 +926,107 @@ amenable_derive::harness! {
         #[ensures(calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds(year, result))]
         fn check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine(year: u16) -> bool {
             year <= 9999u16
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, INTERVAL_START_PRECEDES_END_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.6 / 3.1.1.8 — an interval's first endpoint is no later than its second on the relevant timeline: the outcome equals `start` preceding-or-equal `end` on the timeline.
+        #[logic(open)]
+        pub fn interval_start_precedes_end_holds(start: i32, end: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (start@ <= end@) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::interval_start_precedes_end_holds",
+        "creusot",
+        "ensures",
+        || INTERVAL_START_PRECEDES_END_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_INTERVAL_START_PRECEDES_END_SRC, {
+        /// `start <= end` satisfies the precedence spec, its negation form, and the non-negative-span form, for every `i32` pair.
+        #[requires(true)]
+        #[ensures(interval_start_precedes_end_holds(start, end, result))]
+        #[ensures((start@ <= end@) == !(end@ < start@))]
+        #[ensures((start@ <= end@) == (end@ - start@ >= 0))]
+        fn check_interval_start_precedes_end(start: i32, end: i32) -> bool {
+            start <= end
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.8 — the span between an interval's endpoints is zero or positive, never negative: the outcome equals the `end@ - start@` span being non-negative.
+        #[logic(open)]
+        pub fn interval_duration_is_non_negative_holds(start: i32, end: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (end@ - start@ >= 0) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::interval_duration_is_non_negative_holds",
+        "creusot",
+        "ensures",
+        || INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, {
+        /// `start <= end` is the panic-free witness that the span is non-negative, and pins the zero-span case to endpoint equality, for every `i32` pair.
+        #[requires(true)]
+        #[ensures(interval_duration_is_non_negative_holds(start, end, result))]
+        #[ensures((end@ - start@ >= 0) == (start@ <= end@))]
+        #[ensures((end@ - start@ == 0) == (start@ == end@))]
+        fn check_interval_duration_is_non_negative(start: i32, end: i32) -> bool {
+            start <= end
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC, {
+        /// RFC 3339, 5.1 — two fixed instants are totally ordered by their position on the UTC timeline: the outcome equals `earlier` being at or before `later`.
+        #[logic(open)]
+        pub fn utc_timeline_ordering_applies_to_fixed_instants_holds(earlier: i32, later: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (earlier@ <= later@) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::utc_timeline_ordering_applies_to_fixed_instants_holds",
+        "creusot",
+        "ensures",
+        || UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC, {
+        /// `a <= b` satisfies the ordering spec, and the relation is reflexive, total, antisymmetric, and transitive over `i32` instants.
+        #[requires(true)]
+        #[ensures(utc_timeline_ordering_applies_to_fixed_instants_holds(a, b, result))]
+        #[ensures(utc_timeline_ordering_applies_to_fixed_instants_holds(a, a, true))]
+        #[ensures(a@ <= b@ || b@ <= a@)]
+        #[ensures(a@ <= b@ && b@ <= a@ ==> a@ == b@)]
+        #[ensures(a@ <= b@ && b@ <= c@ ==> a@ <= c@)]
+        fn check_utc_timeline_ordering_applies_to_fixed_instants(a: i32, b: i32, c: i32) -> bool {
+            a <= b
         }
     }
 }

@@ -10,9 +10,10 @@ use amenable_core::Witness;
 use amenable_time::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
     CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-    HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
-    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
-    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+    MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
+    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
+    UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
     WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 
@@ -601,6 +602,162 @@ amenable_derive::harness! {
             let restated = year < 10000;
 
             assert_eq!(predicate, restated);
+        }
+    }
+}
+
+// ── IntervalStartPrecedesEnd ──────────────────
+
+impl Witness<KaniVerifier> for IntervalStartPrecedesEnd {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_interval_start_precedes_end".to_owned(),
+            VERIFY_INTERVAL_START_PRECEDES_END_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::IntervalStartPrecedesEnd",
+        "kani",
+        || <IntervalStartPrecedesEnd as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    IntervalStartPrecedesEnd,
+    "amenable_time::IntervalStartPrecedesEnd::ensures",
+    (i32, i32),
+    |(start, end)| start <= end
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_INTERVAL_START_PRECEDES_END_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.6 / 3.1.1.8 — an interval's first endpoint is no later than its second on the relevant timeline. The `start <= end` predicate agrees, over every `i32` pair, with the
+        /// negation form `!(end < start)` and with a non-negative `i64` span.
+        #[kani::proof]
+        fn verify_interval_start_precedes_end() {
+            let start: i32 = kani::any();
+            let end: i32 = kani::any();
+
+            let precedes = <IntervalStartPrecedesEnd as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures((start, end));
+
+            // Same fact stated as a negation and as a non-negative span.
+            assert_eq!(precedes, !(end < start));
+            assert_eq!(precedes, i64::from(end) - i64::from(start) >= 0);
+        }
+    }
+}
+
+// ── IntervalDurationIsNonNegative ──────────────────
+
+impl Witness<KaniVerifier> for IntervalDurationIsNonNegative {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_interval_duration_is_non_negative".to_owned(),
+            VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::IntervalDurationIsNonNegative",
+        "kani",
+        || <IntervalDurationIsNonNegative as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    IntervalDurationIsNonNegative,
+    "amenable_time::IntervalDurationIsNonNegative::ensures",
+    (i32, i32),
+    |(start, end)| i64::from(end) - i64::from(start) >= 0
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.8 — the span between an interval's endpoints is zero or positive, never negative. The non-negative-span predicate agrees, over every `i32` pair, with
+        /// `start <= end`; the span is zero exactly when the endpoints coincide.
+        #[kani::proof]
+        fn verify_interval_duration_is_non_negative() {
+            let start: i32 = kani::any();
+            let end: i32 = kani::any();
+
+            let non_negative = <IntervalDurationIsNonNegative as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures((start, end));
+
+            // A non-negative span is exactly `start` preceding `end`, and the
+            // span is zero exactly when the endpoints coincide.
+            assert_eq!(non_negative, start <= end);
+            assert_eq!(i64::from(end) - i64::from(start) == 0, start == end);
+        }
+    }
+}
+
+// ── UtcTimelineOrderingAppliesToFixedInstants ──────────────────
+
+impl Witness<KaniVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_utc_timeline_ordering_applies_to_fixed_instants".to_owned(),
+            VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::UtcTimelineOrderingAppliesToFixedInstants",
+        "kani",
+        || <UtcTimelineOrderingAppliesToFixedInstants as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    UtcTimelineOrderingAppliesToFixedInstants,
+    "amenable_time::UtcTimelineOrderingAppliesToFixedInstants::ensures",
+    (i32, i32),
+    |(a, b)| a <= b
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC, {
+        /// RFC 3339, 5.1 — two fixed instants are totally ordered by their position on the UTC timeline. `<=` on `i32` timeline positions is reflexive, antisymmetric, total,
+        /// and transitive — a total order — checked over three symbolic instants.
+        #[kani::proof]
+        fn verify_utc_timeline_ordering_applies_to_fixed_instants() {
+            let a: i32 = kani::any();
+            let b: i32 = kani::any();
+            let c: i32 = kani::any();
+
+            let le = |x: i32, y: i32| {
+                <UtcTimelineOrderingAppliesToFixedInstants as ::amenable_core::Ensures<
+                    KaniVerifier,
+                >>::ensures((x, y))
+            };
+
+            // `<=` on timeline positions is a total order.
+            assert!(le(a, a), "reflexive");
+            assert!(le(a, b) || le(b, a), "total");
+            assert!(!(le(a, b) && le(b, a)) || a == b, "antisymmetric");
+            assert!(!(le(a, b) && le(b, c)) || le(a, c), "transitive");
         }
     }
 }

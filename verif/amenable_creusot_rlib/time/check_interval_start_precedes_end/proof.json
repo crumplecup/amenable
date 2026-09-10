@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_interval_start_precedes_end": {
+        "prover": "alt-ergo",
+        "time": 0.021
+      }
+    }
+  }
+}

@@ -137,6 +137,9 @@ the generated `new`).
 | `CenturyOrdinalInRangeZeroToNinetyNine` | `o <= 99` agrees over the whole `u8` domain with `o < 100` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
 | `DecadeOrdinalInRangeZeroToNineHundredNinetyNine` | `o <= 999` agrees over the whole `u16` domain with `o < 1000` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
 | `CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine` | `y <= 9999` agrees over the whole `u16` domain with `y < 10000` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `IntervalStartPrecedesEnd` | over every `i32` pair, `start <= end` ⟺ `!(end < start)` ⟺ non-negative `i64` span | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
+| `IntervalDurationIsNonNegative` | over every `i32` pair, non-negative span ⟺ `start <= end`; span is `0` exactly when endpoints coincide | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
+| `UtcTimelineOrderingAppliesToFixedInstants` | `<=` on `i32` timeline positions is a total order — reflexive, antisymmetric, total, transitive | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
 
 Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_time` dep; Verus's real `verus! {}` proof lives in

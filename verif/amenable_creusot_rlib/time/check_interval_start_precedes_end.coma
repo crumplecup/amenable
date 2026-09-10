@@ -1,0 +1,37 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 960 8 960 74 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 956 19 956 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 957 18 957 71
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 958 18 958 54
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 959 18 959 58
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 938 24 938 51
+
+use creusot.int.Int32
+use creusot.prelude.Any
+use int.Int
+
+predicate interval_start_precedes_end_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 937 8 937 93] (start: Int32.t) (end': Int32.t) (outcome: bool) =
+  [%#stime'3] outcome = (Int32.to_int start <= Int32.to_int end')
+
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_interval_start_precedes_end [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 960 8 960 74]
+  (start: Int32.t) (end': Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- Int32.le start end' ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & start: Int32.t = start | & end': Int32.t = end' ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_interval_start_precedes_end ensures] ([@stop_split] [@expl:check_interval_start_precedes_end ensures #0] [%#stime'0] interval_start_precedes_end_holds start end' result)
+    /\ ([@stop_split] [@expl:check_interval_start_precedes_end ensures #1] [%#stime'1] (Int32.to_int start
+        <= Int32.to_int end')
+      = (not Int32.to_int end' < Int32.to_int start))
+    /\ ([@stop_split] [@expl:check_interval_start_precedes_end ensures #2] [%#stime'2] (Int32.to_int start
+      <= Int32.to_int end')
+    = ge_log_Int (Int32.to_int end' - Int32.to_int start) 0)}
+    (! return {result}) ]

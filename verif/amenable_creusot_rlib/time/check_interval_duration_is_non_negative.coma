@@ -1,0 +1,38 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 993 8 993 80 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 989 19 989 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 990 18 990 77
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 991 18 991 58
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 992 18 992 58
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 971 24 971 55
+
+use creusot.int.Int32
+use creusot.prelude.Any
+use int.Int
+
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate interval_duration_is_non_negative_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 970 8 970 99] (start: Int32.t) (end': Int32.t) (outcome: bool) =
+  [%#stime'3] outcome = ge_log_Int (Int32.to_int end' - Int32.to_int start) 0
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_interval_duration_is_non_negative [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 993 8 993 80]
+  (start: Int32.t) (end': Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- Int32.le start end' ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & start: Int32.t = start | & end': Int32.t = end' ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_interval_duration_is_non_negative ensures] ([@stop_split] [@expl:check_interval_duration_is_non_negative ensures #0] [%#stime'0] interval_duration_is_non_negative_holds start end' result)
+    /\ ([@stop_split] [@expl:check_interval_duration_is_non_negative ensures #1] [%#stime'1] ge_log_Int (Int32.to_int end'
+        - Int32.to_int start) 0
+      = (Int32.to_int start <= Int32.to_int end'))
+    /\ ([@stop_split] [@expl:check_interval_duration_is_non_negative ensures #2] [%#stime'2] (Int32.to_int end'
+        - Int32.to_int start
+      = 0)
+    = (Int32.to_int start = Int32.to_int end'))}
+    (! return {result}) ]

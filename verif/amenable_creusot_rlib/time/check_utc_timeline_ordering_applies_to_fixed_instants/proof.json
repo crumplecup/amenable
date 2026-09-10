@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_utc_timeline_ordering_applies_to_fixed_instants": {
+        "prover": "alt-ergo",
+        "time": 0.026
+      }
+    }
+  }
+}

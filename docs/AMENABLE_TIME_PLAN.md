@@ -954,9 +954,21 @@ Contract worklist:
       exec-only and clippy rejects the manual `a <= x && x <= b` form —
       so each bound is its own single-comparison `spec fn` and `_holds`
       is their conjunction.)
-- [ ] Ordering contracts: `IntervalStartPrecedesEnd`,
-      `IntervalEndpointsOrdered`, `IntervalDurationIsNonNegative`,
-      `UtcTimelineOrderingAppliesToFixedInstants`.
+- [x] **Ordering contracts** (2026-09-10): `IntervalStartPrecedesEnd`,
+      `IntervalDurationIsNonNegative`,
+      `UtcTimelineOrderingAppliesToFixedInstants`. Endpoints / instants
+      modelled as `i32` timeline positions, the span taken in `i64` / `int`
+      so the subtraction is exact. Real ordering laws, not thin guards:
+      `start ≤ end` ⟺ `!(end < start)` ⟺ non-negative span; the span is
+      `0` exactly when the endpoints coincide; `≤` on timeline positions
+      is a **total order** (reflexive, antisymmetric, total, transitive —
+      checked over three symbolic instants). Kani: all `passed`.
+      Creusot: `Proved (164 files) ✔`. Verus: `500 verified, 0 errors`.
+      (Creusot: pearlite `==>` needs no grouping parens around its `&&`
+      antecedent — `unused_parens` fires under `--cfg creusot`.)
+      `IntervalEndpointsOrdered` is the `interval ∧ ordering ∧ duration`
+      composite — it resolves structurally once `TimeIntervalValid` is
+      also proven; folded into the `proof_composition` step below.
 - [ ] Arithmetic-rule contracts: `GregorianLeapYearUsesDivisibleByFourAndFourHundredException`,
       `LeapYearHasThreeHundredSixtySixCalendarDays`,
       `CommonYearHasThreeHundredSixtyFiveCalendarDays`,

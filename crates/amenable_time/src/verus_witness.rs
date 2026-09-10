@@ -17,9 +17,10 @@ use derive_new::new;
 use crate::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
     CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-    HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
-    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
-    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
+    MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
+    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
+    UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
     WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 
@@ -470,5 +471,105 @@ inventory::submit! {
         "amenable_time::CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine",
         "verus",
         || <CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── IntervalStartPrecedesEnd ──────────────────
+
+const INTERVAL_START_PRECEDES_END_VERUS_SRC: &str =
+    include_str!("../../amenable_verus/src/time/interval_start_precedes_end_carrier.rs");
+
+impl amenable_core::Witness<VerusVerifier> for IntervalStartPrecedesEnd {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_interval_start_precedes_end",
+            INTERVAL_START_PRECEDES_END_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for IntervalStartPrecedesEnd {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::IntervalStartPrecedesEnd",
+        "verus",
+        || <IntervalStartPrecedesEnd as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── IntervalDurationIsNonNegative ──────────────────
+
+const INTERVAL_DURATION_IS_NON_NEGATIVE_VERUS_SRC: &str =
+    include_str!("../../amenable_verus/src/time/interval_duration_is_non_negative_carrier.rs");
+
+impl amenable_core::Witness<VerusVerifier> for IntervalDurationIsNonNegative {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_interval_duration_is_non_negative",
+            INTERVAL_DURATION_IS_NON_NEGATIVE_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for IntervalDurationIsNonNegative {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::IntervalDurationIsNonNegative",
+        "verus",
+        || <IntervalDurationIsNonNegative as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── UtcTimelineOrderingAppliesToFixedInstants ──────────────────
+
+const UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/utc_timeline_ordering_applies_to_fixed_instants_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_utc_timeline_ordering_applies_to_fixed_instants",
+            UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for UtcTimelineOrderingAppliesToFixedInstants {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::UtcTimelineOrderingAppliesToFixedInstants",
+        "verus",
+        || <UtcTimelineOrderingAppliesToFixedInstants as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
