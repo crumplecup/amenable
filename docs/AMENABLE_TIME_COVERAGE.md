@@ -159,6 +159,13 @@ Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_verus/src/time/`, with `amenable_time`'s `verus` feature
 gating `src/verus_witness.rs`.
 
+## The live report
+
+`just temporal-coverage` (`amenable temporal-coverage --features
+creusot,verus`) prints this table from the registries: **345 atomic
+contracts, 23 machine-checked on all three backends, 322 citation-only.**
+This file is the prose companion; the recipe is the source of truth.
+
 ## Composed aggregates
 
 All 152 `proof_composition` `#[derive(Witness)]` aggregates

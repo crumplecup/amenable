@@ -1035,9 +1035,20 @@ Contract worklist:
 
 ### Phase 7 — surfaces, certificates, one reference backend
 
-- [ ] `TemporalReporter` → `Amenable::*_surface()` + `RegistryReport`.
-- [ ] `just temporal-coverage` — the umbrella report: per contract,
-      which backends prove it, which are citation-only.
+- [x] **`just temporal-coverage`** (2026-09-10) — `amenable_time::coverage`
+      (`TemporalCoverage::snapshot()`) reads the `EvidenceLink` +
+      `ProofRecord` inventories and reports, per atomic contract under
+      `amenable_time::contracts::`, which of Kani / Creusot / Verus carries
+      a machine-checked proof. Surfaced as `amenable temporal-coverage`
+      (the facade now depends on and re-exports `amenable_time`; its
+      `verus` feature toggles `amenable_time/verus`) and the
+      `just temporal-coverage` recipe (`--features creusot,verus` so every
+      backend's records link). Current: **345 atomic contracts, 23
+      machine-checked (all on all three backends), 322 citation-only.**
+      `amenable/tests/temporal_coverage_test.rs`.
+- [ ] `TemporalReporter` → a capability-surface renderer (the plan's
+      `Amenable::*_surface()` was removed; fold into a `Display` wrapper or
+      the coverage report).
 - [x] **`std::time` canary backend** (2026-09-10):
       `amenable_time::backends::std_time`. `StdTimeBackend` +
       `CanaryVerifier` (runs no formal tool), implementing the slice

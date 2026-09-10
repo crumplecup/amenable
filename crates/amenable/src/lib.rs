@@ -98,3 +98,11 @@ pub use amenable_std::{
 };
 #[cfg(feature = "verus")]
 pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+/// The temporal contract interface. The facade re-exports the whole crate
+/// rather than a curated list — its public surface is ~500 contract,
+/// descriptor, and trait names, and callers reach for them by full path.
+pub use amenable_time;
+pub use amenable_time::{
+    CanaryVerifier, StdTimeBackend, TemporalCoverage, TemporalCoverageRow, TemporalError,
+    TemporalErrorKind, TemporalReporter,
+};

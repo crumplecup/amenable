@@ -23,6 +23,7 @@ amenable_core = { workspace = true }
 amenable_std = { workspace = true }
 amenable_kani = { workspace = true }
 amenable_creusot = { workspace = true, optional = true }
+amenable_time = { workspace = true }
 clap = { workspace = true }
 derive-getters = { workspace = true }
 derive-new = { workspace = true }
@@ -73,7 +74,7 @@ creusot = ["dep:amenable_creusot"]
 # resolves `Cargo.toml`, so there's no witness/registry machinery to
 # depend on there at all) -- this only toggles `amenable_std/verus`, which
 # `include_str!`s `amenable_verus`'s real proof source by relative path.
-verus = ["amenable_std/verus"]
+verus = ["amenable_std/verus", "amenable_time/verus"]
 
 [lints]
 workspace = true

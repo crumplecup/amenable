@@ -73,6 +73,13 @@ cordial-gate:
 verify-kani harness="":
     cargo run -p amenable -- verify kani {{ if harness == "" { "" } else { "--proof " + harness } }} --harness-timeout 3m
 
+# Per-contract proof-coverage report for the temporal contract graph:
+# one row per atomic contract, showing which of Kani / Creusot / Verus
+# carries a machine-checked proof. `--features creusot,verus` links every
+# backend's `ProofRecord`s so the columns are populated.
+temporal-coverage:
+    cargo run -p amenable --features creusot,verus -- temporal-coverage
+
 # Required env vars for cargo-creusot/why3find; see CREUSOT_GUIDE.md in
 # ~/repos/elicitation for the reference invocation this mirrors.
 creusot_env := "PATH=" + home_directory() + "/.local/share/creusot/bin:${PATH} DUNE_DIR_LOCATIONS=why3find:lib:" + home_directory() + "/.local/share/creusot/share/why3find WHY3CONFIG=" + home_directory() + "/.config/creusot/why3.conf"

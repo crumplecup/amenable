@@ -24,6 +24,7 @@ mod standard_macro;
 mod backends;
 mod carrier;
 mod contracts;
+mod coverage;
 mod error;
 mod exchange;
 mod proof_composition;
@@ -279,6 +280,7 @@ pub use contracts::{
     ZoneTransitionGapDeclared, ZoneTransitionGapHandlingAuthorityDeclared,
     ZuluTimeZoneSuffixAvoidsOffsetInconsistency,
 };
+pub use coverage::{TemporalCoverage, TemporalCoverageRow};
 pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use exchange::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyEstablishedToken,

@@ -78,6 +78,16 @@ pub(super) fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
     Ok(())
 }
 
+/// `amenable temporal-coverage` — one row per temporal contract, showing
+/// which of Kani / Creusot / Verus carries a machine-checked proof for it
+/// (a backend's `ProofRecord`s are only visible with that backend linked,
+/// so run this with `--features creusot,verus`).
+#[instrument(level = "debug", err(level = "warn"))]
+pub(super) fn run_temporal_coverage() -> AmenableResult<()> {
+    crate::write_stdout_line(amenable_time::TemporalCoverage::snapshot().to_string())?;
+    Ok(())
+}
+
 // `emit-verus-*` / `emit-creusot-*` execution lives beside its clap types
 // in `commands::{verus,creusot}` -- feature-gated once at the `mod`
 // declaration -- so there is no feature-gated code in this file at all.

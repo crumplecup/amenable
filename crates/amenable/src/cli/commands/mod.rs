@@ -43,6 +43,9 @@ pub(super) enum Commands {
     /// Write the full evidence and proof registry as JSON.
     #[command(name = "dump-registry")]
     DumpRegistry(DumpRegistryArgs),
+    /// Report which temporal contracts each backend proves.
+    #[command(name = "temporal-coverage")]
+    TemporalCoverage,
     /// Run registered proof harnesses through a verifier backend.
     Verify(VerifyArgs),
 }
@@ -59,6 +62,7 @@ impl Commands {
             Self::Creusot(args) => args.act(),
             Self::Gallery(args) => args.act(),
             Self::DumpRegistry(args) => super::run::run_dump_registry(args),
+            Self::TemporalCoverage => super::run::run_temporal_coverage(),
             Self::Verify(args) => args.act(),
         }
     }
