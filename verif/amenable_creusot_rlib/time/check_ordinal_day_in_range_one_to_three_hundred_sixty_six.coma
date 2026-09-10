@@ -1,12 +1,12 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1115 8 1115 86 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1260 8 1260 86 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1116 19 1116 23
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1116 34 1116 40
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1116 12 1116 40
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1113 19 1113 23
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1114 18 1114 88
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1095 24 1095 64
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1261 19 1261 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1261 34 1261 40
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1261 12 1261 40
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1258 19 1258 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1259 18 1259 88
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1240 24 1240 64
 
 use creusot.int.UInt16
 use creusot.prelude.Any
@@ -15,14 +15,14 @@ predicate ge_log_u16 [@inline:trivial] (self: UInt16.t) (other: UInt16.t) = [%#s
 
 meta "rewrite_def" predicate ge_log_u16
 
-predicate ordinal_day_in_range_one_to_three_hundred_sixty_six_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1094 8 1094 105] (day: UInt16.t) (outcome: bool) =
+predicate ordinal_day_in_range_one_to_three_hundred_sixty_six_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1239 8 1239 105] (day: UInt16.t) (outcome: bool) =
   [%#stime'4] outcome = (ge_log_u16 day (1: UInt16.t) /\ UInt16.lt day (367: UInt16.t))
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_ordinal_day_in_range_one_to_three_hundred_sixty_six [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1115 8 1115 86]
+let check_ordinal_day_in_range_one_to_three_hundred_sixty_six [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1260 8 1260 86]
   (day: UInt16.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- UInt16.ge day ([%#stime] (1: UInt16.t)) ] s1

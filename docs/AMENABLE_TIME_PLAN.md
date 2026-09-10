@@ -1009,14 +1009,29 @@ Contract worklist:
         pearlite `if`-expr, no `Int` logic fn) + the Feb-29 ⟹ leap
         implication. Kani: `passed`. Creusot: `Proved (172 files) ✔`.
         Verus: `508 verified, 0 errors`.
-- [ ] The `proof_composition` aggregates whose leaves are now all proven
-      → composed `Witness<V>` conjunctions (real, not tautological).
+- [x] **The `proof_composition` aggregates → composed `Witness<V>`
+      conjunctions** (2026-09-10). No composite is all-checked — each mixes
+      the 23 machine-checked leaves with structural (citation-only) leaves.
+      So `amenable_time::structural_witness` gives every one of the 322
+      structural contracts a verifier-generic `Witness<V>` +
+      `ClassifiedWitness<V>` (`trusted_temporal_witness!`), classified
+      `trivial_leaf()` (`OpenTextCrossCheck` shape facts) or `trusted_leaf()`
+      (`Normative` rules) with the contract's own `TemporalProvenance` as
+      the artifact; `amenable_core` gains `Witness`/`ClassifiedWitness` for
+      `Option<T>` (optional sub-proofs); the 23 checked leaves gained the
+      `support() -> checked_leaf()` override + `ClassifiedWitness` they were
+      missing. Result: all 152 `#[derive(Witness)]` aggregates resolve as a
+      real `ClassifiedWitness<V>` on **all three backends**, whose derived
+      proof is a genuine product (`WitnessSupportSummary` reports the
+      checked / trusted / trivial breakdown). Asserted by
+      `temporal_composition_test` in `amenable_kani`, `amenable_creusot`,
+      and `amenable_time` (`--features verus`). This subsumes the old
+      "structural contracts stay `Standard`-only" bullet — they stay
+      citation-only, but now carry the `#[trusted]`-equivalent witness the
+      plan called for.
 - [ ] Each real proof: injected-regression check per backend (memory
       `feedback_use_gallery_for_kani_investigations` — findings/timeouts
       go in `amenable_kani::gallery`).
-- [ ] Structural contracts stay `Standard`-only with a documented
-      `#[trusted]`-equivalent citation — that is the honest
-      representation, not a gap (memory `feedback_tautological_model_policy`).
 
 ### Phase 7 — surfaces, certificates, one reference backend
 

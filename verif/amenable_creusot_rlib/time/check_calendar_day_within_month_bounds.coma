@@ -1,31 +1,31 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1569 8 1569 88 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1714 8 1714 88 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1570 38 1570 39
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 26 1571 27
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 19 1571 27
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 31 1571 32
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 44 1571 47
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 37 1571 47
-let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 51 1571 52
-let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 63 1571 66
-let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 56 1571 66
-let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 70 1571 71
-let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 75 1571 77
-let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1571 87 1571 89
-let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 31 1572 32
-let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 45 1572 46
-let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 59 1572 60
-let%span stime'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1572 73 1572 75
-let%span stime'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1573 16 1573 18
-let%span stime'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1575 16 1575 18
-let%span stime'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1577 19 1577 20
-let%span stime'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1577 12 1577 34
-let%span stime'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1566 19 1566 46
-let%span stime'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1567 18 1567 82
-let%span stime'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1568 18 1568 86
-let%span stime'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1542 24 1548 15
-let%span stime'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1384 24 1384 80
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1715 38 1715 39
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 26 1716 27
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 19 1716 27
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 31 1716 32
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 44 1716 47
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 37 1716 47
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 51 1716 52
+let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 63 1716 66
+let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 56 1716 66
+let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 70 1716 71
+let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 75 1716 77
+let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1716 87 1716 89
+let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1717 31 1717 32
+let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1717 45 1717 46
+let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1717 59 1717 60
+let%span stime'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1717 73 1717 75
+let%span stime'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1718 16 1718 18
+let%span stime'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1720 16 1720 18
+let%span stime'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1722 19 1722 20
+let%span stime'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1722 12 1722 34
+let%span stime'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1711 19 1711 46
+let%span stime'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1712 18 1712 82
+let%span stime'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1713 18 1713 86
+let%span stime'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1687 24 1693 15
+let%span stime'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1529 24 1529 80
 
 use creusot.int.UInt8
 use creusot.int.Int32
@@ -38,11 +38,11 @@ predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other
 
 meta "rewrite_def" predicate ge_log_Int
 
-predicate is_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1383 8 1383 56] (year: Int32.t) =
+predicate is_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1528 8 1528 56] (year: Int32.t) =
   [%#stime'23] ComputerDivision.mod (Int32.to_int year) 4 = 0
   /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
 
-predicate calendar_day_within_month_bounds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1541 8 1541 107] (year: Int32.t) (month: UInt8.t) (day: UInt8.t) (outcome: bool) =
+predicate calendar_day_within_month_bounds_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1686 8 1686 107] (year: Int32.t) (month: UInt8.t) (day: UInt8.t) (outcome: bool) =
   [%#stime'22] outcome
   = (ge_log_Int (UInt8.t'int day) 1
   /\ UInt8.t'int day
@@ -56,7 +56,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_calendar_day_within_month_bounds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1569 8 1569 88]
+let check_calendar_day_within_month_bounds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1714 8 1714 88]
   (year: Int32.t) (month: UInt8.t) (day: UInt8.t) (return (x: bool)) =
 {[@stop_split] [@expl:check_calendar_day_within_month_bounds requires] [%#stime'19] ge_log_Int (UInt8.t'int month) 1
   /\ UInt8.t'int month <= 12}

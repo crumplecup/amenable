@@ -159,6 +159,18 @@ Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_verus/src/time/`, with `amenable_time`'s `verus` feature
 gating `src/verus_witness.rs`.
 
+## Composed aggregates
+
+All 152 `proof_composition` `#[derive(Witness)]` aggregates
+(`CalendarDateValid`, `LocalTimeValid`, `Rfc3339TimestampValid`,
+`IxdtfTimestampValid`, …) resolve as real `ClassifiedWitness<V>` on Kani,
+Creusot and Verus. A composite's derived proof is a product of its
+members': the 23 machine-checked leaves contribute `checked` support, the
+322 citation-only structural leaves (`amenable_time::structural_witness`,
+`trivial`/`trusted` by citation tier) contribute the rest, and the
+composite's `WitnessSupportSummary` reports the breakdown. Asserted by
+`temporal_composition_test` in each backend crate.
+
 ## Licensing gate
 
 Phase 1 exit criterion: a test over the `EvidenceLink` registry asserts

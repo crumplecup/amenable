@@ -84,6 +84,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_calendar_month_in_range".to_owned(),
@@ -119,6 +123,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_hour_in_range_zero_to_twenty_four".to_owned(),
@@ -149,6 +157,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for MinuteInRangeZeroToFiftyNine {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -181,6 +193,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_second_in_range_zero_to_sixty".to_owned(),
@@ -211,6 +227,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for UtcOffsetHourInRangeZeroToTwentyThree {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -243,6 +263,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_utc_offset_minute_in_range_zero_to_fifty_nine".to_owned(),
@@ -273,6 +297,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for WeekdayInRangeOneToSeven {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -305,6 +333,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_week_number_in_range_one_to_fifty_three".to_owned(),
@@ -335,6 +367,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for OrdinalDayInRangeOneToThreeHundredSixtySix {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -367,6 +403,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_century_ordinal_in_range_zero_to_ninety_nine".to_owned(),
@@ -397,6 +437,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for DecadeOrdinalInRangeZeroToNineHundredNinetyNine {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -430,6 +474,10 @@ mod not_creusot_mirror {
     {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -466,6 +514,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_interval_start_precedes_end".to_owned(),
@@ -497,6 +549,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_interval_duration_is_non_negative".to_owned(),
@@ -527,6 +583,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -561,6 +621,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_gregorian_leap_year".to_owned(),
@@ -594,6 +658,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_centennial_year_divisible_by_one_hundred".to_owned(),
@@ -625,6 +693,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_leap_year_has_three_hundred_sixty_six_calendar_days".to_owned(),
@@ -655,6 +727,10 @@ mod not_creusot_mirror {
     impl amenable_core::Witness<CreusotVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -688,6 +764,10 @@ mod not_creusot_mirror {
     {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
 
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
@@ -724,6 +804,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days".to_owned(),
@@ -758,6 +842,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_calendar_day_within_month_bounds".to_owned(),
@@ -789,6 +877,10 @@ mod not_creusot_mirror {
         type SupportingEvidence = Self;
         type ProofArtifact = crate::witness::MultiCheckProof;
 
+        fn support() -> amenable_core::WitnessSupportSummary {
+            amenable_core::WitnessSupportSummary::checked_leaf()
+        }
+
         fn proof() -> Self::ProofArtifact {
             crate::witness::MultiCheckProof::new(vec![(
                 "check_leap_day_occurs_only_in_leap_year".to_owned(),
@@ -815,6 +907,59 @@ mod not_creusot_mirror {
             },
         )
     }
+
+    // ClassifiedWitness: every checked leaf above closes over real Creusot
+    // proof content (see its `support()` override).
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for CalendarMonthInRangeOneToTwelve {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for HourInRangeZeroToTwentyFour {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for MinuteInRangeZeroToFiftyNine {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for SecondInRangeZeroToSixty {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for UtcOffsetHourInRangeZeroToTwentyThree {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for UtcOffsetMinuteInRangeZeroToFiftyNine {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for WeekdayInRangeOneToSeven {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for WeekNumberInRangeOneToFiftyThree {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for OrdinalDayInRangeOneToThreeHundredSixtySix
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for DecadeOrdinalInRangeZeroToNineHundredNinetyNine
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for IntervalStartPrecedesEnd {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for IntervalDurationIsNonNegative {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for UtcTimelineOrderingAppliesToFixedInstants
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for CentennialYearDivisibleByOneHundred {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for LeapYearHasThreeHundredSixtySixCalendarDays
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for CommonYearHasThreeHundredSixtyFiveCalendarDays
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier>
+        for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays
+    {
+    }
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for CalendarDayWithinMonthBounds {}
+    impl amenable_core::ClassifiedWitness<CreusotVerifier> for LeapDayOccursOnlyInLeapYear {}
 }
 
 amenable_derive::harness! {

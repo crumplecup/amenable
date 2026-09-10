@@ -69,6 +69,32 @@ pub trait Witness<V: Verifier> {
 )]
 pub trait ClassifiedWitness<V: Verifier>: Witness<V> {}
 
+/// An optional sub-proof.
+///
+/// `Option<T>` appears as a composite field wherever a sub-claim is
+/// present only in some representations (a time-of-day that may omit its
+/// seconds, a year that may omit its sign). It is a two-case structural
+/// closure over `T` — `None` is vacuously witnessed, `Some` carries `T`'s
+/// witness — exactly what `#[derive(Witness)]` treats a struct field as,
+/// so it is `ClassifiedWitness` precisely when `T` is. `proof()` is a
+/// type-level descriptor, so it names the shape of the inner proof
+/// (`Some(T::proof())`); `support()` reports `T`'s surface, the honest
+/// worst case when the component is present.
+impl<V: Verifier, T: Witness<V>> Witness<V> for Option<T> {
+    type SupportingEvidence = T::SupportingEvidence;
+    type ProofArtifact = Option<T::ProofArtifact>;
+
+    fn proof() -> Self::ProofArtifact {
+        Some(T::proof())
+    }
+
+    fn support() -> WitnessSupportSummary {
+        T::support()
+    }
+}
+
+impl<V: Verifier, T: ClassifiedWitness<V>> ClassifiedWitness<V> for Option<T> {}
+
 /// Register explicit witness exports for a verifier backend.
 ///
 /// This is for backends such as Verus that compile proof content in a

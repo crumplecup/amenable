@@ -74,6 +74,11 @@ impl Witness<KaniVerifier> for CalendarMonthInRangeOneToTwelve {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_calendar_month_in_range".to_owned(),
@@ -135,6 +140,11 @@ impl Witness<KaniVerifier> for HourInRangeZeroToTwentyFour {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_hour_in_range_zero_to_twenty_four".to_owned(),
@@ -180,6 +190,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for MinuteInRangeZeroToFiftyNine {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -229,6 +244,11 @@ impl Witness<KaniVerifier> for SecondInRangeZeroToSixty {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_second_in_range_zero_to_sixty".to_owned(),
@@ -274,6 +294,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for UtcOffsetHourInRangeZeroToTwentyThree {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -323,6 +348,11 @@ impl Witness<KaniVerifier> for UtcOffsetMinuteInRangeZeroToFiftyNine {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_utc_offset_minute_in_range_zero_to_fifty_nine".to_owned(),
@@ -368,6 +398,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for WeekdayInRangeOneToSeven {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -417,6 +452,11 @@ impl Witness<KaniVerifier> for WeekNumberInRangeOneToFiftyThree {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_week_number_in_range_one_to_fifty_three".to_owned(),
@@ -462,6 +502,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for OrdinalDayInRangeOneToThreeHundredSixtySix {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -511,6 +556,11 @@ impl Witness<KaniVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_century_ordinal_in_range_zero_to_ninety_nine".to_owned(),
@@ -556,6 +606,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for DecadeOrdinalInRangeZeroToNineHundredNinetyNine {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -605,6 +660,11 @@ impl Witness<KaniVerifier> for CalendarYearInRangeZeroToNineThousandNineHundredN
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine"
@@ -652,6 +712,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for IntervalStartPrecedesEnd {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -704,6 +769,11 @@ impl Witness<KaniVerifier> for IntervalDurationIsNonNegative {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_interval_duration_is_non_negative".to_owned(),
@@ -753,6 +823,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for UtcTimelineOrderingAppliesToFixedInstants {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -808,6 +883,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for GregorianLeapYearUsesDivisibleByFourAndFourHundredException {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -873,6 +953,11 @@ impl Witness<KaniVerifier> for CentennialYearDivisibleByOneHundred {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_centennial_year_divisible_by_one_hundred".to_owned(),
@@ -930,6 +1015,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for LeapYearHasThreeHundredSixtySixCalendarDays {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -995,6 +1085,11 @@ impl Witness<KaniVerifier> for CommonYearHasThreeHundredSixtyFiveCalendarDays {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_common_year_has_three_hundred_sixty_five_calendar_days".to_owned(),
@@ -1056,6 +1151,11 @@ impl Witness<KaniVerifier>
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days".to_owned(),
@@ -1104,6 +1204,11 @@ amenable_derive::harness! {
 impl Witness<KaniVerifier> for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays {
     type SupportingEvidence = Self;
     type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
@@ -1178,6 +1283,11 @@ impl Witness<KaniVerifier> for CalendarDayWithinMonthBounds {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_calendar_day_within_month_bounds".to_owned(),
@@ -1244,6 +1354,11 @@ impl Witness<KaniVerifier> for LeapDayOccursOnlyInLeapYear {
     type ProofArtifact = CalculationProof;
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> ::amenable_core::WitnessSupportSummary {
+        ::amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         CalculationProof::new(
             "time::verify_leap_day_occurs_only_in_leap_year".to_owned(),
@@ -1293,3 +1408,56 @@ amenable_derive::harness! {
         }
     }
 }
+
+// ── ClassifiedWitness: every checked leaf above closes over real,
+// machine-checked Kani proof content (see its `support()` override).
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for CalendarMonthInRangeOneToTwelve {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for HourInRangeZeroToTwentyFour {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for MinuteInRangeZeroToFiftyNine {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for SecondInRangeZeroToSixty {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for UtcOffsetHourInRangeZeroToTwentyThree {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for UtcOffsetMinuteInRangeZeroToFiftyNine {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for WeekdayInRangeOneToSeven {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for WeekNumberInRangeOneToFiftyThree {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for OrdinalDayInRangeOneToThreeHundredSixtySix
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for DecadeOrdinalInRangeZeroToNineHundredNinetyNine
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for IntervalStartPrecedesEnd {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for IntervalDurationIsNonNegative {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for UtcTimelineOrderingAppliesToFixedInstants
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for CentennialYearDivisibleByOneHundred {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for LeapYearHasThreeHundredSixtySixCalendarDays
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for CommonYearHasThreeHundredSixtyFiveCalendarDays
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier>
+    for MonthDurationInRangeTwentyEightToThirtyOneCalendarDays
+{
+}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for CalendarDayWithinMonthBounds {}
+impl ::amenable_core::ClassifiedWitness<KaniVerifier> for LeapDayOccursOnlyInLeapYear {}

@@ -10,6 +10,11 @@ help: the trait `ClassifiedWitness<DemoVerifier>` is not implemented for `Opaque
 35 | struct OpaqueEvidence;
    | ^^^^^^^^^^^^^^^^^^^^^
    = note: implement `ClassifiedWitness<DemoVerifier>` for it (e.g. via `bridge_verus_witness!`, or by overriding `support()` directly) before it can be composed into an exported witness
+help: the trait `ClassifiedWitness<V>` is implemented for `Option<T>`
+  --> src/witness/core_trait.rs
+   |
+   | impl<V: Verifier, T: ClassifiedWitness<V>> ClassifiedWitness<V> for Option<T> {}
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 note: required by a bound in `assert_classified`
   --> tests/ui/opaque_leaf_blocks_export.rs:90:1
    |

@@ -1,11 +1,11 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1274 8 1274 80 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1419 8 1419 80 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1270 19 1270 23
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1271 18 1271 77
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1272 18 1272 58
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1273 18 1273 58
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1252 24 1252 55
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1415 19 1415 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1416 18 1416 77
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1417 18 1417 58
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1418 18 1418 58
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1397 24 1397 55
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -15,14 +15,14 @@ predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other
 
 meta "rewrite_def" predicate ge_log_Int
 
-predicate interval_duration_is_non_negative_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1251 8 1251 99] (start: Int32.t) (end': Int32.t) (outcome: bool) =
+predicate interval_duration_is_non_negative_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1396 8 1396 99] (start: Int32.t) (end': Int32.t) (outcome: bool) =
   [%#stime'3] outcome = ge_log_Int (Int32.to_int end' - Int32.to_int start) 0
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_interval_duration_is_non_negative [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1274 8 1274 80]
+let check_interval_duration_is_non_negative [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1419 8 1419 80]
   (start: Int32.t) (end': Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- Int32.le start end' ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & start: Int32.t = start | & end': Int32.t = end' ])

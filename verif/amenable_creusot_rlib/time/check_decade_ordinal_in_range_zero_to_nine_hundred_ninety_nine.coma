@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1177 8 1177 95 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1322 8 1322 95 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1178 23 1178 29
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1175 19 1175 23
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1176 18 1176 97
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1157 24 1157 54
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1323 23 1323 29
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1320 19 1320 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1321 18 1321 97
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1302 24 1302 54
 
 use creusot.int.UInt16
 use creusot.prelude.Any
 
-predicate decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1156 8 1156 114] (ordinal: UInt16.t) (outcome: bool) =
+predicate decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1301 8 1301 114] (ordinal: UInt16.t) (outcome: bool) =
   [%#stime'2] outcome = UInt16.lt ordinal (1000: UInt16.t)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1177 8 1177 95]
+let check_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1322 8 1322 95]
   (ordinal: UInt16.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- UInt16.le ordinal ([%#stime] (999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & ordinal: UInt16.t = ordinal ])

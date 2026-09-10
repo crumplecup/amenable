@@ -1,27 +1,27 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1341 8 1341 55 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1486 8 1486 55 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 19 1342 20
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 12 1342 20
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 24 1342 25
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 37 1342 40
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 30 1342 40
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 44 1342 45
-let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 29 1342 65
-let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 56 1342 59
-let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 49 1342 59
-let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 63 1342 64
-let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1342 12 1342 65
-let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1338 19 1338 23
-let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1339 18 1339 57
-let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1340 18 1340 93
-let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1320 24 1320 93
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 19 1487 20
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 12 1487 20
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 24 1487 25
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 37 1487 40
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 30 1487 40
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 44 1487 45
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 29 1487 65
+let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 56 1487 59
+let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 49 1487 59
+let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 63 1487 64
+let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 12 1487 65
+let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1483 19 1483 23
+let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1484 18 1484 57
+let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1485 18 1485 93
+let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1465 24 1465 93
 
 use creusot.int.Int32
 use creusot.prelude.Bool
 use creusot.prelude.Any
 use int.ComputerDivision
 
-predicate gregorian_leap_year_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1319 8 1319 74] (year: Int32.t) (outcome: bool) =
+predicate gregorian_leap_year_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1464 8 1464 74] (year: Int32.t) (outcome: bool) =
   [%#stime'13] outcome
   = (ComputerDivision.mod (Int32.to_int year) 4 = 0
   /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0))
@@ -30,7 +30,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1341 8 1341 55]
+let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1486 8 1486 55]
   (year: Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_9 <- year ] s1

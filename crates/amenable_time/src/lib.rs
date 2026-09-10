@@ -28,6 +28,7 @@ mod exchange;
 mod proof_composition;
 mod provenance;
 mod provenance_vocab;
+mod structural_witness;
 mod traits;
 mod types;
 #[cfg(feature = "verus")]
