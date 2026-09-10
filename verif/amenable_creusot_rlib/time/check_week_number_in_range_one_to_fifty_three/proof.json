@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_week_number_in_range_one_to_fifty_three": {
+        "prover": "alt-ergo",
+        "time": 0.032
+      }
+    }
+  }
+}

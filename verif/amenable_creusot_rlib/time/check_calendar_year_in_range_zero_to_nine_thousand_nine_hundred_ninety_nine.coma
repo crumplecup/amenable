@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 830 8 830 105 *)
+
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 831 20 831 27
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 828 19 828 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 829 18 829 107
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 810 24 810 52
+
+use creusot.int.UInt16
+use creusot.prelude.Any
+
+predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 809 8 809 124] (year: UInt16.t) (outcome: bool) =
+  [%#stime'2] outcome = UInt16.lt year (10000: UInt16.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 830 8 830 105]
+  (year: UInt16.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- UInt16.le year ([%#stime] (9999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & year: UInt16.t = year ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine ensures] [%#stime'1] calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds year result}
+    (! return {result}) ]

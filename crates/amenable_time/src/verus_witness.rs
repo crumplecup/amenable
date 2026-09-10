@@ -15,9 +15,12 @@ use derive_getters::Getters;
 use derive_new::new;
 
 use crate::{
-    CalendarMonthInRangeOneToTwelve, HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
-    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
-    UtcOffsetMinuteInRangeZeroToFiftyNine,
+    CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
+    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
+    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 
 /// Proof artifact naming an `amenable_verus` Verus spec function that
@@ -253,5 +256,219 @@ inventory::submit! {
         || {
             <UtcOffsetMinuteInRangeZeroToFiftyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string()
         },
+    )
+}
+
+// ── WeekdayInRangeOneToSeven ──────────────────
+
+const WEEKDAY_IN_RANGE_ONE_TO_SEVEN_VERUS_SRC: &str =
+    include_str!("../../amenable_verus/src/time/weekday_in_range_one_to_seven_carrier.rs");
+
+impl amenable_core::Witness<VerusVerifier> for WeekdayInRangeOneToSeven {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_weekday_in_range_one_to_seven",
+            WEEKDAY_IN_RANGE_ONE_TO_SEVEN_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for WeekdayInRangeOneToSeven {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::WeekdayInRangeOneToSeven",
+        "verus",
+        || <WeekdayInRangeOneToSeven as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── WeekNumberInRangeOneToFiftyThree ──────────────────
+
+const WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/week_number_in_range_one_to_fifty_three_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for WeekNumberInRangeOneToFiftyThree {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_week_number_in_range_one_to_fifty_three",
+            WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for WeekNumberInRangeOneToFiftyThree {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::WeekNumberInRangeOneToFiftyThree",
+        "verus",
+        || <WeekNumberInRangeOneToFiftyThree as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── OrdinalDayInRangeOneToThreeHundredSixtySix ──────────────────
+
+const ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/ordinal_day_in_range_one_to_three_hundred_sixty_six_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for OrdinalDayInRangeOneToThreeHundredSixtySix {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_ordinal_day_in_range_one_to_three_hundred_sixty_six",
+            ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for OrdinalDayInRangeOneToThreeHundredSixtySix
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::OrdinalDayInRangeOneToThreeHundredSixtySix",
+        "verus",
+        || <OrdinalDayInRangeOneToThreeHundredSixtySix as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── CenturyOrdinalInRangeZeroToNinetyNine ──────────────────
+
+const CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/century_ordinal_in_range_zero_to_ninety_nine_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_century_ordinal_in_range_zero_to_ninety_nine",
+            CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::CenturyOrdinalInRangeZeroToNinetyNine",
+        "verus",
+        || <CenturyOrdinalInRangeZeroToNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── DecadeOrdinalInRangeZeroToNineHundredNinetyNine ──────────────────
+
+const DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for DecadeOrdinalInRangeZeroToNineHundredNinetyNine {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine",
+            DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for DecadeOrdinalInRangeZeroToNineHundredNinetyNine
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::DecadeOrdinalInRangeZeroToNineHundredNinetyNine",
+        "verus",
+        || <DecadeOrdinalInRangeZeroToNineHundredNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine ──────────────────
+
+const CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier>
+    for CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine",
+            CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine",
+        "verus",
+        || <CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }

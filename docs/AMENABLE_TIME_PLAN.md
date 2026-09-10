@@ -937,10 +937,23 @@ Contract worklist:
       rule); machine-checked on all three backends as a boundary
       regression guard. Kani: `passed`. Creusot: `Proved (155 files) ✔`.
       Verus: `491 verified, 0 errors`.
-- [ ] More ranges: `WeekNumberInRangeOneToFiftyThree`,
-      `WeekdayInRangeOneToSeven`, `OrdinalDayInRangeOneToThreeHundredSixtySix`,
-      `CenturyOrdinalInRangeZeroToNinetyNine`, `DecadeOrdinalInRange…`,
-      `CalendarYearInRangeZeroToNine…`.
+- [x] **Week / ordinal-day / century / decade / year ranges** (2026-09-09):
+      `WeekdayInRangeOneToSeven` (seven-way enumeration, Mon–Sun, matching
+      the month pattern-setter), `WeekNumberInRangeOneToFiftyThree`,
+      `OrdinalDayInRangeOneToThreeHundredSixtySix` (`u16`),
+      `CenturyOrdinalInRangeZeroToNinetyNine`,
+      `DecadeOrdinalInRangeZeroToNineHundredNinetyNine` (`u16`),
+      `CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine` (`u16`).
+      Uniform theorem: the canonical `LO..=HI` `contains` predicate agrees,
+      over the whole integer domain, with an independently-written
+      restatement — one-sided `n < HI+1`, two-sided `LO <= n && n < HI+1`,
+      weekday the enumeration. Same thin boundary-regression character.
+      Kani: all `passed`. Creusot: `Proved (161 files) ✔`.
+      Verus: `497 verified, 0 errors`. (Verus: a two-sided range can't
+      be a single spec expression — `RangeInclusive::contains` is
+      exec-only and clippy rejects the manual `a <= x && x <= b` form —
+      so each bound is its own single-comparison `spec fn` and `_holds`
+      is their conjunction.)
 - [ ] Ordering contracts: `IntervalStartPrecedesEnd`,
       `IntervalEndpointsOrdered`, `IntervalDurationIsNonNegative`,
       `UtcTimelineOrderingAppliesToFixedInstants`.

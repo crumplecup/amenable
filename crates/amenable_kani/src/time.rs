@@ -8,9 +8,12 @@
 
 use amenable_core::Witness;
 use amenable_time::{
-    CalendarMonthInRangeOneToTwelve, HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
-    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
-    UtcOffsetMinuteInRangeZeroToFiftyNine,
+    CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    HourInRangeZeroToTwentyFour, MinuteInRangeZeroToFiftyNine,
+    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
+    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
 };
 
 use crate::rust_std::kani_ensures;
@@ -314,6 +317,290 @@ amenable_derive::harness! {
             let strict_below_next = minute < 60;
 
             assert_eq!(inclusive, strict_below_next);
+        }
+    }
+}
+
+// ── WeekdayInRangeOneToSeven ──────────────────────
+
+impl Witness<KaniVerifier> for WeekdayInRangeOneToSeven {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_weekday_in_range_one_to_seven".to_owned(),
+            VERIFY_WEEKDAY_IN_RANGE_ONE_TO_SEVEN_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::WeekdayInRangeOneToSeven",
+        "kani",
+        || <WeekdayInRangeOneToSeven as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    WeekdayInRangeOneToSeven,
+    "amenable_time::WeekdayInRangeOneToSeven::ensures",
+    u8,
+    |weekday| (1..=7).contains(&weekday)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_WEEKDAY_IN_RANGE_ONE_TO_SEVEN_SRC, {
+        /// ISO/WD 8601-1:2016(E), 4.1.4.1 — a weekday is 1 (Monday) through 7 (Sunday). The range predicate agrees, over the whole `u8`
+        /// domain, with the seven-way enumeration of the ISO weekdays (Mon..Sun).
+        #[kani::proof]
+        fn verify_weekday_in_range_one_to_seven() {
+            let weekday: u8 = kani::any();
+
+            let predicate =
+                <WeekdayInRangeOneToSeven as ::amenable_core::Ensures<KaniVerifier>>::ensures(weekday);
+            let enumerated = weekday == 1 || weekday == 2 || weekday == 3 || weekday == 4 || weekday == 5 || weekday == 6 || weekday == 7;
+
+            assert_eq!(predicate, enumerated);
+        }
+    }
+}
+
+// ── WeekNumberInRangeOneToFiftyThree ──────────────────────
+
+impl Witness<KaniVerifier> for WeekNumberInRangeOneToFiftyThree {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_week_number_in_range_one_to_fifty_three".to_owned(),
+            VERIFY_WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::WeekNumberInRangeOneToFiftyThree",
+        "kani",
+        || <WeekNumberInRangeOneToFiftyThree as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    WeekNumberInRangeOneToFiftyThree,
+    "amenable_time::WeekNumberInRangeOneToFiftyThree::ensures",
+    u8,
+    |week| (1..=53).contains(&week)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_WEEK_NUMBER_IN_RANGE_ONE_TO_FIFTY_THREE_SRC, {
+        /// ISO/WD 8601-1:2016(E), 4.1.4.1 — a calendar-week number is 01 through 53. The canonical predicate agrees, over the whole `u8`
+        /// domain, with the independently-written `week >= 1 && week < 54`.
+        #[kani::proof]
+        fn verify_week_number_in_range_one_to_fifty_three() {
+            let week: u8 = kani::any();
+
+            let predicate =
+                <WeekNumberInRangeOneToFiftyThree as ::amenable_core::Ensures<KaniVerifier>>::ensures(week);
+            let restated = week >= 1 && week < 54;
+
+            assert_eq!(predicate, restated);
+        }
+    }
+}
+
+// ── OrdinalDayInRangeOneToThreeHundredSixtySix ──────────────────────
+
+impl Witness<KaniVerifier> for OrdinalDayInRangeOneToThreeHundredSixtySix {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_ordinal_day_in_range_one_to_three_hundred_sixty_six".to_owned(),
+            VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::OrdinalDayInRangeOneToThreeHundredSixtySix",
+        "kani",
+        || <OrdinalDayInRangeOneToThreeHundredSixtySix as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    OrdinalDayInRangeOneToThreeHundredSixtySix,
+    "amenable_time::OrdinalDayInRangeOneToThreeHundredSixtySix::ensures",
+    u16,
+    |day| (1..=366).contains(&day)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC, {
+        /// ISO/WD 8601-1:2016(E), 3.2.1 / 4.1.3.1 — an ordinal day-of-year is 001 through 365, or 366 in a leap year. The canonical predicate agrees, over the whole `u16`
+        /// domain, with the independently-written `day >= 1 && day < 367`.
+        #[kani::proof]
+        fn verify_ordinal_day_in_range_one_to_three_hundred_sixty_six() {
+            let day: u16 = kani::any();
+
+            let predicate =
+                <OrdinalDayInRangeOneToThreeHundredSixtySix as ::amenable_core::Ensures<KaniVerifier>>::ensures(day);
+            let restated = day >= 1 && day < 367;
+
+            assert_eq!(predicate, restated);
+        }
+    }
+}
+
+// ── CenturyOrdinalInRangeZeroToNinetyNine ──────────────────────
+
+impl Witness<KaniVerifier> for CenturyOrdinalInRangeZeroToNinetyNine {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_century_ordinal_in_range_zero_to_ninety_nine".to_owned(),
+            VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::CenturyOrdinalInRangeZeroToNinetyNine",
+        "kani",
+        || <CenturyOrdinalInRangeZeroToNinetyNine as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    CenturyOrdinalInRangeZeroToNinetyNine,
+    "amenable_time::CenturyOrdinalInRangeZeroToNinetyNine::ensures",
+    u8,
+    |ordinal| ordinal <= 99
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC, {
+        /// ISO 8601-1:2019/Amd 1:2022, 4.3.12 — a Gregorian century ordinal is 00 through 99. The canonical predicate agrees, over the whole `u8`
+        /// domain, with the independently-written `ordinal < 100`.
+        #[kani::proof]
+        fn verify_century_ordinal_in_range_zero_to_ninety_nine() {
+            let ordinal: u8 = kani::any();
+
+            let predicate =
+                <CenturyOrdinalInRangeZeroToNinetyNine as ::amenable_core::Ensures<KaniVerifier>>::ensures(ordinal);
+            let restated = ordinal < 100;
+
+            assert_eq!(predicate, restated);
+        }
+    }
+}
+
+// ── DecadeOrdinalInRangeZeroToNineHundredNinetyNine ──────────────────────
+
+impl Witness<KaniVerifier> for DecadeOrdinalInRangeZeroToNineHundredNinetyNine {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine".to_owned(),
+            VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::DecadeOrdinalInRangeZeroToNineHundredNinetyNine",
+        "kani",
+        || <DecadeOrdinalInRangeZeroToNineHundredNinetyNine as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    "amenable_time::DecadeOrdinalInRangeZeroToNineHundredNinetyNine::ensures",
+    u16,
+    |ordinal| ordinal <= 999
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC, {
+        /// ISO 8601-1:2019/Amd 1:2022, 4.3.11 — a Gregorian decade ordinal is 000 through 999. The canonical predicate agrees, over the whole `u16`
+        /// domain, with the independently-written `ordinal < 1000`.
+        #[kani::proof]
+        fn verify_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine() {
+            let ordinal: u16 = kani::any();
+
+            let predicate =
+                <DecadeOrdinalInRangeZeroToNineHundredNinetyNine as ::amenable_core::Ensures<KaniVerifier>>::ensures(ordinal);
+            let restated = ordinal < 1000;
+
+            assert_eq!(predicate, restated);
+        }
+    }
+}
+
+// ── CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine ──────────────────────
+
+impl Witness<KaniVerifier> for CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine"
+                .to_owned(),
+            VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC
+                .to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine",
+        "kani",
+        || <CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    "amenable_time::CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine::ensures",
+    u16,
+    |year| year <= 9999
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC, {
+        /// ISO/WD 8601-1:2016(E), 4.1.2.1 — a non-expanded calendar year is 0000 through 9999. The canonical predicate agrees, over the whole `u16`
+        /// domain, with the independently-written `year < 10000`.
+        #[kani::proof]
+        fn verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine() {
+            let year: u16 = kani::any();
+
+            let predicate =
+                <CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine as ::amenable_core::Ensures<KaniVerifier>>::ensures(year);
+            let restated = year < 10000;
+
+            assert_eq!(predicate, restated);
         }
     }
 }

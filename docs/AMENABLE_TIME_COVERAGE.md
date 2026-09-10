@@ -131,6 +131,12 @@ the generated `new`).
 | `SecondInRangeZeroToSixty` | `s <= 60` (60 admits a leap second) agrees over the whole `u8` domain with `s < 61` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
 | `UtcOffsetHourInRangeZeroToTwentyThree` | `h <= 23` agrees over the whole `u8` domain with `h < 24` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
 | `UtcOffsetMinuteInRangeZeroToFiftyNine` | `m <= 59` agrees over the whole `u8` domain with `m < 60` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
+| `WeekdayInRangeOneToSeven` | the `1..=7` range check agrees, over the whole `u8` domain, with the seven-way enumeration of the ISO weekdays (Mon..Sun) | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `WeekNumberInRangeOneToFiftyThree` | `1..=53` `contains` agrees over the whole `u8` domain with `1 <= w && w < 54` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `OrdinalDayInRangeOneToThreeHundredSixtySix` | `1..=366` `contains` agrees over the whole `u16` domain with `1 <= d && d < 367` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `CenturyOrdinalInRangeZeroToNinetyNine` | `o <= 99` agrees over the whole `u8` domain with `o < 100` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `DecadeOrdinalInRangeZeroToNineHundredNinetyNine` | `o <= 999` agrees over the whole `u16` domain with `o < 1000` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
+| `CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine` | `y <= 9999` agrees over the whole `u16` domain with `y < 10000` | ✅ passed | ✅ Proved (161 files) | ✅ 497 verified |
 
 Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_time` dep; Verus's real `verus! {}` proof lives in

@@ -1,0 +1,34 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 675 8 675 67 *)
+
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 676 23 676 26
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 676 41 676 44
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 676 12 676 44
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 673 19 673 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 674 18 674 70
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 655 24 655 159
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate weekday_in_range_one_to_seven_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 654 8 654 86] (weekday: UInt8.t) (outcome: bool) =
+  [%#stime'4] outcome
+  = (weekday = (1: UInt8.t)
+  \/ weekday = (2: UInt8.t)
+  \/ weekday = (3: UInt8.t)
+  \/ weekday = (4: UInt8.t) \/ weekday = (5: UInt8.t) \/ weekday = (6: UInt8.t) \/ weekday = (7: UInt8.t))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_weekday_in_range_one_to_seven [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 675 8 675 67]
+  (weekday: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- UInt8.ge weekday ([%#stime] (1: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_ret <- UInt8.le weekday ([%#stime'0] (7: UInt8.t)) ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- [%#stime'1] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & weekday: UInt8.t = weekday | & _5: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_weekday_in_range_one_to_seven ensures] [%#stime'3] weekday_in_range_one_to_seven_holds weekday result}
+    (! return {result}) ]

@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 706 8 706 74 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 707 20 707 23
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 707 35 707 39
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 707 12 707 39
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 704 19 704 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 705 18 705 77
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 686 24 686 63
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate ge_log_u8 [@inline:trivial] (self: UInt8.t) (other: UInt8.t) = [%#sord] UInt8.le other self
+
+meta "rewrite_def" predicate ge_log_u8
+
+predicate week_number_in_range_one_to_fifty_three_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 685 8 685 93] (week: UInt8.t) (outcome: bool) =
+  [%#stime'4] outcome = (ge_log_u8 week (1: UInt8.t) /\ UInt8.lt week (54: UInt8.t))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_week_number_in_range_one_to_fifty_three [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 706 8 706 74]
+  (week: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- UInt8.ge week ([%#stime] (1: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_ret <- UInt8.le week ([%#stime'0] (53: UInt8.t)) ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- [%#stime'1] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & week: UInt8.t = week | & _5: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_week_number_in_range_one_to_fifty_three ensures] [%#stime'3] week_number_in_range_one_to_fifty_three_holds week result}
+    (! return {result}) ]
