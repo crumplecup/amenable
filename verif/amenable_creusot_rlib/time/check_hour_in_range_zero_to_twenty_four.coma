@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 306 8 306 68 *)
+
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 307 20 307 24
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 304 19 304 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 305 18 305 71
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 285 24 285 48
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate hour_in_range_zero_to_twenty_four_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 284 8 284 87] (hour: UInt8.t) (outcome: bool) =
+  [%#stime'2] outcome = UInt8.lt hour (25: UInt8.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_hour_in_range_zero_to_twenty_four [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 306 8 306 68]
+  (hour: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- UInt8.le hour ([%#stime] (24: UInt8.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & hour: UInt8.t = hour ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_hour_in_range_zero_to_twenty_four ensures] [%#stime'1] hour_in_range_zero_to_twenty_four_holds hour result}
+    (! return {result}) ]

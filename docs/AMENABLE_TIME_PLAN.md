@@ -927,11 +927,20 @@ Contract worklist:
       exec body but not a `spec`/`ensures` clause; the `ensures` names the
       `calendar_month_is_enumerated` spec fn, the exec body writes
       `(1..=12u8).contains(&month)`, and Verus proves they agree.)
-- [ ] Range contracts: `HourInRangeZeroToTwentyFour`, `MinuteInRangeZeroToFiftyNine`,
-      `SecondInRangeZeroToSixty`, `WeekNumberInRangeOneToFiftyThree`,
+- [x] **Time-of-day / UTC-offset ranges** (2026-09-09): `HourInRangeZeroToTwentyFour`
+      (0–24), `MinuteInRangeZeroToFiftyNine`, `SecondInRangeZeroToSixty`
+      (60 admits a leap second), `UtcOffsetHourInRangeZeroToTwentyThree`,
+      `UtcOffsetMinuteInRangeZeroToFiftyNine`. Theorem per contract: the
+      `n <= HI` inclusive form agrees, over the whole `u8` domain, with
+      the independently-written `n < HI+1`. Thin (a pure range has no
+      deeper local law — the real theorem is the composite's end-of-day
+      rule); machine-checked on all three backends as a boundary
+      regression guard. Kani: `passed`. Creusot: `Proved (155 files) ✔`.
+      Verus: `491 verified, 0 errors`.
+- [ ] More ranges: `WeekNumberInRangeOneToFiftyThree`,
       `WeekdayInRangeOneToSeven`, `OrdinalDayInRangeOneToThreeHundredSixtySix`,
-      `UtcOffsetHourInRangeZeroToTwentyThree`, `CenturyOrdinalInRangeZeroToNinetyNine`,
-      `DecadeOrdinalInRange…`, `CalendarYearInRangeZeroToNine…`.
+      `CenturyOrdinalInRangeZeroToNinetyNine`, `DecadeOrdinalInRange…`,
+      `CalendarYearInRangeZeroToNine…`.
 - [ ] Ordering contracts: `IntervalStartPrecedesEnd`,
       `IntervalEndpointsOrdered`, `IntervalDurationIsNonNegative`,
       `UtcTimelineOrderingAppliesToFixedInstants`.

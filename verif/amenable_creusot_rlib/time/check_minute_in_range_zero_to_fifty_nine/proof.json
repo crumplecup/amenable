@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_minute_in_range_zero_to_fifty_nine": {
+        "prover": "cvc4",
+        "time": 0.031
+      }
+    }
+  }
+}

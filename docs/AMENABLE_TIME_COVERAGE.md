@@ -126,6 +126,11 @@ the generated `new`).
 | contract | theorem | kani | creusot | verus |
 |---|---|:--:|:--:|:--:|
 | `CalendarMonthInRangeOneToTwelve` | the `1..=12` range check agrees, over the whole `u8` domain, with the twelve-way enumeration of the legal calendar months (ISO 8601-1:2019, 3.1.1.2) | ✅ passed | ✅ Proved (150 files) | ✅ 486 verified |
+| `HourInRangeZeroToTwentyFour` | `h <= 24` agrees over the whole `u8` domain with `h < 25` (thin boundary guard) | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
+| `MinuteInRangeZeroToFiftyNine` | `m <= 59` agrees over the whole `u8` domain with `m < 60` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
+| `SecondInRangeZeroToSixty` | `s <= 60` (60 admits a leap second) agrees over the whole `u8` domain with `s < 61` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
+| `UtcOffsetHourInRangeZeroToTwentyThree` | `h <= 23` agrees over the whole `u8` domain with `h < 24` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
+| `UtcOffsetMinuteInRangeZeroToFiftyNine` | `m <= 59` agrees over the whole `u8` domain with `m < 60` | ✅ passed | ✅ Proved (155 files) | ✅ 491 verified |
 
 Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_time` dep; Verus's real `verus! {}` proof lives in

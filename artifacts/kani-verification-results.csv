@@ -637,5 +637,10 @@ amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788637946,pas
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788637957,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788637967,passed
 amenable_kani::time::verify_calendar_month_in_range,1788994320,passed
+amenable_kani::time::verify_hour_in_range_zero_to_twenty_four,1789004870,passed
+amenable_kani::time::verify_minute_in_range_zero_to_fifty_nine,1789004879,passed
+amenable_kani::time::verify_second_in_range_zero_to_sixty,1789004889,passed
+amenable_kani::time::verify_utc_offset_hour_in_range_zero_to_twenty_three,1789004898,passed
+amenable_kani::time::verify_utc_offset_minute_in_range_zero_to_fifty_nine,1789004908,passed
 amenable_kani::utf8_model::buffer::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788637979,passed
 amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788027332,passed

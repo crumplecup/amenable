@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_utc_offset_hour_in_range_zero_to_twenty_three": {
+        "prover": "cvc4",
+        "time": 0.023
+      }
+    }
+  }
+}
