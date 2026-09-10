@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_centennial_year_divisible_by_one_hundred": {
+        "prover": "alt-ergo",
+        "time": 0.028
+      }
+    }
+  }
+}

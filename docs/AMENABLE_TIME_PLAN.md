@@ -969,11 +969,25 @@ Contract worklist:
       `IntervalEndpointsOrdered` is the `interval ∧ ordering ∧ duration`
       composite — it resolves structurally once `TimeIntervalValid` is
       also proven; folded into the `proof_composition` step below.
-- [ ] Arithmetic-rule contracts: `GregorianLeapYearUsesDivisibleByFourAndFourHundredException`,
-      `LeapYearHasThreeHundredSixtySixCalendarDays`,
-      `CommonYearHasThreeHundredSixtyFiveCalendarDays`,
-      `CalendarDayWithinMonthBounds`, `LeapDayOccursOnlyInLeapYear`,
-      `CentennialYearDivisibleByOneHundred`.
+- Arithmetic-rule contracts (year `i32`, signed so
+  `clippy::manual_is_multiple_of` stays quiet; `k % n == 0` is
+  sign-agnostic):
+  - [x] **Leap-year rule** (2026-09-10):
+        `GregorianLeapYearUsesDivisibleByFourAndFourHundredException`,
+        `CentennialYearDivisibleByOneHundred`. Kani carries the symbolic
+        number theory over the whole `i32` domain — the leap rule agrees
+        with the centennial case split `if y%100==0 {y%400==0} else
+        {y%4==0}` and six dated anchors; `y%100==0` agrees with
+        `y%4==0 && y%25==0` (100 = 4·25). Verus/Creusot carry the
+        definitional check + the propositional `leap(y) ⟹ 4∣y` + (Verus)
+        the dated anchors — `100∣y ⟹ 4∣y` and the CRT split are nonlinear
+        for an SMT backend, so they live on Kani only. Kani: `passed`.
+        Creusot: `Proved (166 files) ✔`. Verus: `502 verified, 0 errors`.
+  - [ ] Year length: `LeapYearHasThreeHundredSixtySixCalendarDays`,
+        `CommonYearHasThreeHundredSixtyFiveCalendarDays`,
+        `YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays`.
+  - [ ] Month / day bounds: `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays`,
+        `CalendarDayWithinMonthBounds`, `LeapDayOccursOnlyInLeapYear`.
 - [ ] The `proof_composition` aggregates whose leaves are now all proven
       → composed `Witness<V>` conjunctions (real, not tautological).
 - [ ] Each real proof: injected-regression check per backend (memory

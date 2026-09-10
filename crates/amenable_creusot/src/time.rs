@@ -22,12 +22,14 @@ mod not_creusot_mirror {
     use amenable_time::{
         CalendarMonthInRangeOneToTwelve,
         CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
-        CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-        HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
-        MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
-        SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
-        UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
-        WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
+        CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+        DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+        GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
+        IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+        OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
+        UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+        UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
+        WeekdayInRangeOneToSeven,
     };
 
     use crate::CreusotVerifier;
@@ -35,10 +37,12 @@ mod not_creusot_mirror {
     use super::{
         CALENDAR_MONTH_IN_RANGE_HOLDS_SRC,
         CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
+        CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC,
         CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_HOLDS_SRC,
         DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_HOLDS_SRC,
-        HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC, INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC,
-        INTERVAL_START_PRECEDES_END_HOLDS_SRC, MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
+        GREGORIAN_LEAP_YEAR_HOLDS_SRC, HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_HOLDS_SRC,
+        INTERVAL_DURATION_IS_NON_NEGATIVE_HOLDS_SRC, INTERVAL_START_PRECEDES_END_HOLDS_SRC,
+        MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_HOLDS_SRC,
         ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_HOLDS_SRC,
         SECOND_IN_RANGE_ZERO_TO_SIXTY_HOLDS_SRC,
         UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_HOLDS_SRC,
@@ -46,10 +50,12 @@ mod not_creusot_mirror {
         UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_HOLDS_SRC,
         VERIFY_CALENDAR_MONTH_IN_RANGE_SRC,
         VERIFY_CALENDAR_YEAR_IN_RANGE_ZERO_TO_NINE_THOUSAND_NINE_HUNDRED_NINETY_NINE_SRC,
+        VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC,
         VERIFY_CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_SRC,
         VERIFY_DECADE_ORDINAL_IN_RANGE_ZERO_TO_NINE_HUNDRED_NINETY_NINE_SRC,
-        VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC, VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC,
-        VERIFY_INTERVAL_START_PRECEDES_END_SRC, VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
+        VERIFY_GREGORIAN_LEAP_YEAR_SRC, VERIFY_HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_SRC,
+        VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, VERIFY_INTERVAL_START_PRECEDES_END_SRC,
+        VERIFY_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_SRC,
         VERIFY_ORDINAL_DAY_IN_RANGE_ONE_TO_THREE_HUNDRED_SIXTY_SIX_SRC,
         VERIFY_SECOND_IN_RANGE_ZERO_TO_SIXTY_SRC,
         VERIFY_UTC_OFFSET_HOUR_IN_RANGE_ZERO_TO_TWENTY_THREE_SRC,
@@ -531,6 +537,72 @@ mod not_creusot_mirror {
             "creusot",
             || {
                 <UtcTimelineOrderingAppliesToFixedInstants as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier>
+        for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+    {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_gregorian_leap_year".to_owned(),
+                VERIFY_GREGORIAN_LEAP_YEAR_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier>
+        for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+    {
+        type Input = i32;
+        type Bound = &'static str;
+
+        fn ensures(_year: i32) -> Self::Bound {
+            GREGORIAN_LEAP_YEAR_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::GregorianLeapYearUsesDivisibleByFourAndFourHundredException",
+            "creusot",
+            || {
+                <GregorianLeapYearUsesDivisibleByFourAndFourHundredException as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
+            },
+        )
+    }
+
+    impl amenable_core::Witness<CreusotVerifier> for CentennialYearDivisibleByOneHundred {
+        type SupportingEvidence = Self;
+        type ProofArtifact = crate::witness::MultiCheckProof;
+
+        fn proof() -> Self::ProofArtifact {
+            crate::witness::MultiCheckProof::new(vec![(
+                "check_centennial_year_divisible_by_one_hundred".to_owned(),
+                VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC.to_owned(),
+            )])
+        }
+    }
+
+    impl amenable_core::Ensures<CreusotVerifier> for CentennialYearDivisibleByOneHundred {
+        type Input = i32;
+        type Bound = &'static str;
+
+        fn ensures(_year: i32) -> Self::Bound {
+            CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC
+        }
+    }
+
+    ::inventory::submit! {
+        ::amenable_core::ProofRecord::new(
+            "amenable_time::CentennialYearDivisibleByOneHundred",
+            "creusot",
+            || {
+                <CentennialYearDivisibleByOneHundred as amenable_core::Witness<CreusotVerifier>>::proof().to_string()
             },
         )
     }
@@ -1027,6 +1099,69 @@ amenable_derive::harness! {
         #[ensures(a@ <= b@ && b@ <= c@ ==> a@ <= c@)]
         fn check_utc_timeline_ordering_applies_to_fixed_instants(a: i32, b: i32, c: i32) -> bool {
             a <= b
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, GREGORIAN_LEAP_YEAR_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 note 1 — a year is a leap year if divisible by 4, except a centennial year is a leap year only if also divisible by 400: the outcome equals the divisible-by-4-with-the-centennial-/400-exception rule.
+        #[logic(open)]
+        pub fn gregorian_leap_year_holds(year: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (year@ % 4 == 0 && (year@ % 100 != 0 || year@ % 400 == 0)) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::gregorian_leap_year_holds",
+        "creusot",
+        "ensures",
+        || GREGORIAN_LEAP_YEAR_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_GREGORIAN_LEAP_YEAR_SRC, {
+        /// The exec leap rule satisfies the spec, and every leap year is divisible by four, for every `i32`.
+        #[requires(true)]
+        #[ensures(gregorian_leap_year_holds(year, result))]
+        #[ensures(year@ % 4 == 0 && (year@ % 100 != 0 || year@ % 400 == 0) ==> year@ % 4 == 0)]
+        fn check_gregorian_leap_year(year: i32) -> bool {
+            year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+        }
+    }
+}
+
+amenable_derive::harness! {
+    creusot, CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.22 — a centennial year is one whose year number is an exact multiple of 100: the outcome equals `year` being an exact multiple of 100.
+        #[logic(open)]
+        pub fn centennial_year_divisible_by_one_hundred_holds(year: i32, outcome: bool) -> bool {
+            pearlite! { outcome == (year@ % 100 == 0) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::centennial_year_divisible_by_one_hundred_holds",
+        "creusot",
+        "ensures",
+        || CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC, {
+        /// The exec `year % 100 == 0` check satisfies the spec, for every `i32`.
+        #[requires(true)]
+        #[ensures(centennial_year_divisible_by_one_hundred_holds(year, result))]
+        fn check_centennial_year_divisible_by_one_hundred(year: i32) -> bool {
+            year % 100 == 0
         }
     }
 }

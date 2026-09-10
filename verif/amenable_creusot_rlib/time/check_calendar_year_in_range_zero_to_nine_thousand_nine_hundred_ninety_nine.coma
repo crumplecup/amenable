@@ -1,21 +1,21 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 927 8 927 105 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 999 8 999 105 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 928 20 928 27
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 925 19 925 23
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 926 18 926 107
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 907 24 907 52
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1000 20 1000 27
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 997 19 997 23
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 998 18 998 107
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 979 24 979 52
 
 use creusot.int.UInt16
 use creusot.prelude.Any
 
-predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 906 8 906 124] (year: UInt16.t) (outcome: bool) =
+predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 978 8 978 124] (year: UInt16.t) (outcome: bool) =
   [%#stime'2] outcome = UInt16.lt year (10000: UInt16.t)
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 927 8 927 105]
+let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 999 8 999 105]
   (year: UInt16.t) (return (x: bool)) = (! bb0
   [ bb0 = s0 [ s0 = [ &_ret <- UInt16.le year ([%#stime] (9999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
   [ & _ret: bool = Any.any_l () | & year: UInt16.t = year ])

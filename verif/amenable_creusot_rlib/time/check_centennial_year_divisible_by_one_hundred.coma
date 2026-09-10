@@ -1,0 +1,45 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1163 8 1163 76 *)
+
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1164 19 1164 22
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1164 12 1164 22
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1164 26 1164 27
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1161 19 1161 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1162 18 1162 78
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1143 24 1143 53
+
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.ComputerDivision
+
+predicate centennial_year_divisible_by_one_hundred_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1142 8 1142 95] (year: Int32.t) (outcome: bool) =
+  [%#stime'4] outcome = (ComputerDivision.mod (Int32.to_int year) 100 = 0)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_centennial_year_divisible_by_one_hundred [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1163 8 1163 76]
+  (year: Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_6 <- year ] s1
+    | s1 = [ &_7 <- ([%#stime] (100: Int32.t)) = ([%#stime'0] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'0] not _7} s3
+    | s3 = [ &_8 <- ([%#stime] (100: Int32.t)) = ([%#stime'0] (-1: Int32.t)) ] s4
+    | s4 = [ &_9 <- _6 = ([%#stime'0] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_10 <- Bool.bw_and _8 _9 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'0] not _10} s7
+    | s7 = Int32.rem [%#stime'0] {_6} {[%#stime] (100: Int32.t)} (fun (_x: Int32.t) -> [ &_5 <- _x ] s8)
+    | s8 = [ &_ret <- _5 = ([%#stime'1] (0: Int32.t)) ] s9
+    | s9 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & _5: Int32.t = Any.any_l ()
+  | & _6: Int32.t = Any.any_l ()
+  | & _7: bool = Any.any_l ()
+  | & _8: bool = Any.any_l ()
+  | & _9: bool = Any.any_l ()
+  | & _10: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_centennial_year_divisible_by_one_hundred ensures] [%#stime'3] centennial_year_divisible_by_one_hundred_holds year result}
+    (! return {result}) ]

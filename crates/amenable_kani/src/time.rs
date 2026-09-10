@@ -9,12 +9,14 @@
 use amenable_core::Witness;
 use amenable_time::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
-    CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-    HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
-    MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
-    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
-    UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
-    WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
+    CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+    DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
+    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
+    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
+    WeekdayInRangeOneToSeven,
 };
 
 use crate::rust_std::kani_ensures;
@@ -758,6 +760,128 @@ amenable_derive::harness! {
             assert!(le(a, b) || le(b, a), "total");
             assert!(!(le(a, b) && le(b, a)) || a == b, "antisymmetric");
             assert!(!(le(a, b) && le(b, c)) || le(a, c), "transitive");
+        }
+    }
+}
+
+// ── GregorianLeapYearUsesDivisibleByFourAndFourHundredException ──────────────────
+
+impl Witness<KaniVerifier> for GregorianLeapYearUsesDivisibleByFourAndFourHundredException {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_gregorian_leap_year".to_owned(),
+            VERIFY_GREGORIAN_LEAP_YEAR_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::GregorianLeapYearUsesDivisibleByFourAndFourHundredException",
+        "kani",
+        || <GregorianLeapYearUsesDivisibleByFourAndFourHundredException as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException,
+    "amenable_time::GregorianLeapYearUsesDivisibleByFourAndFourHundredException::ensures",
+    i32,
+    |year| year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_GREGORIAN_LEAP_YEAR_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.21 note 1 — a year is a leap year if divisible by 4, except a centennial year is a leap year only if also divisible by 400. The `y%4 && (y%100 || y%400)` rule agrees, over every `i32`, with the
+        /// case split on centennial years, and with six dated anchors.
+        #[kani::proof]
+        fn verify_gregorian_leap_year() {
+            let year: i32 = kani::any();
+
+            let leap = <GregorianLeapYearUsesDivisibleByFourAndFourHundredException as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures(year);
+
+            // The standard's stated form: a centennial year needs the /400
+            // rule, every other year only the /4 rule.
+            let case_split = if year % 100 == 0 { year % 400 == 0 } else { year % 4 == 0 };
+            assert_eq!(leap, case_split);
+
+            // Dated anchors — the classic off-by-a-century bugs.
+            let leap_of = |y: i32| {
+                <GregorianLeapYearUsesDivisibleByFourAndFourHundredException as ::amenable_core::Ensures<
+                    KaniVerifier,
+                >>::ensures(y)
+            };
+            assert!(leap_of(2000), "2000 is a leap year");
+            assert!(leap_of(1600), "1600 is a leap year");
+            assert!(leap_of(2024), "2024 is a leap year");
+            assert!(!leap_of(1900), "1900 is not a leap year");
+            assert!(!leap_of(2100), "2100 is not a leap year");
+            assert!(!leap_of(2023), "2023 is not a leap year");
+        }
+    }
+}
+
+// ── CentennialYearDivisibleByOneHundred ──────────────────
+
+impl Witness<KaniVerifier> for CentennialYearDivisibleByOneHundred {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CalculationProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CalculationProof::new(
+            "time::verify_centennial_year_divisible_by_one_hundred".to_owned(),
+            VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC.to_owned(),
+        )
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_time::CentennialYearDivisibleByOneHundred",
+        "kani",
+        || <CentennialYearDivisibleByOneHundred as Witness<KaniVerifier>>::proof().to_string(),
+    )
+}
+
+kani_ensures!(
+    CentennialYearDivisibleByOneHundred,
+    "amenable_time::CentennialYearDivisibleByOneHundred::ensures",
+    i32,
+    |year| year % 100 == 0
+);
+
+amenable_derive::harness! {
+    kani, VERIFY_CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_SRC, {
+        /// ISO 8601-1:2019, 3.1.1.22 — a centennial year is one whose year number is an exact multiple of 100. `y % 100 == 0` agrees, over every `i32`, with `y%4 == 0 && y%25 == 0`
+        /// (100 = 4·25, coprime factors), plus dated anchors.
+        #[kani::proof]
+        fn verify_centennial_year_divisible_by_one_hundred() {
+            let year: i32 = kani::any();
+
+            let centennial = <CentennialYearDivisibleByOneHundred as ::amenable_core::Ensures<
+                KaniVerifier,
+            >>::ensures(year);
+
+            // 100 = 4 * 25 and gcd(4, 25) = 1, so divisibility by 100 is
+            // exactly divisibility by both 4 and 25.
+            assert_eq!(centennial, year % 4 == 0 && year % 25 == 0);
+
+            let centennial_of = |y: i32| {
+                <CentennialYearDivisibleByOneHundred as ::amenable_core::Ensures<
+                    KaniVerifier,
+                >>::ensures(y)
+            };
+            assert!(centennial_of(0), "year 0 is centennial");
+            assert!(centennial_of(1900), "1900 is centennial");
+            assert!(centennial_of(2000), "2000 is centennial");
+            assert!(!centennial_of(2024), "2024 is not centennial");
         }
     }
 }

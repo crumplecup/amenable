@@ -140,6 +140,13 @@ the generated `new`).
 | `IntervalStartPrecedesEnd` | over every `i32` pair, `start <= end` ⟺ `!(end < start)` ⟺ non-negative `i64` span | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
 | `IntervalDurationIsNonNegative` | over every `i32` pair, non-negative span ⟺ `start <= end`; span is `0` exactly when endpoints coincide | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
 | `UtcTimelineOrderingAppliesToFixedInstants` | `<=` on `i32` timeline positions is a total order — reflexive, antisymmetric, total, transitive | ✅ passed | ✅ Proved (164 files) | ✅ 500 verified |
+| `GregorianLeapYearUsesDivisibleByFourAndFourHundredException` | Kani: `y%4 && (y%100 \|\| y%400)` agrees over every `i32` with the centennial case split + 6 dated anchors. Verus/Creusot: definitional + `leap(y) ⟹ 4∣y` (+ Verus anchors) | ✅ passed | ✅ Proved (166 files) | ✅ 502 verified |
+| `CentennialYearDivisibleByOneHundred` | Kani: `y%100==0` agrees over every `i32` with `y%4==0 && y%25==0` + anchors. Verus: definitional + anchors. Creusot: definitional | ✅ passed | ✅ Proved (166 files) | ✅ 502 verified |
+
+Some contracts prove different depths on different backends — the
+number theory that is nonlinear for an SMT solver (Verus, Creusot) is
+carried bit-precisely by Kani, and the two SMT backends carry the
+definitional check plus whatever linear/propositional facts survive.
 
 Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
 `amenable_time` dep; Verus's real `verus! {}` proof lives in

@@ -1,16 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 581 8 581 59 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 653 8 653 59 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 582 21 582 24
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 582 37 582 41
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 582 12 582 41
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 579 19 579 23
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 580 18 580 62
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 547 16 559 41
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 654 21 654 24
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 654 37 654 41
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 654 12 654 41
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 651 19 651 23
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 652 18 652 62
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 619 16 631 41
 
 use creusot.int.UInt8
 use creusot.prelude.Any
 
-predicate calendar_month_in_range_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 545 8 545 78] (month: UInt8.t) (outcome: bool) =
+predicate calendar_month_in_range_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 617 8 617 78] (month: UInt8.t) (outcome: bool) =
   [%#stime'4] outcome
   = (month = (1: UInt8.t)
   \/ month = (2: UInt8.t)
@@ -26,7 +26,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_calendar_month_in_range [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 581 8 581 59]
+let check_calendar_month_in_range [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 653 8 653 59]
   (month: UInt8.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_5 <- UInt8.ge month ([%#stime] (1: UInt8.t)) ] s1

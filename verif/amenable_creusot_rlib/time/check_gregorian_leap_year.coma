@@ -1,0 +1,98 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1132 8 1132 55 *)
+
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 19 1133 20
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 12 1133 20
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 24 1133 25
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 37 1133 40
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 30 1133 40
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 44 1133 45
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 29 1133 65
+let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 56 1133 59
+let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 49 1133 59
+let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 63 1133 64
+let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1133 12 1133 65
+let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1129 19 1129 23
+let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1130 18 1130 57
+let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1131 18 1131 93
+let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1111 24 1111 93
+
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.ComputerDivision
+
+predicate gregorian_leap_year_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1110 8 1110 74] (year: Int32.t) (outcome: bool) =
+  [%#stime'13] outcome
+  = (ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1132 8 1132 55]
+  (year: Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_9 <- year ] s1
+    | s1 = [ &_10 <- ([%#stime] (4: Int32.t)) = ([%#stime'0] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'0] not _10} s3
+    | s3 = [ &_11 <- ([%#stime] (4: Int32.t)) = ([%#stime'0] (-1: Int32.t)) ] s4
+    | s4 = [ &_12 <- _9 = ([%#stime'0] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_13 <- Bool.bw_and _11 _12 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'0] not _13} s7
+    | s7 = Int32.rem [%#stime'0] {_9} {[%#stime] (4: Int32.t)} (fun (_x: Int32.t) -> [ &_8 <- _x ] s8)
+    | s8 = [ &_7 <- _8 = ([%#stime'1] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_7 = false} (! bb4) | br1 -> {_7} (! bb3) ] ]
+  | bb3 = s0
+    [ s0 = [ &_16 <- year ] s1
+    | s1 = [ &_17 <- ([%#stime'2] (100: Int32.t)) = ([%#stime'3] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'3] not _17} s3
+    | s3 = [ &_18 <- ([%#stime'2] (100: Int32.t)) = ([%#stime'3] (-1: Int32.t)) ] s4
+    | s4 = [ &_19 <- _16 = ([%#stime'3] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_20 <- Bool.bw_and _18 _19 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'3] not _20} s7
+    | s7 = Int32.rem [%#stime'3] {_16} {[%#stime'2] (100: Int32.t)} (fun (_x: Int32.t) -> [ &_15 <- _x ] s8)
+    | s8 = [ &_14 <- _15 <> ([%#stime'4] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_14 = false} (! bb8) | br1 -> {_14} (! bb7) ] ]
+  | bb7 = s0 [ s0 = [ &_ret <- [%#stime'5] true ] s1 | s1 = return {_ret} ]
+  | bb8 = s0
+    [ s0 = [ &_22 <- year ] s1
+    | s1 = [ &_23 <- ([%#stime'6] (400: Int32.t)) = ([%#stime'7] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#stime'7] not _23} s3
+    | s3 = [ &_24 <- ([%#stime'6] (400: Int32.t)) = ([%#stime'7] (-1: Int32.t)) ] s4
+    | s4 = [ &_25 <- _22 = ([%#stime'7] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_26 <- Bool.bw_and _24 _25 ] s6
+    | s6 = {[@expl:Rem overflow] [%#stime'7] not _26} s7
+    | s7 = Int32.rem [%#stime'7] {_22} {[%#stime'6] (400: Int32.t)} (fun (_x: Int32.t) -> [ &_21 <- _x ] s8)
+    | s8 = [ &_ret <- _21 = ([%#stime'8] (0: Int32.t)) ] s9
+    | s9 = return {_ret} ]
+  | bb4 = s0 [ s0 = [ &_ret <- [%#stime'9] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & _7: bool = Any.any_l ()
+  | & _8: Int32.t = Any.any_l ()
+  | & _9: Int32.t = Any.any_l ()
+  | & _10: bool = Any.any_l ()
+  | & _11: bool = Any.any_l ()
+  | & _12: bool = Any.any_l ()
+  | & _13: bool = Any.any_l ()
+  | & _14: bool = Any.any_l ()
+  | & _15: Int32.t = Any.any_l ()
+  | & _16: Int32.t = Any.any_l ()
+  | & _17: bool = Any.any_l ()
+  | & _18: bool = Any.any_l ()
+  | & _19: bool = Any.any_l ()
+  | & _20: bool = Any.any_l ()
+  | & _21: Int32.t = Any.any_l ()
+  | & _22: Int32.t = Any.any_l ()
+  | & _23: bool = Any.any_l ()
+  | & _24: bool = Any.any_l ()
+  | & _25: bool = Any.any_l ()
+  | & _26: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_gregorian_leap_year ensures] ([@stop_split] [@expl:check_gregorian_leap_year ensures #0] [%#stime'11] gregorian_leap_year_holds year result)
+    /\ ([@stop_split] [@expl:check_gregorian_leap_year ensures #1] [%#stime'12] ComputerDivision.mod (Int32.to_int year) 4
+        = 0
+      /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+    -> ComputerDivision.mod (Int32.to_int year) 4 = 0)}
+    (! return {result}) ]

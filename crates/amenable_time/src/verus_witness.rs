@@ -16,12 +16,14 @@ use derive_new::new;
 
 use crate::{
     CalendarMonthInRangeOneToTwelve, CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
-    CenturyOrdinalInRangeZeroToNinetyNine, DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
-    HourInRangeZeroToTwentyFour, IntervalDurationIsNonNegative, IntervalStartPrecedesEnd,
-    MinuteInRangeZeroToFiftyNine, OrdinalDayInRangeOneToThreeHundredSixtySix,
-    SecondInRangeZeroToSixty, UtcOffsetHourInRangeZeroToTwentyThree,
-    UtcOffsetMinuteInRangeZeroToFiftyNine, UtcTimelineOrderingAppliesToFixedInstants,
-    WeekNumberInRangeOneToFiftyThree, WeekdayInRangeOneToSeven,
+    CentennialYearDivisibleByOneHundred, CenturyOrdinalInRangeZeroToNinetyNine,
+    DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException, HourInRangeZeroToTwentyFour,
+    IntervalDurationIsNonNegative, IntervalStartPrecedesEnd, MinuteInRangeZeroToFiftyNine,
+    OrdinalDayInRangeOneToThreeHundredSixtySix, SecondInRangeZeroToSixty,
+    UtcOffsetHourInRangeZeroToTwentyThree, UtcOffsetMinuteInRangeZeroToFiftyNine,
+    UtcTimelineOrderingAppliesToFixedInstants, WeekNumberInRangeOneToFiftyThree,
+    WeekdayInRangeOneToSeven,
 };
 
 /// Proof artifact naming an `amenable_verus` Verus spec function that
@@ -571,5 +573,74 @@ inventory::submit! {
         "amenable_time::UtcTimelineOrderingAppliesToFixedInstants",
         "verus",
         || <UtcTimelineOrderingAppliesToFixedInstants as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── GregorianLeapYearUsesDivisibleByFourAndFourHundredException ──────────────────
+
+const GREGORIAN_LEAP_YEAR_VERUS_SRC: &str =
+    include_str!("../../amenable_verus/src/time/gregorian_leap_year_carrier.rs");
+
+impl amenable_core::Witness<VerusVerifier>
+    for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+{
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new("verify_gregorian_leap_year", GREGORIAN_LEAP_YEAR_VERUS_SRC)
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier>
+    for GregorianLeapYearUsesDivisibleByFourAndFourHundredException
+{
+}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::GregorianLeapYearUsesDivisibleByFourAndFourHundredException",
+        "verus",
+        || <GregorianLeapYearUsesDivisibleByFourAndFourHundredException as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
+
+// ── CentennialYearDivisibleByOneHundred ──────────────────
+
+const CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_VERUS_SRC: &str = include_str!(
+    "../../amenable_verus/src/time/centennial_year_divisible_by_one_hundred_carrier.rs"
+);
+
+impl amenable_core::Witness<VerusVerifier> for CentennialYearDivisibleByOneHundred {
+    type SupportingEvidence = Self;
+    type ProofArtifact = TemporalVerusProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        TemporalVerusProof::new(
+            "verify_centennial_year_divisible_by_one_hundred",
+            CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_VERUS_SRC,
+        )
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn support() -> amenable_core::WitnessSupportSummary {
+        amenable_core::WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl amenable_core::ClassifiedWitness<VerusVerifier> for CentennialYearDivisibleByOneHundred {}
+
+inventory::submit! {
+    amenable_core::ProofRecord::new(
+        "amenable_time::CentennialYearDivisibleByOneHundred",
+        "verus",
+        || <CentennialYearDivisibleByOneHundred as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
