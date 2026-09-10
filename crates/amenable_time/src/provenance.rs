@@ -1,5 +1,5 @@
 //! [`TemporalProvenance`] — the provenance record every temporal contract
-//! carries, built from the [`provenance_vocab`](crate::provenance_vocab).
+//! carries, built from the `provenance_vocab`.
 
 use std::fmt::{self, Display, Formatter};
 
@@ -23,7 +23,7 @@ use crate::{
 /// `url` and `cross_checks` are genuinely optional, so a builder here
 /// would only ever produce a `.build().expect(...)` that cannot fail —
 /// a panic surface for a call that can't panic. The setters chain by
-/// value, so [`temporal_standard!`](crate::temporal_standard) builds a
+/// value, so `temporal_standard!` builds a
 /// record with plain `let` shadowing and no `mut`.
 #[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters)]
 pub struct TemporalProvenance {

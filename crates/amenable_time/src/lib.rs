@@ -5,15 +5,23 @@
 //! Every citation-only contract is a [`Standard`](amenable_core::Standard)
 //! carrying a [`TemporalProvenance`] record that cites its normative
 //! source (ISO 8601, RFC 3339, RFC 9557, CalConnect, IANA TZDB, SI/BIPM,
-//! LoC EDTF). Composed / provable propositions are
-//! [`Evidence`](amenable_core::Evidence); trait methods become
-//! [`Exchange`](amenable_core::Exchange)s. See `docs/AMENABLE_TIME_PLAN.md`
-//! for the full design and the migration phases.
+//! LoC EDTF). The `*Valid` aggregates fold those contracts into
+//! `#[derive(Witness)]` [`Evidence`](amenable_core::Evidence) composites;
+//! the descriptor-factory trait methods become
+//! [`Exchange`](amenable_core::Exchange)s over `Sidecar` pairs; a backend
+//! (see [`StdTimeBackend`]) implements those `Exchange`s plus its native
+//! carrier types and a [`TemporalReporter`] capability declaration.
+//!
+//! 23 of the 345 atomic contracts are machine-checked on Kani, Creusot
+//! and Verus; the rest are citation-only. `just temporal-coverage` (see
+//! [`TemporalCoverage`]) prints the live table. [`StdTimeBackend`] is the
+//! worked backend example. See the crate `README.md` and
+//! `docs/AMENABLE_TIME_PLAN.md` for the full design.
 //!
 //! This crate carries **no checked-in standards corpus** — the relevant
 //! normative clause lives embedded in each contract's provenance
 //! metadata, governed by a three-tier redistributability rule (see
-//! [`provenance_vocab`]). Nothing paywalled is reproduced.
+//! the `provenance_vocab` module). Nothing paywalled is reproduced.
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]

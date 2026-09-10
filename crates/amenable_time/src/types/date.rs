@@ -8,7 +8,7 @@ use derive_new::new;
 /// A complete Gregorian calendar date.
 ///
 /// `Evidence` (the first descriptor to carry it): it appears as a
-/// [`Proven`](crate::Proven) exchange payload, and every
+/// [`ProvenTemporalCarrier`](crate::ProvenTemporalCarrier) exchange payload, and every
 /// `Sidecar::Primary` must be `Evidence`. The rest of the descriptor set
 /// gains `Evidence` as each becomes an exchange output (Phase 4).
 #[derive(

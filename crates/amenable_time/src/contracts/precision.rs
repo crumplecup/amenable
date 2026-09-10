@@ -6,7 +6,7 @@
 //! §8.3-§8.5; RFC 3339 §5.6.
 //!
 //! The first contract module ported from `elicit_temporal` — the
-//! pattern-setter for [`temporal_standard!`](crate::temporal_standard).
+//! pattern-setter for `temporal_standard!`.
 //! Four ISO-sourced contracts are tier C (paraphrase only); the one RFC
 //! 3339 contract is tier A and embeds its normative ABNF verbatim.
 

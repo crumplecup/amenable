@@ -1079,10 +1079,20 @@ Contract worklist:
       `*Request` types still need the same. A `jiff` / `chrono` backend
       module alongside this one would add calendar / zone / parse / format
       coverage.
-- [ ] `tests/` coverage (house rule: no inline `#[cfg(test)]`).
-- [ ] README + module docs as user guide (memory
-      `feedback_follow_claudemd_while_writing_not_after` — docs as we go,
-      not a retro pass).
+- [x] `tests/` coverage (house rule: no inline `#[cfg(test)]`) — every
+      module lands with its own `tests/` file; `temporal_composition_test`
+      (×3 backends), `std_backend_test` (8), `temporal_coverage_test`.
+- [x] **README + module docs as user guide** (2026-09-10) — crate
+      `README.md` rewritten as a guide (the Standard → Evidence → Exchange
+      → backend flow, what's machine-checked, how to use it); the
+      crate-level `//!` doc points to it; the four pre-existing broken
+      intra-doc links fixed (`cargo doc -p amenable_time` is clean).
+
+**Phase 7 complete. The full-scope `elicit_temporal` port is done** —
+Phases 0–7 all closed. Open follow-ons (all optional, none blocking):
+`derive_new::new` on the remaining exchange `*Request` types; widen the
+canary or add a `jiff` backend module; Phase 6 injected-regression
+checks; the plain-`Result` type aliases (Phase 3 Step 3).
 
 ## Resolved decisions (2026-09-08 review)
 

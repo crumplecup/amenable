@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–5 complete; Phase 6 (real per-backend proofs) started — `CalendarMonthInRangeOneToTwelve` proven on Kani/Creusot/Verus as the pattern-setter
+**Status:** ✅ Complete (2026-09-10). All phases 0–7 closed. 23 atomic contracts machine-checked on Kani/Creusot/Verus; all 152 `proof_composition` aggregates compose as `ClassifiedWitness<V>`; `std::time` canary backend; `just temporal-coverage`. Optional follow-ons remain (see plan tail).
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
