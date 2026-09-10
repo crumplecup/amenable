@@ -23,7 +23,7 @@ capability queries).
 | module (`elicit_temporal`) | count | ported | establish | kani | creusot | verus |
 |---|---:|:--:|:--:|:--:|:--:|:--:|
 | `contracts/precision` | 5 | ✅ 5/5 | — | — | — | — |
-| `contracts/iso_8601` | 109 | ✅ 109/109 | — | — | — | — |
+| `contracts/iso_8601` | 109 | ✅ 109/109 | — | 1 | 1 | 1 |
 | `contracts/extended` (ISO 8601-2) | 48 | ✅ 48/48 | — | — | — | — |
 | `contracts/rfc3339` | 20 | ✅ 20/20 (tier A — verbatim) | — | — | — | — |
 | `contracts/rfc9557` | 38 | ✅ 38/38 (tier A — verbatim) | — | — | — | — |
@@ -120,6 +120,17 @@ the generated `new`).
 | native-carrier families (16) | — | ✅ 16/16 | `traits/native_props.rs` — associated-type traits, each `type X: Evidence` (so a carrier can be a `ProvenTemporalCarrier` primary); the 3 aggregate traits get blanket impls (Phase 5 Step 3) |
 | native `realize_*`/`reflect_*` bridges | 28 | ✅ 28/28 | `traits/native_bridge.rs` — each per-family bridge's supertrait bundle *is* its `Exchange<Reflected<X>, Proven<X>Carrier<Self::X>, V>` + inverse pair; 14 `Reflected<X>` sidecars in `src/exchange/reflect.rs`; elicit's aggregate bridges + blankets (Phase 5 Step 4) |
 | native `*_native` factory analogs | 9 | ✅ 9/9 | `traits/native_factory.rs` — carrier→carrier `Exchange`s; multi-input methods fold runtime values into a `<M>NativeRequest<B>` primary (basis = the `NativeCarrierRequest` marker), extra output proofs into a `<M>NativeEstablished` composite (`src/exchange/native.rs`) (Phase 5 Step 4b) |
+
+## Real proofs (Phase 6)
+
+| contract | theorem | kani | creusot | verus |
+|---|---|:--:|:--:|:--:|
+| `CalendarMonthInRangeOneToTwelve` | the `1..=12` range check agrees, over the whole `u8` domain, with the twelve-way enumeration of the legal calendar months (ISO 8601-1:2019, 3.1.1.2) | ✅ passed | ✅ Proved (150 files) | ✅ 486 verified |
+
+Wiring: `amenable_kani::time` / `amenable_creusot::time` take an
+`amenable_time` dep; Verus's real `verus! {}` proof lives in
+`amenable_verus/src/time/`, with `amenable_time`'s `verus` feature
+gating `src/verus_witness.rs`.
 
 ## Licensing gate
 

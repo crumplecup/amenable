@@ -30,6 +30,8 @@ mod provenance;
 mod provenance_vocab;
 mod traits;
 mod types;
+#[cfg(feature = "verus")]
+mod verus_witness;
 
 pub use carrier::{
     BackendConversionSemanticBundleToken, DateTimeFormulaEvaluationResultBundleToken,
@@ -545,3 +547,5 @@ pub use types::{
     WeekDateDescriptor, ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor,
     ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
 };
+#[cfg(feature = "verus")]
+pub use verus_witness::TemporalVerusProof;

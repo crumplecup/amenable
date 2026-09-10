@@ -85,6 +85,7 @@ mod exchange_support;
 pub mod gallery;
 mod provenance_accommodation;
 pub mod rust_std;
+pub mod time;
 mod witness_accommodation;
 
 // The real, unmodified `amenable_core` trait-family source, mod-included

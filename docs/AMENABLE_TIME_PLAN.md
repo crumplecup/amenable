@@ -893,10 +893,41 @@ is the honest representation, not a gap (memory
 `feedback_tautological_model_policy`). Target the ones that do,
 single-source per the established design (Kani: `bool` predicate;
 Creusot/Verus: shared `#[logic]` / `spec fn` via `harness!` / codegen —
-memory `project_amenable_ensures_requires_contract_types`):
+memory `project_amenable_ensures_requires_contract_types`).
 
-- [ ] Range contracts: `CalendarMonthInRangeOneToTwelve`,
-      `HourInRangeZeroToTwentyFour`, `MinuteInRangeZeroToFiftyNine`,
+**Per-backend wiring (established with the first proof, 2026-09-09):**
+
+- **Kani** — `amenable_kani` gains an `amenable_time` dep + `src/time.rs`:
+  `kani_ensures!` (the `bool` predicate), a `Witness<KaniVerifier>` citing
+  the harness, and a `#[kani::proof]` `harness!` over the whole input
+  domain. Registered `KaniProof` + `ProofRecord`.
+- **Creusot** — `amenable_creusot` gains an `amenable_time` dep +
+  `src/time.rs`: a `#[cfg(not(creusot))]` `Witness`/`Ensures<CreusotVerifier>`
+  mirror block (as `ledger::contract_bounds` does), a `#[logic]`
+  postcondition + a `#[requires]`/`#[ensures]`-contracted function
+  `harness!` blocks; `verify-creusot` proves it.
+- **Verus** — the toolchain never resolves Cargo deps, so the real
+  `verus! { spec fn / proof fn }` lives in `amenable_verus/src/time/`
+  (checked by `verify-verus`); `amenable_time` gains a `verus` feature +
+  `src/verus_witness.rs` (`#[cfg(feature = "verus")]`) with the
+  `Witness<VerusVerifier>` + `ClassifiedWitness` + `include_str!` of the
+  `amenable_verus` file + `ProofRecord`, and `TemporalVerusProof` as the
+  proof artifact (temporal analogue of `CalculationProof` /
+  `MultiCheckProof`).
+
+Contract worklist:
+
+- [x] **`CalendarMonthInRangeOneToTwelve`** (2026-09-09) — the
+      pattern-setter. Real theorem on all three backends: the `1..=12`
+      range check agrees, over the entire `u8` domain, with the
+      independently-written twelve-way enumeration of the legal calendar
+      months (ISO 8601-1:2019, 3.1.1.2). Kani: `passed`. Creusot:
+      `Proved (150 files) ✔`. Verus: `486 verified, 0 errors`. (Verus
+      lesson: `RangeInclusive::contains` is exec-only — usable in the
+      exec body but not a `spec`/`ensures` clause; the `ensures` names the
+      `calendar_month_is_enumerated` spec fn, the exec body writes
+      `(1..=12u8).contains(&month)`, and Verus proves they agree.)
+- [ ] Range contracts: `HourInRangeZeroToTwentyFour`, `MinuteInRangeZeroToFiftyNine`,
       `SecondInRangeZeroToSixty`, `WeekNumberInRangeOneToFiftyThree`,
       `WeekdayInRangeOneToSeven`, `OrdinalDayInRangeOneToThreeHundredSixtySix`,
       `UtcOffsetHourInRangeZeroToTwentyThree`, `CenturyOrdinalInRangeZeroToNinetyNine`,

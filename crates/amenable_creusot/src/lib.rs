@@ -25,6 +25,7 @@ mod rust_std;
 #[cfg(not(creusot))]
 mod rust_std_witness;
 mod stoplight;
+mod time;
 mod witness;
 
 pub use ledger::{

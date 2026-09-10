@@ -28,5 +28,13 @@ tracing = { workspace = true }
 [dev-dependencies]
 miette = { workspace = true }
 
+[features]
+# Turns on the Verus-side `Witness<VerusVerifier>` impls for the
+# genuinely-checkable temporal contracts (`src/verus_witness.rs`), which
+# name `amenable_std::VerusVerifier` — itself `#[cfg(feature = "verus")]`.
+# Off by default (an experimental, still-partial verifier backend); the
+# real `verus! { .. }` proof content lives in `amenable_verus`.
+verus = ["amenable_std/verus"]
+
 [lints]
 workspace = true

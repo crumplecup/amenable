@@ -636,5 +636,6 @@ amenable_kani::stoplight::verify_full_cycle_composes,1788637936,passed
 amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788637946,passed
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788637957,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788637967,passed
+amenable_kani::time::verify_calendar_month_in_range,1788994320,passed
 amenable_kani::utf8_model::buffer::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788637979,passed
 amenable_kani::utf8_model::verify_kani_utf8_buffer_bookkeeping_is_consistent,1788027332,passed

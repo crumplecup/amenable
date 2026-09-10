@@ -55,6 +55,7 @@ mod str_pattern_model;
 #[cfg(kani)]
 mod string_drain_model;
 mod sync_lock_model;
+mod time;
 mod utf8_model;
 mod witness;
 

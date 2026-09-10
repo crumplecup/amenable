@@ -8,7 +8,7 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** 🔲 Phases 0–5 complete (contracts + descriptors + composites + the full exchange surface + carriers/bridges); Phase 6 (real per-backend proofs) next
+**Status:** 🔲 Phases 0–5 complete; Phase 6 (real per-backend proofs) started — `CalendarMonthInRangeOneToTwelve` proven on Kani/Creusot/Verus as the pattern-setter
 complete (2026-09-09). A
 **straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
 (~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
