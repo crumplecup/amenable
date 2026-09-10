@@ -1038,9 +1038,21 @@ Contract worklist:
 - [ ] `TemporalReporter` → `Amenable::*_surface()` + `RegistryReport`.
 - [ ] `just temporal-coverage` — the umbrella report: per contract,
       which backends prove it, which are citation-only.
-- [ ] A minimal in-crate reference `TemporalBackend` impl (a test
-      double, not a real datetime library) exercising every `Exchange`
-      edge — the load test's actual assertion surface.
+- [~] **`std::time` canary backend** (2026-09-10):
+      `amenable_time::backends::std_time`. `StdTimeBackend` + a
+      `CanaryVerifier` that proves nothing, implementing only the slice
+      `std::time::{Duration, SystemTime}` can honestly back —
+      `TemporalDurationProps` / `TemporalInstantProps` on `StdDuration` /
+      `StdSystemTime` / `StdUtcOffset`, `TemporalReporter` (the honest
+      capability set: no leap seconds, no zones, no 24:00, `Some(9)`
+      fractional digits), and the four `TemporalIntervalFactory` exchanges
+      — `order_offset_endpoints` real (full sidecar / `Establish` loop),
+      the three ISO-8601-parse edges lawful `Exchange`s that report the
+      operation unsupported. `tests/std_backend_test.rs` asserts
+      `StdTimeBackend: TemporalIntervalFactory<CanaryVerifier>` compiles
+      (the canary) and round-trips one exchange. A `jiff` / `chrono`
+      backend module alongside it would add calendar / zone / parse /
+      format coverage; that is not this.
 - [ ] `tests/` coverage (house rule: no inline `#[cfg(test)]`).
 - [ ] README + module docs as user guide (memory
       `feedback_follow_claudemd_while_writing_not_after` — docs as we go,

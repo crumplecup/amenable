@@ -171,6 +171,17 @@ members': the 23 machine-checked leaves contribute `checked` support, the
 composite's `WitnessSupportSummary` reports the breakdown. Asserted by
 `temporal_composition_test` in each backend crate.
 
+## Canary backend
+
+`amenable_time::backends::std_time` implements the temporal trait surface
+against real `std::time` types with a `CanaryVerifier` that proves
+nothing — an interface-drift tripwire, not a usable backend. Coverage:
+`TemporalDurationProps` / `TemporalInstantProps` / `TemporalReporter`, and
+`TemporalIntervalFactory<CanaryVerifier>` (one real exchange,
+`order_offset_endpoints`; the three ISO-8601-parse edges report
+unsupported). Calendar, week/ordinal dates, zones, parsing and formatting
+are out of scope — those need a date-time library (`jiff` / `chrono`).
+
 ## Licensing gate
 
 Phase 1 exit criterion: a test over the `EvidenceLink` registry asserts

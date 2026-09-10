@@ -21,6 +21,7 @@
 #[macro_use]
 mod standard_macro;
 
+mod backends;
 mod carrier;
 mod contracts;
 mod error;
@@ -34,6 +35,10 @@ mod types;
 #[cfg(feature = "verus")]
 mod verus_witness;
 
+pub use backends::{
+    CanaryVerifier, CanaryVerifierMetadata, StdDuration, StdSystemTime, StdTimeBackend,
+    StdUtcOffset,
+};
 pub use carrier::{
     BackendConversionSemanticBundleToken, DateTimeFormulaEvaluationResultBundleToken,
     DateTimeFormulaSemanticBundleToken, DurationSemanticBundleToken,
