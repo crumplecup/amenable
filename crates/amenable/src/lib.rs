@@ -72,12 +72,14 @@ pub use amenable_core::{
     EvidenceLink, Exchange, ExchangeEdgeRecord, Green, IncompleteSource, Metadata, MetadataEntry,
     MetadataRecord, MetadataReport, MetadataValue, NotFoundSource, OwnedEntry, OwnedMetadataReport,
     ProofChainReport, ProofRecord, ProofToken, ProofTokenMintRecord, Provenance, Red, Registry,
-    RegistryReport, Requires, Sidecar, Standard, State, StateMachine, Transition, TransitionAudit,
-    Verifier, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
-    WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,
-    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, Yellow, init_tracing,
-    proof_chain, proof_chain_for_verifiers, witness_exports,
+    RegistryReport, Requires, SemanticSummary, Sidecar, SourceUrl, Standard, State, StateMachine,
+    Transition, TransitionAudit, Verifier, Witness, WitnessArtifact, WitnessArtifactMember,
+    WitnessArtifactNode, WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord,
+    WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, Yellow,
+    init_tracing, proof_chain, proof_chain_for_verifiers, witness_exports,
 };
+#[cfg(feature = "verus")]
+pub use amenable_core::{VerusVerifier, VerusVerifierMetadata};
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
@@ -91,18 +93,18 @@ pub use amenable_kani::{
     KaniWitness, NonNegativeFd, RedToken, Stoplight, Sum, YellowToken, add,
 };
 pub use amenable_std::{
-    Authority, AuthorityKind, CertId, CertRegistry, ConfigurationChannel, ConfigurationSurface,
-    ProofArtifact, ProvenanceCertificate, RustLanguageProvenance, RustStdProvenance,
-    RustStdStandard, RustStdType, SemanticSummary, SourceCrate, SourceModule, SourceUrl, TypeName,
-    ValidUnicodeScalar, VerifierFamily, write_rust_std_certificate_artifacts,
+    Authority, AuthorityKind, CanaryVerifier, CertId, CertRegistry, ConfigurationChannel,
+    ConfigurationSurface, ProofArtifact, ProvenanceCertificate, RustLanguageProvenance,
+    RustStdProvenance, RustStdStandard, RustStdType, SourceCrate, SourceModule, StdTimeBackend,
+    TypeName, ValidUnicodeScalar, VerifierFamily, write_rust_std_certificate_artifacts,
 };
 #[cfg(feature = "verus")]
-pub use amenable_std::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+pub use amenable_std::{VerusCheckedProof, VerusWitness};
 /// The temporal contract interface. The facade re-exports the whole crate
 /// rather than a curated list — its public surface is ~500 contract,
 /// descriptor, and trait names, and callers reach for them by full path.
 pub use amenable_time;
 pub use amenable_time::{
-    CanaryVerifier, StdTimeBackend, TemporalCapabilities, TemporalCoverage, TemporalCoverageRow,
-    TemporalError, TemporalErrorKind, TemporalReporter,
+    TemporalCapabilities, TemporalCoverage, TemporalCoverageRow, TemporalError, TemporalErrorKind,
+    TemporalReporter,
 };

@@ -1,8 +1,8 @@
 //! Local witness trait bridging into `amenable_core::Witness`.
 
-use amenable_core::{Entry, Evidence, Metadata, OwnedEntry, Provenance, Verifier};
+use amenable_core::{Entry, Evidence, Metadata, OwnedEntry, Provenance, SourceUrl, Verifier};
 use amenable_std::{
-    Authority, ConfigurationChannel, ConfigurationSurface, ProofArtifact, SourceUrl, VerifierFamily,
+    Authority, ConfigurationChannel, ConfigurationSurface, ProofArtifact, VerifierFamily,
 };
 use creusot_std::macros::trusted;
 

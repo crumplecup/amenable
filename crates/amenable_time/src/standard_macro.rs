@@ -81,7 +81,7 @@ macro_rules! temporal_standard {
                         $summary,
                         $quotation,
                     );
-                    $( let facts = facts.with_url(::amenable_std::SourceUrl::new($url)); )?
+                    $( let facts = facts.with_url(::amenable_core::SourceUrl::new($url)); )?
                     $(
                         let facts = facts.with_cross_check($crate::CrossCheck::new(
                             $cc_doc,

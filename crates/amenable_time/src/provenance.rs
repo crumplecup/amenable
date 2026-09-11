@@ -3,8 +3,9 @@
 
 use std::fmt::{self, Display, Formatter};
 
-use amenable_core::{Entry as _, Metadata, OwnedEntry, OwnedMetadataReport, Provenance};
-use amenable_std::{SemanticSummary, SourceUrl};
+use amenable_core::{
+    Entry as _, Metadata, OwnedEntry, OwnedMetadataReport, Provenance, SemanticSummary, SourceUrl,
+};
 
 use crate::{
     CrossCheck, NormativeDocument, NormativeQuotation, NormativeSection, NormativeStatus,

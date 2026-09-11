@@ -34,6 +34,7 @@ mod link;
 mod metadata;
 mod metadata_entry;
 mod provenance;
+mod provenance_vocab;
 mod roles;
 mod state;
 mod state_machine;
@@ -42,6 +43,8 @@ mod tracing_init;
 mod verifier;
 #[cfg(feature = "verus")]
 mod verus_carrier;
+#[cfg(feature = "verus")]
+mod verus_verifier;
 mod witness;
 
 pub use calculation::{Calculation, CarriesToken};
@@ -62,6 +65,7 @@ pub use metadata::{
 };
 pub use metadata_entry::MetadataEntry;
 pub use provenance::Provenance;
+pub use provenance_vocab::{SemanticSummary, SourceUrl};
 pub use roles::{AsStandard, Standard};
 pub use state::State;
 pub use state_machine::{RootEntry, StateMachine, Transition, TransitionAudit};
@@ -74,6 +78,8 @@ pub use verus_carrier::{
     param_name as verus_param_name, predicate_body as verus_predicate_body,
     predicate_signature as verus_predicate_signature, walk_tokens as verus_walk_tokens,
 };
+#[cfg(feature = "verus")]
+pub use verus_verifier::{VerusVerifier, VerusVerifierMetadata};
 pub use witness::{
     ClassifiedWitness, Witness, WitnessArtifact, WitnessArtifactMember, WitnessArtifactNode,
     WitnessArtifactShape, WitnessArtifactVariant, WitnessExportRecord, WitnessExportSnapshot,

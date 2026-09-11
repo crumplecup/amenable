@@ -10,7 +10,7 @@
 //! registers the `Witness<VerusVerifier>` the `proof_composition`
 //! composites need to resolve under `VerusVerifier`.
 
-use amenable_std::VerusVerifier;
+use amenable_core::VerusVerifier;
 use derive_getters::Getters;
 use derive_new::new;
 

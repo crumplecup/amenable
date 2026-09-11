@@ -10,8 +10,7 @@
     reason = "one assertion per composed aggregate — a flat manifest"
 )]
 
-use amenable_core::ClassifiedWitness;
-use amenable_std::VerusVerifier;
+use amenable_core::{ClassifiedWitness, VerusVerifier};
 use amenable_time::{
     BackendConversionSemanticBundle, BackendConversionSemanticsValid, CalendarDateValid,
     CenturyValid, CombinedDateTimeDateEvidence, CompleteDateEvidence,

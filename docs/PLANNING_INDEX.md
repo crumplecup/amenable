@@ -40,10 +40,13 @@ becomes load-bearing once something large actively uses it.
 mirroring `amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern
 (the orphan rule already forces this shape; no interface/impl split to
 make). First target `jiff`, second `uuid` (already a vetted workspace
-dependency). Deliberately decoupled from `amenable_time` — a real
-`amenable_time::backends::jiff` would consume `amenable_ext::jiff`'s
-wrapped types later, but `amenable_ext` isn't scoped to temporal needs
-alone. Phase 2 extends `cordial`'s existing `framework_std` coverage
+dependency). Deliberately decoupled from `amenable_time` at the
+Evidence/Witness layer — `amenable_time` is an optional dep of
+`amenable_ext`, gated by the `jiff`/`chrono` features only; a real jiff
+temporal backend would live in `amenable_ext` and consume
+`amenable_ext::jiff`'s wrapped types later, but `amenable_ext` isn't
+scoped to temporal needs alone. Phase 2 extends `cordial`'s existing
+`framework_std` coverage
 machinery (already builds shadow-dep rustdoc for upstream crates, cross-
 references the `amenable` registry dump, renders checklist/gap CSVs for
 `amenable_std`) to report per-target-crate trait coverage the same way.

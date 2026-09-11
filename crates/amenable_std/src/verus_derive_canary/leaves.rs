@@ -1,12 +1,12 @@
 //! The atomic building-block leaves the composite canaries in
 //! [`super::composites`] are built from.
 
-use amenable_core::{ClassifiedWitness, Witness, WitnessSupportSummary};
+use amenable_core::{ClassifiedWitness, VerusVerifier, Witness, WitnessSupportSummary};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
 
-use crate::{RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof, VerusVerifier};
+use crate::{RustStdProvenance, RustStdStandard, RustStdType, VerusCheckedProof};
 
 /// A leaf whose [`Witness<VerusVerifier>`] proof is real and
 /// machine-checked — exercises the `Checked` slot of the derive-witness

@@ -1,9 +1,8 @@
 #![cfg(feature = "verus")]
 
-use amenable_core::{Ensures, Witness, WitnessSupportSummary};
+use amenable_core::{Ensures, VerusVerifier, Witness, WitnessSupportSummary};
 use amenable_std::{
-    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusImport, VerusVerifier,
-    verus_call_shape,
+    RustStdStandard, RustStdType, ValidUnicodeScalar, VerusCallKind, VerusImport, verus_call_shape,
 };
 
 #[expect(

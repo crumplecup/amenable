@@ -34,7 +34,7 @@ Exchange methods              each Temporal*Factory / Temporal*Formatter /
   ▼  implemented by
 
 a backend                     a concrete type providing the Exchange
-  (backends::*)               impls + the Temporal*Props native carriers +
+  (elsewhere — see below)     impls + the Temporal*Props native carriers +
                               a TemporalReporter capability declaration
 ```
 
@@ -71,14 +71,18 @@ let cite = CalendarMonthInRangeOneToTwelve.provenance();
 
 **Implement a backend.** Provide the `Exchange` impls for the method
 family you support and the `Temporal*Props` native carrier types, against
-a concrete `Verifier`. `backends::std_time` is the worked example: a
-`CanaryVerifier` that runs no formal tool, `StdTimeBackend` covering the
-duration / instant / endpoint-ordering slice `std::time` can honestly
-back. Its `Exchange` bodies *execute* the contracts — `order_offset_endpoints`
-resolves both endpoints through real Gregorian arithmetic and rejects a
-reversed interval. Backends for calendar dates, zones, and ISO 8601 /
-RFC 3339 text need a date-time library (`jiff`, `chrono`) and would sit in
-a sibling `backends::` module.
+a concrete `Verifier`. This crate carries no backend of its own —
+backends live alongside the type registrations they're built from, in
+whichever crate defines the concrete carrier types. `amenable_std::
+std_time_backend` is the worked example: a `CanaryVerifier` that runs no
+formal tool, `StdTimeBackend` covering the duration / instant /
+endpoint-ordering slice `std::time` can honestly back. Its `Exchange`
+bodies *execute* the contracts — `order_offset_endpoints` resolves both
+endpoints through real Gregorian arithmetic and rejects a reversed
+interval. Backends for calendar dates, zones, and ISO 8601 / RFC 3339 text
+need a date-time library (`jiff`, `chrono`) and would live in
+`amenable_ext` instead (an optional dependency on this crate, gated by
+the `jiff`/`chrono` features — see `docs/AMENABLE_EXT_PLAN.md`).
 
 **Report capabilities.** Implement `TemporalReporter`; call
 `.capabilities()` for a `Display`-able declaration.

@@ -180,9 +180,11 @@ composite's `WitnessSupportSummary` reports the breakdown. Asserted by
 
 ## Canary backend
 
-`amenable_time::backends::std_time` implements the temporal trait surface
+`amenable_std::std_time_backend` implements the temporal trait surface
 against real `std::time` types — an interface-drift tripwire *and* a
-runtime oracle over the slice it covers, not a usable backend.
+runtime oracle over the slice it covers, not a usable backend. It lives
+in `amenable_std`, not `amenable_time` (which has no dependency on it):
+backends live alongside the type registrations they're built from.
 `CanaryVerifier` runs no formal tool, but the `Exchange` bodies execute
 the contracts: `order_offset_endpoints` resolves both endpoints to epoch
 seconds through real Gregorian calendar arithmetic and returns `Err` for a

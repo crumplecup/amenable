@@ -9,14 +9,20 @@
 //! `#[derive(Witness)]` [`Evidence`](amenable_core::Evidence) composites;
 //! the descriptor-factory trait methods become
 //! [`Exchange`](amenable_core::Exchange)s over `Sidecar` pairs; a backend
-//! (see [`StdTimeBackend`]) implements those `Exchange`s plus its native
-//! carrier types and a [`TemporalReporter`] capability declaration.
+//! (`amenable_std::StdTimeBackend` is the worked example) implements those
+//! `Exchange`s plus its native carrier types and a [`TemporalReporter`]
+//! capability declaration.
+//!
+//! Backends live in the crate that registers the types they're built
+//! from, not here — this crate is the trait/contract interface, kept
+//! dependency-light so it can be an optional dep of `amenable_ext`'s
+//! jiff/chrono backends without dragging in a std-lib registration
+//! surface (see `docs/AMENABLE_EXT_PLAN.md`).
 //!
 //! 23 of the 345 atomic contracts are machine-checked on Kani, Creusot
 //! and Verus; the rest are citation-only. `just temporal-coverage` (see
-//! [`TemporalCoverage`]) prints the live table. [`StdTimeBackend`] is the
-//! worked backend example. See the crate `README.md` and
-//! `docs/AMENABLE_TIME_PLAN.md` for the full design.
+//! [`TemporalCoverage`]) prints the live table. See the crate
+//! `README.md` and `docs/AMENABLE_TIME_PLAN.md` for the full design.
 //!
 //! This crate carries **no checked-in standards corpus** — the relevant
 //! normative clause lives embedded in each contract's provenance
@@ -29,7 +35,6 @@
 #[macro_use]
 mod standard_macro;
 
-mod backends;
 mod carrier;
 mod contracts;
 mod coverage;
@@ -44,10 +49,6 @@ mod types;
 #[cfg(feature = "verus")]
 mod verus_witness;
 
-pub use backends::{
-    CanaryVerifier, CanaryVerifierMetadata, StdDuration, StdSystemTime, StdTimeBackend,
-    StdUtcOffset,
-};
 pub use carrier::{
     BackendConversionSemanticBundleToken, DateTimeFormulaEvaluationResultBundleToken,
     DateTimeFormulaSemanticBundleToken, DurationSemanticBundleToken,

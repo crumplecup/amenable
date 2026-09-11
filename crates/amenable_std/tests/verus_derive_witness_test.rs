@@ -4,8 +4,8 @@
 mod derive_witness;
 
 use amenable_core::{
-    ClassifiedWitness, Witness, WitnessArtifactShape, WitnessExportRecord, WitnessModulePath,
-    WitnessSupportKind, WitnessSupportSummary,
+    ClassifiedWitness, VerusVerifier, Witness, WitnessArtifactShape, WitnessExportRecord,
+    WitnessModulePath, WitnessSupportKind, WitnessSupportSummary,
 };
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
@@ -13,7 +13,7 @@ use amenable_derive::{
 use amenable_std::{
     CheckedVerusExportLeaf, RawTemplateVerusExportLeaf, RequiresVerusExportLeaf, RustStdProvenance,
     RustStdStandard, RustStdType, TrustedVerusExportLeaf, VerusCheckedProof, VerusExportCanaryEnum,
-    VerusExportMultiCheckedEnum, VerusVerifier,
+    VerusExportMultiCheckedEnum,
 };
 use derive_witness::{
     DerivedWitnessCheckedPlusTrivialStruct as SharedDerivedWitnessCheckedPlusTrivialStruct,

@@ -535,8 +535,8 @@ separate from this.
 
 ```text
 amenable_time                     (interface + vocabulary + contracts + descriptors + Exchange traits)
-  ├── depends on: amenable_core, amenable_derive, amenable_std (for provenance_vocab)
-  └── NO dependency on any verifier backend
+  ├── depends on: amenable_core, amenable_derive
+  └── NO dependency on any verifier backend, NO dependency on amenable_std
 
 amenable_kani/src/time/…          (Witness<KaniVerifier>, Ensures<KaniVerifier>, Exchange proofs)
   └── depends on: amenable_time, amenable_kani(self)
@@ -544,8 +544,18 @@ amenable_kani/src/time/…          (Witness<KaniVerifier>, Ensures<KaniVerifier
 amenable_creusot/src/time/…       (Creusot companions — generated)
 amenable_verus/src/time/…         (Verus companions — generated; #[path]-included, no Cargo.toml)
 
-amenable (facade)                 re-exports amenable_time
+amenable_std                      (std::time canary backend, StdTimeBackend/CanaryVerifier)
+  └── depends on: amenable_core, amenable_derive, amenable_time (see Phase 8)
+
+amenable (facade)                 re-exports amenable_time and amenable_std
 ```
+
+Superseded by Phase 8 below: `SourceUrl`/`SemanticSummary` moved from
+`amenable_std::provenance_vocab` to `amenable_core::provenance_vocab`
+(this crate now imports them from `amenable_core`), and the `std::time`
+backend (originally built here in Phase 7 as `src/backends/`) relocated
+to `amenable_std::std_time_backend` once the dependency direction
+reversed.
 
 Mirrors `amenable_gaap`'s hierarchy decision exactly
 (`GAAP_LEDGER_PLAN.md` "Crate hierarchy"). Producer crates
@@ -1094,15 +1104,71 @@ Phases 0–7 all closed. Open follow-ons (all optional, none blocking):
 canary or add a `jiff` backend module; Phase 6 injected-regression
 checks; the plain-`Result` type aliases (Phase 3 Step 3).
 
+### Phase 8 — dependency reversal (2026-09-11)
+
+- [x] **Reversed `amenable_time` ↔ `amenable_std`.** `amenable_time`
+      dropped its `amenable_std` dependency entirely; `amenable_std` took
+      on an unconditional `amenable_time` dependency instead (parallel to
+      its existing `amenable_core` one). Rationale: `amenable_time` is the
+      trait/contract interface and should stay dependency-light enough to
+      be an *optional* dependency of `amenable_ext`'s future jiff/chrono
+      backends (gated specifically by those features, not by every
+      `amenable_ext` feature) — see `docs/AMENABLE_EXT_PLAN.md`.
+- [x] **Relocated `SourceUrl`/`SemanticSummary`** from
+      `amenable_std::provenance_vocab` to a new, hand-rolled
+      `amenable_core::provenance_vocab` (both crates depend on
+      `amenable_core` unconditionally, so this is the natural shared
+      home; hand-rolled rather than `#[derive(Entry)]`-generated because
+      `amenable_derive`'s optional `verus` feature deps back on
+      `amenable_core`, and using the derive here would recreate a cycle
+      the moment both crates' `verus` features are active). `Authority`
+      and the rest of the vocabulary stayed in `amenable_std` — only
+      these two, needed by both crates, moved.
+- [x] **Relocated `VerusVerifier`/`VerusVerifierMetadata`** from
+      `amenable_std::verus_witness::machinery` to a new
+      `amenable_core::verus_verifier` (behind `amenable_core`'s existing
+      `verus` feature — no new Cargo.toml feature, it already existed for
+      `verus_carrier` parsing). Orphan-rule analysis showed the type's
+      crate of origin was never actually load-bearing at either use site
+      (`amenable_std::bridge_verus_witness!` is always invoked on an
+      already-concrete, already-local `RustStdStandard<ConcreteType>`;
+      `amenable_time::verus_witness`'s impls target its own local contract
+      types) — confirmed by reading the real macro expansion, not assumed.
+- [x] **Relocated the `std::time` canary backend** from
+      `amenable_time::backends` to `amenable_std::std_time_backend`
+      (`CanaryVerifier`/`CanaryVerifierMetadata`/`StdDuration`/
+      `StdSystemTime`/`StdUtcOffset`/`StdTimeBackend`, the `canary_trusts!`
+      macro, and all `Exchange` impls) — backends now live alongside the
+      type registrations they're built from, not in the interface crate.
+      `tests/std_backend_test.rs` moved to `amenable_std/tests/` with it.
+- [x] **`amenable_derive::verus_contract`'s generated code kept
+      `crate::VerusVerifier`**, deliberately not hardcoded to
+      `amenable_core::VerusVerifier` — the macro is verifier-crate-
+      agnostic by design (its own test crate, `amenable_derive/tests/
+      verus_contract_test.rs`, supplies a local stand-in type rather than
+      depending on the real one). `amenable_std` satisfies this with a
+      **private** `use amenable_core::VerusVerifier;` at its crate root
+      (visible to `crate::VerusVerifier` from every submodule, since all
+      of them are descendants of the crate root) rather than a `pub use`
+      — keeping the type's one *public* path at `amenable_core::
+      VerusVerifier`, per CLAUDE.md's no-re-export rule.
+- [x] Facade (`amenable`), `amenable_creusot`, `amenable_kani` updated for
+      the new import paths; full workspace re-verified: `cargo check
+      --workspace --all-features [--tests]`, `cargo clippy --workspace
+      --all-features --all-targets`, `cargo fmt --all --check`, and
+      `cargo test -p <every touched crate> --all-features` all clean.
+
 ## Resolved decisions (2026-09-08 review)
 
 1. **Vocabulary home — new module in `amenable_time`.** A fresh
    `amenable_time::provenance_vocab` for the normative-reference types
    (`NormativeDocument` / `NormativeSection` / `NormativeClause` /
    `NormativeStatus` / `StandardsBody` / `NormativeQuotation` /
-   `QuotationStatus` / `CrossCheckList`), reusing only `Authority` /
-   `SourceUrl` / `SemanticSummary` from `amenable_std::provenance_vocab`.
-   `amenable_std`'s vocabulary is about carrier libraries; this one is
+   `QuotationStatus` / `CrossCheckList`), reusing `SourceUrl` /
+   `SemanticSummary` (originally from `amenable_std::provenance_vocab`;
+   relocated to `amenable_core::provenance_vocab` in Phase 8 so
+   `amenable_std` could depend on `amenable_time` without a cycle).
+   `amenable_std`'s own vocabulary is about carrier libraries; this one is
    about standards documents — different concerns, so no extension.
 2. **Macro home — `macro_rules!` in `amenable_time`.** `temporal_standard!`
    / `temporal_evidence!` as declarative macros (like

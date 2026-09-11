@@ -7,7 +7,9 @@
 //! `amenable_std::provenance_vocab` is about *carrier libraries* (which
 //! Rust crate/module defines a type); the two are deliberately separate
 //! (`docs/AMENABLE_TIME_PLAN.md`, decision 1). Only `SourceUrl` and
-//! `SemanticSummary` are shared, imported from `amenable_std`.
+//! `SemanticSummary` are shared, imported from `amenable_core` (they moved
+//! there from `amenable_std` so `amenable_std` could depend on
+//! `amenable_time` without a cycle — see `docs/AMENABLE_EXT_PLAN.md`).
 //!
 //! # The three-tier quotation rule
 //!

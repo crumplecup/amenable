@@ -95,16 +95,28 @@ own guarantee instead (same `impl_kani_witness_trusted!`-style split
 
 ### Relationship to `amenable_time`
 
-**Deliberately decoupled.** `amenable_ext::jiff` gives `jiff` types
-`Evidence` + `Witness<V>` — a general-purpose fact about those types, not
-specific to temporal contracts. A real `amenable_time::backends::jiff`
-(replacing/extending the `std::time` canary with actual calendar-date,
-zone, and RFC 3339 parse/format coverage) would consume
+**Deliberately decoupled, and one-directional.** `amenable_time` is the
+trait/contract interface only — it does not depend on `amenable_std` or
+`amenable_ext` (that dependency was reversed: `amenable_std` now depends
+on `amenable_time`, not the other way around, so its `std::time` backend
+can live in `amenable_std` alongside the type registrations it's built
+from). `amenable_ext` mirrors that: it takes `amenable_time` as an
+*optional* dependency, gated specifically by the `jiff`/`chrono` features
+(not by every `amenable_ext` feature — `uuid`, `url`, etc. have nothing to
+do with time and must not pull it in).
+
+`amenable_ext::jiff` gives `jiff` types `Evidence` + `Witness<V>` — a
+general-purpose fact about those types, not specific to temporal
+contracts. A real jiff temporal backend (a `amenable_ext::jiff::backend`
+module, replacing/extending the `std::time` canary with actual
+calendar-date, zone, and RFC 3339 parse/format coverage) would consume
 `amenable_ext::jiff`'s wrapped types as its `Temporal*Props` native
-carriers — but that's separate, later work, tracked in
-`AMENABLE_TIME_PLAN.md`'s optional follow-ons, not this plan. `uuid`/`url`
-support has nothing to do with time at all; scoping `amenable_ext` to
-`amenable_time`'s needs would be the wrong cut.
+carriers and live in `amenable_ext` itself (the same "backend lives with
+the type registrations" placement `amenable_std::StdTimeBackend` follows)
+— but that's separate, later work, tracked in `AMENABLE_TIME_PLAN.md`'s
+optional follow-ons, not this plan. `uuid`/`url` support has nothing to
+do with time at all; scoping `amenable_ext` to `amenable_time`'s needs
+would be the wrong cut.
 
 ## cordial coverage tooling
 
@@ -166,8 +178,12 @@ this repo — coordinate there when Phase 2 (below) starts.
       `ClassifiedWitness<KaniVerifier>` per type, `trusted` by default
       (jiff is opaque to Kani), `checked` only where a real harness adds
       value over trusting jiff's own correctness.
-- [ ] Same for `amenable_creusot` and `amenable_time::verus_witness`
-      (feature-gated).
+- [ ] Same for `amenable_creusot` and for a `Witness<VerusVerifier>`
+      module inside `amenable_ext` itself (feature-gated) — `VerusVerifier`
+      now lives in `amenable_core`, so this mirrors
+      `amenable_std::verus_witness`'s own placement (the bridge lives with
+      the type registrations, not in `amenable_time`, which knows nothing
+      about jiff types).
 - [ ] `amenable_kani`/`amenable_creusot`/`amenable`(facade) gain a
       `jiff` feature toggling `amenable_ext/jiff` (+ the crate's own
       jiff witness module).

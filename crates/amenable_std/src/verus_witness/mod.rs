@@ -34,10 +34,10 @@
 //! because `CreusotVerifier`, its trait's own type parameter, is local to
 //! `amenable_creusot`. This file's own legality instead rests on
 //! `RustStdStandard<T>` (the `Self` type) being local to *this* crate.
-//! `VerusVerifier`/`VerusVerifierMetadata`/`VerusWitness` are defined
-//! *here* too, not in `amenable_verus` — they need `amenable_core::
-//! {Verifier, Evidence, ...}`, which `amenable_verus` no longer depends
-//! on.
+//! `VerusWitness` is defined *here* too, not in `amenable_verus` — it
+//! needs `amenable_core::{Verifier, Evidence, ...}`, which `amenable_verus`
+//! no longer depends on. `VerusVerifier`/`VerusVerifierMetadata` moved to
+//! `amenable_core` itself (see that type's own doc comment for why).
 //!
 //! Split into one file per real standard-library carrier cluster, roughly
 //! following `amenable_kani::rust_std`'s own module boundaries where a
@@ -49,9 +49,9 @@
 //! mechanical, verifiable split for a much riskier hand-reordering of
 //! ~10,000 lines of proof-registration code for a purity gain with no
 //! functional benefit). [`machinery`] is the one shared-infrastructure
-//! file every other file here depends on: the `VerusVerifier`, the
-//! `VerusWitness` trait, the `bridge_verus_witness!`/
-//! `impl_verus_witness_trusted!` macros, and the `VerusCallShape` family.
+//! file every other file here depends on: the `VerusWitness` trait, the
+//! `bridge_verus_witness!`/`impl_verus_witness_trusted!` macros, and the
+//! `VerusCallShape` family.
 
 mod ascii_and_drain;
 mod call_shape;
@@ -90,4 +90,4 @@ mod time;
 pub use call_shape::{
     VerusCallKind, VerusCallShape, VerusCallShapeRecord, VerusImport, VerusParam, verus_call_shape,
 };
-pub use machinery::{VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness};
+pub use machinery::{VerusCheckedProof, VerusWitness};

@@ -91,7 +91,7 @@ pub(super) fn run_temporal_coverage() -> AmenableResult<()> {
         "\nreference backend capabilities (std::time canary)\n\
          {:-<72}\n{}",
         "",
-        amenable_time::StdTimeBackend.capabilities(),
+        amenable_std::StdTimeBackend.capabilities(),
     ))?;
     Ok(())
 }

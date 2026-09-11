@@ -1,5 +1,5 @@
-use amenable_core::{Entry, Metadata};
-use amenable_std::{Authority, AuthorityKind, SourceUrl, VerifierFamily};
+use amenable_core::{Entry, Metadata, SourceUrl};
+use amenable_std::{Authority, AuthorityKind, VerifierFamily};
 
 /// A verifier-descriptor record composed from the shared vocabulary via
 /// `#[entry(flatten)]` — the same six keys `KaniVerifierMetadata` /

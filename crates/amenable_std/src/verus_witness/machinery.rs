@@ -1,19 +1,20 @@
-//! The Verus verifier, the `VerusWitness` trait, the
+//! The `VerusWitness` trait, the
 //! `bridge_verus_witness!`/`impl_verus_witness_trusted!` macros every
 //! other file in this module invokes, and the `VerusCallShape` family
 //! (structural call shapes a compositional renderer uses to emit a
 //! literal call to, or citation of, a real Verus harness instead of
 //! assuming its conclusion).
+//!
+//! `VerusVerifier` itself now lives in `amenable_core` (moved so
+//! `amenable_std` can depend on `amenable_time` without a cycle — see
+//! that type's own doc comment).
 
 use amenable_core::{
-    Entry, Evidence, Metadata, MetadataEntry, OwnedEntry, Provenance, Verifier, WitnessArtifact,
+    Evidence, Metadata, MetadataEntry, Verifier, VerusVerifier, WitnessArtifact,
     WitnessArtifactNode, WitnessSupportKind, WitnessSupportSummary,
 };
 
-use crate::{
-    Authority, ConfigurationChannel, ConfigurationSurface, ProofArtifact, RustStdProvenance,
-    RustStdStandard, SourceUrl, VerifierFamily,
-};
+use crate::{RustStdProvenance, RustStdStandard};
 
 /// Verus-specific witness: identifies the Verus spec (if any) behind a
 /// piece of evidence, without ever running it.
@@ -32,48 +33,6 @@ pub(crate) trait VerusProofArtifactSupport {
     fn support() -> WitnessSupportSummary;
 }
 
-/// The Verus verifier, local to this crate: there is only one verifier
-/// Verus works with — Verus. Being local here (not imported from
-/// `amenable_core`) is what makes the per-type bridges below legal under
-/// Rust's orphan rule — a blanket bridge over a bare type parameter is
-/// not: the orphan rule requires every uncovered generic parameter to be
-/// covered before the first local type, and `Self` in a blanket impl
-/// never is.
-pub struct VerusVerifier;
-
-/// Provenance surface for the Verus verifier backend.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
-pub struct VerusVerifierMetadata;
-
-impl Metadata for VerusVerifierMetadata {
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
-    fn snapshot(&self) -> Vec<OwnedEntry> {
-        vec![
-            VerifierFamily::new("verus").into_entry(),
-            Authority::new("Verus project").into_entry(),
-            SourceUrl::new("https://verus-lang.github.io/verus/").into_entry(),
-            ProofArtifact::new("Verus proof module token stream").into_entry(),
-            ConfigurationChannel::new("CLI arguments and VERUS_* environment variables")
-                .into_entry(),
-            ConfigurationSurface::new(
-                "binary path, source selection, flags, timeout, and report output",
-            )
-            .into_entry(),
-        ]
-    }
-}
-
-impl Provenance for VerusVerifierMetadata {}
-
-impl Verifier for VerusVerifier {
-    type Metadata = VerusVerifierMetadata;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-    fn name() -> &'static str {
-        "verus"
-    }
-}
-
 /// Register explicit Verus witness exports for concrete instantiated
 /// types.
 ///
@@ -85,7 +44,7 @@ impl Verifier for VerusVerifier {
 macro_rules! emit_verus_witnesses {
     ($($ty:ty),* $(,)?) => {
         ::amenable_core::register_witness_exports!(
-            verifier = $crate::VerusVerifier;
+            verifier = ::amenable_core::VerusVerifier;
             $($ty),*
         );
     };
@@ -103,7 +62,7 @@ macro_rules! emit_verus_witnesses {
 // resolve from any call site outside this file.
 macro_rules! bridge_verus_witness {
     ($ty:ty) => {
-        impl ::amenable_core::Witness<$crate::VerusVerifier> for $ty {
+        impl ::amenable_core::Witness<::amenable_core::VerusVerifier> for $ty {
             type SupportingEvidence = <$ty as $crate::VerusWitness>::SupportingEvidence;
             type ProofArtifact = <$ty as $crate::VerusWitness>::ProofArtifact;
 
@@ -121,7 +80,7 @@ macro_rules! bridge_verus_witness {
         // or Trusted respectively, see VerusProofArtifactSupport below), never
         // the Witness::support() default (Opaque) -- so this impl is always
         // sound to add unconditionally alongside the bridge.
-        impl ::amenable_core::ClassifiedWitness<$crate::VerusVerifier> for $ty {}
+        impl ::amenable_core::ClassifiedWitness<::amenable_core::VerusVerifier> for $ty {}
     };
 }
 // Every other file in this module invokes this macro on its own leaf

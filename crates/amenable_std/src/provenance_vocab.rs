@@ -6,11 +6,14 @@
 //! that use them (before this, `KaniVerifierMetadata` /
 //! `CreusotVerifierMetadata` / `VerusVerifierMetadata` each hand-maintained a
 //! byte-for-byte-identical `const FACTS: &[(&str, &str)]` slice in a different
-//! crate). `Authority` and `SourceUrl` are shared by both vocabularies.
+//! crate). `Authority` is shared by both vocabularies.
 //!
 //! Lives in `amenable_std`, not `amenable_core`: nothing in core uses the
 //! vocabulary, and here it can be `#[derive(Entry)]`-generated rather than
-//! hand-rolled.
+//! hand-rolled. `SourceUrl` and `SemanticSummary` are the exception —
+//! `amenable_core::provenance_vocab` hand-rolls those two so `amenable_std`
+//! can depend on `amenable_time` without a cycle; see that module's own
+//! doc comment.
 
 use amenable_derive::Entry;
 
@@ -62,16 +65,8 @@ string_vocab_entry! {
     SourceModule, "source_module"
 }
 string_vocab_entry! {
-    /// The canonical documentation URL for a carrier or a verifier backend.
-    SourceUrl, "source_url"
-}
-string_vocab_entry! {
     /// The fully-qualified Rust type name being certified.
     TypeName, "type_name"
-}
-string_vocab_entry! {
-    /// Concise summary of a semantic promise made by the standard library.
-    SemanticSummary, "semantic_summary"
 }
 string_vocab_entry! {
     /// The verifier backend family a descriptor record describes.
