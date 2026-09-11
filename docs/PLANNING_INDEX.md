@@ -8,137 +8,45 @@ This file tracks all planning documents for the amenable project.
 
 **Document:** [AMENABLE_TIME_PLAN.md](AMENABLE_TIME_PLAN.md)
 
-**Status:** ✅ Complete (2026-09-10). All phases 0–7 closed. 23 atomic contracts machine-checked on Kani/Creusot/Verus; all 152 `proof_composition` aggregates compose as `ClassifiedWitness<V>`; `std::time` canary backend; `just temporal-coverage`. Optional follow-ons remain (see plan tail).
-complete (2026-09-09). A
-**straight, full-scope port** of `~/repos/elicitation/crates/elicit_temporal`
-(~345 citation-only contracts, ~95 composed aggregates, 259 descriptors,
-~175 trait methods) into `amenable_time` — **not a probe**; whether the
-trait family works is settled by `Stoplight` + `amenable_gaap`, so the
-deliverable is a working crate plus the edge cases that surface at scope
-and scale. Every contract type → `Standard` (citation-only) or `Evidence`
-(`proof_composition`); every trait method → `Exchange`; `TemporalReporter`
-the one exception. **Work order: proof architecture last.** Phase 1 (all
-citation-only contracts as `Standard` + `Provenance` — web link or
-embedded verbatim clause per redistributability tier — several sessions)
-→ Phase 2 (descriptors) → Phase 3 (`proof_composition` + `Establish`) →
-Phase 4 (trait methods as `Exchange` impls + `ExchangeEdgeRecord`s, no
-proofs) → Phase 5–6 (per-backend `Witness`/`Ensures`, Kani/Creusot/Verus).
-All 7 decisions settled (see plan's "Resolved decisions").
-
-**Phase 0 (done):** `crates/amenable_time` — error layer,
-`provenance_vocab` (`NormativeDocument` / `Section` / `NormativeStatus` /
-`StandardsBody` / `NormativeQuotation` enum / `CrossCheck`),
-`TemporalProvenance` record, the `temporal_standard!` macro,
-`contracts::precision` (5 real contracts) as the pattern-setter,
-`TemporalReporter`, `TemporalComponent` / `SerializationProfile`. Not
-facade-exported. `just check-all-package amenable_time` clean.
-A synthetic `Received -> Preserved` Exchange edge was built and reverted
-(off-plan — do not clone `Stoplight`/`gaap` typestate shapes).
-
-**Phase 1 complete — all 345 citation-only contracts ported as
-`Standard`s** with a real `TemporalProvenance` across 9 normative
-authorities: `iso_8601` (109) / `extended` (48) tier C; `rfc3339` (20) /
-`rfc9557` (38) / `zone` (21) tier A (verbatim RFC clauses + rfc-editor
-deep links); `calconnect` (61) tier B; `interval` (25) / `instant` (6) /
-`serialization` (5) / `conversion` (7) mixed. Directories where the
-500-LOC cap forced a split: `iso_8601/` ×6, `extended/` ×3, `rfc9557/`
-×3, `calconnect/` ×3.
-
-**Phase 2 complete — 93 descriptor definitions ported** (50 structs + 43
-enums) into `src/types/` (13 modules): private fields +
-`derive_getters::Getters` + `derive_new::new` / `derive_builder::Builder`
-(`FooDescriptorBuilder::default()`, 33 structs), `strum::EnumIter` +
-`derive_more::Display` on closed enums, no serde / `JsonSchema`, no
-construction-time validation. `#[derive(Evidence)]` deferred to Phase 3/4
-(its `Default` requirement would cascade meaninglessly onto data-only
-enums; the `Sidecar<V>` wiring there settles which descriptors need it).
-
-**Phase 3 Step 1 complete (2026-09-08)** — the 93 `proof_composition`
-aggregate `*Valid` propositions + 24 shared branch types (117 total)
-ported as composite `#[derive(Evidence, Witness)]` structs / enums. The
-design (user-confirmed): aggregation is `#[derive(Witness)]` structural
-closure, **not** a bag of proof tokens — each `elicit_temporal`
-`*Evidence` bundle is folded into the *fields* of its `*Valid` aggregate,
-so the composite `Witness<V>` proof is the structural product of its
-members' proofs. Generated from `elicit_temporal` by script.
-`Establish`/`Exchange` are reserved for genuine transitions (Phase 4).
-**Step 2 (2026-09-09)** — the 13 `*ProofBranch` enums folded the same way
-(`proof_composition/proof_branches.rs`).
-
-**Phase 4 Steps 1–5 complete (2026-09-09)** — the exchange surface in
-`src/exchange/`. **Design (user-confirmed after several corrections):
-every `elicit_temporal` return tuple IS a sidecar** (`#[sidecar(primary)]`
-descriptor, `#[sidecar(token)]` proof token). **`amenable_time` ships no
-`Exchange` impl** — the orphan rule forbids `impl<T: …, V> Exchange<
-RawInput, …, V> for T` (tested). Instead it ships `TemporalParser<V>` /
-`TemporalFormatter<V>` — traits whose supertrait bundle *is* the 24
-`Exchange<RawInput, ParsedX, V>` / 36 `Exchange<ParsedX, FormattedY, V>` —
-and the backend writes the inherent methods (`#[capture_exchange_body]`
-generates the `Exchange` impls). Step 2a: 23 top-level descriptors + their
-transitive enums gain `Default`/`Evidence`. Step 2b: all 24 `ParsedX`
-sidecars, 12 per-method composite propositions (multi-proof folding), 24
-`#[establish]` tokens, the parser trait. **Step 3 (2026-09-09):**
-`TemporalFormatter<V>` — 36 `Formatted*` output sidecars
-(`FormattedTemporalText` primary), 36 `<Method>Formatted` emission-proof
-composites, 3 formatter-only `Parsed*` inputs, 36+3 `#[establish]` tokens.
-**Step 4 (2026-09-09):** `TemporalZoneFactory<V>` (5) /
-`TemporalConversionFactory<V>` (4) / `TemporalIntervalFactory<V>` (4) —
-9 transition methods fold descriptors → a `*Request` primary,
-`Established<_>` preconditions → a `*Preconditions` proposition, and
-return-tuple proofs → a `*Established` proposition; `*Input` / `*Output`
-`#[derive(Sidecar)]` structs + paired `#[establish]` edges
-(`*PreconditionsToken` ← `TemporalInputToken`, `*EstablishedToken` ←
-`*PreconditionsToken`) in `factory_establish.rs`; the 4 parser-style
-factory methods reuse `RawInput`. **Step 5 (2026-09-09):**
-`TemporalCalConnectFactory<V>` (19) — 6 CalConnect-only parse methods +
-their 6 emit counterparts (`Parsed<X>` → `Formatted<X>`, folded to
-`<X>Proof` / `<X>Formatted`) + `evaluate_date_time_formula` transition,
-self-contained in `src/exchange/calconnect.rs`; the 6 shared families
-reuse the parser / formatter sidecars. **Phase 4 exchange surface
-complete.** Two earlier sketches (`Proven`/`Proven::prove`, then a
-standalone `TemporalExchange`) were reverted.
-
-**Phase 5 Steps 1–4 complete (2026-09-09)** — Step 4: the 14
-`realize_*`/`reflect_*` bridge pairs → `traits/native_bridge.rs`, each
-per-family bridge's supertrait bundle *is* its exchange pair
-(`Exchange<Reflected<X>, Proven<X>Carrier<Self::X>, V>` + inverse); 14
-`Reflected<X>` sidecars (`<X>Descriptor` + the semantic-bundle token,
-ridden through from the carrier) in `src/exchange/reflect.rs`; elicit's
-aggregate bridges + blankets. Step 3: the 16 `native_props`
-associated-type families → `traits/native_props.rs`, one-to-one with
-`elicit_temporal` (same supertrait graph + 3 aggregate blanket traits),
-every `type X` bound `: Evidence` so a native carrier can be a
-`ProvenTemporalCarrier` primary. Step 1: the 22
-`elicit_temporal` `*Bundle` aggregate proof bundles (15 `*SemanticBundle`
-plus 7 single-proof `*Bundle`) ported as folded `#[derive(Evidence,
-Witness)]` composites (`proof_composition/semantic_bundles.rs`). Step 2:
-`ProvenTemporalCarrier<T, STok>` (`src/carrier.rs`) — a token-keyed
-`#[derive(Sidecar)]`. The "open question" resolved: the native carrier
-`T` becomes a backend `Evidence` newtype (thin wrapper) and is the
-primary; a `*SemanticBundle` is a *named aggregate proposition*, so each
-of the 22 gets a `<Bundle>Token` `#[establish]`-swapped from the token
-that produced it, and the carrier is keyed on the token (proposition =
-`<STok as ProofToken>::Proposition` via a new
-`#[sidecar(proposition_from_token)]` derive flag). 14 `Proven*Carrier<T>`
-aliases. **Step 4b (2026-09-09):** the 9 `*_native` factory analogs →
-carrier↔carrier `Exchange`s (`traits/native_factory.rs`); multi-input
-methods fold runtime values into a `<M>NativeRequest<B>` primary
-(`#[evidence(basis = "NativeCarrierRequest")]` marker, so the generic
-compound needs no `Default`). **Phase 5 is complete** — contracts,
-descriptors, composites, the full exchange surface (parser / formatter /
-factories / CalConnect), the semantic bundles, the carriers and the
-descriptor↔carrier bridges are all ported. Next: Phase 6 — replace the
-trivial Phase-3 `Witness<V>` placeholders with real per-backend proofs
-(Kani / Creusot / Verus) where a checkable predicate exists. (Step 2c — the backend
-`Exchange`-impl codegen macro — is deferred until there is a backend
-crate to target; `#[capture_exchange_body]` is the working per-method
-form.)
+**Status:** ✅ Complete (2026-09-10). A straight, full-scope port of
+`~/repos/elicitation/crates/elicit_temporal` (345 citation-only
+contracts, 152 composed `proof_composition` aggregates, 259 descriptors,
+~175 trait methods as `Exchange`s) into `amenable_time`. All phases 0–7
+closed: every contract is a `Standard`/`Evidence`; every trait method is
+an `Exchange` over a `Sidecar` pair; 23 atomic contracts machine-checked
+on Kani/Creusot/Verus (ranges, ordering, Gregorian leap-year/month/year
+arithmetic — `Σ days_in_month == days_in_year` proven); all 152
+aggregates compose as a real `ClassifiedWitness<V>` on every backend
+(`amenable_time::structural_witness` gives the other 322 contracts a
+trusted/trivial citation-backed witness so composition never blocks); a
+`std::time` canary backend (`backends::std_time`) exercising the interface
+as a runtime oracle, not a stub; `just temporal-coverage`. See the plan
+document for full phase-by-phase detail and the open, non-blocking
+follow-ons at its tail.
 
 **Description:** MVP-for-proper-testing — the trait interface only
 becomes load-bearing once something large actively uses it.
-`elicit_temporal` is a ready-made large contract-first interface crate
+`elicit_temporal` was a ready-made large contract-first interface crate
 (no implementation, no current consumers) covering ISO 8601-1/-2, RFC
 3339, RFC 9557, CalConnect CC 18011, IANA TZDB, SI/BIPM, and LoC EDTF.
+
+### amenable_ext (third-party crate support)
+
+**Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
+
+**Status:** 🔲 Planned (2026-09-10), not started. One crate,
+`amenable_ext`, not one crate per target library — a directory per target
+(`jiff`, `uuid`, …) behind a same-named feature flag, default empty,
+mirroring `amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern
+(the orphan rule already forces this shape; no interface/impl split to
+make). First target `jiff`, second `uuid` (already a vetted workspace
+dependency). Deliberately decoupled from `amenable_time` — a real
+`amenable_time::backends::jiff` would consume `amenable_ext::jiff`'s
+wrapped types later, but `amenable_ext` isn't scoped to temporal needs
+alone. Phase 2 extends `cordial`'s existing `framework_std` coverage
+machinery (already builds shadow-dep rustdoc for upstream crates, cross-
+references the `amenable` registry dump, renders checklist/gap CSVs for
+`amenable_std`) to report per-target-crate trait coverage the same way.
 
 ### Metadata trait family
 
