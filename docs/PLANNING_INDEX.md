@@ -34,22 +34,31 @@ becomes load-bearing once something large actively uses it.
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
 
-**Status:** 🔲 Planned (2026-09-10), not started. One crate,
+**Status:** 🔲 Planned (2026-09-11 revision), not started. One crate,
 `amenable_ext`, not one crate per target library — a directory per target
-(`jiff`, `uuid`, …) behind a same-named feature flag, default empty,
-mirroring `amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern
-(the orphan rule already forces this shape; no interface/impl split to
-make). First target `jiff`, second `uuid` (already a vetted workspace
-dependency). Deliberately decoupled from `amenable_time` at the
-Evidence/Witness layer — `amenable_time` is an optional dep of
-`amenable_ext`, gated by the `jiff`/`chrono` features only; a real jiff
-temporal backend would live in `amenable_ext` and consume
-`amenable_ext::jiff`'s wrapped types later, but `amenable_ext` isn't
-scoped to temporal needs alone. Phase 2 extends `cordial`'s existing
-`framework_std` coverage
-machinery (already builds shadow-dep rustdoc for upstream crates, cross-
-references the `amenable` registry dump, renders checklist/gap CSVs for
-`amenable_std`) to report per-target-crate trait coverage the same way.
+behind a same-named feature flag, default empty, mirroring
+`amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern (the orphan
+rule already forces this shape; no interface/impl split to make).
+**Scoped tightly to jiff first** (Phases 0-3: skeleton, type
+registrations + witnesses, cordial coverage tooling, a real jiff
+temporal backend); `chrono`/`chrono-tz` are the deliberate next target
+once jiff is done (more calendar-library coverage for `amenable_time`);
+`uuid` deferred further still, unrelated to time. `amenable_time` is an
+optional dep of `amenable_ext`, gated by the `jiff`/`chrono` features
+only. The cordial section is now grounded in real, named symbols read
+directly from `~/repos/cordial` (not sketched): `CoverageTargetKind::
+UpstreamDep`/`CoverageTarget::upstream_dep`, `build_shadow_dep_rustdoc`
+(already crate-name-generic — no `elicitation`-style shadow-pair
+registration needed once `amenable_ext`'s `Cargo.toml` names `jiff`),
+`load_std_inventory_from_json` (already generic despite living in
+`framework_std`), and `build_amenable_std_report` (already
+source/impl-crate generic). The one real gap: `registry.rs`'s
+`RUST_STD_STANDARD_PREFIX` is hardcoded and needs an `ExtStandard<`
+sibling. See the plan doc's cordial section for the full wiring mirror
+(`plugins/amenable.rs` → `AmenableExtCoverage`, etc.) and its sequencing
+note: the coverage report works the moment the `jiff` Cargo dependency
+exists, before any real type registration, and can drive Phase 1's
+backlog the same way `amenable_std`'s own report does today.
 
 ### Metadata trait family
 
