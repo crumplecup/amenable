@@ -179,8 +179,10 @@ real, not sketched.
 and `PROOF_CHAIN_RUST_STD_PREFIX = "RustStdStandard<"` are hardcoded
 literals `parse_rust_std_standard_inner` strips before matching an
 evidence name to an inventory type path. `ExtStandard<T>` evidence names
-(`amenable_ext::jiff::ExtStandard<jiff::Timestamp>`, or however the real
-registration renders) need the same treatment. The fix is mechanical:
+(`amenable_ext::ExtStandard<jiff::Timestamp>` — `ExtStandard` lives at
+the crate root, not nested under a `jiff` submodule, so the prefix is
+shorter than `RustStdStandard`'s own `amenable_std::rust_std::` nesting)
+need the same treatment. The fix is mechanical:
 generalize `parse_rust_std_standard_inner` to take a prefix pair (or a
 small slice of prefix pairs, if a report ever needs to recognize both
 wrapper families at once) instead of the two module-level constants, and
@@ -240,27 +242,50 @@ current code, don't trust a description of it — cordial changes weekly).
 
 ### Phase 0 — skeleton
 
-- [ ] `crates/amenable_ext` (`Cargo.toml`, `lib.rs` — mod + pub use only).
-- [ ] `ExtType` trait + `ExtStandard<T>` generic `Evidence` newtype
-      (`ext_type.rs`).
-- [ ] `impl_ext_type!` macro family, mirroring `amenable_std`'s
-      arity/lifetime variants — start with the plain (no generics) case
-      only; add the others when a real jiff type needs them.
-- [ ] `register_ext_standard_evidence!`.
-- [ ] Workspace `Cargo.toml`: add `amenable_ext` member + `jiff`
-      workspace dependency (optional, `amenable_ext/Cargo.toml` only —
-      this single edge is what makes the whole cordial mechanism above
-      resolve with zero extra registration).
-- [ ] `just check-all-package amenable_ext` clean.
+- [x] `crates/amenable_ext` (`Cargo.toml`, `lib.rs` — mod + pub use only).
+- [x] `ExtType` trait + `ExtStandard<T>` generic `Evidence` newtype
+      (`ext_type.rs`); `ExtLanguageProvenance`/`ExtProvenance` (parallel
+      to `RustLanguageProvenance`/`RustStdProvenance`, but with an
+      explicit `authority` parameter per registration — see that
+      module's own doc comment for why there's no crate-wide default).
+- [x] `impl_ext_type!` macro family — the plain (no generics) case only,
+      as planned; `register_ext_standard_evidence!`. Both gated behind
+      `#[cfg(feature = "jiff")]` (extend to `any(feature = "jiff",
+      feature = "chrono", ...)` once a second target lands) — with zero
+      target modules yet, an ungated shared macro would be genuinely
+      dead code.
+- [x] Workspace `Cargo.toml`: `amenable_ext` member + `jiff` workspace
+      dependency added; `amenable_ext/Cargo.toml`'s own `jiff = {
+      workspace = true, optional = true }` + `jiff = ["dep:jiff",
+      "dep:amenable_time"]` feature is the single edge the whole cordial
+      mechanism above resolves against.
+- [x] One real registration landed alongside the skeleton rather than
+      after it: `jiff::Timestamp` (`src/jiff/timestamp.rs`) — needed to
+      keep Phase 0 itself free of dead code (an unused shared macro with
+      no consumer is exactly the kind of thing this codebase's own
+      dead-code discipline flags), and it doubles as the first real
+      exercise of the whole mechanism end to end. `tests/jiff_test.rs`
+      (3 tests: derived provenance report, `Standard` impl, `EvidenceLink`
+      registration) — note `std::any::type_name::<jiff::Timestamp>()`
+      resolves to `jiff::timestamp::Timestamp` (jiff's internal defining
+      module), not the public re-export path, the same property
+      `RustStdType::provenance()` already lives with for std types.
+- [x] `just check-all-package amenable_ext` clean (fmt, clippy
+      `--all-features -D warnings`, test); `cargo test -p amenable_ext
+      --features jiff` separately (the recipe's own `cargo test` step
+      doesn't pass `--all-features`, matching every other crate's
+      recipe use); full workspace `check`/`clippy --all-features
+      --all-targets`/`fmt --check` all clean with the new member added.
 
 ### Phase 1 — jiff type registrations and witnesses
 
-- [ ] `#[cfg(feature = "jiff")] mod jiff` — `ExtType`/`ExtStandard<T>`
-      registrations for `jiff::{Timestamp, Zoned, Span, tz::TimeZone,
-      civil::{Date, Time, DateTime}}` (the set `elicitation`'s own jiff
-      coverage judged worth wrapping — recheck against `elicitation`'s
-      `datetime_jiff.rs`/`datetime_specs.rs` for what "worth wrapping"
-      meant there before assuming this list is complete; Open decision 3).
+- [ ] `#[cfg(feature = "jiff")] mod jiff` gains the rest of
+      `jiff::{Zoned, Span, tz::TimeZone, civil::{Date, Time, DateTime}}`
+      (`Timestamp` itself landed in Phase 0, see above) — the set
+      `elicitation`'s own jiff coverage judged worth wrapping — recheck
+      against `elicitation`'s `datetime_jiff.rs`/`datetime_specs.rs` for
+      what "worth wrapping" meant there before assuming this list is
+      complete (Open decision 3).
 - [ ] `amenable_kani::rust_std` (or a new sibling module) gains a
       `#[cfg(feature = "jiff")] mod jiff` — `Witness<KaniVerifier>` /
       `ClassifiedWitness<KaniVerifier>` per type, `trusted` by default

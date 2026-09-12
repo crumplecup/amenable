@@ -1,0 +1,39 @@
+[package]
+name = "amenable_ext"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme = "README.md"
+
+description = "Third-party crate support for the amenable trait family: Evidence/Witness for foreign types, one crate per target behind a same-named feature flag"
+keywords = ["formal-verification", "proof", "provenance"]
+categories = ["development-tools"]
+
+[dependencies]
+amenable_core = { workspace = true }
+amenable_derive = { workspace = true }
+# Optional: only pulled in by a target feature that needs the temporal
+# contract interface (jiff, later chrono) -- see docs/AMENABLE_EXT_PLAN.md's
+# "Relationship to amenable_time". Not pulled in by non-temporal targets
+# (uuid, when it lands).
+amenable_time = { workspace = true, optional = true }
+derive-new = { workspace = true }
+derive_more = { workspace = true }
+inventory = { workspace = true }
+# Optional, gated by the `jiff` feature below.
+jiff = { workspace = true, optional = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+miette = { workspace = true }
+
+[features]
+default = []
+jiff = ["dep:jiff", "dep:amenable_time"]
+
+[lints]
+workspace = true

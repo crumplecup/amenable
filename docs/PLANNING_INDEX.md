@@ -34,7 +34,11 @@ becomes load-bearing once something large actively uses it.
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
 
-**Status:** 🔲 Planned (2026-09-11 revision), not started. One crate,
+**Status:** 🟡 Phase 0 done (2026-09-11): `crates/amenable_ext` exists,
+`ExtType`/`ExtStandard<T>` landed, `jiff::Timestamp` registered as the
+first real type (kept the skeleton free of dead code — an unused shared
+macro with zero consumers), 3 passing tests, full workspace re-verified
+clean. One crate,
 `amenable_ext`, not one crate per target library — a directory per target
 behind a same-named feature flag, default empty, mirroring
 `amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern (the orphan
