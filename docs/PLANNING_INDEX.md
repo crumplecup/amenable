@@ -34,11 +34,20 @@ becomes load-bearing once something large actively uses it.
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
 
-**Status:** 🟡 Phase 0 done (2026-09-11): `crates/amenable_ext` exists,
-`ExtType`/`ExtStandard<T>` landed, `jiff::Timestamp` registered as the
-first real type (kept the skeleton free of dead code — an unused shared
-macro with zero consumers), 3 passing tests, full workspace re-verified
-clean. One crate,
+**Status:** 🟡 Phases 0-1 done (2026-09-13). Phase 0: `crates/amenable_ext`
+exists, `ExtType`/`ExtStandard<T>` landed, `jiff::Timestamp` registered
+first (kept the skeleton free of dead code). Phase 1: `Zoned`/
+`civil::DateTime` added (the full set verified against `elicitation`'s
+real coverage, narrower than this plan's own earlier speculative list);
+`Witness<KaniVerifier>`/`Witness<CreusotVerifier>` in new `ext::jiff`
+sibling modules in both backend crates (trusted, no `ClassifiedWitness`
+— matches `RustStdStandard<T>`'s own real precedent, not this plan's
+earlier aspiration); `Witness<VerusVerifier>` + `ClassifiedWitness`
+inside `amenable_ext::jiff` itself; facade `jiff` feature wired with a
+weak-dep `?` edge to `amenable_creusot` so it never force-enables
+`creusot`. 15 new passing tests across 4 files; full workspace
+re-verified clean (check/clippy/fmt --all-features --all-targets, every
+touched crate's own test suite). One crate,
 `amenable_ext`, not one crate per target library — a directory per target
 behind a same-named feature flag, default empty, mirroring
 `amenable_std`'s `RustStdType`/`RustStdStandard<T>` pattern (the orphan

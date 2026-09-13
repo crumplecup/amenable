@@ -24,6 +24,7 @@ mod compose;
 mod env_model;
 mod env_path_model;
 mod error;
+mod ext;
 mod fd_model;
 mod fmt_model;
 mod fs_model;

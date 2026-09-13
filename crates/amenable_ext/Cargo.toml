@@ -34,6 +34,10 @@ miette = { workspace = true }
 [features]
 default = []
 jiff = ["dep:jiff", "dep:amenable_time"]
+# The Witness<VerusVerifier> bridge for every target's ExtStandard<T>
+# (src/jiff/verus_witness.rs and siblings) -- off by default like every
+# other verifier feature in this workspace.
+verus = ["amenable_core/verus"]
 
 [lints]
 workspace = true

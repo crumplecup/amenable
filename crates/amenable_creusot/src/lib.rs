@@ -20,6 +20,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+#[cfg(not(creusot))]
+mod ext;
 mod ledger;
 mod rust_std;
 #[cfg(not(creusot))]

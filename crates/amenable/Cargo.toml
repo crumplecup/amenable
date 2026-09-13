@@ -23,6 +23,9 @@ amenable_core = { workspace = true }
 amenable_std = { workspace = true }
 amenable_kani = { workspace = true }
 amenable_creusot = { workspace = true, optional = true }
+# Optional: only pulled in by a target feature that needs it (jiff so
+# far) -- see docs/AMENABLE_EXT_PLAN.md.
+amenable_ext = { workspace = true, optional = true }
 amenable_time = { workspace = true }
 clap = { workspace = true }
 derive-getters = { workspace = true }
@@ -75,6 +78,13 @@ creusot = ["dep:amenable_creusot"]
 # depend on there at all) -- this only toggles `amenable_std/verus`, which
 # `include_str!`s `amenable_verus`'s real proof source by relative path.
 verus = ["amenable_std/verus", "amenable_time/verus"]
+# `amenable_kani` is unconditional so its own `jiff` sub-feature is
+# turned on directly; `amenable_creusot` is itself optional (the
+# `creusot` feature above), so its `jiff` sub-feature uses the weak-dep
+# `?` syntax -- enabled only if `creusot` has already turned that
+# dependency on, never forcing it on by itself (keeping `creusot`'s own
+# "opt-in, not default" rationale above intact).
+jiff = ["amenable_kani/jiff", "amenable_creusot?/jiff", "dep:amenable_ext", "amenable_ext/jiff"]
 
 [lints]
 workspace = true

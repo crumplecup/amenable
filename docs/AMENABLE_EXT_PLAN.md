@@ -97,15 +97,22 @@ that same recheck, and get added if/when Phase 3's backend actually
 needs one as a native carrier.
 
 `amenable_kani` / `amenable_creusot` gain a `#[cfg(feature = "jiff")]`-gated
-module (`ext::jiff` or similar — see Open decision 2), mirroring
-`amenable_kani::rust_std::std_time` — `Witness<V>` / `ClassifiedWitness<V>`
-for `ExtStandard<T>` per concrete `T`, `checked` where a real proof
-exists, `trusted` where the type is opaque to the verifier and we cite
-upstream's own guarantee instead (same `impl_kani_witness_trusted!`-style
-split `elicitation`'s `#[cfg(kani)]` wrapper-logic-only proofs already
-use). The Verus bridge lives inside `amenable_ext::jiff` itself
-(`Witness<VerusVerifier>` for `ExtStandard<T>`), not in a separate
-backend crate — `VerusVerifier` lives in `amenable_core` (Phase 8 of
+`ext::jiff` module (Open decision 2, resolved — a new sibling module,
+not nested under `rust_std`), mirroring `impl_kani_witness_trusted!`'s
+own split: `checked` where a real proof exists, `trusted` where the type
+is opaque to the verifier and we cite upstream's own guarantee instead
+(the same split `elicitation`'s `#[cfg(kani)]` wrapper-logic-only proofs
+already use). **`Witness<V>` only on Kani/Creusot, not
+`ClassifiedWitness<V>`** — checked against the real precedent rather
+than assumed: `RustStdStandard<T>`'s own trusted registrations don't
+implement `ClassifiedWitness` either (only `amenable_time`'s contract
+types do), so `ExtStandard<T>` follows the same real pattern it's
+modeled on. The Verus bridge lives inside `amenable_ext::jiff` itself
+(`Witness<VerusVerifier>` *and* `ClassifiedWitness<VerusVerifier>` for
+`ExtStandard<T>` — Verus's own asymmetry with Kani/Creusot here is real,
+matching `RustStdStandard<T>`'s own Verus registrations in
+`amenable_std::verus_derive_canary::leaves`), not in a separate backend
+crate — `VerusVerifier` lives in `amenable_core` (Phase 8 of
 `AMENABLE_TIME_PLAN.md`), so this mirrors `amenable_std::verus_witness`'s
 own placement: the bridge lives with the type registrations.
 
@@ -308,20 +315,60 @@ current code, don't trust a description of it — cordial changes weekly).
       (`src/jiff/civil.rs`) registered, doc strings verified against
       jiff 0.2.35's own vendored source. `register_ext_standard_evidence!`
       extended for both.
-- [ ] `amenable_kani::rust_std` (or a new sibling module) gains a
-      `#[cfg(feature = "jiff")] mod jiff` — `Witness<KaniVerifier>` /
-      `ClassifiedWitness<KaniVerifier>` per type, `trusted` by default
-      (jiff is opaque to Kani), `checked` only where a real harness adds
-      value over trusting jiff's own correctness.
-- [ ] Same for `amenable_creusot`, and a `Witness<VerusVerifier>` module
-      inside `amenable_ext::jiff` itself (feature-gated) — see
-      Architecture above for why it lives there, not in a backend crate.
-- [ ] `amenable_kani`/`amenable_creusot`/`amenable`(facade) gain a
-      `jiff` feature toggling `amenable_ext/jiff` (+ the crate's own
-      jiff witness module).
-- [ ] Tests: a `temporal_composition_test`-style compile assertion (every
-      registered jiff `ExtStandard<T>` is `ClassifiedWitness<V>` on every
-      linked backend).
+- [x] **Open decision 2 resolved:** a new sibling module in each backend
+      crate — `amenable_kani::ext::jiff`, `amenable_creusot::ext::jiff`
+      — not nested under `rust_std`/`rust_std_witness`. `rust_std`
+      stays std-only by name.
+- [x] `amenable_kani::ext::jiff` — `Witness<KaniVerifier>` per type,
+      `trusted` by default (jiff is opaque to Kani), via a new
+      `impl_kani_witness_trusted_ext!` macro (`ext/macros.rs`, reusing
+      the already-generic `bridge_kani_witness!` from `rust_std` —
+      `pub(crate) use`d at `rust_std`'s own module boundary, not
+      duplicated). **Not** `ClassifiedWitness<KaniVerifier>` — checked
+      against the real precedent first: `RustStdStandard<T>`'s own
+      trusted registrations (`impl_kani_witness_trusted!`) don't
+      implement it either (only `amenable_time`'s contract types do);
+      this plan's earlier text calling for it was aspirational, not
+      matching the established pattern, so dropped to stay consistent
+      with `RustStdStandard<T>`'s real treatment.
+- [x] Same for `amenable_creusot::ext::jiff` (`bridge_creusot_witness!`/
+      `impl_creusot_witness_trusted_ext!` defined locally in that one
+      file, matching every other file in `rust_std_witness` — none of
+      which share it from a common module either); module gated
+      `#[cfg(not(creusot))]` in `lib.rs`, matching `rust_std_witness`'s
+      own gate (both need `String`/`Vec`-returning closures and
+      `inventory::submit!`, the exact shape that crate's own doc
+      comment identifies as a real `creusot-rustc` ICE trigger when
+      local to the crate being translated).
+- [x] `Witness<VerusVerifier>` module inside `amenable_ext::jiff` itself
+      (`verus_witness.rs`, `#[cfg(feature = "verus")]`) — implements
+      `Witness<VerusVerifier>` directly on `ExtStandard<T>` (no
+      intermediate `VerusWitness` trait, unlike `amenable_std`'s: there
+      is no real per-type Verus harness to render a call-shape for
+      yet), plus `ClassifiedWitness<VerusVerifier>` (this one *does*
+      get it — `amenable_std`'s own canary/backend-style trusted
+      impls set `support()` to `trusted_leaf()` and implement
+      `ClassifiedWitness` alongside it; the asymmetry with Kani/Creusot
+      above is real, not an oversight, since `RustStdStandard<T>`'s own
+      Verus registrations follow the identical shape in
+      `amenable_std::verus_derive_canary::leaves`).
+- [x] `amenable_kani`/`amenable_creusot`/`amenable`(facade) gain a
+      `jiff` feature. Facade: `amenable_kani/jiff` (unconditional dep)
+      turned on directly; `amenable_creusot?/jiff` via Cargo's weak-dep
+      `?` syntax so enabling `jiff` alone never force-enables the
+      otherwise-optional `creusot` feature (verified via `cargo tree -e
+      features`: `amenable_creusot` is absent from the resolved graph
+      with `--features jiff` alone, and gains its own `jiff` feature
+      only with `--features jiff,creusot` together); `amenable_ext`
+      re-exported wholesale (`pub use amenable_ext;`), mirroring
+      `amenable_time`'s own precedent.
+- [x] Tests: `amenable_kani/tests/ext_jiff_test.rs` (4),
+      `amenable_creusot/tests/ext_jiff_test.rs` (4),
+      `amenable_ext/tests/jiff_verus_witness_test.rs` (3, using the same
+      `assert_classified::<T>()` pattern the `temporal_composition_test`s
+      use) — proof-value equality against `ExtType::provenance()` plus
+      a real `ProofRecord`/`ClassifiedWitness` check per type, on all
+      three backends.
 
 ### Phase 2 — cordial coverage tooling
 
@@ -380,19 +427,18 @@ two temporal libraries, not a reason to design it now.
 
 ## Open decisions
 
-1. **`ExtType` metadata shape** — identical to `RustStdType` (source
-   crate/module, doc URL, semantics summary), or does a third-party crate
-   need an extra field (e.g. the target crate's own version pin, since
-   "jiff 0.2" and "jiff 0.1" may have different guarantees)? Lean toward
-   identical-to-`RustStdType` unless a real need shows up.
-2. **Where the per-backend `jiff` witness modules live** — a new
-   top-level `mod` in each backend crate (`amenable_kani::ext_jiff`?) or
-   nested under the existing `rust_std` module despite jiff not being
-   std? Lean toward a new sibling module (`amenable_kani::ext::jiff`) —
-   `rust_std` should stay std-only by name.
-3. **First jiff type set** — the plan lists a plausible starting set
-   above; worth a quick pass against `elicitation`'s own jiff coverage
-   (`datetime_jiff.rs`, `datetime_specs.rs`, `verification/types/
-   datetimes.rs`) before Phase 1 starts, to avoid missing something that
-   prior art already judged important (or wrapping something it judged
-   not worth it).
+1. **`ExtType` metadata shape — settled, identical to `RustStdType`**
+   (source crate/module, doc URL, semantics summary; `ext_type.rs`).
+   No extra field turned out to be needed for the three jiff types
+   registered so far; revisit only if a real need shows up (e.g. a
+   target crate's own version pin).
+2. **Where the per-backend `jiff` witness modules live — settled,**
+   `amenable_kani::ext::jiff` / `amenable_creusot::ext::jiff`, new
+   sibling modules, not nested under `rust_std`/`rust_std_witness`.
+3. **First jiff type set — settled** against `elicitation`'s real
+   coverage (`datetime_jiff.rs`, `verification/types/datetimes.rs`,
+   `elicitation_kani/src/datetimes_jiff.rs`): `Timestamp`, `Zoned`,
+   `civil::DateTime` — narrower than this plan's own earlier
+   speculative list. `Span`/`tz::TimeZone`/`civil::{Date, Time}` get
+   registered later if/when Phase 3's real backend needs one as a
+   native carrier, not preemptively.

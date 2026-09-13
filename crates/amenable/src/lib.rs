@@ -84,6 +84,11 @@ pub use amenable_core::{VerusVerifier, VerusVerifierMetadata};
 pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
 };
+/// Third-party crate support (jiff, later chrono). The facade re-exports
+/// the whole crate rather than a curated list, same as `amenable_time`
+/// above — see `docs/AMENABLE_EXT_PLAN.md`.
+#[cfg(feature = "jiff")]
+pub use amenable_ext;
 #[cfg(kani)]
 pub use amenable_kani::KaniCompose;
 pub use amenable_kani::{

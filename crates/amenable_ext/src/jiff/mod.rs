@@ -9,4 +9,6 @@
 
 mod civil;
 mod timestamp;
+#[cfg(feature = "verus")]
+mod verus_witness;
 mod zoned;

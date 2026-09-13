@@ -32,6 +32,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "amenable_creusot",
+ "amenable_ext",
  "amenable_kani",
  "amenable_std",
  "amenable_time",
@@ -74,6 +75,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "amenable_derive",
+ "amenable_ext",
  "amenable_gaap",
  "amenable_std",
  "amenable_time",
@@ -81,6 +83,7 @@ dependencies = [
  "derive-getters",
  "derive-new",
  "inventory",
+ "jiff",
 ]
 
 [[package]]
@@ -135,6 +138,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "amenable_derive",
+ "amenable_ext",
  "amenable_gaap",
  "amenable_std",
  "amenable_time",
@@ -144,6 +148,7 @@ dependencies = [
  "derive_more",
  "derive_setters",
  "inventory",
+ "jiff",
  "miette",
  "tracing",
  "uuid",

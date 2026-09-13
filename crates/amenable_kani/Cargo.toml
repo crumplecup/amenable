@@ -16,6 +16,9 @@ categories = ["development-tools"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
+# Optional: only pulled in by a target feature that needs it (jiff so
+# far) -- see docs/AMENABLE_EXT_PLAN.md.
+amenable_ext = { workspace = true, optional = true }
 amenable_gaap = { workspace = true }
 amenable_std = { workspace = true }
 amenable_time = { workspace = true }
@@ -25,11 +28,17 @@ derive_builder = { workspace = true }
 derive_more = { workspace = true }
 derive_setters = { workspace = true }
 inventory = { workspace = true }
+# Optional, gated by the `jiff` feature below.
+jiff = { workspace = true, optional = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
 miette = { workspace = true }
+
+[features]
+default = []
+jiff = ["dep:amenable_ext", "amenable_ext/jiff", "dep:jiff"]
 
 [lints]
 workspace = true
