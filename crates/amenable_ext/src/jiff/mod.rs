@@ -7,4 +7,6 @@
 //! export — the same shape `amenable_std::rust_std`'s own per-type
 //! registration files follow.
 
+mod civil;
 mod timestamp;
+mod zoned;

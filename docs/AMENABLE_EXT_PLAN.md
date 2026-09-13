@@ -83,13 +83,18 @@ amenable_ext/
                         # + register_ext_standard_evidence!
     jiff/               # #[cfg(feature = "jiff")]
       mod.rs
-      timestamp.rs      # impl_ext_type!(jiff::Timestamp, "jiff", "jiff", url, summary), etc.
-      civil.rs          # jiff::civil::{Date, Time, DateTime}
-      span.rs           # jiff::Span
+      timestamp.rs      # impl_ext_type!(jiff::Timestamp, "jiff contributors", "jiff", "jiff", url, summary)
       zoned.rs          # jiff::Zoned
-      tz.rs             # jiff::tz::TimeZone
+      civil.rs          # jiff::civil::DateTime
       verus_witness.rs  # #[cfg(feature = "verus")] Witness<VerusVerifier> bridge for ExtStandard<T>
 ```
+
+Only `Timestamp`/`Zoned`/`civil::DateTime` so far — the verified-against-
+`elicitation` set (Phase 1's own checklist entry below). `Span`/
+`tz::TimeZone`/`civil::{Date, Time}` are not first-class registrations
+here; they show up only as supporting types other methods use, per
+that same recheck, and get added if/when Phase 3's backend actually
+needs one as a native carrier.
 
 `amenable_kani` / `amenable_creusot` gain a `#[cfg(feature = "jiff")]`-gated
 module (`ext::jiff` or similar — see Open decision 2), mirroring
@@ -279,13 +284,30 @@ current code, don't trust a description of it — cordial changes weekly).
 
 ### Phase 1 — jiff type registrations and witnesses
 
-- [ ] `#[cfg(feature = "jiff")] mod jiff` gains the rest of
-      `jiff::{Zoned, Span, tz::TimeZone, civil::{Date, Time, DateTime}}`
-      (`Timestamp` itself landed in Phase 0, see above) — the set
-      `elicitation`'s own jiff coverage judged worth wrapping — recheck
-      against `elicitation`'s `datetime_jiff.rs`/`datetime_specs.rs` for
-      what "worth wrapping" meant there before assuming this list is
-      complete (Open decision 3).
+- [x] **Open decision 3 resolved (2026-09-13):** read `elicitation`'s
+      real jiff coverage (`crates/elicitation/src/datetime_jiff.rs` +
+      `verification/types/datetimes.rs` + `elicitation_kani/src/
+      datetimes_jiff.rs`) rather than assuming the Architecture
+      section's speculative list above. Finding: elicitation's own
+      judgment of "worth wrapping" is narrower than that list —
+      `Timestamp`, `Zoned`, and `civil::DateTime` get real `Elicitation`
+      impls (the MCP-input-worthy carriers); only `Timestamp` gets a
+      verification-focused refinement wrapper (`TimestampAfter`/
+      `TimestampBefore`, `#[cfg(kani)]` trust-jiff/verify-wrapper-only
+      split). `Span`/`tz::TimeZone`/`civil::{Date, Time}` appear only as
+      supporting types inside other types' methods, never as a
+      first-class wrapped carrier. **Registering exactly that verified
+      set for now — `Timestamp` (done), `Zoned`, `civil::DateTime` —
+      not the wider speculative list; `Span`/`TimeZone`/`Date`/`Time`
+      get registered later if/when Phase 3's real backend actually
+      needs one as a native carrier type**, per this crate's own
+      dead-code discipline (a registration with no consumer is exactly
+      what Phase 0 already flagged as a real problem, not a
+      hypothetical one).
+- [x] `Zoned` (`src/jiff/zoned.rs`) and `civil::DateTime`
+      (`src/jiff/civil.rs`) registered, doc strings verified against
+      jiff 0.2.35's own vendored source. `register_ext_standard_evidence!`
+      extended for both.
 - [ ] `amenable_kani::rust_std` (or a new sibling module) gains a
       `#[cfg(feature = "jiff")] mod jiff` — `Witness<KaniVerifier>` /
       `ClassifiedWitness<KaniVerifier>` per type, `trusted` by default
