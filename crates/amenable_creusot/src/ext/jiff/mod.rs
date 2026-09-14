@@ -23,6 +23,7 @@
 
 mod error;
 mod offset;
+mod signed_duration;
 
 use crate::CreusotWitness;
 use amenable_core::{Evidence, Metadata};

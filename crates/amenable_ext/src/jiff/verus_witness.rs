@@ -134,3 +134,9 @@ impl_verus_witness_checked_ext!(
     "verify_error_classification_predicates_are_mutually_exclusive",
     "../../../amenable_verus/src/ext/jiff/error.rs"
 );
+
+impl_verus_witness_checked_ext!(
+    jiff::SignedDuration,
+    "verify_signed_duration_new_model_normalizes_nanos_and_carries_into_secs",
+    "../../../amenable_verus/src/ext/jiff/signed_duration.rs"
+);

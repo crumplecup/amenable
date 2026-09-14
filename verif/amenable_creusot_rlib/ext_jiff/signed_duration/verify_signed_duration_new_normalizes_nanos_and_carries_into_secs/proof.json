@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_as_secs": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.029 },
+      "vc_subsec_nanos": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_verify_signed_duration_new_normalizes_nanos_and_carries_into_secs": {
+        "prover": "alt-ergo",
+        "time": 0.068
+      }
+    }
+  }
+}
