@@ -14,6 +14,12 @@
 //! file and its `jiff::` siblings only — not promoted to a crate-wide
 //! module, matching `rust_std_witness`'s own convention of never sharing
 //! this bridge across unrelated files.
+//!
+//! `jiff::RoundMode` also stays trusted, for the same real reason named
+//! in `amenable_kani::ext::jiff`'s own doc comment: checked directly
+//! against jiff's real source, it has no public methods at all beyond
+//! the standard derives — nothing non-tautological to state on any
+//! backend.
 
 mod error;
 mod offset;
@@ -61,7 +67,12 @@ macro_rules! impl_creusot_witness_trusted_ext {
     };
 }
 
-impl_creusot_witness_trusted_ext!(jiff::Timestamp, jiff::Zoned, jiff::civil::DateTime);
+impl_creusot_witness_trusted_ext!(
+    jiff::Timestamp,
+    jiff::Zoned,
+    jiff::civil::DateTime,
+    jiff::RoundMode
+);
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
 /// machine-checked Creusot contract — the third-party-crate counterpart

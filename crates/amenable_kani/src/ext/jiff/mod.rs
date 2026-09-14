@@ -18,6 +18,14 @@
 //! `mem::forget`-ed value — see `gallery::jiff_error_drop_cost`'s own
 //! doc comment for the full isolation. There is no accessor-level
 //! property left to check once every accessor hits the same wall.
+//!
+//! `jiff::RoundMode` stays trusted for a third, simpler real reason:
+//! checked directly against jiff's real source, it has *no* public
+//! methods at all beyond the standard derives (`Clone`/`Copy`/`Debug`/
+//! `Eq`/`Hash`/`PartialEq`) — its actual rounding logic
+//! (`round_by_duration`) is `pub(crate)`. There is nothing non-
+//! tautological to state about a fieldless, behaviorless configuration
+//! marker on any backend.
 
 mod offset;
 
@@ -27,5 +35,6 @@ impl_kani_witness_trusted_ext!(
     jiff::Timestamp,
     jiff::Zoned,
     jiff::civil::DateTime,
-    jiff::Error
+    jiff::Error,
+    jiff::RoundMode
 );
