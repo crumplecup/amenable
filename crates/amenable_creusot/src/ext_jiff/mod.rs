@@ -10,4 +10,5 @@
 //! Pearlite proof content, the thing `cargo creusot` actually
 //! translates — stays unconditional.
 
+pub(crate) mod error;
 pub(crate) mod offset;

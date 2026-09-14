@@ -9,12 +9,12 @@
 //! Most stay trusted: jiff is opaque to Verus (never resolves
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
-//! rest on. `jiff::tz::Offset` is the first exception — a real,
-//! hand-verified accommodation model in
-//! `amenable_verus::ext::jiff::offset` (jiff itself is still
-//! unreachable, but the model's own round-trip law is genuinely
-//! checked, and independently confirmed against the real API by the
-//! Kani/Creusot proofs for the identical claim).
+//! rest on. `jiff::tz::Offset`/`jiff::Error` are the first exceptions —
+//! real, hand-verified accommodation models in
+//! `amenable_verus::ext::jiff::{offset,error}` (jiff itself is still
+//! unreachable, but each model's own law is genuinely checked, and
+//! independently confirmed against the real API by the Kani/Creusot
+//! proofs for the identical claim).
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -78,32 +78,50 @@ impl std::fmt::Display for ExtCheckedProof {
     }
 }
 
-const VERIFY_OFFSET_FROM_SECONDS_MODEL_ROUND_TRIPS_SRC: &str =
-    include_str!("../../../amenable_verus/src/ext/jiff/offset.rs");
+/// Registers a real, hand-verified Verus accommodation model as an
+/// `ExtStandard<$ty>` witness — the checked counterpart of
+/// [`impl_verus_witness_trusted_ext`]. `$src_path` is the model's own
+/// source file (embedded verbatim as the witness's `claim`), relative
+/// to this file.
+macro_rules! impl_verus_witness_checked_ext {
+    ($ty:ty, $harness:literal, $src_path:literal) => {
+        impl Witness<VerusVerifier> for ExtStandard<$ty> {
+            type SupportingEvidence = Self;
+            type ProofArtifact = ExtCheckedProof;
 
-impl Witness<VerusVerifier> for ExtStandard<jiff::tz::Offset> {
-    type SupportingEvidence = Self;
-    type ProofArtifact = ExtCheckedProof;
+            fn proof() -> Self::ProofArtifact {
+                ExtCheckedProof::new(
+                    $harness.to_owned(),
+                    include_str!($src_path).to_owned(),
+                    <Self::SupportingEvidence as Evidence>::basis().audit(),
+                )
+            }
 
-    fn proof() -> Self::ProofArtifact {
-        ExtCheckedProof::new(
-            "verify_offset_from_seconds_model_round_trips".to_owned(),
-            VERIFY_OFFSET_FROM_SECONDS_MODEL_ROUND_TRIPS_SRC.to_owned(),
-            <Self::SupportingEvidence as Evidence>::basis().audit(),
-        )
-    }
+            fn support() -> WitnessSupportSummary {
+                WitnessSupportSummary::checked_leaf()
+            }
+        }
 
-    fn support() -> WitnessSupportSummary {
-        WitnessSupportSummary::checked_leaf()
-    }
+        impl ClassifiedWitness<VerusVerifier> for ExtStandard<$ty> {}
+
+        ::inventory::submit! {
+            ::amenable_core::ProofRecord::new(
+                concat!("amenable_ext::ExtStandard<", stringify!($ty), ">"),
+                "verus",
+                || <ExtStandard<$ty> as Witness<VerusVerifier>>::proof().to_string(),
+            )
+        }
+    };
 }
 
-impl ClassifiedWitness<VerusVerifier> for ExtStandard<jiff::tz::Offset> {}
+impl_verus_witness_checked_ext!(
+    jiff::tz::Offset,
+    "verify_offset_from_seconds_model_round_trips",
+    "../../../amenable_verus/src/ext/jiff/offset.rs"
+);
 
-::inventory::submit! {
-    ::amenable_core::ProofRecord::new(
-        "amenable_ext::ExtStandard<jiff::tz::Offset>",
-        "verus",
-        || <ExtStandard<jiff::tz::Offset> as Witness<VerusVerifier>>::proof().to_string(),
-    )
-}
+impl_verus_witness_checked_ext!(
+    jiff::Error,
+    "verify_error_classification_predicates_are_mutually_exclusive",
+    "../../../amenable_verus/src/ext/jiff/error.rs"
+);

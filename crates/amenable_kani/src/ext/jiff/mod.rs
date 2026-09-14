@@ -9,9 +9,23 @@
 //! see `docs/AMENABLE_EXT_PLAN.md`'s Phase 1 for why that set was chosen
 //! first. Simpler value types get a real per-type assessment as they're
 //! added (see `offset.rs` for the first checked example).
+//!
+//! `jiff::Error` also stays trusted, but for a different, real reason
+//! confirmed empirically (not the default): every public accessor
+//! (`Display`, `is_range`, `is_invalid_parameter`, `is_crate_feature`)
+//! routes through `Error::chain()`'s iterator traversal, which times
+//! out under Kani's unwinder even for a single, deterministic,
+//! `mem::forget`-ed value — see `gallery::jiff_error_drop_cost`'s own
+//! doc comment for the full isolation. There is no accessor-level
+//! property left to check once every accessor hits the same wall.
 
 mod offset;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;
 
-impl_kani_witness_trusted_ext!(jiff::Timestamp, jiff::Zoned, jiff::civil::DateTime);
+impl_kani_witness_trusted_ext!(
+    jiff::Timestamp,
+    jiff::Zoned,
+    jiff::civil::DateTime,
+    jiff::Error
+);

@@ -15,6 +15,7 @@
 //! module, matching `rust_std_witness`'s own convention of never sharing
 //! this bridge across unrelated files.
 
+mod error;
 mod offset;
 
 use crate::CreusotWitness;

@@ -2,7 +2,9 @@ proof_id,timestamp,status
 amenable_kani::calculator::add_impl_computes_exact_sum,1788632964,passed
 amenable_kani::calculator::verify_credit_access_preserves_value,1788632974,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1788632983,passed
-amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789409560,passed
+amenable_kani::ext::jiff::error::diagnostic_error_from_args_construct_and_drop,1789417703,timeout
+amenable_kani::ext::jiff::error::verify_error_from_args_round_trips_through_display,1789418427,timeout
+amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788632993,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788633003,passed
 amenable_kani::gaap_ledger::verify_gaap_commit_always_balances,1788633114,passed

@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_is_crate_feature": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_is_invalid_parameter": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_is_range": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_verify_error_classification_predicates_are_mutually_exclusive": {
+        "prover": "alt-ergo",
+        "time": 0.033
+      }
+    }
+  }
+}

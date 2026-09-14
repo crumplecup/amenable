@@ -24,6 +24,26 @@
 //! not a workaround — see `ext::jiff::offset`'s real, shipped witness,
 //! which verifies for every `i32` via this exact shape, not an assumed
 //! slice of one.
+//!
+//! **A second, distinct `jiff::Error` wall (found assessing `jiff::Error`
+//! itself as a witness candidate, not `Offset`): every accessor times
+//! out too, deterministic input, no Drop involved at all.** A single
+//! fixed `jiff::Error::from_args(format_args!("something failed"))`,
+//! immediately `mem::forget`-ed (so the drop-glue cost above can't be
+//! the explanation), still times out the moment *any* accessor is
+//! called on it — `.to_string()`, and even the cheap-looking boolean
+//! `.is_range()`. Root-caused by reading jiff's real source, not
+//! guessed: `Error::root()`/`is_range()`/`Display::fmt` all go through
+//! `Error::chain()`, which returns `impl Iterator<Item = &Error>` over
+//! the (potentially recursive) `cause` field and calls `.last()`/loops
+//! over `.next()` — the exact "iterator adapter with an unwind bound
+//! Kani's unwinder can't conclude is finite" shape this crate's own
+//! [[project_kani_failure_patterns]] catalog already names (pattern 1),
+//! just reached through `jiff::Error`'s own chain-walking accessors
+//! instead of a `Range`/`Iterator` adapter directly. Since every public
+//! accessor on `Error` routes through `chain()`, there is no accessor-
+//! level property left to check — `ext::jiff::error`'s witness is
+//! trusted for Kani specifically for this reason, not by default.
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
@@ -78,6 +98,36 @@ amenable_derive::gallery_harness! {
             let secs: i32 = kani::any();
             kani::assume(secs >= -93_604 && secs <= 93_604);
             std::mem::forget(jiff::tz::Offset::from_seconds(secs));
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::any_accessor_on_a_deterministic_forgotten_error_times_out".to_owned(),
+            "gallery::jiff_error_drop_cost::any_accessor_on_a_deterministic_forgotten_error_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "A single fixed, mem::forget-ed jiff::Error still times out the moment any accessor (.to_string(), even the boolean .is_range()) is called on it -- isolating the cost to Error::chain()'s unbounded iterator traversal, not Drop".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, ANY_ACCESSOR_ON_A_DETERMINISTIC_FORGOTTEN_ERROR_TIMES_OUT_SRC, {
+        /// Deterministic input, `mem::forget` on the error itself (so
+        /// drop-glue cost is ruled out), and still a timeout the moment
+        /// `.is_range()` is called — confirms the wall is in
+        /// `Error::chain()`'s iterator traversal, reached by every
+        /// public accessor, not in Drop or in construction.
+        #[kani::proof]
+        fn any_accessor_on_a_deterministic_forgotten_error_times_out() {
+            let err = jiff::Error::from_args(format_args!("something failed"));
+            let is_range = err.is_range();
+            std::mem::forget(err);
+            assert!(!is_range);
         }
     }
 }
