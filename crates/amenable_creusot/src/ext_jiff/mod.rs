@@ -1,0 +1,13 @@
+//! Real Creusot proof content (`extern_spec!`/`harness!` Pearlite
+//! functions) for `amenable_ext`'s jiff carriers — the proof-content
+//! sibling to `ext::jiff`'s `CreusotWitness` bridge, exactly the same
+//! split `rust_std`/`rust_std_witness` use and for the same reason (see
+//! this crate's own root doc comment): `creusot-rustc`'s whole-crate
+//! translation pass can't handle the ordinary Rust machinery
+//! (`inventory::submit!`, trait dispatch) the witness bridge needs when
+//! it's *local* to the translated crate, so that bridge stays
+//! `#[cfg(not(creusot))]`-gated inside `ext`, and this module — pure
+//! Pearlite proof content, the thing `cargo creusot` actually
+//! translates — stays unconditional.
+
+pub(crate) mod offset;

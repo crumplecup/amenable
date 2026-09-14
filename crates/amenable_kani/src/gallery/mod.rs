@@ -19,6 +19,8 @@ mod atomic_ptr_compare_exchange;
 mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
 mod iter_materialization;
+#[cfg(feature = "jiff")]
+mod jiff_error_drop_cost;
 mod ledger_account_id_comparison;
 mod ledger_commit_contract_timeout;
 mod ledger_gaap_free_function_contract;

@@ -110,6 +110,7 @@ dependencies = [
  "amenable_core",
  "amenable_derive",
  "amenable_time",
+ "derive-getters",
  "derive-new",
  "derive_more",
  "inventory",

@@ -21,6 +21,7 @@ amenable_derive = { workspace = true }
 # "Relationship to amenable_time". Not pulled in by non-temporal targets
 # (uuid, when it lands).
 amenable_time = { workspace = true, optional = true }
+derive-getters = { workspace = true }
 derive-new = { workspace = true }
 derive_more = { workspace = true }
 inventory = { workspace = true }

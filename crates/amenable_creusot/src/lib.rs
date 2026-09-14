@@ -22,6 +22,8 @@
 
 #[cfg(not(creusot))]
 mod ext;
+#[cfg(feature = "jiff")]
+mod ext_jiff;
 mod ledger;
 mod rust_std;
 #[cfg(not(creusot))]
@@ -30,6 +32,10 @@ mod stoplight;
 mod time;
 mod witness;
 
+#[cfg(feature = "jiff")]
+pub use ext_jiff::offset::{
+    OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,
+};
 pub use ledger::{
     ACCOUNTS_DISTINCT_HOLDS_SRC, AMOUNT_POSITIVE_HOLDS_SRC, BALANCED_ENTRIES_HOLDS_SRC,
     SUFFICIENT_FUNDS_HOLDS_SRC, VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC,

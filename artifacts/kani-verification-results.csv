@@ -2,6 +2,7 @@ proof_id,timestamp,status
 amenable_kani::calculator::add_impl_computes_exact_sum,1788632964,passed
 amenable_kani::calculator::verify_credit_access_preserves_value,1788632974,passed
 amenable_kani::calculator::verify_debit_access_preserves_value,1788632983,passed
+amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789409560,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788632993,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788633003,passed
 amenable_kani::gaap_ledger::verify_gaap_commit_always_balances,1788633114,passed
@@ -72,7 +73,7 @@ amenable_kani::rust_std::alloc_vec::verify_vec_drain_removes_and_yields_in_order
 amenable_kani::rust_std::alloc_vec::verify_vec_extract_if_partitions_by_the_predicate,1788384073,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_into_iter_yields_owned_values_in_order,1788384089,passed
 amenable_kani::rust_std::alloc_vec::verify_vec_push_pop_round_trips,1788384103,passed
-amenable_kani::rust_std::any::verify_type_id_is_reflexive_and_distinguishes_distinct_types,1788634016,passed
+amenable_kani::rust_std::any::verify_type_id_is_reflexive_and_distinguishes_distinct_types,1789406207,passed
 amenable_kani::rust_std::array::verify_array_into_iter_yields_elements_in_order,1788634025,passed
 amenable_kani::rust_std::array::verify_try_from_slice_rejects_a_length_mismatch,1788634036,passed
 amenable_kani::rust_std::ascii::verify_escape_default_escapes_a_control_byte,1788634050,passed

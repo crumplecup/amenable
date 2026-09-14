@@ -82,6 +82,7 @@
 )]
 pub mod derived_witness;
 mod exchange_support;
+pub mod ext;
 pub mod gallery;
 mod provenance_accommodation;
 pub mod rust_std;

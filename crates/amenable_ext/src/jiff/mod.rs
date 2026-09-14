@@ -8,7 +8,11 @@
 //! registration files follow.
 
 mod civil;
+mod fmt;
+mod misc;
+mod span;
 mod timestamp;
+mod tz;
 #[cfg(feature = "verus")]
 mod verus_witness;
 mod zoned;
