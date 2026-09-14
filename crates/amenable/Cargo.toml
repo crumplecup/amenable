@@ -77,7 +77,10 @@ creusot = ["dep:amenable_creusot"]
 # resolves `Cargo.toml`, so there's no witness/registry machinery to
 # depend on there at all) -- this only toggles `amenable_std/verus`, which
 # `include_str!`s `amenable_verus`'s real proof source by relative path.
-verus = ["amenable_std/verus", "amenable_time/verus"]
+# `amenable_ext` is itself optional (the `jiff` feature below), so its
+# own `verus` sub-feature uses the weak-dep `?` syntax, same rationale as
+# `amenable_creusot?/jiff` just below.
+verus = ["amenable_std/verus", "amenable_time/verus", "amenable_ext?/verus"]
 # `amenable_kani` is unconditional so its own `jiff` sub-feature is
 # turned on directly; `amenable_creusot` is itself optional (the
 # `creusot` feature above), so its `jiff` sub-feature uses the weak-dep

@@ -17,6 +17,20 @@ fn assert_root_has_kani_and_creusot(report: &amenable::ProofChainReport, expecte
     assert!(verifiers.contains(&"creusot"));
 }
 
+fn assert_root_has_kani_creusot_and_verus(
+    report: &amenable::ProofChainReport,
+    expected_suffix: &str,
+) {
+    assert_root_has_kani_and_creusot(report, expected_suffix);
+    let verifiers: Vec<&str> = report
+        .root()
+        .proofs()
+        .iter()
+        .map(|(verifier, _)| verifier.as_str())
+        .collect();
+    assert!(verifiers.contains(&"verus"));
+}
+
 fn proof_description<'a>(
     report: &'a amenable::ProofChainReport,
     verifier: &str,
@@ -8372,5 +8386,50 @@ fn writer_panicked_proof_chain_reports_the_kani_and_creusot_harnesses() -> miett
     assert!(proof_description(&report, "creusot").is_some_and(|d| {
         d.contains("https://doc.rust-lang.org/std/io/struct.WriterPanicked.html")
     }));
+    Ok(())
+}
+
+// `amenable_ext::ExtStandard<T>` over jiff's registered carriers (see
+// `docs/AMENABLE_EXT_PLAN.md`, Phase 1). All trusted for now, same as
+// most `RustStdStandard<T>` leaves: kani/creusot/verus witnesses exist
+// but jiff itself is opaque to every verifier. `jiff` unconditionally
+// compiles `amenable_kani`'s own jiff witnesses (kani is never
+// optional); `creusot`/`verus` both need to be explicit, mirroring the
+// weak-dep `amenable_creusot?/jiff` / `amenable_ext?/verus` edges in the
+// facade's own `Cargo.toml`.
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_timestamp_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::Timestamp>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::Timestamp>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_zoned_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::Zoned>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::Zoned>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_civil_date_time_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::civil::DateTime>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::civil::DateTime>");
     Ok(())
 }

@@ -49,6 +49,21 @@ cordial-gate:
     cordial exceptions load
     cordial quality --deny-open
 
+# Runs every registered coverage etiquette for this workspace's hub
+# (amenable-std + amenable-ext-jiff, once cordial is installed with the
+# amenable_ext feature -- it's in `full`, so a plain `just install` in
+# ~/repos/cordial already includes it). First run builds jiff's shadow-
+# dep rustdoc JSON (a real `cargo doc -p amenable_ext --features jiff`
+# build -- jiff is an optional dependency, so cordial reaches its JSON
+# as a side effect of documenting amenable_ext's whole resolved graph,
+# not via a direct `cargo rustdoc -p jiff`) and a fresh `amenable
+# dump-registry` dump; later runs reuse both caches. Artifacts land
+# under the cordial store: `cordial view amenable-ext-jiff.checklist.md`
+# (or `std.checklist.md` for the std side) to read the actionable gap
+# list.
+cordial-coverage:
+    cordial coverage
+
 # Canonical Kani verification entrypoint -- delegates to the `amenable
 # verify kani` binary, never a raw `cargo kani` call, so it's registry-
 # driven: `crates/amenable/src/kani.rs`'s `registered_proofs()` iterates

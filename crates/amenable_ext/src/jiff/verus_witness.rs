@@ -32,6 +32,14 @@ macro_rules! impl_verus_witness_trusted_ext {
             }
 
             impl ClassifiedWitness<VerusVerifier> for ExtStandard<$ty> {}
+
+            ::inventory::submit! {
+                ::amenable_core::ProofRecord::new(
+                    concat!("amenable_ext::ExtStandard<", stringify!($ty), ">"),
+                    "verus",
+                    || <ExtStandard<$ty> as Witness<VerusVerifier>>::proof().to_string(),
+                )
+            }
         )*
     };
 }

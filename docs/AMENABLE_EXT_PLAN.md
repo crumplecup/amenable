@@ -372,26 +372,81 @@ current code, don't trust a description of it — cordial changes weekly).
 
 ### Phase 2 — cordial coverage tooling
 
-- [ ] In `~/repos/cordial`: generalize `registry.rs`'s
-      `parse_rust_std_standard_inner` to accept the `ExtStandard<`
-      prefix pair alongside `RustStdStandard<` (the one real gap
-      identified above).
-- [ ] `framework_ext` module / `AmenableExtOptions` /
-      `assess_amenable_ext_coverage` (thin wrappers, see wiring steps
-      1-2 above).
-- [ ] `AmenableExtTargetProvider` + `AmenableExtCoverage` plugin,
-      registered in `coverage_plugins()` behind a new `amenable_ext`
-      cargo feature (wiring steps 3-4).
-- [ ] `etiquettes/framework_ext/*` (wiring step 5).
-- [ ] An `amenable_ext_jiff` skip-map / patch-set (empty to start;
-      entries added as real exceptions are found and reviewed — never
-      added unilaterally, per standing policy).
-- [ ] `just` recipe in this repo to run the new coverage command,
-      parallel to the existing `just cordial-gate`.
-- [ ] Run it against the Phase 0 skeleton (before Phase 1's
-      registrations land) to confirm the "100% missing" baseline report
-      renders correctly, then again after Phase 1 to confirm it tracks
-      real coverage.
+- [x] In `~/repos/cordial`: generalized `registry.rs`'s prefix-stripping
+      (`parse_wrapped_standard_inner`, a new private generic core) so
+      `parse_ext_standard_inner`/`evidence_for_ext_type`/
+      `witness_verifiers_for_ext_type`/`ext_type_has_proof_test` sit
+      alongside the std versions as thin wrappers over the same core —
+      the one real gap identified above, plus a second one found only
+      by writing a real test: `ExtStandard<T>` needs *two* prefixes
+      (`amenable_ext::ExtStandard<` for the registry's fully-qualified
+      names, bare `ExtStandard<` for `collect_proof_chain_subjects`'
+      source-text reads), the same two-prefix shape `RustStdStandard<T>`
+      already needed and the first pass missed.
+- [x] `framework_std/ext_inventory.rs` (`load_ext_inventory_from_shadow_dep`)
+      and `framework_std/ext_run.rs` (`AmenableExtOptions` — a genuinely
+      separate type from `AmenableStdOptions`, not a reuse: a third,
+      independent cache-refresh axis for the shadow-dep rustdoc build —
+      and `assess_amenable_ext_coverage`).
+- [x] `AmenableExtTargetProvider` + `AmenableExtCoverage` plugin
+      (`plugins/amenable_ext.rs`), registered in `coverage_plugins()`
+      behind a new `amenable_ext` cargo feature
+      (`amenable_ext = ["amenable_std", "shadow"]`, folded into `full`).
+- [x] `etiquettes/framework_ext/{probe,assessor,jiff,reporter,mod}.rs` —
+      mirrors `etiquettes/framework_std/{probe,assessor,amenable,
+      amenable_reporter,mod}.rs` exactly; `reporter/coverage_summary.rs`
+      gained matching dispatch arms too.
+- [ ] An `amenable_ext_jiff` skip-map / patch-set — **not created**;
+      `load_verifier_skip_map` already returns an empty map when the
+      file is absent, so there is nothing to add until a real exception
+      is found and reviewed (never added unilaterally, per standing
+      policy). Leave this unchecked as a reminder that none exist yet,
+      not as unfinished work.
+- [x] `just cordial-coverage` in this repo, parallel to `just
+      cordial-gate` (runs `cordial coverage`, which dispatches to every
+      registered coverage plugin for the detected workspace hub).
+- [x] `tests/amenable_ext_registry.rs` in cordial (5 tests) exercises
+      the classify/report/gap functions directly against synthetic
+      registry data — real coverage of the logic, not a stub.
+- [x] Real end-to-end run (`just cordial-coverage` against this actual
+      workspace): `amenable-ext-jiff.checklist.md` now shows 90
+      accountable jiff types, 3 Complete (`jiff::Timestamp`/`Zoned`/
+      `civil::DateTime`, each with kani + creusot + verus + proof_test),
+      87 missing evidence (genuinely unregistered jiff types, correctly
+      reported). The first attempt surfaced two real bugs, both fixed in
+      `~/repos/cordial` (not workarounds):
+      - `build_shadow_dep_rustdoc` only worked for a shadow crate's
+        *unconditional* upstream dependency (`elicit_jiff`/`elicit_url`'s
+        own precedent); `amenable_ext`'s `jiff` dependency is deliberately
+        optional, so `cargo rustdoc -p jiff` failed outright (`package ID
+        specification 'jiff' did not match any packages` — an unactivated
+        optional dependency never enters cargo's resolved graph, so it
+        isn't addressable via a bare `-p`). Fixed: `dep_features.rs`'s
+        `collect_member_dep_build_config` now detects `dep.optional` and
+        resolves the member crate's own activating feature; when present,
+        a new `run_cargo_doc_for_optional_dep` runs `cargo doc -p
+        {shadow_crate} --features {activating_feature}` (no `--no-deps`,
+        so cargo documents the whole resolved graph by default) and reads
+        the upstream's JSON out of the resulting `target/doc/{upstream}
+        .json` side effect.
+      - `std` and `amenable-ext-jiff` coverage share one cached registry
+        dump, built via a hardcoded `creusot,verus` feature list that
+        never linked `amenable_ext` in at all (its facade feature is
+        `jiff`) — every `ExtStandard<T>` row showed as missing evidence
+        regardless of what was actually registered. Fixed by adding
+        `jiff` to that shared feature list.
+      Closing the loop also surfaced two real gaps back here, in
+      `amenable_ext` itself: the Verus witness macro
+      (`src/jiff/verus_witness.rs`) never called `inventory::submit!` for
+      a `ProofRecord`, unlike its Kani/Creusot siblings in the same
+      Phase-1 macro family; and the facade's own `verus` feature never
+      wired `amenable_ext?/verus` at all, so that feature was an orphan
+      nobody could actually turn on. Both fixed, plus three new
+      `proof_chain_test.rs` cases (`ext_timestamp_proof_chain_reports_
+      all_three_verifiers` and its `Zoned`/`civil::DateTime` siblings,
+      gated on `all(feature = "jiff", feature = "creusot", feature =
+      "verus")`) confirming all three verifiers resolve through the real
+      proof chain, not just cordial's own registry dump.
 
 ### Phase 3 — a real jiff temporal backend (the payoff)
 
