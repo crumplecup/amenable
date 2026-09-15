@@ -14,11 +14,13 @@
 //! `amenable_verus::ext::jiff::{offset,error}` (jiff itself is still
 //! unreachable, but each model's own law is genuinely checked, and
 //! independently confirmed against the real API by the Kani/Creusot
-//! proofs for the identical claim). `jiff::RoundMode` stays trusted for
-//! a different, simpler real reason (checked against jiff's real
-//! source): it has no public methods at all beyond the standard
-//! derives, so there is nothing non-tautological to model on any
-//! backend.
+//! proofs for the identical claim). `jiff::RoundMode`/`jiff::
+//! SignedDurationRound` stay trusted for different, simpler real
+//! reasons (checked against jiff's real source): `RoundMode` has no
+//! public methods at all beyond the standard derives;
+//! `SignedDurationRound` is a pure builder (setters only, no getters,
+//! real rounding logic private). Nothing non-tautological to model
+//! about either on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -61,7 +63,8 @@ impl_verus_witness_trusted_ext!(
     jiff::Timestamp,
     jiff::Zoned,
     jiff::civil::DateTime,
-    jiff::RoundMode
+    jiff::RoundMode,
+    jiff::SignedDurationRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

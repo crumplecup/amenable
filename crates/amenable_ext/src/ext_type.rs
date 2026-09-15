@@ -17,7 +17,7 @@ use crate::{Authority, AuthorityKind, SourceCrate, SourceModule, TypeName};
 /// `amenable_ext` covers a different maintaining project per target crate
 /// (jiff, later chrono, …) — there is no universal default to fall back
 /// to, so every registration names its own authority explicitly (see
-/// [`crate::impl_ext_type`]).
+/// `impl_ext_type!`).
 pub trait ExtType {
     /// Structured provenance for the documented semantics of this type.
     fn provenance() -> ExtProvenance {

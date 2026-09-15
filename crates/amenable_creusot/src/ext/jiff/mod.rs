@@ -15,11 +15,12 @@
 //! module, matching `rust_std_witness`'s own convention of never sharing
 //! this bridge across unrelated files.
 //!
-//! `jiff::RoundMode` also stays trusted, for the same real reason named
-//! in `amenable_kani::ext::jiff`'s own doc comment: checked directly
-//! against jiff's real source, it has no public methods at all beyond
-//! the standard derives — nothing non-tautological to state on any
-//! backend.
+//! `jiff::RoundMode`/`jiff::SignedDurationRound` also stay trusted, for
+//! the same real reasons named in `amenable_kani::ext::jiff`'s own doc
+//! comment: `RoundMode` has no public methods at all beyond the
+//! standard derives; `SignedDurationRound` is a pure builder (setters
+//! only, no getters, its real rounding logic is private). Nothing
+//! non-tautological to state about either on any backend.
 
 mod error;
 mod offset;
@@ -72,7 +73,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::Timestamp,
     jiff::Zoned,
     jiff::civil::DateTime,
-    jiff::RoundMode
+    jiff::RoundMode,
+    jiff::SignedDurationRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

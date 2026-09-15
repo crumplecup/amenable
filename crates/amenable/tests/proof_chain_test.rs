@@ -8481,3 +8481,15 @@ fn ext_signed_duration_proof_chain_reports_all_three_verifiers() -> miette::Resu
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::SignedDuration>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_signed_duration_round_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::SignedDurationRound>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::SignedDurationRound>");
+    Ok(())
+}

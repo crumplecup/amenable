@@ -26,6 +26,17 @@
 //! (`round_by_duration`) is `pub(crate)`. There is nothing non-
 //! tautological to state about a fieldless, behaviorless configuration
 //! marker on any backend.
+//!
+//! `jiff::SignedDurationRound` also stays trusted, for the builder-
+//! type shape of that same reason: its only public methods are
+//! `new`/`smallest`/`mode`/`increment`, plain field setters returning a
+//! new value via `..self` — no getters, and its actual rounding logic
+//! (`round`, called from `SignedDuration::round`) is private. There is
+//! no publicly-inspectable state to state a property about. The same
+//! shape recurs across jiff's other `*Round`/`*Arithmetic`/`*Compare`/
+//! `*Difference`/`*Total` builder-option types (confirmed for
+//! `SpanRound` too, which has the identical setter-only surface) —
+//! expect most of that family to land here for the same reason.
 
 mod offset;
 mod signed_duration;
@@ -37,5 +48,6 @@ impl_kani_witness_trusted_ext!(
     jiff::Zoned,
     jiff::civil::DateTime,
     jiff::Error,
-    jiff::RoundMode
+    jiff::RoundMode,
+    jiff::SignedDurationRound
 );
