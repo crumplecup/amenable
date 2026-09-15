@@ -15,3 +15,4 @@ pub(crate) mod offset;
 pub(crate) mod signed_duration;
 pub(crate) mod span;
 pub(crate) mod span_fieldwise;
+pub(crate) mod timestamp_series;

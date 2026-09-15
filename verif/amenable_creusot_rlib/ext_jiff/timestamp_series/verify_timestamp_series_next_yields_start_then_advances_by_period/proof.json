@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_timestamp_series_next_yields_start_then_advances_by_period": {
+        "prover": "alt-ergo",
+        "time": 0.085
+      }
+    }
+  }
+}

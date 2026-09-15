@@ -107,6 +107,20 @@
 //! real source, its four public methods (`new`/`smallest`/`mode`/
 //! `increment`) are all plain setters, and all three fields
 //! (`smallest`/`mode`/`increment`) are private with no getters.
+//!
+//! `jiff::TimestampSeries` also stays trusted for Kani specifically,
+//! for a real reason confirmed empirically (not the default), the
+//! same recursive-Arc `jiff::Error` Drop-glue wall the module doc
+//! comment above already names for `jiff::Error` itself, reached
+//! through a new, *unavoidable* call site this time: `Timestamp::
+//! series(period)`'s own implementation drops a transient `Result<_,
+//! jiff::Error>` internally (`SignedDuration::try_from(period).ok()`)
+//! before `.series()` even returns, with no way for a caller to gate
+//! around it the way `Offset::from_seconds`'s own harness could — see
+//! `gallery::jiff_error_drop_cost`'s own doc comment for the full
+//! isolation. Checked on Creusot and Verus instead (`ext_jiff::
+//! timestamp_series`/`ext::jiff::timestamp_series`), neither of which
+//! shares this Rust-Drop-glue mechanism.
 
 mod offset;
 mod signed_duration;
@@ -130,5 +144,6 @@ impl_kani_witness_trusted_ext!(
     jiff::TimestampArithmetic,
     jiff::TimestampDifference,
     jiff::TimestampDisplayWithOffset,
-    jiff::TimestampRound
+    jiff::TimestampRound,
+    jiff::TimestampSeries
 );

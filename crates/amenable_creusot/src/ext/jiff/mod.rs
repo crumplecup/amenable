@@ -29,12 +29,22 @@
 //! impl, and checking its exact RFC 3339 output would mean
 //! reproducing jiff's whole formatting algorithm. Nothing
 //! non-tautological to state about any of the eleven on any backend.
+//!
+//! `jiff::TimestampSeries` gets a real checked property (see
+//! `timestamp_series.rs`): an accommodation model (not a real
+//! `extern_spec!` against jiff's actual `Iterator` impl, matching
+//! this crate's own established precedent for iterator types lacking
+//! real contract coverage), checking the same periodicity law
+//! `amenable_kani::ext::jiff` documents as unavoidably too costly for
+//! Kani specifically (a real `jiff::Error` Drop-glue wall inside
+//! `Timestamp::series`'s own private implementation).
 
 mod error;
 mod offset;
 mod signed_duration;
 mod span;
 mod span_fieldwise;
+mod timestamp_series;
 
 use crate::CreusotWitness;
 use amenable_core::{Evidence, Metadata};

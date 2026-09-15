@@ -50,6 +50,8 @@ pub use ext_jiff::signed_duration::{
 pub use ext_jiff::span::VERIFY_SPAN_UNIT_SETTERS_ROUND_TRIP_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::span_fieldwise::VERIFY_SPAN_FIELDWISE_NEGATION_NEGATES_EVERY_UNIT_GETTER_SRC;
+#[cfg(feature = "jiff")]
+pub use ext_jiff::timestamp_series::VERIFY_TIMESTAMP_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;
 pub use ledger::{
     ACCOUNTS_DISTINCT_HOLDS_SRC, AMOUNT_POSITIVE_HOLDS_SRC, BALANCED_ENTRIES_HOLDS_SRC,
     SUFFICIENT_FUNDS_HOLDS_SRC, VERIFY_CHECK_ACCOUNTS_DISTINCT_SRC,

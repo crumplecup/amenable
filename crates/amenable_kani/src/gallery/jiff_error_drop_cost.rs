@@ -44,6 +44,37 @@
 //! accessor on `Error` routes through `chain()`, there is no accessor-
 //! level property left to check — `ext::jiff::error`'s witness is
 //! trusted for Kani specifically for this reason, not by default.
+//!
+//! **A third case (found assessing `jiff::TimestampSeries` as a witness
+//! candidate): the exact same recursive-Arc Drop-glue wall, reached
+//! through a completely different, *unavoidable* call site.**
+//! `Timestamp::series(period)`'s own real implementation
+//! (`TimestampSeries::new`) is `let duration =
+//! SignedDuration::try_from(period).ok(); TimestampSeries { ts,
+//! duration }` — the fallible `TryFrom<Span> for SignedDuration`
+//! conversion (whose `Error` is the same `jiff::Error`) happens
+//! *inside* `.series()` itself, with `.ok()` dropping the transient
+//! `Result`'s `Err` arm immediately, before `.series()` even returns.
+//! Isolated by direct substitution, same technique as the `Offset`
+//! case above: a bare `Timestamp::from_second(secs)` call (no series
+//! involved) passes instantly; adding `.series(period_secs.seconds())`
+//! afterward times out, even with the *entire* `series` value
+//! immediately `mem::forget`-ed (ruling out the series struct's own
+//! Drop, since `TimestampSeries` derives no custom `Drop` at all —
+//! confirming the cost is paid *during* construction, inside jiff's
+//! own `.ok()` call, not on anything the caller can reach or skip).
+//! Unlike the `Offset` case, there is no fix available here: `Offset`
+//! let the harness call the fallible constructor *directly*, so an
+//! independent bounds check upstream could keep the call from ever
+//! reaching its `Err` arm; `Timestamp::series`'s fallible conversion is
+//! entirely private to jiff's own implementation, with no way to gate
+//! around it from outside. `ext::jiff::timestamp_series`'s witness is
+//! trusted for Kani specifically for this reason (checked on Creusot
+//! and Verus instead, neither of which shares this Rust-Drop-glue
+//! mechanism), not by default.
+
+#[cfg(kani)]
+use jiff::ToSpan;
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
@@ -128,6 +159,68 @@ amenable_derive::gallery_harness! {
             let is_range = err.is_range();
             std::mem::forget(err);
             assert!(!is_range);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::timestamp_series_construction_times_out".to_owned(),
+            "gallery::jiff_error_drop_cost::timestamp_series_construction_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "Timestamp::series(period) times out even for a tiny assumed range and even when the entire returned TimestampSeries is immediately mem::forget-ed -- TimestampSeries::new's own internal SignedDuration::try_from(period).ok() call drops a transient jiff::Error before series() even returns, unreachable from outside".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, TIMESTAMP_SERIES_CONSTRUCTION_TIMES_OUT_SRC, {
+        /// A bare `Timestamp::from_second(secs).series(period)` call,
+        /// forgotten immediately, still times out — isolating the cost
+        /// to `.series()`'s own internal fallible conversion, not
+        /// anything the caller does with the result.
+        #[kani::proof]
+        fn timestamp_series_construction_times_out() {
+            let secs: i64 = kani::any();
+            let period_secs: i64 = kani::any();
+            kani::assume(secs >= -300_000_000_000 && secs <= 200_000_000_000);
+            kani::assume(period_secs >= -1_000_000_000 && period_secs <= 1_000_000_000);
+            let ts = jiff::Timestamp::from_second(secs)
+                .expect("secs is already checked to be within Timestamp's valid range");
+            let series = ts.series(period_secs.seconds());
+            std::mem::forget(series);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::timestamp_from_second_alone_passes".to_owned(),
+            "gallery::jiff_error_drop_cost::timestamp_from_second_alone_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "The identical symbolic Timestamp::from_second(secs) call, with no .series() call at all, verifies instantly -- confirming from_second itself is not the source of the timeout, isolating it specifically to .series()'s internal conversion".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, TIMESTAMP_FROM_SECOND_ALONE_PASSES_SRC, {
+        /// `timestamp_series_construction_times_out`, with the
+        /// `.series()` call removed — confirms `from_second` alone is
+        /// fast, isolating the wall to `.series()` specifically.
+        #[kani::proof]
+        fn timestamp_from_second_alone_passes() {
+            let secs: i64 = kani::any();
+            kani::assume(secs >= -300_000_000_000 && secs <= 200_000_000_000);
+            let ts = jiff::Timestamp::from_second(secs)
+                .expect("secs is already checked to be within Timestamp's valid range");
+            assert!(ts.as_second() == secs);
         }
     }
 }
