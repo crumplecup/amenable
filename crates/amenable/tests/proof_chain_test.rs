@@ -8535,3 +8535,15 @@ fn ext_span_compare_proof_chain_reports_all_three_verifiers() -> miette::Result<
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::SpanCompare<'static>>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_span_fieldwise_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::SpanFieldwise>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::SpanFieldwise>");
+    Ok(())
+}

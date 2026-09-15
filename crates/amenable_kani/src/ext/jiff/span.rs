@@ -60,31 +60,33 @@ bridge_kani_witness!(ExtStandard<jiff::Span>);
 /// jiff's own documented valid ranges for each `Span` unit setter (each
 /// setter's own `# Panics` section), checked independently of the
 /// setters themselves so no symbolic value ever reaches the panicking
-/// path.
-const SPAN_YEARS_MIN: i16 = -19_998;
-const SPAN_YEARS_MAX: i16 = 19_998;
-const SPAN_MONTHS_MIN: i32 = -239_976;
-const SPAN_MONTHS_MAX: i32 = 239_976;
-const SPAN_WEEKS_MIN: i32 = -1_043_497;
-const SPAN_WEEKS_MAX: i32 = 1_043_497;
-const SPAN_DAYS_MIN: i32 = -7_304_484;
-const SPAN_DAYS_MAX: i32 = 7_304_484;
-const SPAN_HOURS_MIN: i32 = -175_307_616;
-const SPAN_HOURS_MAX: i32 = 175_307_616;
-const SPAN_MINUTES_MIN: i64 = -10_518_456_960;
-const SPAN_MINUTES_MAX: i64 = 10_518_456_960;
-const SPAN_SECONDS_MIN: i64 = -631_107_417_600;
-const SPAN_SECONDS_MAX: i64 = 631_107_417_600;
-const SPAN_MILLISECONDS_MIN: i64 = -631_107_417_600_000;
-const SPAN_MILLISECONDS_MAX: i64 = 631_107_417_600_000;
-const SPAN_MICROSECONDS_MIN: i64 = -631_107_417_600_000_000;
-const SPAN_MICROSECONDS_MAX: i64 = 631_107_417_600_000_000;
-const SPAN_NANOSECONDS_MIN: i64 = -9_223_372_036_854_775_807;
-const SPAN_NANOSECONDS_MAX: i64 = 9_223_372_036_854_775_807;
+/// path. `pub(super)`: reused by `span_fieldwise.rs`'s own harness,
+/// which needs the identical bounds.
+pub(super) const SPAN_YEARS_MIN: i16 = -19_998;
+pub(super) const SPAN_YEARS_MAX: i16 = 19_998;
+pub(super) const SPAN_MONTHS_MIN: i32 = -239_976;
+pub(super) const SPAN_MONTHS_MAX: i32 = 239_976;
+pub(super) const SPAN_WEEKS_MIN: i32 = -1_043_497;
+pub(super) const SPAN_WEEKS_MAX: i32 = 1_043_497;
+pub(super) const SPAN_DAYS_MIN: i32 = -7_304_484;
+pub(super) const SPAN_DAYS_MAX: i32 = 7_304_484;
+pub(super) const SPAN_HOURS_MIN: i32 = -175_307_616;
+pub(super) const SPAN_HOURS_MAX: i32 = 175_307_616;
+pub(super) const SPAN_MINUTES_MIN: i64 = -10_518_456_960;
+pub(super) const SPAN_MINUTES_MAX: i64 = 10_518_456_960;
+pub(super) const SPAN_SECONDS_MIN: i64 = -631_107_417_600;
+pub(super) const SPAN_SECONDS_MAX: i64 = 631_107_417_600;
+pub(super) const SPAN_MILLISECONDS_MIN: i64 = -631_107_417_600_000;
+pub(super) const SPAN_MILLISECONDS_MAX: i64 = 631_107_417_600_000;
+pub(super) const SPAN_MICROSECONDS_MIN: i64 = -631_107_417_600_000_000;
+pub(super) const SPAN_MICROSECONDS_MAX: i64 = 631_107_417_600_000_000;
+pub(super) const SPAN_NANOSECONDS_MIN: i64 = -9_223_372_036_854_775_807;
+pub(super) const SPAN_NANOSECONDS_MAX: i64 = 9_223_372_036_854_775_807;
 
 /// One symbolic tuple per `Span` unit field mirrors the type's own ten
-/// independent setter/getter pairs.
-type SpanUnitFields = (i16, i32, i32, i32, i32, i64, i64, i64, i64, i64);
+/// independent setter/getter pairs. `pub(super)`: reused by
+/// `span_fieldwise.rs`'s own harness.
+pub(super) type SpanUnitFields = (i16, i32, i32, i32, i32, i64, i64, i64, i64, i64);
 
 kani_ensures_ext!(
     ExtStandard<jiff::Span>,

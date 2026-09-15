@@ -10,12 +10,13 @@
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
 //! rest on. `jiff::tz::Offset`/`jiff::Error`/`jiff::SignedDuration`/
-//! `jiff::Span` are the exceptions so far — real, hand-verified
-//! accommodation models in `amenable_verus::ext::jiff::{offset,error,
-//! signed_duration,span}` (jiff itself is still unreachable, but each
-//! model's own law is genuinely checked, and independently confirmed
-//! against the real API by the Kani/Creusot proofs for the identical
-//! claim). `jiff::RoundMode`/`jiff::SignedDurationRound`/`jiff::
+//! `jiff::Span`/`jiff::SpanFieldwise` are the exceptions so far — real,
+//! hand-verified accommodation models in `amenable_verus::ext::jiff::
+//! {offset,error,signed_duration,span,span_fieldwise}` (jiff itself is
+//! still unreachable, but each model's own law is genuinely checked,
+//! and independently confirmed against the real API by the Kani/
+//! Creusot proofs for the identical claim). `jiff::RoundMode`/`jiff::
+//! SignedDurationRound`/`jiff::
 //! SpanArithmetic<'static>`/`jiff::SpanCompare<'static>` stay trusted
 //! for different, simpler real reasons (checked against jiff's real
 //! source): `RoundMode` has no public methods at all beyond the
@@ -151,4 +152,10 @@ impl_verus_witness_checked_ext!(
     jiff::Span,
     "verify_span_unit_setters_model_round_trips",
     "../../../amenable_verus/src/ext/jiff/span.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::SpanFieldwise,
+    "verify_span_fieldwise_negation_model_negates_every_unit_getter",
+    "../../../amenable_verus/src/ext/jiff/span_fieldwise.rs"
 );

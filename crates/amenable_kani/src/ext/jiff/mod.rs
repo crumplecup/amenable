@@ -45,10 +45,18 @@
 //! (their fields are both private), and their own `checked_add`/
 //! `compare`/`relative` are `pub(crate)`. Nothing publicly inspectable
 //! to state a property about.
+//!
+//! `jiff::SpanFieldwise` gets a real checked property (see
+//! `span_fieldwise.rs`): its own added value over `Span` is `Neg`/`Eq`/
+//! `Hash`, and negating flips `Span`'s one shared `sign` field, which
+//! every unit getter multiplies through — so negating a `SpanFieldwise`
+//! negates every one of its ten unit getters simultaneously, checked
+//! reusing `span.rs`'s own construction discipline.
 
 mod offset;
 mod signed_duration;
 mod span;
+mod span_fieldwise;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;
 

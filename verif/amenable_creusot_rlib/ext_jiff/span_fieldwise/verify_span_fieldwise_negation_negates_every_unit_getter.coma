@@ -1,0 +1,631 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 118 8 129 17 *)
+
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sspan = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 59 10 59 43
+let%span sspan'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 64 10 64 43
+let%span sspan'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 69 10 69 43
+let%span sspan'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 731 4 731 24
+let%span sspan'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 150 18 150 22
+let%span sspan'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 154 31 154 35
+let%span sspan'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 745 4 745 54
+let%span sspan'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 153 18 153 69
+let%span sspan'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 1455 4 1455 43
+let%span sspan'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 3522 4 3522 33
+let%span sspan'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 175 22 175 26
+let%span sspan'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 174 18 174 62
+let%span sspan'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 156 32 156 36
+let%span sspan'12 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 759 4 759 56
+let%span sspan'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 155 18 155 71
+let%span sspan'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 177 23 177 27
+let%span sspan'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 176 18 176 63
+let%span sspan'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 158 31 158 35
+let%span sspan'17 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 773 4 773 54
+let%span sspan'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 157 18 157 69
+let%span sspan'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 179 22 179 26
+let%span sspan'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 178 18 178 62
+let%span sspan'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 160 30 160 34
+let%span sspan'22 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 787 4 787 52
+let%span sspan'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 159 18 159 67
+let%span sspan'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 181 21 181 25
+let%span sspan'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 180 18 180 61
+let%span sspan'26 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 162 31 162 35
+let%span sspan'27 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 801 4 801 54
+let%span sspan'28 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 161 18 161 69
+let%span sspan'29 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 183 22 183 26
+let%span sspan'30 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 182 18 182 62
+let%span sspan'31 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 164 33 164 37
+let%span sspan'32 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 815 4 815 58
+let%span sspan'33 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 163 18 163 73
+let%span sspan'34 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 185 24 185 28
+let%span sspan'35 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 184 18 184 57
+let%span sspan'36 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 166 33 166 37
+let%span sspan'37 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 829 4 829 58
+let%span sspan'38 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 165 18 165 73
+let%span sspan'39 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 187 24 187 28
+let%span sspan'40 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 186 18 186 57
+let%span sspan'41 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 168 38 168 42
+let%span sspan'42 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 843 4 843 68
+let%span sspan'43 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 167 18 167 83
+let%span sspan'44 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 189 29 189 33
+let%span sspan'45 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 188 18 188 62
+let%span sspan'46 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 170 38 170 42
+let%span sspan'47 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 858 4 858 68
+let%span sspan'48 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 169 18 169 83
+let%span sspan'49 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 191 29 191 33
+let%span sspan'50 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 190 18 190 62
+let%span sspan'51 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 172 37 172 41
+let%span sspan'52 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 880 4 880 66
+let%span sspan'53 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 171 18 171 81
+let%span sspan'54 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 193 28 193 32
+let%span sspan'55 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 192 18 192 61
+let%span sspan_fieldwise = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 130 12 130 40
+let%span sspan_fieldwise'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 131 12 131 41
+let%span sspan_fieldwise'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 132 12 132 40
+let%span sspan_fieldwise'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 133 12 133 39
+let%span sspan_fieldwise'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 134 12 134 40
+let%span sspan_fieldwise'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 135 12 135 42
+let%span sspan_fieldwise'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 136 12 136 42
+let%span sspan_fieldwise'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 137 12 137 47
+let%span sspan_fieldwise'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 138 12 138 47
+let%span sspan_fieldwise'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 139 12 139 46
+let%span sspan_fieldwise'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 14 140 31
+let%span sspan_fieldwise'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 14 140 44
+let%span sspan_fieldwise'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 14 140 56
+let%span sspan_fieldwise'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 12 140 57
+let%span sspan_fieldwise'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 12 140 71
+let%span sspan_fieldwise'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 141 21 141 38
+let%span sspan_fieldwise'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 141 21 141 53
+let%span sspan_fieldwise'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 141 21 141 65
+let%span sspan_fieldwise'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 141 19 141 66
+let%span sspan_fieldwise'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 141 19 141 81
+let%span sspan_fieldwise'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 142 21 142 38
+let%span sspan_fieldwise'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 142 21 142 51
+let%span sspan_fieldwise'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 142 21 142 63
+let%span sspan_fieldwise'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 142 19 142 64
+let%span sspan_fieldwise'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 142 19 142 78
+let%span sspan_fieldwise'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 143 21 143 38
+let%span sspan_fieldwise'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 143 21 143 49
+let%span sspan_fieldwise'26 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 143 21 143 61
+let%span sspan_fieldwise'27 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 143 19 143 62
+let%span sspan_fieldwise'28 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 143 19 143 75
+let%span sspan_fieldwise'29 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 144 21 144 38
+let%span sspan_fieldwise'30 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 144 21 144 51
+let%span sspan_fieldwise'31 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 144 21 144 63
+let%span sspan_fieldwise'32 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 144 19 144 64
+let%span sspan_fieldwise'33 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 144 19 144 78
+let%span sspan_fieldwise'34 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 145 21 145 38
+let%span sspan_fieldwise'35 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 145 21 145 55
+let%span sspan_fieldwise'36 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 145 21 145 67
+let%span sspan_fieldwise'37 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 145 19 145 68
+let%span sspan_fieldwise'38 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 145 19 145 84
+let%span sspan_fieldwise'39 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 146 21 146 38
+let%span sspan_fieldwise'40 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 146 21 146 55
+let%span sspan_fieldwise'41 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 146 21 146 67
+let%span sspan_fieldwise'42 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 146 19 146 68
+let%span sspan_fieldwise'43 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 146 19 146 84
+let%span sspan_fieldwise'44 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 147 21 147 38
+let%span sspan_fieldwise'45 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 147 21 147 65
+let%span sspan_fieldwise'46 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 147 21 147 77
+let%span sspan_fieldwise'47 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 147 19 147 78
+let%span sspan_fieldwise'48 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 147 19 149 39
+let%span sspan_fieldwise'49 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 151 21 151 38
+let%span sspan_fieldwise'50 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 151 21 151 65
+let%span sspan_fieldwise'51 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 151 21 151 77
+let%span sspan_fieldwise'52 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 151 19 151 78
+let%span sspan_fieldwise'53 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 151 19 153 39
+let%span sspan_fieldwise'54 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 155 21 155 38
+let%span sspan_fieldwise'55 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 155 21 155 63
+let%span sspan_fieldwise'56 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 155 21 155 75
+let%span sspan_fieldwise'57 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 155 19 155 76
+let%span sspan_fieldwise'58 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 155 19 157 38
+let%span sspan_fieldwise'59 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 140 12 158 35
+let%span sspan_fieldwise'60 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 101 19 101 72
+let%span sspan_fieldwise'61 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 102 19 102 76
+let%span sspan_fieldwise'62 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 103 19 103 78
+let%span sspan_fieldwise'63 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 104 19 104 76
+let%span sspan_fieldwise'64 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 105 19 105 82
+let%span sspan_fieldwise'65 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 106 19 106 92
+let%span sspan_fieldwise'66 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 107 19 107 94
+let%span sspan_fieldwise'67 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 109 12 110 63
+let%span sspan_fieldwise'68 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 113 12 114 67
+let%span sspan_fieldwise'69 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 116 19 116 88
+let%span sspan_fieldwise'70 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 117 18 117 24
+let%span sspan_fieldwise'71 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 68 21 68 25
+let%span sspan_fieldwise'72 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 57 12 66 93
+let%span sspan_fieldwise'73 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 84 15 84 19
+let%span sspan_fieldwise'74 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 73 12 82 96
+
+use creusot.int.Int16
+use creusot.int.Int64
+use creusot.int.Int32
+use creusot.prelude.Any
+
+function span_i64_of_i16 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 43 4 43 46] (_x: Int16.t) : Int64.t
+
+let span_i64_of_i16_lemma (x: Int16.t) (return (x'0: ())) = any
+  [ return (result: ()) -> {[@stop_split] [@expl:span_i64_of_i16_lemma ensures] [%#sspan] span_i64_of_i16 x
+    = Int64.of_int (Int16.to_int x)}
+    (! return {result}) ]
+
+function span_i64_of_i32 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 43 4 43 46] (_x: Int32.t) : Int64.t
+
+let span_i64_of_i32_lemma (x: Int32.t) (return (x'0: ())) = any
+  [ return (result: ()) -> {[@stop_split] [@expl:span_i64_of_i32_lemma ensures] [%#sspan'0] span_i64_of_i32 x
+    = Int64.of_int (Int32.to_int x)}
+    (! return {result}) ]
+
+function span_i64_of_i64 [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 43 4 43 46] (_x: Int64.t) : Int64.t
+
+let span_i64_of_i64_lemma (x: Int64.t) (return (x'0: ())) = any
+  [ return (result: ()) -> {[@stop_split] [@expl:span_i64_of_i64_lemma ensures] [%#sspan'1] span_i64_of_i64 x = x}
+    (! return {result}) ]
+
+type t_Span
+
+predicate inv_Span (_1: t_Span)
+
+let new (return (x: t_Span)) = any
+  [ return (result: t_Span) -> {[@stop_split] [@expl:new result type invariant] [%#sspan'2] inv_Span result}
+    (! return {result}) ]
+
+function span_get_years_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 86 0 86 58] (_s: t_Span) : Int64.t
+
+let years_i16 (self_: t_Span) (years: Int16.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:years 'self_' type invariant] [%#sspan'4] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:years_i16 ensures] ([@stop_split] [@expl:years result type invariant] [%#sspan'5] inv_Span result)
+    /\ ([@stop_split] [@expl:years ensures] [%#sspan'6] span_get_years_value result = span_i64_of_i16 years)}
+    (! return {result}) ]
+
+type t_SpanFieldwise = { f0: t_Span }
+
+predicate inv_SpanFieldwise (_1: t_SpanFieldwise)
+
+axiom inv_axiom [@rewrite]: forall x: t_SpanFieldwise [inv_SpanFieldwise x]. inv_SpanFieldwise x = inv_Span x.f0
+
+function span_get_months_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 92 0 92 59] (_s: t_Span) : Int64.t
+
+function span_get_weeks_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 98 0 98 58] (_s: t_Span) : Int64.t
+
+function span_get_days_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 104 0 104 57] (_s: t_Span) : Int64.t
+
+function span_get_hours_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 110 0 110 58] (_s: t_Span) : Int64.t
+
+function span_get_minutes_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 116 0 116 60] (_s: t_Span) : Int64.t
+
+function span_get_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 122 0 122 60] (_s: t_Span) : Int64.t
+
+function span_get_milliseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 128 0 128 65] (_s: t_Span) : Int64.t
+
+function span_get_microseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 134 0 134 65] (_s: t_Span) : Int64.t
+
+function span_get_nanoseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 140 0 140 64] (_s: t_Span) : Int64.t
+
+let fieldwise (self_: t_Span) (return (x: t_SpanFieldwise)) =
+{[@stop_split] [@expl:fieldwise 'self_' type invariant] [%#sspan_fieldwise'71] inv_Span self_}
+  any
+  [ return (result: t_SpanFieldwise) ->
+  {[@stop_split] [@expl:fieldwise ensures] ([@stop_split] [@expl:fieldwise result type invariant] [%#sspan'7] inv_SpanFieldwise result)
+    /\ ([@stop_split] [@expl:fieldwise ensures] [%#sspan_fieldwise'72] span_get_years_value result.f0
+      = span_get_years_value self_
+    /\ span_get_months_value result.f0 = span_get_months_value self_
+    /\ span_get_weeks_value result.f0 = span_get_weeks_value self_
+    /\ span_get_days_value result.f0 = span_get_days_value self_
+    /\ span_get_hours_value result.f0 = span_get_hours_value self_
+    /\ span_get_minutes_value result.f0 = span_get_minutes_value self_
+    /\ span_get_seconds_value result.f0 = span_get_seconds_value self_
+    /\ span_get_milliseconds_value result.f0 = span_get_milliseconds_value self_
+    /\ span_get_microseconds_value result.f0 = span_get_microseconds_value self_
+    /\ span_get_nanoseconds_value result.f0 = span_get_nanoseconds_value self_)}
+    (! return {result}) ]
+
+let neg_SpanFieldwise (self_: t_SpanFieldwise) (return (x: t_SpanFieldwise)) =
+{[@stop_split] [@expl:neg 'self_' type invariant] [%#sspan_fieldwise'73] inv_SpanFieldwise self_}
+  any
+  [ return (result: t_SpanFieldwise) ->
+  {[@stop_split] [@expl:neg_SpanFieldwise ensures] ([@stop_split] [@expl:neg result type invariant] [%#sspan'8] inv_SpanFieldwise result)
+    /\ ([@stop_split] [@expl:neg ensures] [%#sspan_fieldwise'74] span_get_years_value result.f0
+      = Int64.neg (span_get_years_value self_.f0)
+    /\ span_get_months_value result.f0 = Int64.neg (span_get_months_value self_.f0)
+    /\ span_get_weeks_value result.f0 = Int64.neg (span_get_weeks_value self_.f0)
+    /\ span_get_days_value result.f0 = Int64.neg (span_get_days_value self_.f0)
+    /\ span_get_hours_value result.f0 = Int64.neg (span_get_hours_value self_.f0)
+    /\ span_get_minutes_value result.f0 = Int64.neg (span_get_minutes_value self_.f0)
+    /\ span_get_seconds_value result.f0 = Int64.neg (span_get_seconds_value self_.f0)
+    /\ span_get_milliseconds_value result.f0 = Int64.neg (span_get_milliseconds_value self_.f0)
+    /\ span_get_microseconds_value result.f0 = Int64.neg (span_get_microseconds_value self_.f0)
+    /\ span_get_nanoseconds_value result.f0 = Int64.neg (span_get_nanoseconds_value self_.f0))}
+    (! return {result}) ]
+
+predicate invariant_ref_Span [@inline:trivial] (self: t_Span) = [%#sinvariant] inv_Span self
+
+meta "rewrite_def" predicate invariant_ref_Span
+
+predicate inv_ref_Span [@inline:trivial] (_1: t_Span) = invariant_ref_Span _1
+
+meta "rewrite_def" predicate inv_ref_Span
+
+let get_years (self_: t_Span) (return (x: Int16.t)) =
+{[@stop_split] [@expl:get_years 'self_' type invariant] [%#sspan'9] inv_ref_Span self_}
+  any
+  [ return (result: Int16.t) -> {[@stop_split] [@expl:get_years ensures] [%#sspan'10] Int64.of_int (Int16.to_int result)
+    = span_get_years_value self_}
+    (! return {result}) ]
+
+let months_i32 (self_: t_Span) (months: Int32.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:months 'self_' type invariant] [%#sspan'11] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:months_i32 ensures] ([@stop_split] [@expl:months result type invariant] [%#sspan'12] inv_Span result)
+    /\ ([@stop_split] [@expl:months ensures] [%#sspan'13] span_get_months_value result = span_i64_of_i32 months)}
+    (! return {result}) ]
+
+let get_months (self_: t_Span) (return (x: Int32.t)) =
+{[@stop_split] [@expl:get_months 'self_' type invariant] [%#sspan'14] inv_ref_Span self_}
+  any
+  [ return (result: Int32.t) ->
+  {[@stop_split] [@expl:get_months ensures] [%#sspan'15] Int64.of_int (Int32.to_int result)
+    = span_get_months_value self_}
+    (! return {result}) ]
+
+let weeks_i32 (self_: t_Span) (weeks: Int32.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:weeks 'self_' type invariant] [%#sspan'16] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:weeks_i32 ensures] ([@stop_split] [@expl:weeks result type invariant] [%#sspan'17] inv_Span result)
+    /\ ([@stop_split] [@expl:weeks ensures] [%#sspan'18] span_get_weeks_value result = span_i64_of_i32 weeks)}
+    (! return {result}) ]
+
+let get_weeks (self_: t_Span) (return (x: Int32.t)) =
+{[@stop_split] [@expl:get_weeks 'self_' type invariant] [%#sspan'19] inv_ref_Span self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:get_weeks ensures] [%#sspan'20] Int64.of_int (Int32.to_int result)
+    = span_get_weeks_value self_}
+    (! return {result}) ]
+
+let days_i32 (self_: t_Span) (days: Int32.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:days 'self_' type invariant] [%#sspan'21] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:days_i32 ensures] ([@stop_split] [@expl:days result type invariant] [%#sspan'22] inv_Span result)
+    /\ ([@stop_split] [@expl:days ensures] [%#sspan'23] span_get_days_value result = span_i64_of_i32 days)}
+    (! return {result}) ]
+
+let get_days (self_: t_Span) (return (x: Int32.t)) =
+{[@stop_split] [@expl:get_days 'self_' type invariant] [%#sspan'24] inv_ref_Span self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:get_days ensures] [%#sspan'25] Int64.of_int (Int32.to_int result)
+    = span_get_days_value self_}
+    (! return {result}) ]
+
+let hours_i32 (self_: t_Span) (hours: Int32.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:hours 'self_' type invariant] [%#sspan'26] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:hours_i32 ensures] ([@stop_split] [@expl:hours result type invariant] [%#sspan'27] inv_Span result)
+    /\ ([@stop_split] [@expl:hours ensures] [%#sspan'28] span_get_hours_value result = span_i64_of_i32 hours)}
+    (! return {result}) ]
+
+let get_hours (self_: t_Span) (return (x: Int32.t)) =
+{[@stop_split] [@expl:get_hours 'self_' type invariant] [%#sspan'29] inv_ref_Span self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:get_hours ensures] [%#sspan'30] Int64.of_int (Int32.to_int result)
+    = span_get_hours_value self_}
+    (! return {result}) ]
+
+let minutes_i64 (self_: t_Span) (minutes: Int64.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:minutes 'self_' type invariant] [%#sspan'31] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:minutes_i64 ensures] ([@stop_split] [@expl:minutes result type invariant] [%#sspan'32] inv_Span result)
+    /\ ([@stop_split] [@expl:minutes ensures] [%#sspan'33] span_get_minutes_value result = span_i64_of_i64 minutes)}
+    (! return {result}) ]
+
+let get_minutes (self_: t_Span) (return (x: Int64.t)) =
+{[@stop_split] [@expl:get_minutes 'self_' type invariant] [%#sspan'34] inv_ref_Span self_}
+  any
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:get_minutes ensures] [%#sspan'35] result
+    = span_get_minutes_value self_}
+    (! return {result}) ]
+
+let seconds_i64 (self_: t_Span) (seconds: Int64.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:seconds 'self_' type invariant] [%#sspan'36] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:seconds_i64 ensures] ([@stop_split] [@expl:seconds result type invariant] [%#sspan'37] inv_Span result)
+    /\ ([@stop_split] [@expl:seconds ensures] [%#sspan'38] span_get_seconds_value result = span_i64_of_i64 seconds)}
+    (! return {result}) ]
+
+let get_seconds (self_: t_Span) (return (x: Int64.t)) =
+{[@stop_split] [@expl:get_seconds 'self_' type invariant] [%#sspan'39] inv_ref_Span self_}
+  any
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:get_seconds ensures] [%#sspan'40] result
+    = span_get_seconds_value self_}
+    (! return {result}) ]
+
+let milliseconds_i64 (self_: t_Span) (milliseconds: Int64.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:milliseconds 'self_' type invariant] [%#sspan'41] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:milliseconds_i64 ensures] ([@stop_split] [@expl:milliseconds result type invariant] [%#sspan'42] inv_Span result)
+    /\ ([@stop_split] [@expl:milliseconds ensures] [%#sspan'43] span_get_milliseconds_value result
+    = span_i64_of_i64 milliseconds)}
+    (! return {result}) ]
+
+let get_milliseconds (self_: t_Span) (return (x: Int64.t)) =
+{[@stop_split] [@expl:get_milliseconds 'self_' type invariant] [%#sspan'44] inv_ref_Span self_}
+  any
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:get_milliseconds ensures] [%#sspan'45] result
+    = span_get_milliseconds_value self_}
+    (! return {result}) ]
+
+let microseconds_i64 (self_: t_Span) (microseconds: Int64.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:microseconds 'self_' type invariant] [%#sspan'46] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:microseconds_i64 ensures] ([@stop_split] [@expl:microseconds result type invariant] [%#sspan'47] inv_Span result)
+    /\ ([@stop_split] [@expl:microseconds ensures] [%#sspan'48] span_get_microseconds_value result
+    = span_i64_of_i64 microseconds)}
+    (! return {result}) ]
+
+let get_microseconds (self_: t_Span) (return (x: Int64.t)) =
+{[@stop_split] [@expl:get_microseconds 'self_' type invariant] [%#sspan'49] inv_ref_Span self_}
+  any
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:get_microseconds ensures] [%#sspan'50] result
+    = span_get_microseconds_value self_}
+    (! return {result}) ]
+
+let nanoseconds_i64 (self_: t_Span) (nanoseconds: Int64.t) (return (x: t_Span)) =
+{[@stop_split] [@expl:nanoseconds 'self_' type invariant] [%#sspan'51] inv_Span self_}
+  any
+  [ return (result: t_Span) ->
+  {[@stop_split] [@expl:nanoseconds_i64 ensures] ([@stop_split] [@expl:nanoseconds result type invariant] [%#sspan'52] inv_Span result)
+    /\ ([@stop_split] [@expl:nanoseconds ensures] [%#sspan'53] span_get_nanoseconds_value result
+    = span_i64_of_i64 nanoseconds)}
+    (! return {result}) ]
+
+let get_nanoseconds (self_: t_Span) (return (x: Int64.t)) =
+{[@stop_split] [@expl:get_nanoseconds 'self_' type invariant] [%#sspan'54] inv_ref_Span self_}
+  any
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:get_nanoseconds ensures] [%#sspan'55] result
+    = span_get_nanoseconds_value self_}
+    (! return {result}) ]
+
+predicate gt_log_i16 [@inline:trivial] (self: Int16.t) (other: Int16.t) = [%#sord] Int16.lt other self
+
+meta "rewrite_def" predicate gt_log_i16
+
+predicate gt_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.lt other self
+
+meta "rewrite_def" predicate gt_log_i32
+
+predicate gt_log_i64 [@inline:trivial] (self: Int64.t) (other: Int64.t) = [%#sord] Int64.lt other self
+
+meta "rewrite_def" predicate gt_log_i64
+
+constant const_MAX: Int64.t = (9223372036854775807: Int64.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_span_fieldwise_negation_negates_every_unit_getter [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span_fieldwise.rs" 118 8 129 17]
+  (years: Int16.t) (months: Int32.t) (weeks: Int32.t) (days: Int32.t) (hours: Int32.t) (minutes: Int64.t)
+  (seconds: Int64.t) (milliseconds: Int64.t) (microseconds: Int64.t) (nanoseconds: Int64.t) (return (x: bool)) =
+{[@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires] ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #0] [%#sspan_fieldwise'60] gt_log_i16 years (Int16.sub (Int16.neg (19998: Int16.t)) (1: Int16.t))
+    /\ Int16.lt years (Int16.add (19998: Int16.t) (1: Int16.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #1] [%#sspan_fieldwise'61] gt_log_i32 months (Int32.sub (Int32.neg (239976: Int32.t)) (1: Int32.t))
+    /\ Int32.lt months (Int32.add (239976: Int32.t) (1: Int32.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #2] [%#sspan_fieldwise'62] gt_log_i32 weeks (Int32.sub (Int32.neg (1043497: Int32.t)) (1: Int32.t))
+    /\ Int32.lt weeks (Int32.add (1043497: Int32.t) (1: Int32.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #3] [%#sspan_fieldwise'63] gt_log_i32 days (Int32.sub (Int32.neg (7304484: Int32.t)) (1: Int32.t))
+    /\ Int32.lt days (Int32.add (7304484: Int32.t) (1: Int32.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #4] [%#sspan_fieldwise'64] gt_log_i32 hours (Int32.sub (Int32.neg (175307616: Int32.t)) (1: Int32.t))
+    /\ Int32.lt hours (Int32.add (175307616: Int32.t) (1: Int32.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #5] [%#sspan_fieldwise'65] gt_log_i64 minutes (Int64.sub (Int64.neg (10518456960: Int64.t)) (1: Int64.t))
+    /\ Int64.lt minutes (Int64.add (10518456960: Int64.t) (1: Int64.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #6] [%#sspan_fieldwise'66] gt_log_i64 seconds (Int64.sub (Int64.neg (631107417600: Int64.t)) (1: Int64.t))
+    /\ Int64.lt seconds (Int64.add (631107417600: Int64.t) (1: Int64.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #7] [%#sspan_fieldwise'67] gt_log_i64 milliseconds (Int64.sub (Int64.neg (631107417600000: Int64.t)) (1: Int64.t))
+    /\ Int64.lt milliseconds (Int64.add (631107417600000: Int64.t) (1: Int64.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #8] [%#sspan_fieldwise'68] gt_log_i64 microseconds (Int64.sub (Int64.neg (631107417600000000: Int64.t)) (1: Int64.t))
+    /\ Int64.lt microseconds (Int64.add (631107417600000000: Int64.t) (1: Int64.t)))
+  /\ ([@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter requires #9] [%#sspan_fieldwise'69] gt_log_i64 nanoseconds (Int64.neg (9223372036854775807: Int64.t))
+  /\ Int64.lt nanoseconds const_MAX)}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = span_i64_of_i16_lemma [%#sspan_fieldwise] {years} (fun (_x: ()) -> [ &_32 <- _x ] s1)
+    | s1 = span_i64_of_i32_lemma [%#sspan_fieldwise'0] {months} (fun (_x: ()) -> [ &_34 <- _x ] s2)
+    | s2 = span_i64_of_i32_lemma [%#sspan_fieldwise'1] {weeks} (fun (_x: ()) -> [ &_36 <- _x ] s3)
+    | s3 = span_i64_of_i32_lemma [%#sspan_fieldwise'2] {days} (fun (_x: ()) -> [ &_38 <- _x ] s4)
+    | s4 = span_i64_of_i32_lemma [%#sspan_fieldwise'3] {hours} (fun (_x: ()) -> [ &_40 <- _x ] s5)
+    | s5 = span_i64_of_i64_lemma [%#sspan_fieldwise'4] {minutes} (fun (_x: ()) -> [ &_42 <- _x ] s6)
+    | s6 = span_i64_of_i64_lemma [%#sspan_fieldwise'5] {seconds} (fun (_x: ()) -> [ &_44 <- _x ] s7)
+    | s7 = span_i64_of_i64_lemma [%#sspan_fieldwise'6] {milliseconds} (fun (_x: ()) -> [ &_46 <- _x ] s8)
+    | s8 = span_i64_of_i64_lemma [%#sspan_fieldwise'7] {microseconds} (fun (_x: ()) -> [ &_48 <- _x ] s9)
+    | s9 = span_i64_of_i64_lemma [%#sspan_fieldwise'8] {nanoseconds} (fun (_x: ()) -> [ &_50 <- _x ] s10)
+    | s10 = new [%#sspan_fieldwise'9] (fun (_x: t_Span) -> [ &_58 <- _x ] s11)
+    | s11 = years_i16 [%#sspan_fieldwise'10] {_58} {years} (fun (_x: t_Span) -> [ &_57 <- _x ] s12)
+    | s12 = fieldwise [%#sspan_fieldwise'11] {_57} (fun (_x: t_SpanFieldwise) -> [ &_56 <- _x ] s13)
+    | s13 = neg_SpanFieldwise [%#sspan_fieldwise'12] {_56} (fun (_x: t_SpanFieldwise) -> [ &_55 <- _x ] s14)
+    | s14 = get_years [%#sspan_fieldwise'13] {_55.f0} (fun (_x: Int16.t) -> [ &_53 <- _x ] s15)
+    | s15 = Int16.neg {years} (fun (_x: Int16.t) -> [ &_60 <- _x ] s16)
+    | s16 = [ &_52 <- _53 = _60 ] s17
+    | s17 = any [ br0 -> {_52 = false} (! bb74) | br1 -> {_52} (! bb16) ] ]
+  | bb16 = s0
+    [ s0 = new [%#sspan_fieldwise'14] (fun (_x: t_Span) -> [ &_68 <- _x ] s1)
+    | s1 = months_i32 [%#sspan_fieldwise'15] {_68} {months} (fun (_x: t_Span) -> [ &_67 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'16] {_67} (fun (_x: t_SpanFieldwise) -> [ &_66 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'17] {_66} (fun (_x: t_SpanFieldwise) -> [ &_65 <- _x ] s4)
+    | s4 = get_months [%#sspan_fieldwise'18] {_65.f0} (fun (_x: Int32.t) -> [ &_63 <- _x ] s5)
+    | s5 = Int32.neg {months} (fun (_x: Int32.t) -> [ &_70 <- _x ] s6)
+    | s6 = [ &_62 <- _63 = _70 ] s7
+    | s7 = any [ br0 -> {_62 = false} (! bb74) | br1 -> {_62} (! bb22) ] ]
+  | bb22 = s0
+    [ s0 = new [%#sspan_fieldwise'19] (fun (_x: t_Span) -> [ &_78 <- _x ] s1)
+    | s1 = weeks_i32 [%#sspan_fieldwise'20] {_78} {weeks} (fun (_x: t_Span) -> [ &_77 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'21] {_77} (fun (_x: t_SpanFieldwise) -> [ &_76 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'22] {_76} (fun (_x: t_SpanFieldwise) -> [ &_75 <- _x ] s4)
+    | s4 = get_weeks [%#sspan_fieldwise'23] {_75.f0} (fun (_x: Int32.t) -> [ &_73 <- _x ] s5)
+    | s5 = Int32.neg {weeks} (fun (_x: Int32.t) -> [ &_80 <- _x ] s6)
+    | s6 = [ &_72 <- _73 = _80 ] s7
+    | s7 = any [ br0 -> {_72 = false} (! bb74) | br1 -> {_72} (! bb28) ] ]
+  | bb28 = s0
+    [ s0 = new [%#sspan_fieldwise'24] (fun (_x: t_Span) -> [ &_88 <- _x ] s1)
+    | s1 = days_i32 [%#sspan_fieldwise'25] {_88} {days} (fun (_x: t_Span) -> [ &_87 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'26] {_87} (fun (_x: t_SpanFieldwise) -> [ &_86 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'27] {_86} (fun (_x: t_SpanFieldwise) -> [ &_85 <- _x ] s4)
+    | s4 = get_days [%#sspan_fieldwise'28] {_85.f0} (fun (_x: Int32.t) -> [ &_83 <- _x ] s5)
+    | s5 = Int32.neg {days} (fun (_x: Int32.t) -> [ &_90 <- _x ] s6)
+    | s6 = [ &_82 <- _83 = _90 ] s7
+    | s7 = any [ br0 -> {_82 = false} (! bb74) | br1 -> {_82} (! bb34) ] ]
+  | bb34 = s0
+    [ s0 = new [%#sspan_fieldwise'29] (fun (_x: t_Span) -> [ &_98 <- _x ] s1)
+    | s1 = hours_i32 [%#sspan_fieldwise'30] {_98} {hours} (fun (_x: t_Span) -> [ &_97 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'31] {_97} (fun (_x: t_SpanFieldwise) -> [ &_96 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'32] {_96} (fun (_x: t_SpanFieldwise) -> [ &_95 <- _x ] s4)
+    | s4 = get_hours [%#sspan_fieldwise'33] {_95.f0} (fun (_x: Int32.t) -> [ &_93 <- _x ] s5)
+    | s5 = Int32.neg {hours} (fun (_x: Int32.t) -> [ &_100 <- _x ] s6)
+    | s6 = [ &_92 <- _93 = _100 ] s7
+    | s7 = any [ br0 -> {_92 = false} (! bb74) | br1 -> {_92} (! bb40) ] ]
+  | bb40 = s0
+    [ s0 = new [%#sspan_fieldwise'34] (fun (_x: t_Span) -> [ &_108 <- _x ] s1)
+    | s1 = minutes_i64 [%#sspan_fieldwise'35] {_108} {minutes} (fun (_x: t_Span) -> [ &_107 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'36] {_107} (fun (_x: t_SpanFieldwise) -> [ &_106 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'37] {_106} (fun (_x: t_SpanFieldwise) -> [ &_105 <- _x ] s4)
+    | s4 = get_minutes [%#sspan_fieldwise'38] {_105.f0} (fun (_x: Int64.t) -> [ &_103 <- _x ] s5)
+    | s5 = Int64.neg {minutes} (fun (_x: Int64.t) -> [ &_110 <- _x ] s6)
+    | s6 = [ &_102 <- _103 = _110 ] s7
+    | s7 = any [ br0 -> {_102 = false} (! bb74) | br1 -> {_102} (! bb46) ] ]
+  | bb46 = s0
+    [ s0 = new [%#sspan_fieldwise'39] (fun (_x: t_Span) -> [ &_118 <- _x ] s1)
+    | s1 = seconds_i64 [%#sspan_fieldwise'40] {_118} {seconds} (fun (_x: t_Span) -> [ &_117 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'41] {_117} (fun (_x: t_SpanFieldwise) -> [ &_116 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'42] {_116} (fun (_x: t_SpanFieldwise) -> [ &_115 <- _x ] s4)
+    | s4 = get_seconds [%#sspan_fieldwise'43] {_115.f0} (fun (_x: Int64.t) -> [ &_113 <- _x ] s5)
+    | s5 = Int64.neg {seconds} (fun (_x: Int64.t) -> [ &_120 <- _x ] s6)
+    | s6 = [ &_112 <- _113 = _120 ] s7
+    | s7 = any [ br0 -> {_112 = false} (! bb74) | br1 -> {_112} (! bb52) ] ]
+  | bb52 = s0
+    [ s0 = new [%#sspan_fieldwise'44] (fun (_x: t_Span) -> [ &_128 <- _x ] s1)
+    | s1 = milliseconds_i64 [%#sspan_fieldwise'45] {_128} {milliseconds} (fun (_x: t_Span) -> [ &_127 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'46] {_127} (fun (_x: t_SpanFieldwise) -> [ &_126 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'47] {_126} (fun (_x: t_SpanFieldwise) -> [ &_125 <- _x ] s4)
+    | s4 = get_milliseconds [%#sspan_fieldwise'48] {_125.f0} (fun (_x: Int64.t) -> [ &_123 <- _x ] s5)
+    | s5 = Int64.neg {milliseconds} (fun (_x: Int64.t) -> [ &_130 <- _x ] s6)
+    | s6 = [ &_122 <- _123 = _130 ] s7
+    | s7 = any [ br0 -> {_122 = false} (! bb74) | br1 -> {_122} (! bb58) ] ]
+  | bb58 = s0
+    [ s0 = new [%#sspan_fieldwise'49] (fun (_x: t_Span) -> [ &_138 <- _x ] s1)
+    | s1 = microseconds_i64 [%#sspan_fieldwise'50] {_138} {microseconds} (fun (_x: t_Span) -> [ &_137 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'51] {_137} (fun (_x: t_SpanFieldwise) -> [ &_136 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'52] {_136} (fun (_x: t_SpanFieldwise) -> [ &_135 <- _x ] s4)
+    | s4 = get_microseconds [%#sspan_fieldwise'53] {_135.f0} (fun (_x: Int64.t) -> [ &_133 <- _x ] s5)
+    | s5 = Int64.neg {microseconds} (fun (_x: Int64.t) -> [ &_140 <- _x ] s6)
+    | s6 = [ &_132 <- _133 = _140 ] s7
+    | s7 = any [ br0 -> {_132 = false} (! bb74) | br1 -> {_132} (! bb64) ] ]
+  | bb64 = s0
+    [ s0 = new [%#sspan_fieldwise'54] (fun (_x: t_Span) -> [ &_147 <- _x ] s1)
+    | s1 = nanoseconds_i64 [%#sspan_fieldwise'55] {_147} {nanoseconds} (fun (_x: t_Span) -> [ &_146 <- _x ] s2)
+    | s2 = fieldwise [%#sspan_fieldwise'56] {_146} (fun (_x: t_SpanFieldwise) -> [ &_145 <- _x ] s3)
+    | s3 = neg_SpanFieldwise [%#sspan_fieldwise'57] {_145} (fun (_x: t_SpanFieldwise) -> [ &_144 <- _x ] s4)
+    | s4 = get_nanoseconds [%#sspan_fieldwise'58] {_144.f0} (fun (_x: Int64.t) -> [ &_142 <- _x ] s5)
+    | s5 = Int64.neg {nanoseconds} (fun (_x: Int64.t) -> [ &_149 <- _x ] s6)
+    | s6 = [ &_ret <- _142 = _149 ] s7
+    | s7 = return {_ret} ]
+  | bb74 = s0 [ s0 = [ &_ret <- [%#sspan_fieldwise'59] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & years: Int16.t = years
+  | & months: Int32.t = months
+  | & weeks: Int32.t = weeks
+  | & days: Int32.t = days
+  | & hours: Int32.t = hours
+  | & minutes: Int64.t = minutes
+  | & seconds: Int64.t = seconds
+  | & milliseconds: Int64.t = milliseconds
+  | & microseconds: Int64.t = microseconds
+  | & nanoseconds: Int64.t = nanoseconds
+  | & _32: () = Any.any_l ()
+  | & _34: () = Any.any_l ()
+  | & _36: () = Any.any_l ()
+  | & _38: () = Any.any_l ()
+  | & _40: () = Any.any_l ()
+  | & _42: () = Any.any_l ()
+  | & _44: () = Any.any_l ()
+  | & _46: () = Any.any_l ()
+  | & _48: () = Any.any_l ()
+  | & _50: () = Any.any_l ()
+  | & _52: bool = Any.any_l ()
+  | & _53: Int16.t = Any.any_l ()
+  | & _55: t_SpanFieldwise = Any.any_l ()
+  | & _56: t_SpanFieldwise = Any.any_l ()
+  | & _57: t_Span = Any.any_l ()
+  | & _58: t_Span = Any.any_l ()
+  | & _60: Int16.t = Any.any_l ()
+  | & _62: bool = Any.any_l ()
+  | & _63: Int32.t = Any.any_l ()
+  | & _65: t_SpanFieldwise = Any.any_l ()
+  | & _66: t_SpanFieldwise = Any.any_l ()
+  | & _67: t_Span = Any.any_l ()
+  | & _68: t_Span = Any.any_l ()
+  | & _70: Int32.t = Any.any_l ()
+  | & _72: bool = Any.any_l ()
+  | & _73: Int32.t = Any.any_l ()
+  | & _75: t_SpanFieldwise = Any.any_l ()
+  | & _76: t_SpanFieldwise = Any.any_l ()
+  | & _77: t_Span = Any.any_l ()
+  | & _78: t_Span = Any.any_l ()
+  | & _80: Int32.t = Any.any_l ()
+  | & _82: bool = Any.any_l ()
+  | & _83: Int32.t = Any.any_l ()
+  | & _85: t_SpanFieldwise = Any.any_l ()
+  | & _86: t_SpanFieldwise = Any.any_l ()
+  | & _87: t_Span = Any.any_l ()
+  | & _88: t_Span = Any.any_l ()
+  | & _90: Int32.t = Any.any_l ()
+  | & _92: bool = Any.any_l ()
+  | & _93: Int32.t = Any.any_l ()
+  | & _95: t_SpanFieldwise = Any.any_l ()
+  | & _96: t_SpanFieldwise = Any.any_l ()
+  | & _97: t_Span = Any.any_l ()
+  | & _98: t_Span = Any.any_l ()
+  | & _100: Int32.t = Any.any_l ()
+  | & _102: bool = Any.any_l ()
+  | & _103: Int64.t = Any.any_l ()
+  | & _105: t_SpanFieldwise = Any.any_l ()
+  | & _106: t_SpanFieldwise = Any.any_l ()
+  | & _107: t_Span = Any.any_l ()
+  | & _108: t_Span = Any.any_l ()
+  | & _110: Int64.t = Any.any_l ()
+  | & _112: bool = Any.any_l ()
+  | & _113: Int64.t = Any.any_l ()
+  | & _115: t_SpanFieldwise = Any.any_l ()
+  | & _116: t_SpanFieldwise = Any.any_l ()
+  | & _117: t_Span = Any.any_l ()
+  | & _118: t_Span = Any.any_l ()
+  | & _120: Int64.t = Any.any_l ()
+  | & _122: bool = Any.any_l ()
+  | & _123: Int64.t = Any.any_l ()
+  | & _125: t_SpanFieldwise = Any.any_l ()
+  | & _126: t_SpanFieldwise = Any.any_l ()
+  | & _127: t_Span = Any.any_l ()
+  | & _128: t_Span = Any.any_l ()
+  | & _130: Int64.t = Any.any_l ()
+  | & _132: bool = Any.any_l ()
+  | & _133: Int64.t = Any.any_l ()
+  | & _135: t_SpanFieldwise = Any.any_l ()
+  | & _136: t_SpanFieldwise = Any.any_l ()
+  | & _137: t_Span = Any.any_l ()
+  | & _138: t_Span = Any.any_l ()
+  | & _140: Int64.t = Any.any_l ()
+  | & _142: Int64.t = Any.any_l ()
+  | & _144: t_SpanFieldwise = Any.any_l ()
+  | & _145: t_SpanFieldwise = Any.any_l ()
+  | & _146: t_Span = Any.any_l ()
+  | & _147: t_Span = Any.any_l ()
+  | & _149: Int64.t = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_span_fieldwise_negation_negates_every_unit_getter ensures] [%#sspan_fieldwise'70] result}
+    (! return {result}) ]

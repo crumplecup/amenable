@@ -43,78 +43,103 @@ mod mirror {
     pub(super) fn span_i64_of<I>(_x: I) -> i64 {
         dead
     }
-
-    #[trusted]
-    #[ensures(span_i64_of::<i16>(x) == x as i64)]
-    pub(super) fn span_i64_of_i16_lemma(x: i16) {}
-
-    #[trusted]
-    #[ensures(span_i64_of::<i32>(x) == x as i64)]
-    pub(super) fn span_i64_of_i32_lemma(x: i32) {}
-
-    #[trusted]
-    #[ensures(span_i64_of::<i64>(x) == x as i64)]
-    pub(super) fn span_i64_of_i64_lemma(x: i64) {}
-
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_years_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_months_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_weeks_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_days_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_hours_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_minutes_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_seconds_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_milliseconds_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_microseconds_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_get_nanoseconds_value(_s: &jiff::Span) -> i64 {
-        dead
-    }
 }
 #[cfg(creusot)]
-use mirror::{
-    ensures, extern_spec, requires, span_get_days_value, span_get_hours_value,
-    span_get_microseconds_value, span_get_milliseconds_value, span_get_minutes_value,
-    span_get_months_value, span_get_nanoseconds_value, span_get_seconds_value,
-    span_get_weeks_value, span_get_years_value, span_i64_of, span_i64_of_i16_lemma,
-    span_i64_of_i32_lemma, span_i64_of_i64_lemma,
-};
+use creusot_std::macros::{logic, trusted};
+#[cfg(creusot)]
+use mirror::{ensures, extern_spec, requires, span_i64_of};
+
+// `pub(crate)`, declared directly here (not nested in `mirror`, for the
+// same real reason the getter accessors below are: `span_fieldwise.rs`
+// needs to call these too, and a two-hop re-export through a private
+// nested module is real toolchain territory Creusot's own visibility
+// check rejects even though plain rustc accepts it.
+#[cfg(creusot)]
+#[trusted]
+#[ensures(span_i64_of::<i16>(x) == x as i64)]
+pub(crate) fn span_i64_of_i16_lemma(x: i16) {}
+
+#[cfg(creusot)]
+#[trusted]
+#[ensures(span_i64_of::<i32>(x) == x as i64)]
+pub(crate) fn span_i64_of_i32_lemma(x: i32) {}
+
+#[cfg(creusot)]
+#[trusted]
+#[ensures(span_i64_of::<i64>(x) == x as i64)]
+pub(crate) fn span_i64_of_i64_lemma(x: i64) {}
+
+// `pub(crate)`, declared directly here (not nested in `mirror`):
+// reused by `span_fieldwise.rs`'s own extern_spec, which needs the SAME
+// opaque accessors the extern_spec below already ties them to --
+// Creusot only allows one extern_spec per real function crate-wide, so
+// redeclaring a second one for the same method isn't an option, and a
+// two-hop re-export through a private nested module (`mirror::foo` ->
+// `pub(crate) use mirror::foo`) is real toolchain territory Creusot's
+// own visibility check rejects even though plain rustc accepts it --
+// confirmed by a real "function import ... is private" error from
+// `cargo creusot` (not from `cargo check`, which never compiles this
+// `#[cfg(creusot)]`-gated code at all) when these lived inside `mirror`.
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_years_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_months_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_weeks_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_days_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_hours_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_minutes_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_seconds_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_milliseconds_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_microseconds_value(_s: &jiff::Span) -> i64 {
+    dead
+}
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn span_get_nanoseconds_value(_s: &jiff::Span) -> i64 {
+    dead
+}
 
 // jiff's own documented valid ranges for each `Span` unit setter (the
 // same constants `amenable_kani::ext::jiff::span`'s Kani harness

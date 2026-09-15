@@ -1,114 +1,114 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 203 8 214 17 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 228 8 239 17 *)
 
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
-let%span sspan = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 215 12 215 40
-let%span sspan'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 216 12 216 41
-let%span sspan'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 217 12 217 40
-let%span sspan'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 218 12 218 39
-let%span sspan'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 219 12 219 40
-let%span sspan'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 220 12 220 42
-let%span sspan'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 221 12 221 42
-let%span sspan'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 222 12 222 47
-let%span sspan'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 223 12 223 47
-let%span sspan'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 224 12 224 46
-let%span sspan'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 225 12 225 29
-let%span sspan'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 225 12 225 42
-let%span sspan'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 225 12 225 54
-let%span sspan'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 226 19 226 36
-let%span sspan'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 226 19 226 51
-let%span sspan'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 226 19 226 64
-let%span sspan'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 227 19 227 36
-let%span sspan'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 227 19 227 49
-let%span sspan'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 227 19 227 61
-let%span sspan'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 228 19 228 36
-let%span sspan'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 228 19 228 47
-let%span sspan'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 228 19 228 58
-let%span sspan'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 229 19 229 36
-let%span sspan'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 229 19 229 49
-let%span sspan'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 229 19 229 61
-let%span sspan'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 230 19 230 36
-let%span sspan'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 230 19 230 53
-let%span sspan'26 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 230 19 230 67
-let%span sspan'27 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 231 19 231 36
-let%span sspan'28 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 231 19 231 53
-let%span sspan'29 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 231 19 231 67
-let%span sspan'30 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 232 19 232 36
-let%span sspan'31 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 232 19 232 63
-let%span sspan'32 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 232 19 232 82
-let%span sspan'33 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 233 19 233 36
-let%span sspan'34 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 233 19 233 63
-let%span sspan'35 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 233 19 233 82
-let%span sspan'36 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 234 19 234 36
-let%span sspan'37 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 234 19 234 61
-let%span sspan'38 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 234 19 234 79
-let%span sspan'39 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 225 12 234 94
-let%span sspan'40 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 186 19 186 72
-let%span sspan'41 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 187 19 187 76
-let%span sspan'42 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 188 19 188 78
-let%span sspan'43 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 189 19 189 76
-let%span sspan'44 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 190 19 190 82
-let%span sspan'45 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 191 19 191 92
-let%span sspan'46 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 192 19 192 94
-let%span sspan'47 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 194 12 195 63
-let%span sspan'48 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 198 12 199 67
-let%span sspan'49 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 201 19 201 88
-let%span sspan'50 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 202 18 202 24
-let%span sspan'51 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 48 14 48 47
-let%span sspan'52 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 52 14 52 47
-let%span sspan'53 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 56 14 56 47
+let%span sspan = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 240 12 240 40
+let%span sspan'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 241 12 241 41
+let%span sspan'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 242 12 242 40
+let%span sspan'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 243 12 243 39
+let%span sspan'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 244 12 244 40
+let%span sspan'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 245 12 245 42
+let%span sspan'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 246 12 246 42
+let%span sspan'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 247 12 247 47
+let%span sspan'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 248 12 248 47
+let%span sspan'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 249 12 249 46
+let%span sspan'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 250 12 250 29
+let%span sspan'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 250 12 250 42
+let%span sspan'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 250 12 250 54
+let%span sspan'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 251 19 251 36
+let%span sspan'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 251 19 251 51
+let%span sspan'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 251 19 251 64
+let%span sspan'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 252 19 252 36
+let%span sspan'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 252 19 252 49
+let%span sspan'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 252 19 252 61
+let%span sspan'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 253 19 253 36
+let%span sspan'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 253 19 253 47
+let%span sspan'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 253 19 253 58
+let%span sspan'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 254 19 254 36
+let%span sspan'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 254 19 254 49
+let%span sspan'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 254 19 254 61
+let%span sspan'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 255 19 255 36
+let%span sspan'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 255 19 255 53
+let%span sspan'26 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 255 19 255 67
+let%span sspan'27 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 256 19 256 36
+let%span sspan'28 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 256 19 256 53
+let%span sspan'29 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 256 19 256 67
+let%span sspan'30 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 257 19 257 36
+let%span sspan'31 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 257 19 257 63
+let%span sspan'32 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 257 19 257 82
+let%span sspan'33 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 258 19 258 36
+let%span sspan'34 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 258 19 258 63
+let%span sspan'35 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 258 19 258 82
+let%span sspan'36 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 259 19 259 36
+let%span sspan'37 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 259 19 259 61
+let%span sspan'38 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 259 19 259 79
+let%span sspan'39 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 250 12 259 94
+let%span sspan'40 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 211 19 211 72
+let%span sspan'41 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 212 19 212 76
+let%span sspan'42 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 213 19 213 78
+let%span sspan'43 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 214 19 214 76
+let%span sspan'44 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 215 19 215 82
+let%span sspan'45 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 216 19 216 92
+let%span sspan'46 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 217 19 217 94
+let%span sspan'47 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 219 12 220 63
+let%span sspan'48 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 223 12 224 67
+let%span sspan'49 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 226 19 226 88
+let%span sspan'50 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 227 18 227 24
+let%span sspan'51 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 59 10 59 43
+let%span sspan'52 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 64 10 64 43
+let%span sspan'53 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 69 10 69 43
 let%span sspan'54 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 731 4 731 24
-let%span sspan'55 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 125 18 125 22
-let%span sspan'56 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 129 31 129 35
+let%span sspan'55 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 150 18 150 22
+let%span sspan'56 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 154 31 154 35
 let%span sspan'57 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 745 4 745 54
-let%span sspan'58 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 128 18 128 69
-let%span sspan'59 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 150 22 150 26
-let%span sspan'60 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 149 18 149 62
-let%span sspan'61 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 131 32 131 36
+let%span sspan'58 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 153 18 153 69
+let%span sspan'59 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 175 22 175 26
+let%span sspan'60 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 174 18 174 62
+let%span sspan'61 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 156 32 156 36
 let%span sspan'62 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 759 4 759 56
-let%span sspan'63 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 130 18 130 71
-let%span sspan'64 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 152 23 152 27
-let%span sspan'65 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 151 18 151 63
-let%span sspan'66 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 133 31 133 35
+let%span sspan'63 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 155 18 155 71
+let%span sspan'64 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 177 23 177 27
+let%span sspan'65 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 176 18 176 63
+let%span sspan'66 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 158 31 158 35
 let%span sspan'67 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 773 4 773 54
-let%span sspan'68 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 132 18 132 69
-let%span sspan'69 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 154 22 154 26
-let%span sspan'70 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 153 18 153 62
-let%span sspan'71 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 135 30 135 34
+let%span sspan'68 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 157 18 157 69
+let%span sspan'69 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 179 22 179 26
+let%span sspan'70 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 178 18 178 62
+let%span sspan'71 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 160 30 160 34
 let%span sspan'72 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 787 4 787 52
-let%span sspan'73 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 134 18 134 67
-let%span sspan'74 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 156 21 156 25
-let%span sspan'75 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 155 18 155 61
-let%span sspan'76 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 137 31 137 35
+let%span sspan'73 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 159 18 159 67
+let%span sspan'74 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 181 21 181 25
+let%span sspan'75 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 180 18 180 61
+let%span sspan'76 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 162 31 162 35
 let%span sspan'77 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 801 4 801 54
-let%span sspan'78 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 136 18 136 69
-let%span sspan'79 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 158 22 158 26
-let%span sspan'80 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 157 18 157 62
-let%span sspan'81 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 139 33 139 37
+let%span sspan'78 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 161 18 161 69
+let%span sspan'79 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 183 22 183 26
+let%span sspan'80 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 182 18 182 62
+let%span sspan'81 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 164 33 164 37
 let%span sspan'82 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 815 4 815 58
-let%span sspan'83 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 138 18 138 73
-let%span sspan'84 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 160 24 160 28
-let%span sspan'85 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 159 18 159 57
-let%span sspan'86 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 141 33 141 37
+let%span sspan'83 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 163 18 163 73
+let%span sspan'84 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 185 24 185 28
+let%span sspan'85 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 184 18 184 57
+let%span sspan'86 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 166 33 166 37
 let%span sspan'87 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 829 4 829 58
-let%span sspan'88 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 140 18 140 73
-let%span sspan'89 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 162 24 162 28
-let%span sspan'90 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 161 18 161 57
-let%span sspan'91 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 143 38 143 42
+let%span sspan'88 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 165 18 165 73
+let%span sspan'89 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 187 24 187 28
+let%span sspan'90 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 186 18 186 57
+let%span sspan'91 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 168 38 168 42
 let%span sspan'92 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 843 4 843 68
-let%span sspan'93 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 142 18 142 83
-let%span sspan'94 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 164 29 164 33
-let%span sspan'95 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 163 18 163 62
-let%span sspan'96 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 145 38 145 42
+let%span sspan'93 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 167 18 167 83
+let%span sspan'94 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 189 29 189 33
+let%span sspan'95 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 188 18 188 62
+let%span sspan'96 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 170 38 170 42
 let%span sspan'97 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 858 4 858 68
-let%span sspan'98 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 144 18 144 83
-let%span sspan'99 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 166 29 166 33
-let%span sspan'100 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 165 18 165 62
-let%span sspan'101 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 147 37 147 41
+let%span sspan'98 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 169 18 169 83
+let%span sspan'99 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 191 29 191 33
+let%span sspan'100 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 190 18 190 62
+let%span sspan'101 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 172 37 172 41
 let%span sspan'102 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/span.rs" 880 4 880 66
-let%span sspan'103 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 146 18 146 81
-let%span sspan'104 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 168 28 168 32
-let%span sspan'105 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 167 18 167 61
+let%span sspan'103 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 171 18 171 81
+let%span sspan'104 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 193 28 193 32
+let%span sspan'105 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 192 18 192 61
 
 use creusot.int.Int16
 use creusot.int.Int64
@@ -143,7 +143,7 @@ let new (return (x: t_Span)) = any
   [ return (result: t_Span) -> {[@stop_split] [@expl:new result type invariant] [%#sspan'54] inv_Span result}
     (! return {result}) ]
 
-function span_get_years_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 61 4 61 62] (_s: t_Span) : Int64.t
+function span_get_years_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 86 0 86 58] (_s: t_Span) : Int64.t
 
 let years_i16 (self_: t_Span) (years: Int16.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:years 'self_' type invariant] [%#sspan'56] inv_Span self_}
@@ -168,7 +168,7 @@ let get_years (self_: t_Span) (return (x: Int16.t)) =
     = span_get_years_value self_}
     (! return {result}) ]
 
-function span_get_months_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 66 4 66 63] (_s: t_Span) : Int64.t
+function span_get_months_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 92 0 92 59] (_s: t_Span) : Int64.t
 
 let months_i32 (self_: t_Span) (months: Int32.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:months 'self_' type invariant] [%#sspan'61] inv_Span self_}
@@ -186,7 +186,7 @@ let get_months (self_: t_Span) (return (x: Int32.t)) =
     = span_get_months_value self_}
     (! return {result}) ]
 
-function span_get_weeks_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 71 4 71 62] (_s: t_Span) : Int64.t
+function span_get_weeks_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 98 0 98 58] (_s: t_Span) : Int64.t
 
 let weeks_i32 (self_: t_Span) (weeks: Int32.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:weeks 'self_' type invariant] [%#sspan'66] inv_Span self_}
@@ -203,7 +203,7 @@ let get_weeks (self_: t_Span) (return (x: Int32.t)) =
     = span_get_weeks_value self_}
     (! return {result}) ]
 
-function span_get_days_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 76 4 76 61] (_s: t_Span) : Int64.t
+function span_get_days_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 104 0 104 57] (_s: t_Span) : Int64.t
 
 let days_i32 (self_: t_Span) (days: Int32.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:days 'self_' type invariant] [%#sspan'71] inv_Span self_}
@@ -220,7 +220,7 @@ let get_days (self_: t_Span) (return (x: Int32.t)) =
     = span_get_days_value self_}
     (! return {result}) ]
 
-function span_get_hours_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 81 4 81 62] (_s: t_Span) : Int64.t
+function span_get_hours_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 110 0 110 58] (_s: t_Span) : Int64.t
 
 let hours_i32 (self_: t_Span) (hours: Int32.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:hours 'self_' type invariant] [%#sspan'76] inv_Span self_}
@@ -237,7 +237,7 @@ let get_hours (self_: t_Span) (return (x: Int32.t)) =
     = span_get_hours_value self_}
     (! return {result}) ]
 
-function span_get_minutes_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 86 4 86 64] (_s: t_Span) : Int64.t
+function span_get_minutes_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 116 0 116 60] (_s: t_Span) : Int64.t
 
 let minutes_i64 (self_: t_Span) (minutes: Int64.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:minutes 'self_' type invariant] [%#sspan'81] inv_Span self_}
@@ -254,7 +254,7 @@ let get_minutes (self_: t_Span) (return (x: Int64.t)) =
     = span_get_minutes_value self_}
     (! return {result}) ]
 
-function span_get_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 91 4 91 64] (_s: t_Span) : Int64.t
+function span_get_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 122 0 122 60] (_s: t_Span) : Int64.t
 
 let seconds_i64 (self_: t_Span) (seconds: Int64.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:seconds 'self_' type invariant] [%#sspan'86] inv_Span self_}
@@ -271,7 +271,7 @@ let get_seconds (self_: t_Span) (return (x: Int64.t)) =
     = span_get_seconds_value self_}
     (! return {result}) ]
 
-function span_get_milliseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 96 4 96 69] (_s: t_Span) : Int64.t
+function span_get_milliseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 128 0 128 65] (_s: t_Span) : Int64.t
 
 let milliseconds_i64 (self_: t_Span) (milliseconds: Int64.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:milliseconds 'self_' type invariant] [%#sspan'91] inv_Span self_}
@@ -289,7 +289,7 @@ let get_milliseconds (self_: t_Span) (return (x: Int64.t)) =
     = span_get_milliseconds_value self_}
     (! return {result}) ]
 
-function span_get_microseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 101 4 101 69] (_s: t_Span) : Int64.t
+function span_get_microseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 134 0 134 65] (_s: t_Span) : Int64.t
 
 let microseconds_i64 (self_: t_Span) (microseconds: Int64.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:microseconds 'self_' type invariant] [%#sspan'96] inv_Span self_}
@@ -307,7 +307,7 @@ let get_microseconds (self_: t_Span) (return (x: Int64.t)) =
     = span_get_microseconds_value self_}
     (! return {result}) ]
 
-function span_get_nanoseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 106 4 106 68] (_s: t_Span) : Int64.t
+function span_get_nanoseconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 140 0 140 64] (_s: t_Span) : Int64.t
 
 let nanoseconds_i64 (self_: t_Span) (nanoseconds: Int64.t) (return (x: t_Span)) =
 {[@stop_split] [@expl:nanoseconds 'self_' type invariant] [%#sspan'101] inv_Span self_}
@@ -343,7 +343,7 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let verify_span_unit_setters_round_trip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 203 8 214 17]
+let verify_span_unit_setters_round_trip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/span.rs" 228 8 239 17]
   (years: Int16.t) (months: Int32.t) (weeks: Int32.t) (days: Int32.t) (hours: Int32.t) (minutes: Int64.t)
   (seconds: Int64.t) (milliseconds: Int64.t) (microseconds: Int64.t) (nanoseconds: Int64.t) (return (x: bool)) =
 {[@stop_split] [@expl:verify_span_unit_setters_round_trip requires] ([@stop_split] [@expl:verify_span_unit_setters_round_trip requires #0] [%#sspan'40] gt_log_i16 years (Int16.sub (Int16.neg (19998: Int16.t)) (1: Int16.t))

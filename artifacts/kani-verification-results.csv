@@ -6,7 +6,8 @@ amenable_kani::ext::jiff::error::diagnostic_error_from_args_construct_and_drop,1
 amenable_kani::ext::jiff::error::verify_error_from_args_round_trips_through_display,1789418427,timeout
 amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed
 amenable_kani::ext::jiff::signed_duration::verify_signed_duration_new_normalizes_nanos_and_carries_into_secs,1789421600,passed
-amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789437740,passed
+amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789441687,passed
+amenable_kani::ext::jiff::span_fieldwise::verify_span_fieldwise_negation_negates_every_unit_getter,1789441835,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788632993,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788633003,passed
 amenable_kani::gaap_ledger::verify_gaap_commit_always_balances,1788633114,passed

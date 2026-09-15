@@ -27,6 +27,7 @@ mod error;
 mod offset;
 mod signed_duration;
 mod span;
+mod span_fieldwise;
 
 use crate::CreusotWitness;
 use amenable_core::{Evidence, Metadata};
