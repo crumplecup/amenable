@@ -90,6 +90,17 @@
 //! `increment`) are all plain setters; `rounding_may_change_span`/
 //! `until_with_largest_unit` are private, and both fields
 //! (`timestamp`/`round`) are private with no getters.
+//!
+//! `jiff::TimestampDisplayWithOffset` stays trusted for a genuinely
+//! different reason from the rest of this file: unlike the builder
+//! types above, it has no `pub fn`s at all, but it DOES have real
+//! public behavior — a `Display` impl formatting an RFC 3339 string
+//! with the given (never `Z`/`-00:00`) offset. Checking that output
+//! exactly would mean reproducing jiff's entire
+//! `temporal::DateTimePrinter` formatting algorithm character-for-
+//! character, wildly disproportionate to this thin two-field
+//! (`timestamp`/`offset`, both private, no getters) formatting
+//! adapter's own complexity.
 
 mod offset;
 mod signed_duration;
@@ -111,5 +122,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SpanRound<'static>,
     jiff::SpanTotal<'static>,
     jiff::TimestampArithmetic,
-    jiff::TimestampDifference
+    jiff::TimestampDifference,
+    jiff::TimestampDisplayWithOffset
 );
