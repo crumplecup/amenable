@@ -101,6 +101,12 @@
 //! character, wildly disproportionate to this thin two-field
 //! (`timestamp`/`offset`, both private, no getters) formatting
 //! adapter's own complexity.
+//!
+//! `jiff::TimestampRound` stays trusted for the same builder-only
+//! reason as `TimestampDifference`: checked directly against jiff's
+//! real source, its four public methods (`new`/`smallest`/`mode`/
+//! `increment`) are all plain setters, and all three fields
+//! (`smallest`/`mode`/`increment`) are private with no getters.
 
 mod offset;
 mod signed_duration;
@@ -123,5 +129,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SpanTotal<'static>,
     jiff::TimestampArithmetic,
     jiff::TimestampDifference,
-    jiff::TimestampDisplayWithOffset
+    jiff::TimestampDisplayWithOffset,
+    jiff::TimestampRound
 );

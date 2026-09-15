@@ -19,16 +19,16 @@
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
-//! TimestampArithmetic`/`jiff::TimestampDifference` stay trusted for
-//! different, simpler real reasons (checked against jiff's real
-//! source): `RoundMode` has no public methods at all beyond the
-//! standard derives; the other eight are pure builders/markers (no
-//! getters, real internal logic private). `jiff::
-//! TimestampDisplayWithOffset` also stays trusted, but for a
+//! TimestampArithmetic`/`jiff::TimestampDifference`/`jiff::
+//! TimestampRound` stay trusted for different, simpler real reasons
+//! (checked against jiff's real source): `RoundMode` has no public
+//! methods at all beyond the standard derives; the other nine are
+//! pure builders/markers (no getters, real internal logic private).
+//! `jiff::TimestampDisplayWithOffset` also stays trusted, but for a
 //! different real reason: its only public behavior is a `Display`
 //! impl, and checking its exact RFC 3339 output would mean
 //! reproducing jiff's whole formatting algorithm. Nothing
-//! non-tautological to model about any of the ten on any backend.
+//! non-tautological to model about any of the eleven on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -80,7 +80,8 @@ impl_verus_witness_trusted_ext!(
     jiff::SpanTotal<'static>,
     jiff::TimestampArithmetic,
     jiff::TimestampDifference,
-    jiff::TimestampDisplayWithOffset
+    jiff::TimestampDisplayWithOffset,
+    jiff::TimestampRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
