@@ -19,12 +19,12 @@
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
-//! TimestampArithmetic` stay trusted for different, simpler real
-//! reasons (checked against jiff's real source): `RoundMode` has no
-//! public methods at all beyond the standard derives; the other seven
-//! are pure builders/markers (no getters, real internal logic
-//! private). Nothing non-tautological to model about any of the eight
-//! on any backend.
+//! TimestampArithmetic`/`jiff::TimestampDifference` stay trusted for
+//! different, simpler real reasons (checked against jiff's real
+//! source): `RoundMode` has no public methods at all beyond the
+//! standard derives; the other eight are pure builders/markers (no
+//! getters, real internal logic private). Nothing non-tautological to
+//! model about any of the nine on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -74,7 +74,8 @@ impl_verus_witness_trusted_ext!(
     jiff::SpanRelativeTo<'static>,
     jiff::SpanRound<'static>,
     jiff::SpanTotal<'static>,
-    jiff::TimestampArithmetic
+    jiff::TimestampArithmetic,
+    jiff::TimestampDifference
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

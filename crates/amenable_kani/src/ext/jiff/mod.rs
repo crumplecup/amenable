@@ -83,6 +83,13 @@
 //! are all private; only the `From` impls (construction, not
 //! inspection) are public. Its one field (`duration`) is private with
 //! no getter.
+//!
+//! `jiff::TimestampDifference` stays trusted for the same builder-only
+//! reason as `SpanRound`: checked directly against jiff's real source,
+//! its five public methods (`new`/`smallest`/`largest`/`mode`/
+//! `increment`) are all plain setters; `rounding_may_change_span`/
+//! `until_with_largest_unit` are private, and both fields
+//! (`timestamp`/`round`) are private with no getters.
 
 mod offset;
 mod signed_duration;
@@ -103,5 +110,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SpanRelativeTo<'static>,
     jiff::SpanRound<'static>,
     jiff::SpanTotal<'static>,
-    jiff::TimestampArithmetic
+    jiff::TimestampArithmetic,
+    jiff::TimestampDifference
 );
