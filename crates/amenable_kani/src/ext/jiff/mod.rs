@@ -68,6 +68,13 @@
 //! `mode`/`increment`/`relative`/`days_are_24_hours`) are all plain
 //! setters, all five of its fields are private with no getters, and
 //! its own `round` (the real rounding logic) is private too.
+//!
+//! `jiff::SpanTotal<'static>` stays trusted for the same one-method
+//! shape as `SpanArithmetic`/`SpanCompare`: checked directly against
+//! jiff's real source, its only public method is
+//! `days_are_24_hours(self) -> Self`; `new`/`relative`/`total`/
+//! `total_invariant` are all private, and both fields (`unit`/
+//! `relative`) are private with no getters.
 
 mod offset;
 mod signed_duration;
@@ -86,5 +93,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SpanArithmetic<'static>,
     jiff::SpanCompare<'static>,
     jiff::SpanRelativeTo<'static>,
-    jiff::SpanRound<'static>
+    jiff::SpanRound<'static>,
+    jiff::SpanTotal<'static>
 );
