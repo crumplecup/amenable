@@ -75,6 +75,14 @@
 //! `days_are_24_hours(self) -> Self`; `new`/`relative`/`total`/
 //! `total_invariant` are all private, and both fields (`unit`/
 //! `relative`) are private with no getters.
+//!
+//! `jiff::TimestampArithmetic` stays trusted too, even more opaque
+//! than `SpanArithmetic`: checked directly against jiff's real source
+//! (`src/timestamp.rs`), it has *no* public methods of its own at
+//! all — `checked_add`/`saturating_add`/`checked_neg`/`is_negative`
+//! are all private; only the `From` impls (construction, not
+//! inspection) are public. Its one field (`duration`) is private with
+//! no getter.
 
 mod offset;
 mod signed_duration;
@@ -94,5 +102,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SpanCompare<'static>,
     jiff::SpanRelativeTo<'static>,
     jiff::SpanRound<'static>,
-    jiff::SpanTotal<'static>
+    jiff::SpanTotal<'static>,
+    jiff::TimestampArithmetic
 );

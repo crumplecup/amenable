@@ -18,12 +18,13 @@
 //! Creusot proofs for the identical claim). `jiff::RoundMode`/`jiff::
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
-//! SpanRound<'static>`/`jiff::SpanTotal<'static>` stay trusted for
-//! different, simpler real reasons (checked against jiff's real
-//! source): `RoundMode` has no public methods at all beyond the
-//! standard derives; the other six are pure builders/markers (no
-//! getters, real internal logic private). Nothing non-tautological to
-//! model about any of the seven on any backend.
+//! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
+//! TimestampArithmetic` stay trusted for different, simpler real
+//! reasons (checked against jiff's real source): `RoundMode` has no
+//! public methods at all beyond the standard derives; the other seven
+//! are pure builders/markers (no getters, real internal logic
+//! private). Nothing non-tautological to model about any of the eight
+//! on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -72,7 +73,8 @@ impl_verus_witness_trusted_ext!(
     jiff::SpanCompare<'static>,
     jiff::SpanRelativeTo<'static>,
     jiff::SpanRound<'static>,
-    jiff::SpanTotal<'static>
+    jiff::SpanTotal<'static>,
+    jiff::TimestampArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
