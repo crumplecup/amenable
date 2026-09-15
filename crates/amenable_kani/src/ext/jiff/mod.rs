@@ -60,6 +60,14 @@
 //! `self`-consuming) — no getters, its one field (`kind`) is private,
 //! and its own `to_relative` is private too. Nothing publicly
 //! inspectable to state a property about.
+//!
+//! `jiff::SpanRound<'static>` stays trusted too, now actually
+//! confirmed rather than just predicted by the `SignedDurationRound`
+//! resemblance noted above: checked directly against jiff's real
+//! source, its seven public methods (`new`/`smallest`/`largest`/
+//! `mode`/`increment`/`relative`/`days_are_24_hours`) are all plain
+//! setters, all five of its fields are private with no getters, and
+//! its own `round` (the real rounding logic) is private too.
 
 mod offset;
 mod signed_duration;
@@ -77,5 +85,6 @@ impl_kani_witness_trusted_ext!(
     jiff::SignedDurationRound,
     jiff::SpanArithmetic<'static>,
     jiff::SpanCompare<'static>,
-    jiff::SpanRelativeTo<'static>
+    jiff::SpanRelativeTo<'static>,
+    jiff::SpanRound<'static>
 );
