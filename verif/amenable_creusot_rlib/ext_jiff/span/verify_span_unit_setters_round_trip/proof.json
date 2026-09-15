@@ -1,0 +1,35 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_days_i32": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_get_days": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_get_hours": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_get_microseconds": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_get_milliseconds": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_get_minutes": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_get_months": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_get_nanoseconds": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_get_seconds": { "prover": "alt-ergo", "time": 0.029 },
+      "vc_get_weeks": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_get_years": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_hours_i32": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_microseconds_i64": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_milliseconds_i64": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_minutes_i64": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_months_i32": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_nanoseconds_i64": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.024 },
+      "vc_seconds_i64": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_span_i64_of_i16_lemma": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_span_i64_of_i32_lemma": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_span_i64_of_i64_lemma": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_verify_span_unit_setters_round_trip": {
+        "prover": "z3",
+        "time": 0.019
+      },
+      "vc_weeks_i32": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_years_i16": { "prover": "alt-ergo", "time": 0.033 }
+    }
+  }
+}

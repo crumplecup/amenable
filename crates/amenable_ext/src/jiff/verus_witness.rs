@@ -9,18 +9,18 @@
 //! Most stay trusted: jiff is opaque to Verus (never resolves
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
-//! rest on. `jiff::tz::Offset`/`jiff::Error` are the first exceptions —
-//! real, hand-verified accommodation models in
-//! `amenable_verus::ext::jiff::{offset,error}` (jiff itself is still
-//! unreachable, but each model's own law is genuinely checked, and
-//! independently confirmed against the real API by the Kani/Creusot
-//! proofs for the identical claim). `jiff::RoundMode`/`jiff::
-//! SignedDurationRound` stay trusted for different, simpler real
-//! reasons (checked against jiff's real source): `RoundMode` has no
-//! public methods at all beyond the standard derives;
-//! `SignedDurationRound` is a pure builder (setters only, no getters,
-//! real rounding logic private). Nothing non-tautological to model
-//! about either on any backend.
+//! rest on. `jiff::tz::Offset`/`jiff::Error`/`jiff::SignedDuration`/
+//! `jiff::Span` are the exceptions so far — real, hand-verified
+//! accommodation models in `amenable_verus::ext::jiff::{offset,error,
+//! signed_duration,span}` (jiff itself is still unreachable, but each
+//! model's own law is genuinely checked, and independently confirmed
+//! against the real API by the Kani/Creusot proofs for the identical
+//! claim). `jiff::RoundMode`/`jiff::SignedDurationRound` stay trusted
+//! for different, simpler real reasons (checked against jiff's real
+//! source): `RoundMode` has no public methods at all beyond the
+//! standard derives; `SignedDurationRound` is a pure builder (setters
+//! only, no getters, real rounding logic private). Nothing
+//! non-tautological to model about either on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -142,4 +142,10 @@ impl_verus_witness_checked_ext!(
     jiff::SignedDuration,
     "verify_signed_duration_new_model_normalizes_nanos_and_carries_into_secs",
     "../../../amenable_verus/src/ext/jiff/signed_duration.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::Span,
+    "verify_span_unit_setters_model_round_trips",
+    "../../../amenable_verus/src/ext/jiff/span.rs"
 );

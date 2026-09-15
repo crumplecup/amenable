@@ -40,6 +40,7 @@
 
 mod offset;
 mod signed_duration;
+mod span;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;
 
