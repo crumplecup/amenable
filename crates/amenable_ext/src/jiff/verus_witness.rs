@@ -16,13 +16,13 @@
 //! still unreachable, but each model's own law is genuinely checked,
 //! and independently confirmed against the real API by the Kani/
 //! Creusot proofs for the identical claim). `jiff::RoundMode`/`jiff::
-//! SignedDurationRound`/`jiff::
-//! SpanArithmetic<'static>`/`jiff::SpanCompare<'static>` stay trusted
+//! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
+//! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>` stay trusted
 //! for different, simpler real reasons (checked against jiff's real
 //! source): `RoundMode` has no public methods at all beyond the
-//! standard derives; the other three are pure builders (setters only,
-//! no getters, real internal logic private). Nothing non-tautological
-//! to model about any of the four on any backend.
+//! standard derives; the other four are pure builders/markers (no
+//! getters, real internal logic private). Nothing non-tautological to
+//! model about any of the five on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -68,7 +68,8 @@ impl_verus_witness_trusted_ext!(
     jiff::RoundMode,
     jiff::SignedDurationRound,
     jiff::SpanArithmetic<'static>,
-    jiff::SpanCompare<'static>
+    jiff::SpanCompare<'static>,
+    jiff::SpanRelativeTo<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

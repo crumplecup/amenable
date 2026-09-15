@@ -52,6 +52,14 @@
 //! every unit getter multiplies through — so negating a `SpanFieldwise`
 //! negates every one of its ten unit getters simultaneously, checked
 //! reusing `span.rs`'s own construction discipline.
+//!
+//! `jiff::SpanRelativeTo<'static>` stays trusted, even more opaque than
+//! `SpanArithmetic`/`SpanCompare`: checked directly against jiff's real
+//! source, its only public "method" is `days_are_24_hours() -> Self`, a
+//! bare `pub const fn` static marker constructor (not even
+//! `self`-consuming) — no getters, its one field (`kind`) is private,
+//! and its own `to_relative` is private too. Nothing publicly
+//! inspectable to state a property about.
 
 mod offset;
 mod signed_duration;
@@ -68,5 +76,6 @@ impl_kani_witness_trusted_ext!(
     jiff::RoundMode,
     jiff::SignedDurationRound,
     jiff::SpanArithmetic<'static>,
-    jiff::SpanCompare<'static>
+    jiff::SpanCompare<'static>,
+    jiff::SpanRelativeTo<'static>
 );
