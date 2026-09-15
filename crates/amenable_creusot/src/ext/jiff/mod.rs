@@ -16,13 +16,12 @@
 //! this bridge across unrelated files.
 //!
 //! `jiff::RoundMode`/`jiff::SignedDurationRound`/`jiff::
-//! SpanArithmetic<'static>` also stay trusted, for the same real
-//! reasons named in `amenable_kani::ext::jiff`'s own doc comment:
-//! `RoundMode` has no public methods at all beyond the standard
-//! derives; `SignedDurationRound` and `SpanArithmetic` are both pure
-//! builders (setters only, no getters, their real logic is private).
-//! Nothing non-tautological to state about any of the three on any
-//! backend.
+//! SpanArithmetic<'static>`/`jiff::SpanCompare<'static>` also stay
+//! trusted, for the same real reasons named in `amenable_kani::
+//! ext::jiff`'s own doc comment: `RoundMode` has no public methods at
+//! all beyond the standard derives; the other three are pure builders
+//! (setters only, no getters, their real logic is private). Nothing
+//! non-tautological to state about any of the four on any backend.
 
 mod error;
 mod offset;
@@ -78,7 +77,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateTime,
     jiff::RoundMode,
     jiff::SignedDurationRound,
-    jiff::SpanArithmetic<'static>
+    jiff::SpanArithmetic<'static>,
+    jiff::SpanCompare<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

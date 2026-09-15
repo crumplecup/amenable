@@ -38,13 +38,13 @@
 //! `SpanRound` too, which has the identical setter-only surface) —
 //! expect most of that family to land here for the same reason.
 //!
-//! `jiff::SpanArithmetic<'static>` is the first of that family
-//! actually confirmed and landed: checked directly against jiff's real
-//! source, it has exactly one public method
-//! (`days_are_24_hours(self) -> SpanArithmetic<'a>`), no getters at
-//! all (`duration`/`relative` are both private fields), and its own
-//! `checked_add`/`relative` are `pub(crate)`. Nothing publicly
-//! inspectable to state a property about.
+//! `jiff::SpanArithmetic<'static>`/`jiff::SpanCompare<'static>` are the
+//! first two of that family actually confirmed and landed: checked
+//! directly against jiff's real source, each has exactly one public
+//! method (`days_are_24_hours(self) -> Self`), no getters at all
+//! (their fields are both private), and their own `checked_add`/
+//! `compare`/`relative` are `pub(crate)`. Nothing publicly inspectable
+//! to state a property about.
 
 mod offset;
 mod signed_duration;
@@ -59,5 +59,6 @@ impl_kani_witness_trusted_ext!(
     jiff::Error,
     jiff::RoundMode,
     jiff::SignedDurationRound,
-    jiff::SpanArithmetic<'static>
+    jiff::SpanArithmetic<'static>,
+    jiff::SpanCompare<'static>
 );
