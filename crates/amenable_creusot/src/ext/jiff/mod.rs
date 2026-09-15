@@ -38,6 +38,20 @@
 //! `amenable_kani::ext::jiff` documents as unavoidably too costly for
 //! Kani specifically (a real `jiff::Error` Drop-glue wall inside
 //! `Timestamp::series`'s own private implementation).
+//!
+//! `jiff::Unit` also stays trusted here, but for a real reason
+//! specific to Creusot, checked (not assumed): an `extern_spec!` for
+//! `Ord::cmp` on `jiff::Unit` compiles fine as a bare declaration, but
+//! actually calling it inside a harness fails with "the trait bound
+//! `jiff::Unit: creusot_std::model::DeepModel` is not satisfied" —
+//! the same class of constraint this crate's own `rust_std::
+//! cmp_carriers` already documents for `Reverse<T>: OrdLogic` (a
+//! foreign type's comparison machinery needs a model Creusot can't
+//! derive for third-party types), reached directly on a concrete enum
+//! this time rather than through a generic wrapper's blanket impl.
+//! Checked for real on Kani instead (`amenable_kani::ext::jiff::unit`,
+//! exhaustive enumeration of all 100 ordered pairs among the ten real
+//! variants).
 
 mod error;
 mod offset;
@@ -103,7 +117,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::TimestampArithmetic,
     jiff::TimestampDifference,
     jiff::TimestampDisplayWithOffset,
-    jiff::TimestampRound
+    jiff::TimestampRound,
+    jiff::Unit
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

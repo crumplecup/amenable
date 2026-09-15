@@ -126,6 +126,7 @@ mod offset;
 mod signed_duration;
 mod span;
 mod span_fieldwise;
+mod unit;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;
 

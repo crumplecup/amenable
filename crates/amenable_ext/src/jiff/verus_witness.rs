@@ -10,16 +10,17 @@
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
 //! rest on. `jiff::tz::Offset`/`jiff::Error`/`jiff::SignedDuration`/
-//! `jiff::Span`/`jiff::SpanFieldwise`/`jiff::TimestampSeries` are the
-//! exceptions so far — real, hand-verified accommodation models in
-//! `amenable_verus::ext::jiff::{offset,error,signed_duration,span,
-//! span_fieldwise,timestamp_series}` (jiff itself is still
-//! unreachable, but each model's own law is genuinely checked, and
-//! independently confirmed against the real API by the Kani/Creusot
-//! proofs for the identical claim where Kani could check it at all —
-//! `TimestampSeries` specifically is Kani-uncheckable for a real,
-//! confirmed reason, see `amenable_kani::ext::jiff`'s own doc
-//! comment). `jiff::RoundMode`/`jiff::
+//! `jiff::Span`/`jiff::SpanFieldwise`/`jiff::TimestampSeries`/`jiff::
+//! Unit` are the exceptions so far — real, hand-verified
+//! accommodation models in `amenable_verus::ext::jiff::{offset,error,
+//! signed_duration,span,span_fieldwise,timestamp_series,unit}` (jiff
+//! itself is still unreachable, but each model's own law is genuinely
+//! checked, and independently confirmed against the real API by the
+//! Kani/Creusot proofs for the identical claim where those backends
+//! could check it at all — `TimestampSeries` is Kani-uncheckable and
+//! `Unit` is Creusot-uncheckable, each for a real, confirmed reason,
+//! see `amenable_kani::ext::jiff`'s and `amenable_creusot::ext::jiff`'s
+//! own doc comments). `jiff::RoundMode`/`jiff::
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
@@ -181,4 +182,10 @@ impl_verus_witness_checked_ext!(
     jiff::TimestampSeries,
     "verify_timestamp_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/timestamp_series.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::Unit,
+    "verify_unit_ordering_matches_discriminant_order_model",
+    "../../../amenable_verus/src/ext/jiff/unit.rs"
 );
