@@ -56,6 +56,11 @@
 //! `jiff::ZonedArithmetic` also stays trusted, the identical shape to
 //! `TimestampArithmetic`: it has no public methods of its own at all,
 //! and its one field is private with no getter.
+//!
+//! `jiff::ZonedDifference<'static>` also stays trusted, the identical
+//! builder-only shape to `TimestampDifference`: its five public
+//! methods are all plain setters, and both fields are private with no
+//! getters.
 
 mod error;
 mod offset;
@@ -123,7 +128,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::TimestampDisplayWithOffset,
     jiff::TimestampRound,
     jiff::Unit,
-    jiff::ZonedArithmetic
+    jiff::ZonedArithmetic,
+    jiff::ZonedDifference<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
