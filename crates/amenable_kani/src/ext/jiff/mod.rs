@@ -136,6 +136,12 @@
 //! setters; `rounding_may_change_span`/`until_with_largest_unit` are
 //! private, and both fields (`zoned`/`round`) are private with no
 //! getters.
+//!
+//! `jiff::ZonedRound` stays trusted for the same builder-only reason
+//! as `TimestampRound`: checked directly against jiff's real source,
+//! its four public methods (`new`/`smallest`/`mode`/`increment`) are
+//! all plain setters; `round_days` is private, and its one field
+//! (`round`) is private with no getter.
 
 mod offset;
 mod signed_duration;
@@ -163,5 +169,6 @@ impl_kani_witness_trusted_ext!(
     jiff::TimestampRound,
     jiff::TimestampSeries,
     jiff::ZonedArithmetic,
-    jiff::ZonedDifference<'static>
+    jiff::ZonedDifference<'static>,
+    jiff::ZonedRound
 );

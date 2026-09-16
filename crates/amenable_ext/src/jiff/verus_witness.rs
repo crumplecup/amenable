@@ -26,15 +26,16 @@
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
 //! TimestampArithmetic`/`jiff::TimestampDifference`/`jiff::
 //! TimestampRound`/`jiff::ZonedArithmetic`/`jiff::
-//! ZonedDifference<'static>` stay trusted for different, simpler real
-//! reasons (checked against jiff's real source): `RoundMode` has no
-//! public methods at all beyond the standard derives; the other
-//! eleven are pure builders/markers (no getters, real internal logic
-//! private). `jiff::TimestampDisplayWithOffset` also stays trusted,
-//! but for a different real reason: its only public behavior is a
-//! `Display` impl, and checking its exact RFC 3339 output would mean
+//! ZonedDifference<'static>`/`jiff::ZonedRound` stay trusted for
+//! different, simpler real reasons (checked against jiff's real
+//! source): `RoundMode` has no public methods at all beyond the
+//! standard derives; the other twelve are pure builders/markers (no
+//! getters, real internal logic private). `jiff::
+//! TimestampDisplayWithOffset` also stays trusted, but for a
+//! different real reason: its only public behavior is a `Display`
+//! impl, and checking its exact RFC 3339 output would mean
 //! reproducing jiff's whole formatting algorithm. Nothing
-//! non-tautological to model about any of the thirteen on any
+//! non-tautological to model about any of the fourteen on any
 //! backend.
 
 use amenable_core::{
@@ -90,7 +91,8 @@ impl_verus_witness_trusted_ext!(
     jiff::TimestampDisplayWithOffset,
     jiff::TimestampRound,
     jiff::ZonedArithmetic,
-    jiff::ZonedDifference<'static>
+    jiff::ZonedDifference<'static>,
+    jiff::ZonedRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
