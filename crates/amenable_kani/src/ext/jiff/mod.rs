@@ -160,6 +160,35 @@
 //! pointer/memory model — each scoped honestly to `TimeZone::UTC`,
 //! where `ZonedSeries::next()`'s real DST-repeat retry loop is
 //! structurally unreachable (see those modules' own doc comments).
+//!
+//! `jiff::ZonedWith` stays trusted on all three backends — the first
+//! type this session where all three real assessments independently
+//! landed on trusted, each for its own genuinely different reason,
+//! not a shared shortcut. On Kani: `ZonedWith::build()`'s whole
+//! purpose is producing a real `Zoned` (confirmed by reading its
+//! implementation: it calls `OffsetConflict::resolve`, which consults
+//! the receiver's `TimeZone`), so it necessarily hits the same
+//! `TimeZone::Repr` pointer-tagging wall documented above for
+//! `ZonedSeries`. On Creusot: checked directly (not assumed) that a
+//! real `extern_spec!` here would be UNSOUND if stated narrowly —
+//! `ZonedWith`'s type alone can't distinguish "fresh from `.with()`,
+//! no overrides" from "modified by `.date(..)`/etc." (both are the
+//! same type, private fields), so the one real, simple law jiff
+//! documents ("no fields set" ⟹ "returns the original unchanged")
+//! can't be stated as an unconditional `#[ensures(..)]` on `build()`
+//! without also extern-speccing every setter against a tracked ghost
+//! override-state — plus `civil::DateTimeWith`'s own calendar-field
+//! setters underneath — disproportionate to one type, and it would
+//! mean opening up `Zoned`/`civil::DateTime`'s deliberately-opaque
+//! surface (see this module's own opening paragraph). On Verus: the
+//! same law, restated as a self-contained model, reduces to a bare
+//! identity function (`build(original, None) == original`) with no
+//! distinguishing computation at all — genuinely as tautological as
+//! it gets, the case this codebase's own tautological-model policy
+//! says to accept trusted rather than build a thin model for its own
+//! sake, arrived at here only after actually trying the richer
+//! extern_spec/model and finding the real obstacle above, not assumed
+//! upfront.
 
 mod offset;
 mod signed_duration;
@@ -189,5 +218,6 @@ impl_kani_witness_trusted_ext!(
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
     jiff::ZonedRound,
-    jiff::ZonedSeries
+    jiff::ZonedSeries,
+    jiff::ZonedWith
 );

@@ -40,9 +40,17 @@
 //! TimestampDisplayWithOffset` also stays trusted, but for a
 //! different real reason: its only public behavior is a `Display`
 //! impl, and checking its exact RFC 3339 output would mean
-//! reproducing jiff's whole formatting algorithm. Nothing
-//! non-tautological to model about any of the fourteen on any
-//! backend.
+//! reproducing jiff's whole formatting algorithm. `jiff::ZonedWith`
+//! also stays trusted, for a reason checked directly rather than
+//! assumed: the one real, simple law jiff documents for it ("no
+//! fields set" ⟹ "returns the original unchanged") can't be modeled
+//! honestly without also tracking which setters were called (its type
+//! carries no such distinction), and a model scoped to just the "no
+//! override" case reduces to a bare identity function with no
+//! distinguishing computation at all — see `amenable_kani::ext::jiff`'s
+//! own doc comment for the full reasoning, independently reached the
+//! same way on Creusot. Nothing non-tautological to model about any
+//! of the fifteen on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -98,7 +106,8 @@ impl_verus_witness_trusted_ext!(
     jiff::TimestampRound,
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
-    jiff::ZonedRound
+    jiff::ZonedRound,
+    jiff::ZonedWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

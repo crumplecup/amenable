@@ -76,6 +76,25 @@
 //! confirmed via `amenable_kani::gallery::jiff_error_drop_cost` to time
 //! out CBMC even for a single, fully concrete `TimeZone::UTC.
 //! to_offset(..)` call.
+//!
+//! `jiff::ZonedWith` also stays trusted, but not for a Kani-shaped
+//! reason this time — checked directly, not assumed, that a real
+//! `extern_spec!` here would be UNSOUND if scoped narrowly to jiff's
+//! own documented "no fields set ⟹ returns the original unchanged"
+//! law: `ZonedWith`'s type alone can't distinguish "fresh from
+//! `.with()`" from "modified by a setter" (both the same type, private
+//! fields), so an `#[ensures(..)]` on `build()` stating that law
+//! unconditionally would be FALSE for the general case (setting
+//! `.date(..)` deliberately changes the result) — correctly scoping it
+//! would mean extern-speccing every setter against a tracked ghost
+//! override-state, plus `civil::DateTimeWith`'s own calendar-field
+//! setters underneath, disproportionate to one type and reopening
+//! `Zoned`/`civil::DateTime`'s deliberately-opaque surface. An
+//! accommodation model of just the "no override" case would reduce to
+//! a bare identity function with no distinguishing computation at all
+//! — genuinely tautological, the case this codebase's own
+//! tautological-model policy says to accept trusted for rather than
+//! build a thin model for its own sake.
 
 mod error;
 mod offset;
@@ -146,7 +165,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::Unit,
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
-    jiff::ZonedRound
+    jiff::ZonedRound,
+    jiff::ZonedWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
