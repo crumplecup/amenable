@@ -1,0 +1,156 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 118 8 122 38 *)
+
+let%span scivil_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 123 18 123 58
+let%span scivil_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 124 29 124 37
+let%span scivil_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 124 39 124 48
+let%span scivil_date'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 124 50 124 57
+let%span scivil_date'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 116 19 116 23
+let%span scivil_date'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 117 18 117 85
+let%span scivil_date'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 55 18 62 9
+let%span scivil_date'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 67 16 67 20
+let%span scivil_date'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 66 18 66 50
+let%span scivil_date'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 71 17 71 21
+let%span scivil_date'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 70 18 70 51
+let%span scivil_date'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 75 15 75 19
+let%span scivil_date'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 74 18 74 49
+let%span scivil_date'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 95 16 100 17
+let%span sdate = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/civil/date.rs" 245 4 245 68
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+
+use creusot.int.Int16
+use creusot.int.Int8
+use creusot.prelude.Any
+
+type t_Date
+
+type t_Error
+
+type t_Result_Date_Error = Ok t_Date | Err t_Error
+
+predicate inv_Date (_1: t_Date)
+
+predicate inv_Error (_1: t_Error)
+
+predicate inv_Result_Date_Error (_1: t_Result_Date_Error)
+
+axiom inv_axiom [@rewrite]: forall x: t_Result_Date_Error [inv_Result_Date_Error x]. inv_Result_Date_Error x
+    = match x with
+      | Ok f0 -> inv_Date f0
+      | Err f0 -> inv_Error f0
+      end
+
+function date_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 29 4 29 64] (_d: t_Date) : Int16.t
+
+function date_month_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 35 4 35 64] (_d: t_Date) : Int8.t
+
+function date_day_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 41 4 41 62] (_d: t_Date) : Int8.t
+
+predicate gt_log_i16 [@inline:trivial] (self: Int16.t) (other: Int16.t) = [%#sord] Int16.lt other self
+
+meta "rewrite_def" predicate gt_log_i16
+
+predicate gt_log_i8 [@inline:trivial] (self: Int8.t) (other: Int8.t) = [%#sord] Int8.lt other self
+
+meta "rewrite_def" predicate gt_log_i8
+
+let new (year: Int16.t) (month: Int8.t) (day: Int8.t) (return (x: t_Result_Date_Error)) = any
+  [ return (result: t_Result_Date_Error) ->
+  {[@stop_split] [@expl:new ensures] ([@stop_split] [@expl:new result type invariant] [%#sdate] inv_Result_Date_Error result)
+    /\ ([@stop_split] [@expl:new ensures] [%#scivil_date'5] match result with
+      | Ok d -> date_year_value d = year /\ date_month_value d = month /\ date_day_value d = day
+      | Err _ -> Int16.lt year (Int16.neg (9999: Int16.t))
+      \/ gt_log_i16 year (9999: Int16.t)
+      \/ Int8.lt month (1: Int8.t)
+      \/ gt_log_i8 month (12: Int8.t) \/ Int8.lt day (1: Int8.t) \/ gt_log_i8 day (28: Int8.t)
+      end)}
+    (! return {result}) ]
+
+predicate resolve_Date (_1: t_Date)
+
+predicate resolve_Error (_1: t_Error)
+
+predicate resolve_Result_Date_Error (_1: t_Result_Date_Error)
+
+axiom resolve_axiom [@rewrite]: forall x: t_Result_Date_Error [resolve_Result_Date_Error x]. resolve_Result_Date_Error x
+    = match x with
+      | Ok x0 -> resolve_Date x0
+      | Err x0 -> resolve_Error x0
+      end
+
+type tup3_i16_i8_i8 = { f0: Int16.t; f1: Int8.t; f2: Int8.t }
+
+type t_Result_tup3_i16_i8_i8_unit = Ok'0 tup3_i16_i8_i8 | Err'0 ()
+
+let elim_Ok (_x: t_Result_Date_Error) (return (f0'0: t_Date)) = any
+  [ _k (f0'0: t_Date) -> {Ok f0'0 = _x} (! return {f0'0})
+  | _chk -> (! {[@expl:elim Ok] match _x with
+      | Ok _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let year (self_: t_Date) (return (x: Int16.t)) =
+{[@stop_split] [@expl:year 'self_' type invariant] [%#scivil_date'6] inv_Date self_}
+  any
+  [ return (result: Int16.t) -> {[@stop_split] [@expl:year ensures] [%#scivil_date'7] result = date_year_value self_}
+    (! return {result}) ]
+
+let month (self_: t_Date) (return (x: Int8.t)) =
+{[@stop_split] [@expl:month 'self_' type invariant] [%#scivil_date'8] inv_Date self_}
+  any
+  [ return (result: Int8.t) -> {[@stop_split] [@expl:month ensures] [%#scivil_date'9] result = date_month_value self_}
+    (! return {result}) ]
+
+let day (self_: t_Date) (return (x: Int8.t)) =
+{[@stop_split] [@expl:day 'self_' type invariant] [%#scivil_date'10] inv_Date self_}
+  any
+  [ return (result: Int8.t) -> {[@stop_split] [@expl:day ensures] [%#scivil_date'11] result = date_day_value self_}
+    (! return {result}) ]
+
+predicate civil_date_new_year_month_day_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 88 8 93 17] (year'0: Int16.t) (month'0: Int8.t) (day'0: Int8.t) (round_trip: t_Result_tup3_i16_i8_i8_unit) =
+  [%#scivil_date'12] match round_trip with
+    | Ok'0 got -> got.f0 = year'0 /\ got.f1 = month'0 /\ got.f2 = day'0
+    | Err'0 _ -> Int16.lt year'0 (Int16.neg (9999: Int16.t))
+    \/ gt_log_i16 year'0 (9999: Int16.t)
+    \/ Int8.lt month'0 (1: Int8.t)
+    \/ gt_log_i8 month'0 (12: Int8.t) \/ Int8.lt day'0 (1: Int8.t) \/ gt_log_i8 day'0 (28: Int8.t)
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_civil_date_new_year_month_day_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_date.rs" 118 8 122 38]
+  (year'0: Int16.t) (month'0: Int8.t) (day'0: Int8.t) (return (x: t_Result_tup3_i16_i8_i8_unit)) = (! bb0
+  [ bb0 = s0
+    [ s0 = new [%#scivil_date] {year'0} {month'0} {day'0} (fun (_x: t_Result_Date_Error) -> [ &_9 <- _x ] s1)
+    | s1 = any [ br0 (x0: t_Date) -> {_9 = Ok x0} (! bb5) | br1 (x0: t_Error) -> {_9 = Err x0} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Date_Error _9} any) ]
+    | s1 = -{resolve_Result_Date_Error _9}- s2
+    | s2 = [ &_ret <- Err'0 _22 ] s3
+    | s3 = return {_ret} ]
+  | bb5 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Date_Error _9} any) ]
+    | s1 = -{resolve_Result_Date_Error _9}- s2
+    | s2 = elim_Ok {_9} (fun (r0: t_Date) -> [ &d <- r0 ] s3)
+    | s3 = year [%#scivil_date'0] {d} (fun (_x: Int16.t) -> [ &_16 <- _x ] s4)
+    | s4 = month [%#scivil_date'1] {d} (fun (_x: Int8.t) -> [ &_18 <- _x ] s5)
+    | s5 = day [%#scivil_date'2] {d} (fun (_x: Int8.t) -> [ &_20 <- _x ] s6)
+    | s6 = [ &_15 <- { f0 = _16; f1 = _18; f2 = _20 } ] s7
+    | s7 = [ &_ret <- Ok'0 _15 ] s8
+    | s8 = return {_ret} ] ]
+  [ & _ret: t_Result_tup3_i16_i8_i8_unit = Any.any_l ()
+  | & year'0: Int16.t = year'0
+  | & month'0: Int8.t = month'0
+  | & day'0: Int8.t = day'0
+  | & _9: t_Result_Date_Error = Any.any_l ()
+  | & d: t_Date = Any.any_l ()
+  | & _15: tup3_i16_i8_i8 = Any.any_l ()
+  | & _16: Int16.t = Any.any_l ()
+  | & _18: Int8.t = Any.any_l ()
+  | & _20: Int8.t = Any.any_l ()
+  | & _22: () = Any.any_l () ])
+  [ return (result: t_Result_tup3_i16_i8_i8_unit) ->
+  {[@stop_split] [@expl:verify_civil_date_new_year_month_day_round_trips ensures] [%#scivil_date'4] civil_date_new_year_month_day_round_trips year'0 month'0 day'0 result}
+    (! return {result}) ]

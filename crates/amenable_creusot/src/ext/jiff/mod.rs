@@ -95,7 +95,16 @@
 //! — genuinely tautological, the case this codebase's own
 //! tautological-model policy says to accept trusted for rather than
 //! build a thin model for its own sake.
+//!
+//! `jiff::civil::Date` gets a real checked property too (see
+//! `civil_date.rs`), the first `civil::*` type: unlike `civil::
+//! DateTime`/`Zoned`, `Date` is a pure calendar value with no time
+//! zone involved at all, so a real `extern_spec!` (not an
+//! accommodation model) round-trips `Date::new`/`year`/`month`/`day`
+//! over jiff's real API — checked directly, not assumed safe by
+//! resemblance to the already-trusted composite types.
 
+mod civil_date;
 mod error;
 mod offset;
 mod signed_duration;

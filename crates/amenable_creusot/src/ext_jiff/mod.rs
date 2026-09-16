@@ -10,6 +10,7 @@
 //! Pearlite proof content, the thing `cargo creusot` actually
 //! translates — stays unconditional.
 
+pub(crate) mod civil_date;
 pub(crate) mod error;
 pub(crate) mod offset;
 pub(crate) mod signed_duration;

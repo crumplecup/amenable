@@ -1,0 +1,16 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_day": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_month": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_verify_civil_date_new_year_month_day_round_trips": {
+        "prover": "alt-ergo",
+        "time": 0.06
+      },
+      "vc_year": { "prover": "alt-ergo", "time": 0.03 }
+    }
+  }
+}

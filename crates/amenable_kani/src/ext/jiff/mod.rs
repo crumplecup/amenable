@@ -189,7 +189,19 @@
 //! sake, arrived at here only after actually trying the richer
 //! extern_spec/model and finding the real obstacle above, not assumed
 //! upfront.
+//!
+//! `jiff::civil::Date` gets a real checked property too (see
+//! `civil_date.rs`), the first `civil::*` type assessed: unlike
+//! `civil::DateTime`/`Zoned` (opaque composites needing `TimeZone`'s
+//! `Repr`), `Date` is a pure calendar value with no time zone
+//! involved at all — checked directly by reading jiff's real source,
+//! not assumed safe just because it's a "calendar type." A real
+//! `jiff::Error` Drop-glue wall on `Date::new`'s `Err` arm (the same
+//! class this module's own opening paragraphs document for `Offset`)
+//! is fixed the identical way: an independent, Drop-free bounds check
+//! gates the call.
 
+mod civil_date;
 mod offset;
 mod signed_duration;
 mod span;

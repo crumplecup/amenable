@@ -33,6 +33,8 @@ mod time;
 mod witness;
 
 #[cfg(feature = "jiff")]
+pub use ext_jiff::civil_date::VERIFY_CIVIL_DATE_NEW_YEAR_MONTH_DAY_ROUND_TRIPS_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::error::{
     ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_HOLDS_SRC,
     VERIFY_ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_SRC,
