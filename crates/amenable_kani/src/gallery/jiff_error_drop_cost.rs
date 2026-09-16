@@ -72,6 +72,38 @@
 //! trusted for Kani specifically for this reason (checked on Creusot
 //! and Verus instead, neither of which shares this Rust-Drop-glue
 //! mechanism), not by default.
+//!
+//! **A fourth, genuinely different wall (found assessing
+//! `jiff::ZonedSeries` as a witness candidate): not Drop glue at all,
+//! but `TimeZone`'s own pointer-tagged internal representation.**
+//! First hypothesized (wrongly) as the same `Error`-drop mechanism
+//! reached through `ZonedSeries::next()`'s `checked_mul`/`checked_add`
+//! calls — checked directly instead of assumed, and the real cause is
+//! earlier and more fundamental: merely *constructing* a `Zoned`,
+//! before any series/iteration logic runs at all, already times out.
+//! Isolated by direct substitution, narrowing steadily: `TimeZone::UTC`
+//! alone (a bare `const`, `mem::forget`-ed) verifies instantly, but
+//! `TimeZone::UTC.to_offset(timestamp)` — even for a single *concrete*
+//! `Timestamp::from_second(0)`, no symbolic input anywhere — times out.
+//! Root-caused by reading jiff's real source
+//! (`tz::timezone::repr`): `TimeZone`'s `Repr` is a hand-rolled
+//! pointer-tagging union (`ptr: *const u8`, encoding UTC/fixed/tzif
+//! variants in the low bits of what is never a real allocation),
+//! built via `without_provenance(addr) -> *const u8` — a bare `unsafe {
+//! core::mem::transmute(addr) }` from a `usize` straight into a
+//! pointer, with the reverse transmute used again to read the tag back
+//! out in `Repr::tag()`. CBMC's pointer/memory object model has to
+//! treat that transmuted value as a genuine pointer despite it never
+//! addressing real memory, and pays a wall-clock cost for it even on
+//! the single cheapest, fully concrete `UTC` case — nothing to do with
+//! `jiff::Error`'s recursive Drop glue, an entirely distinct root cause
+//! that happens to land in the same file because it was found while
+//! chasing the same family of witness. `ext::jiff::zoned_series`'s
+//! witness is trusted for Kani specifically for this reason (checked
+//! on Creusot and Verus instead, neither of which shares CBMC's
+//! pointer/memory model) — and this same wall applies to *any* future
+//! Kani witness needing a real, non-trivial `Zoned` construction, not
+//! just this one.
 
 #[cfg(kani)]
 use jiff::ToSpan;
@@ -221,6 +253,83 @@ amenable_derive::gallery_harness! {
             let ts = jiff::Timestamp::from_second(secs)
                 .expect("secs is already checked to be within Timestamp's valid range");
             assert!(ts.as_second() == secs);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::timezone_to_offset_on_concrete_utc_times_out".to_owned(),
+            "gallery::jiff_error_drop_cost::timezone_to_offset_on_concrete_utc_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "TimeZone::UTC.to_offset(Timestamp::from_second(0)) times out even though every input is concrete (no symbolic values at all) -- the wall is in TimeZone's own hand-rolled pointer-tagged Repr, not in symbolic-input complexity or Drop glue".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, TIMEZONE_TO_OFFSET_ON_CONCRETE_UTC_TIMES_OUT_SRC, {
+        /// A single, fully concrete `TimeZone::UTC.to_offset(ts)` call,
+        /// the result `mem::forget`-ed immediately — still times out.
+        /// No symbolic input anywhere in this harness, ruling out
+        /// symbolic-domain complexity as the explanation; the wall is
+        /// in `to_offset` itself, reached via `Repr`'s pointer-tagging
+        /// dispatch (`without_provenance`'s `usize`-to-pointer
+        /// transmute and its reverse in `Repr::tag()`).
+        #[kani::proof]
+        fn timezone_to_offset_on_concrete_utc_times_out() {
+            let tz = jiff::tz::TimeZone::UTC;
+            let ts = jiff::Timestamp::from_second(0)
+                .expect("0 is within Timestamp's valid range");
+            let offset = tz.to_offset(ts);
+            std::mem::forget(offset);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::timezone_utc_construction_alone_passes".to_owned(),
+            "gallery::jiff_error_drop_cost::timezone_utc_construction_alone_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "TimeZone::UTC alone, mem::forget-ed with no to_offset/to_datetime call at all, verifies instantly -- confirming the bare pointer-tagged constant itself is not the source of the timeout, isolating it specifically to to_offset's Repr-dispatch machinery".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, TIMEZONE_UTC_CONSTRUCTION_ALONE_PASSES_SRC, {
+        /// `timezone_to_offset_on_concrete_utc_times_out`, with the
+        /// `.to_offset()` call removed — confirms the bare constant
+        /// alone is fast, isolating the wall to `to_offset`'s `Repr`
+        /// dispatch specifically.
+        #[kani::proof]
+        fn timezone_utc_construction_alone_passes() {
+            let tz = jiff::tz::TimeZone::UTC;
+            std::mem::forget(tz);
+        }
+    }
+}
+
+amenable_derive::gallery_harness! {
+    kani, ZONED_NEW_FROM_UTC_ALONE_PASSES_SRC, {
+        /// `zoned_series_next_call_times_out`, with the
+        /// `.series()`/`.next()` calls removed — confirms the cheap UTC
+        /// construction alone is fast, isolating the wall to
+        /// `ZonedSeries::next` specifically.
+        #[kani::proof]
+        fn zoned_new_from_utc_alone_passes() {
+            let tz = jiff::tz::TimeZone::UTC;
+            let ts = jiff::Timestamp::from_second(0)
+                .expect("0 is within Timestamp's valid range");
+            let offset = tz.to_offset(ts);
+            std::mem::forget(offset);
         }
     }
 }

@@ -142,6 +142,24 @@
 //! its four public methods (`new`/`smallest`/`mode`/`increment`) are
 //! all plain setters; `round_days` is private, and its one field
 //! (`round`) is private with no getter.
+//!
+//! `jiff::ZonedSeries` also stays trusted for Kani specifically, for a
+//! real reason confirmed empirically, genuinely different from
+//! `TimestampSeries`'s: not `jiff::Error`'s recursive-Arc Drop glue,
+//! but `TimeZone`'s own hand-rolled pointer-tagged `Repr` (a `usize`-
+//! to-pointer `transmute` and its reverse in `Repr::tag()`), which
+//! times out CBMC even for a single, fully concrete `TimeZone::UTC.
+//! to_offset(Timestamp::from_second(0))` call — before any series or
+//! iteration logic runs at all, confirmed by narrowing a first
+//! (wrong) hypothesis blaming `ZonedSeries::next()`'s own
+//! `checked_mul`/`checked_add` calls down to this earlier, more
+//! fundamental construction-time wall. See `gallery::
+//! jiff_error_drop_cost`'s own doc comment for the full isolation.
+//! Checked on Creusot and Verus instead (`ext_jiff::zoned_series`/
+//! `ext::jiff::zoned_series`), neither of which shares CBMC's
+//! pointer/memory model — each scoped honestly to `TimeZone::UTC`,
+//! where `ZonedSeries::next()`'s real DST-repeat retry loop is
+//! structurally unreachable (see those modules' own doc comments).
 
 mod offset;
 mod signed_duration;
@@ -170,5 +188,6 @@ impl_kani_witness_trusted_ext!(
     jiff::TimestampSeries,
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
-    jiff::ZonedRound
+    jiff::ZonedRound,
+    jiff::ZonedSeries
 );

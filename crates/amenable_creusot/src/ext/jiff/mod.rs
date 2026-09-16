@@ -65,6 +65,17 @@
 //! `jiff::ZonedRound` also stays trusted, the identical builder-only
 //! shape to `TimestampRound`: its four public methods are all plain
 //! setters, and its one field is private with no getter.
+//!
+//! `jiff::ZonedSeries` gets a real checked property too (see
+//! `zoned_series.rs`), an accommodation model scoped to `TimeZone::
+//! UTC` (see `ext_jiff::zoned_series`'s own doc comment for the real,
+//! confirmed reason the scoping is honest, not a shortcut). Checked
+//! here despite being trusted for Kani specifically, for a real reason
+//! genuinely different from `TimestampSeries`'s: not `jiff::Error`
+//! Drop glue, but `TimeZone`'s own hand-rolled pointer-tagged `Repr`,
+//! confirmed via `amenable_kani::gallery::jiff_error_drop_cost` to time
+//! out CBMC even for a single, fully concrete `TimeZone::UTC.
+//! to_offset(..)` call.
 
 mod error;
 mod offset;
@@ -72,6 +83,7 @@ mod signed_duration;
 mod span;
 mod span_fieldwise;
 mod timestamp_series;
+mod zoned_series;
 
 use crate::CreusotWitness;
 use amenable_core::{Evidence, Metadata};

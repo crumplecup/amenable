@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_zoned_series_next_yields_start_then_advances_by_period_under_utc": {
+        "prover": "alt-ergo",
+        "time": 0.08
+      }
+    }
+  }
+}

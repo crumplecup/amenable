@@ -8,3 +8,4 @@ pub mod span;
 pub mod span_fieldwise;
 pub mod timestamp_series;
 pub mod unit;
+pub mod zoned_series;
