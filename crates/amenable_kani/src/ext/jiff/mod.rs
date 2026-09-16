@@ -248,6 +248,13 @@
 //! `increment`) are all plain setters; `rounding_may_change_span` is
 //! private, and both fields (`datetime`/`round`) are private with no
 //! getters.
+//!
+//! `jiff::civil::DateTimeRound` stays trusted for the same
+//! builder-only reason as `TimestampRound`/`ZonedRound`: checked
+//! directly against jiff's real source, its four public methods
+//! (`new`/`smallest`/`mode`/`increment`) are all plain setters; the
+//! actual rounding logic (`round`) is private, and all three fields
+//! (`smallest`/`mode`/`increment`) are private with no getters.
 
 mod civil_date;
 mod offset;
@@ -284,5 +291,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::DateDifference,
     jiff::civil::DateSeries,
     jiff::civil::DateTimeArithmetic,
-    jiff::civil::DateTimeDifference
+    jiff::civil::DateTimeDifference,
+    jiff::civil::DateTimeRound
 );
