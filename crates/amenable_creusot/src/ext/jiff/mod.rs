@@ -52,6 +52,10 @@
 //! Checked for real on Kani instead (`amenable_kani::ext::jiff::unit`,
 //! exhaustive enumeration of all 100 ordered pairs among the ten real
 //! variants).
+//!
+//! `jiff::ZonedArithmetic` also stays trusted, the identical shape to
+//! `TimestampArithmetic`: it has no public methods of its own at all,
+//! and its one field is private with no getter.
 
 mod error;
 mod offset;
@@ -118,7 +122,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::TimestampDifference,
     jiff::TimestampDisplayWithOffset,
     jiff::TimestampRound,
-    jiff::Unit
+    jiff::Unit,
+    jiff::ZonedArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

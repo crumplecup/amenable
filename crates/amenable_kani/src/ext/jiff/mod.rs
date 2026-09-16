@@ -121,6 +121,13 @@
 //! isolation. Checked on Creusot and Verus instead (`ext_jiff::
 //! timestamp_series`/`ext::jiff::timestamp_series`), neither of which
 //! shares this Rust-Drop-glue mechanism.
+//!
+//! `jiff::ZonedArithmetic` stays trusted too, the identical shape to
+//! `TimestampArithmetic`: checked directly against jiff's real source
+//! (`src/zoned.rs`), it has *no* public methods of its own at all —
+//! `checked_add`/`checked_neg`/`is_negative` are all private; only the
+//! `From` impls (construction, not inspection) are public. Its one
+//! field (`duration`) is private with no getter.
 
 mod offset;
 mod signed_duration;
@@ -146,5 +153,6 @@ impl_kani_witness_trusted_ext!(
     jiff::TimestampDifference,
     jiff::TimestampDisplayWithOffset,
     jiff::TimestampRound,
-    jiff::TimestampSeries
+    jiff::TimestampSeries,
+    jiff::ZonedArithmetic
 );
