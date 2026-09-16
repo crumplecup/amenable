@@ -216,6 +216,22 @@
 //! plain setters; `rounding_may_change_span`/`since_with_largest_unit`
 //! are private, and both fields (`date`/`round`) are private with no
 //! getters.
+//!
+//! `jiff::civil::DateSeries` also stays trusted for Kani specifically,
+//! for the SAME real reason as `TimestampSeries` — not `ZonedSeries`'s
+//! `TimeZone::Repr` wall (`Date` has no time zone at all): confirmed
+//! empirically (not assumed from either resemblance) that a single
+//! `.series(period).next()` call times out even for a tiny assumed
+//! range, and even with the result immediately `mem::forget`-ed, while
+//! bare `Date::new` alone passes instantly — isolating the cost to
+//! `DateSeries::next`'s own `checked_mul`/`checked_add` calls, both
+//! `Result<_, jiff::Error>`-returning and `.ok()`-converted on every
+//! step, the identical recursive-Arc Drop-glue wall this module's own
+//! opening paragraphs document for `Offset`/`Error`/`TimestampSeries`.
+//! See `gallery::jiff_error_drop_cost`'s own doc comment for the full
+//! isolation. Checked on Creusot and Verus instead (`ext_jiff::
+//! date_series`/`ext::jiff::date_series`), neither of which shares
+//! this Rust-Drop-glue mechanism.
 
 mod civil_date;
 mod offset;
@@ -249,5 +265,6 @@ impl_kani_witness_trusted_ext!(
     jiff::ZonedSeries,
     jiff::ZonedWith,
     jiff::civil::DateArithmetic,
-    jiff::civil::DateDifference
+    jiff::civil::DateDifference,
+    jiff::civil::DateSeries
 );

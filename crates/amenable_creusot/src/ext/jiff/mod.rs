@@ -113,8 +113,18 @@
 //! builder-only reason as `TimestampDifference`/`ZonedDifference`:
 //! its five public methods are all plain setters, and both fields
 //! are private with no getters.
+//!
+//! `jiff::civil::DateSeries` gets a real checked property too (see
+//! `date_series.rs`), an accommodation model — checked here despite
+//! being trusted for Kani specifically, for the same real reason
+//! `TimestampSeries` is (a `jiff::Error` Drop-glue wall), confirmed
+//! distinct from `ZonedSeries`'s `TimeZone::Repr` wall since `Date`
+//! has no time zone at all. Unlike `ZonedSeries`'s model, this one
+//! needs no `TimeZone::UTC` scoping caveat: `Date` has no DST-repeat
+//! retry loop to begin with.
 
 mod civil_date;
+mod date_series;
 mod error;
 mod offset;
 mod signed_duration;
