@@ -200,6 +200,14 @@
 //! class this module's own opening paragraphs document for `Offset`)
 //! is fixed the identical way: an independent, Drop-free bounds check
 //! gates the call.
+//!
+//! `jiff::civil::DateArithmetic` stays trusted, the identical shape
+//! to `TimestampArithmetic`/`ZonedArithmetic`: checked directly
+//! against jiff's real source (`src/civil/date.rs`), it has *no*
+//! public methods of its own at all — `checked_add`/`checked_neg`/
+//! `is_negative` are all private; only the `From` impls (construction,
+//! not inspection) are public. Its one field (`duration`) is private
+//! with no getter.
 
 mod civil_date;
 mod offset;
@@ -231,5 +239,6 @@ impl_kani_witness_trusted_ext!(
     jiff::ZonedDifference<'static>,
     jiff::ZonedRound,
     jiff::ZonedSeries,
-    jiff::ZonedWith
+    jiff::ZonedWith,
+    jiff::civil::DateArithmetic
 );

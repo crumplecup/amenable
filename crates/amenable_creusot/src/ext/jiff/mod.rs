@@ -103,6 +103,11 @@
 //! accommodation model) round-trips `Date::new`/`year`/`month`/`day`
 //! over jiff's real API — checked directly, not assumed safe by
 //! resemblance to the already-trusted composite types.
+//!
+//! `jiff::civil::DateArithmetic` stays trusted, the identical shape
+//! to `TimestampArithmetic`/`ZonedArithmetic`: it has no public
+//! methods of its own at all, and its one field is private with no
+//! getter.
 
 mod civil_date;
 mod error;
@@ -175,7 +180,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
     jiff::ZonedRound,
-    jiff::ZonedWith
+    jiff::ZonedWith,
+    jiff::civil::DateArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -50,8 +50,11 @@
 //! override" case reduces to a bare identity function with no
 //! distinguishing computation at all — see `amenable_kani::ext::jiff`'s
 //! own doc comment for the full reasoning, independently reached the
-//! same way on Creusot. Nothing non-tautological to model about any
-//! of the fifteen on any backend.
+//! same way on Creusot. `jiff::civil::DateArithmetic` also stays
+//! trusted, the identical shape to `TimestampArithmetic`/`jiff::
+//! ZonedArithmetic`: no public methods at all, one private field, only
+//! `From` impls public. Nothing non-tautological to model about any
+//! of the sixteen on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -108,7 +111,8 @@ impl_verus_witness_trusted_ext!(
     jiff::ZonedArithmetic,
     jiff::ZonedDifference<'static>,
     jiff::ZonedRound,
-    jiff::ZonedWith
+    jiff::ZonedWith,
+    jiff::civil::DateArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
