@@ -122,6 +122,11 @@
 //! has no time zone at all. Unlike `ZonedSeries`'s model, this one
 //! needs no `TimeZone::UTC` scoping caveat: `Date` has no DST-repeat
 //! retry loop to begin with.
+//!
+//! `jiff::civil::DateTimeArithmetic` stays trusted, the identical
+//! shape to `DateArithmetic`/`TimestampArithmetic`/`ZonedArithmetic`:
+//! it has no public methods of its own at all, and its one field is
+//! private with no getter.
 
 mod civil_date;
 mod date_series;
@@ -197,7 +202,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::ZonedRound,
     jiff::ZonedWith,
     jiff::civil::DateArithmetic,
-    jiff::civil::DateDifference
+    jiff::civil::DateDifference,
+    jiff::civil::DateTimeArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -232,6 +232,14 @@
 //! isolation. Checked on Creusot and Verus instead (`ext_jiff::
 //! date_series`/`ext::jiff::date_series`), neither of which shares
 //! this Rust-Drop-glue mechanism.
+//!
+//! `jiff::civil::DateTimeArithmetic` stays trusted, the identical
+//! shape to `DateArithmetic`/`TimestampArithmetic`/`ZonedArithmetic`:
+//! checked directly against jiff's real source
+//! (`src/civil/datetime.rs`), it has *no* public methods of its own
+//! at all — `checked_add`/`checked_neg`/`is_negative` are all
+//! private; only the `From` impls (construction, not inspection) are
+//! public. Its one field (`duration`) is private with no getter.
 
 mod civil_date;
 mod offset;
@@ -266,5 +274,6 @@ impl_kani_witness_trusted_ext!(
     jiff::ZonedWith,
     jiff::civil::DateArithmetic,
     jiff::civil::DateDifference,
-    jiff::civil::DateSeries
+    jiff::civil::DateSeries,
+    jiff::civil::DateTimeArithmetic
 );
