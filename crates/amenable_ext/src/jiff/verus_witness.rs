@@ -62,9 +62,12 @@
 //! fields private with no getters. `jiff::civil::DateTimeArithmetic`
 //! also stays trusted, the identical shape to `DateArithmetic`/
 //! `TimestampArithmetic`/`jiff::ZonedArithmetic`: no public methods at
-//! all, one private field, only `From` impls public. Nothing
-//! non-tautological to model about any of the eighteen on any
-//! backend.
+//! all, one private field, only `From` impls public. `jiff::civil::
+//! DateTimeDifference` also stays trusted, the identical builder-only
+//! shape to `DateDifference`/`TimestampDifference`/`jiff::
+//! ZonedDifference`: five plain-setter public methods, both fields
+//! private with no getters. Nothing non-tautological to model about
+//! any of the nineteen on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -124,7 +127,8 @@ impl_verus_witness_trusted_ext!(
     jiff::ZonedWith,
     jiff::civil::DateArithmetic,
     jiff::civil::DateDifference,
-    jiff::civil::DateTimeArithmetic
+    jiff::civil::DateTimeArithmetic,
+    jiff::civil::DateTimeDifference
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
