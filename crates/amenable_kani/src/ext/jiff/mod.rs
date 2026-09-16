@@ -208,6 +208,14 @@
 //! `is_negative` are all private; only the `From` impls (construction,
 //! not inspection) are public. Its one field (`duration`) is private
 //! with no getter.
+//!
+//! `jiff::civil::DateDifference` stays trusted for the same
+//! builder-only reason as `TimestampDifference`/`ZonedDifference`:
+//! checked directly against jiff's real source, its five public
+//! methods (`new`/`smallest`/`largest`/`mode`/`increment`) are all
+//! plain setters; `rounding_may_change_span`/`since_with_largest_unit`
+//! are private, and both fields (`date`/`round`) are private with no
+//! getters.
 
 mod civil_date;
 mod offset;
@@ -240,5 +248,6 @@ impl_kani_witness_trusted_ext!(
     jiff::ZonedRound,
     jiff::ZonedSeries,
     jiff::ZonedWith,
-    jiff::civil::DateArithmetic
+    jiff::civil::DateArithmetic,
+    jiff::civil::DateDifference
 );
