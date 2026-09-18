@@ -154,6 +154,11 @@
 //! unconditional `#[ensures(..)]`, and an accommodation model of just
 //! the "no override" case reduces to a bare identity function. See
 //! `ZonedWith`'s own doc comment above for the full reasoning.
+//!
+//! `jiff::civil::DateWith` stays trusted too, the third confirmed
+//! instance: its fields (private `Option`-wrapped overrides) are
+//! just as invisible to a real `extern_spec!` as `ZonedWith`'s/
+//! `DateTimeWith`'s, so the same soundness obstacle applies.
 
 mod civil_date;
 mod date_series;
@@ -234,7 +239,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateTimeArithmetic,
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
-    jiff::civil::DateTimeWith
+    jiff::civil::DateTimeWith,
+    jiff::civil::DateWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

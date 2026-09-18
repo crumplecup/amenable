@@ -278,6 +278,15 @@
 //! unconditional `#[ensures(..)]`, and an accommodation model of just
 //! that case reduces to a bare identity function. See `ZonedWith`'s
 //! own doc comment above for the full reasoning.
+//!
+//! `jiff::civil::DateWith` stays trusted too, the third confirmed
+//! instance of this exact pattern: its fields (`original: Date`,
+//! `year: Option<DateWithYear>`, `month: Option<i8>`, `day:
+//! Option<DateWithDay>`) are private either way, so the extern_spec/
+//! model boundary still can't distinguish "no override" from "some
+//! override" from the outside — the `Option` wrapping doesn't change
+//! that, since private fields are invisible to a real `extern_spec!`
+//! regardless of their own internal shape.
 
 mod civil_date;
 mod offset;
@@ -317,5 +326,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
     jiff::civil::DateTimeSeries,
-    jiff::civil::DateTimeWith
+    jiff::civil::DateTimeWith,
+    jiff::civil::DateWith
 );

@@ -78,8 +78,11 @@
 //! any more than `ZonedWith`'s can, so its one real documented law
 //! can't be stated soundly as an unconditional claim, and a model of
 //! just the "no override" case reduces to a bare identity function.
-//! Nothing non-tautological to model about any of the twenty-one on
-//! any backend.
+//! `jiff::civil::DateWith` also stays trusted, the third confirmed
+//! instance of this exact pattern: its private `Option`-wrapped
+//! override fields are just as invisible to a model boundary as
+//! `ZonedWith`'s/`DateTimeWith`'s. Nothing non-tautological to model
+//! about any of the twenty-two on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -142,7 +145,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::DateTimeArithmetic,
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
-    jiff::civil::DateTimeWith
+    jiff::civil::DateTimeWith,
+    jiff::civil::DateWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
