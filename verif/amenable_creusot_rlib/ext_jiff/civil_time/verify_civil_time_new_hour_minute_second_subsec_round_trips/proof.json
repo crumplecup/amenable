@@ -1,0 +1,17 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_hour": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_minute": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_second": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_subsec_nanosecond": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_verify_civil_time_new_hour_minute_second_subsec_round_trips": {
+        "prover": "alt-ergo",
+        "time": 0.067
+      }
+    }
+  }
+}

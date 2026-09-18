@@ -10,15 +10,15 @@
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
 //! rest on. `jiff::civil::Date`/`jiff::civil::Era`/`jiff::civil::
-//! ISOWeekDate`/`jiff::civil::DateSeries`/`jiff::civil::
-//! DateTimeSeries`/`jiff::tz::Offset`/`jiff::Error`/`jiff::
+//! ISOWeekDate`/`jiff::civil::Time`/`jiff::civil::DateSeries`/`jiff::
+//! civil::DateTimeSeries`/`jiff::tz::Offset`/`jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
 //! exceptions so far — real, hand-verified accommodation models in
 //! `amenable_verus::ext::jiff::{civil_date,civil_era,
-//! civil_iso_week_date,date_series,date_time_series,offset,error,
-//! signed_duration,span,span_fieldwise,timestamp_series,unit,
-//! zoned_series}` (jiff itself is still unreachable, but each
+//! civil_iso_week_date,civil_time,date_series,date_time_series,
+//! offset,error,signed_duration,span,span_fieldwise,timestamp_series,
+//! unit,zoned_series}` (jiff itself is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
 //! against the real API by the Kani/Creusot proofs for the identical
 //! claim where those backends could check it at all — `TimestampSeries`,
@@ -34,15 +34,17 @@
 //! zoned_series`'s own doc comment — `DateSeries`'s and
 //! `DateTimeSeries`'s models need no such scoping, since neither
 //! `Date` nor `civil::DateTime` has a DST-repeat retry loop to begin
-//! with. `jiff::civil::Era` and `jiff::civil::ISOWeekDate` are the
-//! two exceptions in this list genuinely checked on all three
-//! backends with no asymmetry at all — each model exists purely
-//! because Verus can't reach jiff at all, same as every other model
-//! here, not because Kani or Creusot hit any wall for either type;
-//! `ISOWeekDate`'s own year range is narrowed to `-9990..=9990`, the
-//! same real, Kani-confirmed reason `amenable_kani::ext::jiff::
-//! civil_iso_week_date`'s own doc comment documents). `jiff::
-//! RoundMode`/`jiff::
+//! with. `jiff::civil::Era`, `jiff::civil::ISOWeekDate`, and
+//! `jiff::civil::Time` are the three exceptions in this list
+//! genuinely checked on all three backends with no asymmetry at
+//! all — each model exists purely because Verus can't reach jiff at
+//! all, same as every other model here, not because Kani or Creusot
+//! hit any wall for any of them; `ISOWeekDate`'s own year range is
+//! narrowed to `-9990..=9990`, the same real, Kani-confirmed reason
+//! `amenable_kani::ext::jiff::civil_iso_week_date`'s own doc comment
+//! documents, while `Time`'s model states jiff's FULL documented
+//! validity range with no narrowing at all, confirmed to have no
+//! interdependency between fields). `jiff::RoundMode`/`jiff::
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
@@ -233,6 +235,12 @@ impl_verus_witness_checked_ext!(
     jiff::civil::ISOWeekDate,
     "verify_civil_iso_week_date_new_year_week_weekday_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/civil_iso_week_date.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::civil::Time,
+    "verify_civil_time_new_hour_minute_second_subsec_round_trips_model",
+    "../../../amenable_verus/src/ext/jiff/civil_time.rs"
 );
 
 impl_verus_witness_checked_ext!(

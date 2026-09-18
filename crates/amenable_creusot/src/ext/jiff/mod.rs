@@ -178,10 +178,17 @@
 //! scoped to a narrowed year range (`-9990..=9990`) confirmed
 //! necessary by a real Kani failure — see `amenable_kani::ext::jiff`'s
 //! own doc comment for the full finding.
+//!
+//! `jiff::civil::Time` also gets a real checked property (see
+//! `civil_time.rs`) — a fully rectangular, unconditional validity
+//! domain with no interdependency between fields, so this states
+//! jiff's FULL documented validity condition, not a narrowed
+//! sufficient sub-range.
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
+mod civil_time;
 mod date_series;
 mod date_time_series;
 mod error;

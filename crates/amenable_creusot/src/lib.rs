@@ -39,6 +39,8 @@ pub use ext_jiff::civil_era::VERIFY_CIVIL_ERA_YEAR_CLASSIFIES_BCE_AND_CE_CORRECT
 #[cfg(feature = "jiff")]
 pub use ext_jiff::civil_iso_week_date::VERIFY_CIVIL_ISO_WEEK_DATE_NEW_YEAR_WEEK_WEEKDAY_ROUND_TRIPS_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::civil_time::VERIFY_CIVIL_TIME_NEW_HOUR_MINUTE_SECOND_SUBSEC_ROUND_TRIPS_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::date_series::VERIFY_DATE_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::date_time_series::VERIFY_DATE_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;

@@ -1,0 +1,185 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 132 8 137 42 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span scivil_time = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 138 18 138 81
+let%span scivil_time'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 139 29 139 37
+let%span scivil_time'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 139 39 139 49
+let%span scivil_time'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 139 51 139 61
+let%span scivil_time'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 139 63 139 84
+let%span scivil_time'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 130 19 130 23
+let%span scivil_time'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 131 18 131 119
+let%span scivil_time'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 62 18 71 9
+let%span scivil_time'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 76 16 76 20
+let%span scivil_time'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 75 18 75 56
+let%span scivil_time'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 80 18 80 22
+let%span scivil_time'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 79 18 79 58
+let%span scivil_time'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 84 18 84 22
+let%span scivil_time'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 83 18 83 58
+let%span scivil_time'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 88 29 88 33
+let%span scivil_time'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 87 18 87 69
+let%span scivil_time'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 108 16 114 17
+let%span stime = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/civil/time.rs" 278 4 283 28
+
+use creusot.int.Int8
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Time
+
+type t_Error
+
+type t_Result_Time_Error = Ok t_Time | Err t_Error
+
+predicate inv_Time (_1: t_Time)
+
+predicate inv_Error (_1: t_Error)
+
+predicate inv_Result_Time_Error (_1: t_Result_Time_Error)
+
+axiom inv_axiom [@rewrite]: forall x: t_Result_Time_Error [inv_Result_Time_Error x]. inv_Result_Time_Error x
+    = match x with
+      | Ok f0 -> inv_Time f0
+      | Err f0 -> inv_Error f0
+      end
+
+function civil_time_hour_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 33 0 33 65] (_t: t_Time) : Int8.t
+
+function civil_time_minute_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 40 0 40 67] (_t: t_Time) : Int8.t
+
+function civil_time_second_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 47 0 47 67] (_t: t_Time) : Int8.t
+
+function civil_time_subsec_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 54 0 54 79] (_t: t_Time) : Int32.t
+
+predicate gt_log_i8 [@inline:trivial] (self: Int8.t) (other: Int8.t) = [%#sord] Int8.lt other self
+
+meta "rewrite_def" predicate gt_log_i8
+
+predicate gt_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.lt other self
+
+meta "rewrite_def" predicate gt_log_i32
+
+let new (hour: Int8.t) (minute: Int8.t) (second: Int8.t) (subsec_nanosecond: Int32.t)
+  (return (x: t_Result_Time_Error)) = any
+  [ return (result: t_Result_Time_Error) ->
+  {[@stop_split] [@expl:new ensures] ([@stop_split] [@expl:new result type invariant] [%#stime] inv_Result_Time_Error result)
+    /\ ([@stop_split] [@expl:new ensures] [%#scivil_time'6] match result with
+      | Ok t -> civil_time_hour_value t = hour
+      /\ civil_time_minute_value t = minute
+      /\ civil_time_second_value t = second /\ civil_time_subsec_nanosecond_value t = subsec_nanosecond
+      | Err _ -> Int8.lt hour (0: Int8.t)
+      \/ gt_log_i8 hour (23: Int8.t)
+      \/ Int8.lt minute (0: Int8.t)
+      \/ gt_log_i8 minute (59: Int8.t)
+      \/ Int8.lt second (0: Int8.t)
+      \/ gt_log_i8 second (59: Int8.t)
+      \/ Int32.lt subsec_nanosecond (0: Int32.t) \/ gt_log_i32 subsec_nanosecond (999999999: Int32.t)
+      end)}
+    (! return {result}) ]
+
+predicate resolve_Time (_1: t_Time)
+
+predicate resolve_Error (_1: t_Error)
+
+predicate resolve_Result_Time_Error (_1: t_Result_Time_Error)
+
+axiom resolve_axiom [@rewrite]: forall x: t_Result_Time_Error [resolve_Result_Time_Error x]. resolve_Result_Time_Error x
+    = match x with
+      | Ok x0 -> resolve_Time x0
+      | Err x0 -> resolve_Error x0
+      end
+
+type tup4_i8_i8_i8_i32 = { f0: Int8.t; f1: Int8.t; f2: Int8.t; f3: Int32.t }
+
+type t_Result_tup4_i8_i8_i8_i32_unit = Ok'0 tup4_i8_i8_i8_i32 | Err'0 ()
+
+let elim_Ok (_x: t_Result_Time_Error) (return (f0'0: t_Time)) = any
+  [ _k (f0'0: t_Time) -> {Ok f0'0 = _x} (! return {f0'0})
+  | _chk -> (! {[@expl:elim Ok] match _x with
+      | Ok _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let hour (self_: t_Time) (return (x: Int8.t)) =
+{[@stop_split] [@expl:hour 'self_' type invariant] [%#scivil_time'7] inv_Time self_}
+  any
+  [ return (result: Int8.t) -> {[@stop_split] [@expl:hour ensures] [%#scivil_time'8] result
+    = civil_time_hour_value self_}
+    (! return {result}) ]
+
+let minute (self_: t_Time) (return (x: Int8.t)) =
+{[@stop_split] [@expl:minute 'self_' type invariant] [%#scivil_time'9] inv_Time self_}
+  any
+  [ return (result: Int8.t) -> {[@stop_split] [@expl:minute ensures] [%#scivil_time'10] result
+    = civil_time_minute_value self_}
+    (! return {result}) ]
+
+let second (self_: t_Time) (return (x: Int8.t)) =
+{[@stop_split] [@expl:second 'self_' type invariant] [%#scivil_time'11] inv_Time self_}
+  any
+  [ return (result: Int8.t) -> {[@stop_split] [@expl:second ensures] [%#scivil_time'12] result
+    = civil_time_second_value self_}
+    (! return {result}) ]
+
+let subsec_nanosecond (self_: t_Time) (return (x: Int32.t)) =
+{[@stop_split] [@expl:subsec_nanosecond 'self_' type invariant] [%#scivil_time'13] inv_Time self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:subsec_nanosecond ensures] [%#scivil_time'14] result
+    = civil_time_subsec_nanosecond_value self_}
+    (! return {result}) ]
+
+predicate civil_time_new_hour_minute_second_subsec_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 100 8 106 17] (hour'0: Int8.t) (minute'0: Int8.t) (second'0: Int8.t) (subsec_nanosecond'0: Int32.t) (round_trip: t_Result_tup4_i8_i8_i8_i32_unit) =
+  [%#scivil_time'15] match round_trip with
+    | Ok'0 got -> got.f0 = hour'0 /\ got.f1 = minute'0 /\ got.f2 = second'0 /\ got.f3 = subsec_nanosecond'0
+    | Err'0 _ -> Int8.lt hour'0 (0: Int8.t)
+    \/ gt_log_i8 hour'0 (23: Int8.t)
+    \/ Int8.lt minute'0 (0: Int8.t)
+    \/ gt_log_i8 minute'0 (59: Int8.t)
+    \/ Int8.lt second'0 (0: Int8.t)
+    \/ gt_log_i8 second'0 (59: Int8.t)
+    \/ Int32.lt subsec_nanosecond'0 (0: Int32.t) \/ gt_log_i32 subsec_nanosecond'0 (999999999: Int32.t)
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_civil_time_new_hour_minute_second_subsec_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/civil_time.rs" 132 8 137 42]
+  (hour'0: Int8.t) (minute'0: Int8.t) (second'0: Int8.t) (subsec_nanosecond'0: Int32.t)
+  (return (x: t_Result_tup4_i8_i8_i8_i32_unit)) = (! bb0
+  [ bb0 = s0
+    [ s0 = new [%#scivil_time] {hour'0} {minute'0} {second'0} {subsec_nanosecond'0}
+        (fun (_x: t_Result_Time_Error) -> [ &_11 <- _x ] s1)
+    | s1 = any [ br0 (x0: t_Time) -> {_11 = Ok x0} (! bb5) | br1 (x0: t_Error) -> {_11 = Err x0} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Time_Error _11} any) ]
+    | s1 = -{resolve_Result_Time_Error _11}- s2
+    | s2 = [ &_ret <- Err'0 _27 ] s3
+    | s3 = return {_ret} ]
+  | bb5 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Time_Error _11} any) ]
+    | s1 = -{resolve_Result_Time_Error _11}- s2
+    | s2 = elim_Ok {_11} (fun (r0: t_Time) -> [ &t <- r0 ] s3)
+    | s3 = hour [%#scivil_time'0] {t} (fun (_x: Int8.t) -> [ &_19 <- _x ] s4)
+    | s4 = minute [%#scivil_time'1] {t} (fun (_x: Int8.t) -> [ &_21 <- _x ] s5)
+    | s5 = second [%#scivil_time'2] {t} (fun (_x: Int8.t) -> [ &_23 <- _x ] s6)
+    | s6 = subsec_nanosecond [%#scivil_time'3] {t} (fun (_x: Int32.t) -> [ &_25 <- _x ] s7)
+    | s7 = [ &_18 <- { f0 = _19; f1 = _21; f2 = _23; f3 = _25 } ] s8
+    | s8 = [ &_ret <- Ok'0 _18 ] s9
+    | s9 = return {_ret} ] ]
+  [ & _ret: t_Result_tup4_i8_i8_i8_i32_unit = Any.any_l ()
+  | & hour'0: Int8.t = hour'0
+  | & minute'0: Int8.t = minute'0
+  | & second'0: Int8.t = second'0
+  | & subsec_nanosecond'0: Int32.t = subsec_nanosecond'0
+  | & _11: t_Result_Time_Error = Any.any_l ()
+  | & t: t_Time = Any.any_l ()
+  | & _18: tup4_i8_i8_i8_i32 = Any.any_l ()
+  | & _19: Int8.t = Any.any_l ()
+  | & _21: Int8.t = Any.any_l ()
+  | & _23: Int8.t = Any.any_l ()
+  | & _25: Int32.t = Any.any_l ()
+  | & _27: () = Any.any_l () ])
+  [ return (result: t_Result_tup4_i8_i8_i8_i32_unit) ->
+  {[@stop_split] [@expl:verify_civil_time_new_hour_minute_second_subsec_round_trips ensures] [%#scivil_time'5] civil_time_new_hour_minute_second_subsec_round_trips hour'0 minute'0 second'0 subsec_nanosecond'0 result}
+    (! return {result}) ]

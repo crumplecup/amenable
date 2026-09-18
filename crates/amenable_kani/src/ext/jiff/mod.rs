@@ -307,10 +307,20 @@
 //! only valid for years containing a "leap week"), so this scopes to
 //! week `1..=52`, jiff's own documented always-valid sub-range,
 //! matching `civil_date.rs`'s own day-range simplification.
+//!
+//! `jiff::civil::Time` also gets a real checked property (see
+//! `civil_time.rs`) — but unlike `Date`/`ISOWeekDate`, its validity
+//! is a fully rectangular, unconditional domain with no
+//! interdependency between fields at all (checked directly:
+//! `Time::MIN`/`MAX` exactly match the same independent per-field
+//! bounds, no derived-elsewhere restriction), so this witness states
+//! jiff's FULL documented validity condition, not a narrowed
+//! sufficient sub-range.
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
+mod civil_time;
 mod offset;
 mod signed_duration;
 mod span;
