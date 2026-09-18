@@ -189,6 +189,12 @@
 //! to `DateArithmetic`/`DateTimeArithmetic`/`TimestampArithmetic`/
 //! `ZonedArithmetic`: it has no public methods of its own at all,
 //! and its one field is private with no getter.
+//!
+//! `jiff::civil::TimeDifference` stays trusted for the same
+//! builder-only reason as `DateDifference`/`DateTimeDifference`/
+//! `TimestampDifference`/`ZonedDifference`: its five public methods
+//! are all plain setters, and both fields are private with no
+//! getters.
 
 mod civil_date;
 mod civil_era;
@@ -274,7 +280,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateTimeRound,
     jiff::civil::DateTimeWith,
     jiff::civil::DateWith,
-    jiff::civil::TimeArithmetic
+    jiff::civil::TimeArithmetic,
+    jiff::civil::TimeDifference
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
