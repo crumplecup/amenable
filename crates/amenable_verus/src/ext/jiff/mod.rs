@@ -3,6 +3,7 @@
 
 pub mod civil_date;
 pub mod civil_era;
+pub mod civil_iso_week_date;
 pub mod date_series;
 pub mod date_time_series;
 pub mod error;

@@ -298,9 +298,19 @@
 //! the wrong lesson from `RoundMode`'s own trusted reasoning, which
 //! rested on having literally no public methods, not on having no
 //! fields).
+//!
+//! `jiff::civil::ISOWeekDate` gets a real checked property too (see
+//! `civil_iso_week_date.rs`): a real value type with real getters
+//! (`year`/`week`/`weekday`), the same shape as `civil::Date` —
+//! checked directly by reading jiff's real source. `ISOWeekDate::
+//! new`'s validity is more complex than `Date::new`'s (week `53` is
+//! only valid for years containing a "leap week"), so this scopes to
+//! week `1..=52`, jiff's own documented always-valid sub-range,
+//! matching `civil_date.rs`'s own day-range simplification.
 
 mod civil_date;
 mod civil_era;
+mod civil_iso_week_date;
 mod offset;
 mod signed_duration;
 mod span;

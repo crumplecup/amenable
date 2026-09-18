@@ -4,6 +4,7 @@ amenable_kani::calculator::verify_credit_access_preserves_value,1788632974,passe
 amenable_kani::calculator::verify_debit_access_preserves_value,1788632983,passed
 amenable_kani::ext::jiff::civil_date::verify_civil_date_new_year_month_day_round_trips,1789523068,passed
 amenable_kani::ext::jiff::civil_era::verify_civil_era_year_classifies_bce_and_ce_correctly,1789750815,passed
+amenable_kani::ext::jiff::civil_iso_week_date::verify_civil_iso_week_date_new_year_week_weekday_round_trips,1789751804,passed
 amenable_kani::ext::jiff::error::diagnostic_error_from_args_construct_and_drop,1789417703,timeout
 amenable_kani::ext::jiff::error::verify_error_from_args_round_trips_through_display,1789418427,timeout
 amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed

@@ -171,9 +171,17 @@
 //! the same way as `civil_date.rs`'s multi-field accessors: an opaque
 //! `era_discriminant` axiom stands in for "which variant this is,"
 //! stated without ever calling `Era::eq` directly.
+//!
+//! `jiff::civil::ISOWeekDate` gets a real checked property too (see
+//! `civil_iso_week_date.rs`): a real `extern_spec!` over `new`/
+//! `year`/`week`/`weekday` plus `Weekday::to_monday_one_offset`,
+//! scoped to a narrowed year range (`-9990..=9990`) confirmed
+//! necessary by a real Kani failure — see `amenable_kani::ext::jiff`'s
+//! own doc comment for the full finding.
 
 mod civil_date;
 mod civil_era;
+mod civil_iso_week_date;
 mod date_series;
 mod date_time_series;
 mod error;
