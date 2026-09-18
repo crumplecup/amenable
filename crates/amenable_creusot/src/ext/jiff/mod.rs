@@ -146,6 +146,14 @@
 //! wall since `civil::DateTime` has no time zone at all). Identical
 //! in shape to `date_series.rs`'s own model: no `TimeZone::UTC`
 //! scoping caveat needed at all.
+//!
+//! `jiff::civil::DateTimeWith` stays trusted, for the identical real
+//! reason as `ZonedWith` — its type can't distinguish "no overrides"
+//! from "some override" any more than `ZonedWith`'s can, so the one
+//! real law jiff documents can't be stated soundly as an
+//! unconditional `#[ensures(..)]`, and an accommodation model of just
+//! the "no override" case reduces to a bare identity function. See
+//! `ZonedWith`'s own doc comment above for the full reasoning.
 
 mod civil_date;
 mod date_series;
@@ -225,7 +233,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateDifference,
     jiff::civil::DateTimeArithmetic,
     jiff::civil::DateTimeDifference,
-    jiff::civil::DateTimeRound
+    jiff::civil::DateTimeRound,
+    jiff::civil::DateTimeWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

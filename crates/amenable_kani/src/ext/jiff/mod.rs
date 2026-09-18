@@ -267,6 +267,17 @@
 //! and Verus instead (`ext_jiff::date_time_series`/`ext::jiff::
 //! date_time_series`), neither of which shares this Rust-Drop-glue
 //! mechanism.
+//!
+//! `jiff::civil::DateTimeWith` stays trusted on all three backends,
+//! for the identical real reason as `ZonedWith` — checked directly,
+//! not assumed from resemblance: its type (`{date_with: DateWith,
+//! time_with: TimeWith}`) can't distinguish "fresh from `.with()`"
+//! from "modified by a setter" any more than `ZonedWith`'s can, so
+//! the one real law jiff documents ("no fields set" ⟹ "`build()`
+//! returns the original unchanged") can't be stated soundly as an
+//! unconditional `#[ensures(..)]`, and an accommodation model of just
+//! that case reduces to a bare identity function. See `ZonedWith`'s
+//! own doc comment above for the full reasoning.
 
 mod civil_date;
 mod offset;
@@ -305,5 +316,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::DateTimeArithmetic,
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
-    jiff::civil::DateTimeSeries
+    jiff::civil::DateTimeSeries,
+    jiff::civil::DateTimeWith
 );
