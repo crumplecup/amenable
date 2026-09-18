@@ -3,6 +3,7 @@
 
 pub mod civil_date;
 pub mod date_series;
+pub mod date_time_series;
 pub mod error;
 pub mod offset;
 pub mod signed_duration;

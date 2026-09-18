@@ -137,9 +137,19 @@
 //! builder-only reason as `TimestampRound`/`ZonedRound`: its four
 //! public methods are all plain setters, and all three fields are
 //! private with no getters.
+//!
+//! `jiff::civil::DateTimeSeries` gets a real checked property too
+//! (see `date_time_series.rs`), an accommodation model — checked
+//! here despite being trusted for Kani specifically, for the
+//! identical real reason `DateSeries` is (a `jiff::Error` Drop-glue
+//! wall, confirmed distinct from `ZonedSeries`'s `TimeZone::Repr`
+//! wall since `civil::DateTime` has no time zone at all). Identical
+//! in shape to `date_series.rs`'s own model: no `TimeZone::UTC`
+//! scoping caveat needed at all.
 
 mod civil_date;
 mod date_series;
+mod date_time_series;
 mod error;
 mod offset;
 mod signed_duration;

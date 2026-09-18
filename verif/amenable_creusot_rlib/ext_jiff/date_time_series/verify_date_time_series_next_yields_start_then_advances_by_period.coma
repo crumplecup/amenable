@@ -1,0 +1,43 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 64 8 67 23 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sdate_time_series = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 68 25 68 49
+let%span sdate_time_series'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 61 19 61 88
+let%span sdate_time_series'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 62 19 62 98
+let%span sdate_time_series'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 63 18 63 115
+let%span sdate_time_series'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 38 24 38 90
+
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type tup2_i64_i64 = { f0: Int64.t; f1: Int64.t }
+
+predicate gt_log_i64 [@inline:trivial] (self: Int64.t) (other: Int64.t) = [%#sord] Int64.lt other self
+
+meta "rewrite_def" predicate gt_log_i64
+
+predicate date_time_series_next_yields_start_then_advances_by_period_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 33 8 37 17] (start_days: Int64.t) (period_days: Int64.t) (observed: tup2_i64_i64) =
+  [%#sdate_time_series'3] observed.f0 = start_days /\ observed.f1 = Int64.add start_days period_days
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_date_time_series_next_yields_start_then_advances_by_period [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/date_time_series.rs" 64 8 67 23]
+  (start_days: Int64.t) (period_days: Int64.t) (return (x: tup2_i64_i64)) =
+{[@stop_split] [@expl:verify_date_time_series_next_yields_start_then_advances_by_period requires] ([@stop_split] [@expl:verify_date_time_series_next_yields_start_then_advances_by_period requires #0] [%#sdate_time_series'0] gt_log_i64 start_days (Int64.sub (Int64.neg (3700000: Int64.t)) (1: Int64.t))
+    /\ Int64.lt start_days (Int64.add (3700000: Int64.t) (1: Int64.t)))
+  /\ ([@stop_split] [@expl:verify_date_time_series_next_yields_start_then_advances_by_period requires #1] [%#sdate_time_series'1] gt_log_i64 period_days (Int64.sub (Int64.neg (1000000000: Int64.t)) (1: Int64.t))
+  /\ Int64.lt period_days (Int64.add (1000000000: Int64.t) (1: Int64.t)))}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = Int64.add [%#sdate_time_series] {start_days} {period_days} (fun (_x: Int64.t) -> [ &_11 <- _x ] s1)
+    | s1 = [ &_ret <- { f0 = start_days; f1 = _11 } ] s2
+    | s2 = return {_ret} ] ]
+  [ & _ret: tup2_i64_i64 = Any.any_l ()
+  | & start_days: Int64.t = start_days
+  | & period_days: Int64.t = period_days
+  | & _11: Int64.t = Any.any_l () ])
+  [ return (result: tup2_i64_i64) ->
+  {[@stop_split] [@expl:verify_date_time_series_next_yields_start_then_advances_by_period ensures] [%#sdate_time_series'2] date_time_series_next_yields_start_then_advances_by_period_holds start_days period_days result}
+    (! return {result}) ]

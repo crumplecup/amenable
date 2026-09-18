@@ -119,6 +119,19 @@
 //! new(year, month, day)` call passes instantly; adding `.series(
 //! period).next()` times out even with the result immediately
 //! `mem::forget`-ed.
+//!
+//! **A sixth case (found assessing `jiff::civil::DateTimeSeries` as a
+//! witness candidate): the identical shape to `DateSeries`'s, checked
+//! again rather than assumed.** `civil::DateTime` is, like `civil::
+//! Date`, a pure calendar+clock value with no `TimeZone` at all — so
+//! the fourth case's `Repr` wall cannot apply here either.
+//! `DateTimeSeries::next()` has the exact same `checked_mul`/
+//! `checked_add` shape as `DateSeries::next()`, hitting the identical
+//! `jiff::Error` Drop-glue wall. Isolated the same way: a bare
+//! `Date::new(year, month, day).at(0, 0, 0, 0)` call (cheap: `Date::
+//! at` is a `const fn`, no fallible step) passes instantly; adding
+//! `.series(period).next()` times out even with the result
+//! immediately `mem::forget`-ed.
 
 #[cfg(kani)]
 use jiff::ToSpan;
@@ -404,6 +417,82 @@ amenable_derive::gallery_harness! {
             let d = jiff::civil::Date::new(year, month, day)
                 .expect("year/month/day are already checked to always be a valid civil::Date");
             assert!(d.year() == year && d.month() == month && d.day() == day);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::date_time_series_next_call_times_out".to_owned(),
+            "gallery::jiff_error_drop_cost::date_time_series_next_call_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "A single .next() call on a DateTime::series(period) iterator times out even for a tiny assumed range and even when the returned Option<DateTime> is immediately mem::forget-ed -- DateTimeSeries::next's own checked_mul/checked_add calls drop a transient jiff::Error via .ok()? on every step, the same Drop-glue wall DateSeries/TimestampSeries hit, unrelated to TimeZone (DateTime has none)".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, DATE_TIME_SERIES_NEXT_CALL_TIMES_OUT_SRC, {
+        /// A bare `Date::new(year, month, day).at(0, 0, 0, 0).series(
+        /// period).next()` call, forgotten immediately, still times
+        /// out — isolating the cost to `DateTimeSeries::next`'s own
+        /// internal fallible conversions, the identical `jiff::Error`
+        /// Drop-glue wall `DateSeries` hits.
+        #[kani::proof]
+        fn date_time_series_next_call_times_out() {
+            let year: i16 = kani::any();
+            let month: i8 = kani::any();
+            let day: i8 = kani::any();
+            let period_days: i64 = kani::any();
+            kani::assume(year >= -9999 && year <= 9999);
+            kani::assume(month >= 1 && month <= 12);
+            kani::assume(day >= 1 && day <= 28);
+            kani::assume(period_days >= -1_000_000_000 && period_days <= 1_000_000_000);
+            let d = jiff::civil::Date::new(year, month, day)
+                .expect("year/month/day are already checked to always be a valid civil::Date");
+            let dt = d.at(0, 0, 0, 0);
+            let mut series = dt.series(period_days.days());
+            let next = series.next();
+            std::mem::forget(series);
+            std::mem::forget(next);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::civil_date_at_midnight_alone_passes".to_owned(),
+            "gallery::jiff_error_drop_cost::civil_date_at_midnight_alone_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "The identical symbolic Date::new(year, month, day).at(0, 0, 0, 0) call, with no .series()/.next() call at all, verifies instantly -- confirming the cheap DateTime construction itself is not the source of the timeout, isolating it specifically to DateTimeSeries::next's internal conversions".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CIVIL_DATE_AT_MIDNIGHT_ALONE_PASSES_SRC, {
+        /// `date_time_series_next_call_times_out`, with the
+        /// `.series()`/`.next()` calls removed — confirms the cheap
+        /// `DateTime` construction alone is fast, isolating the wall
+        /// to `DateTimeSeries::next` specifically.
+        #[kani::proof]
+        fn civil_date_at_midnight_alone_passes() {
+            let year: i16 = kani::any();
+            let month: i8 = kani::any();
+            let day: i8 = kani::any();
+            kani::assume(year >= -9999 && year <= 9999);
+            kani::assume(month >= 1 && month <= 12);
+            kani::assume(day >= 1 && day <= 28);
+            let d = jiff::civil::Date::new(year, month, day)
+                .expect("year/month/day are already checked to always be a valid civil::Date");
+            let dt = d.at(0, 0, 0, 0);
+            assert!(dt.date() == d);
         }
     }
 }

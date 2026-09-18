@@ -12,6 +12,7 @@
 
 pub(crate) mod civil_date;
 pub(crate) mod date_series;
+pub(crate) mod date_time_series;
 pub(crate) mod error;
 pub(crate) mod offset;
 pub(crate) mod signed_duration;

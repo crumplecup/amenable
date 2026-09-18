@@ -10,27 +10,30 @@
 //! `Cargo.toml`, no `vstd` coverage for third-party crates), so most
 //! registrations have nothing beyond `Evidence::basis().audit()` to
 //! rest on. `jiff::civil::Date`/`jiff::civil::DateSeries`/`jiff::
-//! tz::Offset`/`jiff::Error`/`jiff::SignedDuration`/`jiff::Span`/
-//! `jiff::SpanFieldwise`/`jiff::TimestampSeries`/`jiff::Unit`/`jiff::
-//! ZonedSeries` are the exceptions so far — real, hand-verified
-//! accommodation models in `amenable_verus::ext::jiff::{civil_date,
-//! date_series,offset,error,signed_duration,span,span_fieldwise,
+//! civil::DateTimeSeries`/`jiff::tz::Offset`/`jiff::Error`/`jiff::
+//! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
+//! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
+//! exceptions so far — real, hand-verified accommodation models in
+//! `amenable_verus::ext::jiff::{civil_date,date_series,
+//! date_time_series,offset,error,signed_duration,span,span_fieldwise,
 //! timestamp_series,unit,zoned_series}` (jiff itself is still
 //! unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
 //! against the real API by the Kani/Creusot proofs for the identical
 //! claim where those backends could check it at all — `TimestampSeries`,
-//! `ZonedSeries`, and `DateSeries` are all Kani-uncheckable
-//! (`TimestampSeries`/`DateSeries` share a `jiff::Error` Drop-glue
-//! wall; `ZonedSeries` hits a different one, `TimeZone`'s
-//! pointer-tagged `Repr`) and `Unit` is Creusot-uncheckable, each for
-//! a real, confirmed reason, see `amenable_kani::ext::jiff`'s and
-//! `amenable_creusot::ext::jiff`'s own doc comments; `ZonedSeries`'s
-//! model is also honestly scoped to `TimeZone::UTC`, where its real
-//! DST-repeat retry loop is structurally unreachable, see
-//! `amenable_verus::ext::jiff::zoned_series`'s own doc comment —
-//! `DateSeries`'s model needs no such scoping, since `Date` has no
-//! DST-repeat retry loop to begin with). `jiff::RoundMode`/`jiff::
+//! `ZonedSeries`, `DateSeries`, and `DateTimeSeries` are all
+//! Kani-uncheckable (`TimestampSeries`/`DateSeries`/`DateTimeSeries`
+//! share a `jiff::Error` Drop-glue wall; `ZonedSeries` hits a
+//! different one, `TimeZone`'s pointer-tagged `Repr`) and `Unit` is
+//! Creusot-uncheckable, each for a real, confirmed reason, see
+//! `amenable_kani::ext::jiff`'s and `amenable_creusot::ext::jiff`'s
+//! own doc comments; `ZonedSeries`'s model is also honestly scoped to
+//! `TimeZone::UTC`, where its real DST-repeat retry loop is
+//! structurally unreachable, see `amenable_verus::ext::jiff::
+//! zoned_series`'s own doc comment — `DateSeries`'s and
+//! `DateTimeSeries`'s models need no such scoping, since neither
+//! `Date` nor `civil::DateTime` has a DST-repeat retry loop to begin
+//! with). `jiff::RoundMode`/`jiff::
 //! SignedDurationRound`/`jiff::SpanArithmetic<'static>`/`jiff::
 //! SpanCompare<'static>`/`jiff::SpanRelativeTo<'static>`/`jiff::
 //! SpanRound<'static>`/`jiff::SpanTotal<'static>`/`jiff::
@@ -204,6 +207,12 @@ impl_verus_witness_checked_ext!(
     jiff::civil::DateSeries,
     "verify_date_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/date_series.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::civil::DateTimeSeries,
+    "verify_date_time_series_next_yields_start_then_advances_by_period",
+    "../../../amenable_verus/src/ext/jiff/date_time_series.rs"
 );
 
 impl_verus_witness_checked_ext!(
