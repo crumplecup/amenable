@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_era_year": { "prover": "alt-ergo", "time": 0.022 },
+      "vc_expect_Date": { "prover": "alt-ergo", "time": 0.022 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_verify_civil_era_year_classifies_bce_and_ce_correctly": {
+        "prover": "alt-ergo",
+        "time": 0.064
+      }
+    }
+  }
+}

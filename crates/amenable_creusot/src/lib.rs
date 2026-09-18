@@ -35,6 +35,8 @@ mod witness;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::civil_date::VERIFY_CIVIL_DATE_NEW_YEAR_MONTH_DAY_ROUND_TRIPS_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::civil_era::VERIFY_CIVIL_ERA_YEAR_CLASSIFIES_BCE_AND_CE_CORRECTLY_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::date_series::VERIFY_DATE_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::date_time_series::VERIFY_DATE_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;

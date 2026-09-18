@@ -11,6 +11,7 @@
 //! translates — stays unconditional.
 
 pub(crate) mod civil_date;
+pub(crate) mod civil_era;
 pub(crate) mod date_series;
 pub(crate) mod date_time_series;
 pub(crate) mod error;

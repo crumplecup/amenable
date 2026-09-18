@@ -2,6 +2,7 @@
 //! area that has earned one.
 
 pub mod civil_date;
+pub mod civil_era;
 pub mod date_series;
 pub mod date_time_series;
 pub mod error;

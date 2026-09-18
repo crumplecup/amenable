@@ -287,8 +287,20 @@
 //! override" from the outside — the `Option` wrapping doesn't change
 //! that, since private fields are invisible to a real `extern_spec!`
 //! regardless of their own internal shape.
+//!
+//! `jiff::civil::Era` gets a real checked property too (see
+//! `civil_era.rs`): though `Era` is a plain fieldless 2-variant enum
+//! with no constructor of its own, its only real production path
+//! (`Date::era_year() -> (i16, Era)`) has a precisely documented,
+//! genuinely checkable law (`year >= 1` ⟺ `(year, Era::CE)`; `year <=
+//! 0` ⟺ `(-year + 1, Era::BCE)`) — checked directly, not assumed
+//! trusted just because the type itself is fieldless (that would be
+//! the wrong lesson from `RoundMode`'s own trusted reasoning, which
+//! rested on having literally no public methods, not on having no
+//! fields).
 
 mod civil_date;
+mod civil_era;
 mod offset;
 mod signed_duration;
 mod span;

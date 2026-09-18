@@ -159,8 +159,21 @@
 //! instance: its fields (private `Option`-wrapped overrides) are
 //! just as invisible to a real `extern_spec!` as `ZonedWith`'s/
 //! `DateTimeWith`'s, so the same soundness obstacle applies.
+//!
+//! `jiff::civil::Era` gets a real checked property too (see
+//! `civil_era.rs`): a genuine `extern_spec!` on `Date::era_year`
+//! checking jiff's own documented BCE/CE classification law, not
+//! assumed trusted just because `Era` is fieldless. A real, distinct
+//! Creusot finding from `Unit`'s own `DeepModel` wall: `Era` has no
+//! `Ord` at all, so that specific wall never comes up, but a bare
+//! equality comparison (`==`) is still an ordinary method call that
+//! can't appear inside `#[ensures(..)]`/`#[logic]` — worked around
+//! the same way as `civil_date.rs`'s multi-field accessors: an opaque
+//! `era_discriminant` axiom stands in for "which variant this is,"
+//! stated without ever calling `Era::eq` directly.
 
 mod civil_date;
+mod civil_era;
 mod date_series;
 mod date_time_series;
 mod error;

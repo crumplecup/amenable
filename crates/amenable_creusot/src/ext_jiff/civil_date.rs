@@ -19,33 +19,44 @@
 //! every year (even February in a non-leap year), so this avoids
 //! needing to model days-in-month for a symbolic year/month
 //! combination while still checking the full year/month range.
+//!
+//! `date_year_value`/`date_month_value`/`date_day_value` are
+//! `pub(crate)` at this module's own top level, not nested in a
+//! private `mirror` module: `civil_era.rs` needs to reuse them (its
+//! own `Date::era_year` extern_spec needs `date_year_value` to state
+//! anything about `self`), and Creusot only allows one `extern_spec!`
+//! per real function crate-wide — confirmed via a genuine "duplicate
+//! extern specification for jiff::civil::Date::new" compiler error
+//! from a first attempt that (wrongly) redeclared `Date::new`'s own
+//! contract in `civil_era.rs` instead of reusing this one. The
+//! `pub(crate)`-at-top-level shape (not a two-hop re-export through a
+//! private nested `mod mirror`) is `span.rs`'s own already-established
+//! fix for the identical class of problem (`span_fieldwise.rs` reusing
+//! `span.rs`'s accessors) — see that file's own doc comment.
 
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn date_year_value(_d: &jiff::civil::Date) -> i16 {
-        dead
-    }
-
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn date_month_value(_d: &jiff::civil::Date) -> i8 {
-        dead
-    }
-
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn date_day_value(_d: &jiff::civil::Date) -> i8 {
-        dead
-    }
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn date_year_value(_d: &jiff::civil::Date) -> i16 {
+    dead
 }
+
 #[cfg(creusot)]
-use mirror::{
-    check, date_day_value, date_month_value, date_year_value, ensures, extern_spec, logic, requires,
-};
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn date_month_value(_d: &jiff::civil::Date) -> i8 {
+    dead
+}
+
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn date_day_value(_d: &jiff::civil::Date) -> i8 {
+    dead
+}
 
 #[cfg(creusot)]
 extern_spec! {
