@@ -316,6 +316,15 @@
 //! bounds, no derived-elsewhere restriction), so this witness states
 //! jiff's FULL documented validity condition, not a narrowed
 //! sufficient sub-range.
+//!
+//! `jiff::civil::TimeArithmetic` stays trusted, the identical shape
+//! to `DateArithmetic`/`DateTimeArithmetic`/`TimestampArithmetic`/
+//! `ZonedArithmetic`: checked directly against jiff's real source
+//! (`src/civil/time.rs`), it has *no* public methods of its own at
+//! all — `wrapping_add`/`wrapping_sub`/`checked_add`/`checked_neg`/
+//! `is_negative` are all private; only the `From` impls (construction,
+//! not inspection) are public. Its one field (`duration`) is private
+//! with no getter.
 
 mod civil_date;
 mod civil_era;
@@ -359,5 +368,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::DateTimeRound,
     jiff::civil::DateTimeSeries,
     jiff::civil::DateTimeWith,
-    jiff::civil::DateWith
+    jiff::civil::DateWith,
+    jiff::civil::TimeArithmetic
 );

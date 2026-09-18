@@ -184,6 +184,11 @@
 //! domain with no interdependency between fields, so this states
 //! jiff's FULL documented validity condition, not a narrowed
 //! sufficient sub-range.
+//!
+//! `jiff::civil::TimeArithmetic` stays trusted, the identical shape
+//! to `DateArithmetic`/`DateTimeArithmetic`/`TimestampArithmetic`/
+//! `ZonedArithmetic`: it has no public methods of its own at all,
+//! and its one field is private with no getter.
 
 mod civil_date;
 mod civil_era;
@@ -268,7 +273,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
     jiff::civil::DateTimeWith,
-    jiff::civil::DateWith
+    jiff::civil::DateWith,
+    jiff::civil::TimeArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

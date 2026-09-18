@@ -92,8 +92,12 @@
 //! `jiff::civil::DateWith` also stays trusted, the third confirmed
 //! instance of this exact pattern: its private `Option`-wrapped
 //! override fields are just as invisible to a model boundary as
-//! `ZonedWith`'s/`DateTimeWith`'s. Nothing non-tautological to model
-//! about any of the twenty-two on any backend.
+//! `ZonedWith`'s/`DateTimeWith`'s. `jiff::civil::TimeArithmetic` also
+//! stays trusted, the identical shape to `DateArithmetic`/`jiff::
+//! DateTimeArithmetic`/`TimestampArithmetic`/`jiff::ZonedArithmetic`:
+//! no public methods at all, one private field, only `From` impls
+//! public. Nothing non-tautological to model about any of the
+//! twenty-three on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -157,7 +161,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::DateTimeDifference,
     jiff::civil::DateTimeRound,
     jiff::civil::DateTimeWith,
-    jiff::civil::DateWith
+    jiff::civil::DateWith,
+    jiff::civil::TimeArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
