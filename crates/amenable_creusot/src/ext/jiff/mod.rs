@@ -223,6 +223,15 @@
 //! from_monday_one_offset`/`to_monday_one_offset` directly, since
 //! Creusot allows only one `extern_spec!` per real function
 //! crate-wide.
+//!
+//! `jiff::civil::WeekdaysForward` gets a real checked property too
+//! (see `civil_weekdays_forward.rs`), an accommodation model —
+//! `WeekdaysForward::next()` has no `jiff::Error` anywhere in its
+//! call chain at all (confirmed by reading jiff's real source), so
+//! this is checked for real here rather than trusted like the
+//! `*Series` family's Kani side; modeled purely in terms of the
+//! plain `i8` Monday-one offset, matching `civil_weekday.rs`'s own
+//! choice.
 
 mod civil_date;
 mod civil_era;
@@ -230,6 +239,7 @@ mod civil_iso_week_date;
 mod civil_time;
 mod civil_time_series;
 mod civil_weekday;
+mod civil_weekdays_forward;
 mod date_series;
 mod date_time_series;
 mod error;

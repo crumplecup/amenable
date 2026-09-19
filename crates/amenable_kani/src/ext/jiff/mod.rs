@@ -370,12 +370,24 @@
 //! established): a real round-trip law over
 //! `from_monday_one_offset`/`to_monday_one_offset`, the identical
 //! claim already extern-spec'd once for `ISOWeekDate`'s own witness.
+//!
+//! `jiff::civil::WeekdaysForward` gets a real checked property too
+//! (see `civil_weekdays_forward.rs`) — checked directly on Kani,
+//! genuinely different from the `*Series` family: its `Iterator::
+//! next()` has no `Result`/`jiff::Error` anywhere in its call chain
+//! at all (confirmed by reading jiff's real source — it delegates to
+//! an infallible `jcore` cycle plus a plain `const fn` match), so
+//! the recursive-Arc Drop-glue wall that makes `TimestampSeries`/
+//! `DateSeries`/`DateTimeSeries`/`TimeSeries` Kani-uncheckable never
+//! applies here — not assumed trusted-and-why by resemblance to that
+//! family just because it's also an "iterator over a jiff type."
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
 mod civil_time;
 mod civil_weekday;
+mod civil_weekdays_forward;
 mod offset;
 mod signed_duration;
 mod span;

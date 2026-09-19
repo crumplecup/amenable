@@ -45,6 +45,8 @@ pub use ext_jiff::civil_time_series::VERIFY_CIVIL_TIME_SERIES_NEXT_YIELDS_START_
 #[cfg(feature = "jiff")]
 pub use ext_jiff::civil_weekday::VERIFY_CIVIL_WEEKDAY_MONDAY_ONE_OFFSET_ROUND_TRIPS_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::civil_weekdays_forward::VERIFY_CIVIL_WEEKDAYS_FORWARD_NEXT_YIELDS_START_THEN_ITS_SUCCESSOR_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::date_series::VERIFY_DATE_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::date_time_series::VERIFY_DATE_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC;
