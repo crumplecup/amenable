@@ -1,0 +1,14 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_from_monday_one_offset": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_to_monday_one_offset": { "prover": "alt-ergo", "time": 0.022 },
+      "vc_verify_civil_weekday_monday_one_offset_round_trips": {
+        "prover": "alt-ergo",
+        "time": 0.044
+      }
+    }
+  }
+}

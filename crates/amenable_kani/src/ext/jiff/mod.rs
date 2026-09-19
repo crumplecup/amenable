@@ -363,11 +363,19 @@
 //! from "some override" from the outside — the identical soundness
 //! obstacle, checked directly against jiff's real source rather than
 //! assumed from the earlier three.
+//!
+//! `jiff::civil::Weekday` gets a real checked property too (see
+//! `civil_weekday.rs`) — checked directly, not assumed trusted just
+//! because it's a fieldless enum (the same lesson `Era` already
+//! established): a real round-trip law over
+//! `from_monday_one_offset`/`to_monday_one_offset`, the identical
+//! claim already extern-spec'd once for `ISOWeekDate`'s own witness.
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
 mod civil_time;
+mod civil_weekday;
 mod offset;
 mod signed_duration;
 mod span;

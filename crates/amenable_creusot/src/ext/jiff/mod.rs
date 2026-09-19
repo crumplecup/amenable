@@ -215,12 +215,21 @@
 //! instance of the `ZonedWith`/`DateTimeWith`/`DateWith` pattern:
 //! its private `Option`-wrapped override fields are just as
 //! invisible to a model boundary as the earlier three's.
+//!
+//! `jiff::civil::Weekday` gets a real checked property too (see
+//! `civil_weekday.rs`) — checked directly, not assumed trusted just
+//! because it's a fieldless enum. Reuses `civil_iso_week_date.rs`'s
+//! existing `extern_spec!` for `Weekday::
+//! from_monday_one_offset`/`to_monday_one_offset` directly, since
+//! Creusot allows only one `extern_spec!` per real function
+//! crate-wide.
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
 mod civil_time;
 mod civil_time_series;
+mod civil_weekday;
 mod date_series;
 mod date_time_series;
 mod error;
