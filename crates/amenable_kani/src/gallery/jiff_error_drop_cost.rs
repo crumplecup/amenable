@@ -132,6 +132,19 @@
 //! at` is a `const fn`, no fallible step) passes instantly; adding
 //! `.series(period).next()` times out even with the result
 //! immediately `mem::forget`-ed.
+//!
+//! **A seventh case (found assessing `jiff::civil::TimeSeries` as a
+//! witness candidate): the identical shape to `DateSeries`'s/
+//! `DateTimeSeries`'s, confirmed again rather than assumed.**
+//! `civil::Time` is, like `civil::Date`/`civil::DateTime`, a pure
+//! clock value with no `TimeZone` at all — so the fourth case's
+//! `Repr` wall cannot apply here either. `TimeSeries::next()` has the
+//! exact same `checked_mul`/`checked_add` shape as `DateSeries::
+//! next()`/`DateTimeSeries::next()`, hitting the identical
+//! `jiff::Error` Drop-glue wall. Isolated the same way: a bare
+//! `Time::new(hour, minute, second, subsec_nanosecond)` call passes
+//! instantly; adding `.series(period).next()` times out even with the
+//! result immediately `mem::forget`-ed.
 
 #[cfg(kani)]
 use jiff::ToSpan;
@@ -493,6 +506,87 @@ amenable_derive::gallery_harness! {
                 .expect("year/month/day are already checked to always be a valid civil::Date");
             let dt = d.at(0, 0, 0, 0);
             assert!(dt.date() == d);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::civil_time_series_next_call_times_out".to_owned(),
+            "gallery::jiff_error_drop_cost::civil_time_series_next_call_times_out".to_owned(),
+            "amenable_kani".to_owned(),
+            "A single .next() call on a Time::series(period) iterator times out even for a tiny assumed range and even when the returned Option<Time> is immediately mem::forget-ed -- TimeSeries::next's own checked_mul/checked_add calls drop a transient jiff::Error via .ok()? on every step, the same Drop-glue wall DateSeries/DateTimeSeries/TimestampSeries hit, unrelated to TimeZone (Time has none)".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CIVIL_TIME_SERIES_NEXT_CALL_TIMES_OUT_SRC, {
+        /// A bare `Time::new(hour, minute, second,
+        /// subsec_nanosecond).series(period).next()` call, forgotten
+        /// immediately, still times out — isolating the cost to
+        /// `TimeSeries::next`'s own internal fallible conversions,
+        /// the identical `jiff::Error` Drop-glue wall `DateSeries`/
+        /// `DateTimeSeries` hit.
+        #[kani::proof]
+        fn civil_time_series_next_call_times_out() {
+            let hour: i8 = kani::any();
+            let minute: i8 = kani::any();
+            let second: i8 = kani::any();
+            let subsec_nanosecond: i32 = kani::any();
+            let period_hours: i64 = kani::any();
+            kani::assume(hour >= 0 && hour <= 23);
+            kani::assume(minute >= 0 && minute <= 59);
+            kani::assume(second >= 0 && second <= 59);
+            kani::assume(subsec_nanosecond >= 0 && subsec_nanosecond <= 999_999_999);
+            kani::assume(period_hours >= -1_000_000 && period_hours <= 1_000_000);
+            let t = jiff::civil::Time::new(hour, minute, second, subsec_nanosecond).expect(
+                "hour/minute/second/subsec_nanosecond are already checked to always be a valid civil::Time",
+            );
+            let mut series = t.series(period_hours.hours());
+            let next = series.next();
+            std::mem::forget(series);
+            std::mem::forget(next);
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::jiff_error_drop_cost::civil_time_new_alone_passes".to_owned(),
+            "gallery::jiff_error_drop_cost::civil_time_new_alone_passes".to_owned(),
+            "amenable_kani".to_owned(),
+            "The identical symbolic Time::new(hour, minute, second, subsec_nanosecond) call, with no .series()/.next() call at all, verifies instantly -- confirming Time::new itself is not the source of the timeout, isolating it specifically to TimeSeries::next's internal conversions".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::Hypothesis,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CIVIL_TIME_NEW_ALONE_PASSES_SRC, {
+        /// `civil_time_series_next_call_times_out`, with the
+        /// `.series()`/`.next()` calls removed — confirms `Time::new`
+        /// alone is fast, isolating the wall to `TimeSeries::next`
+        /// specifically.
+        #[kani::proof]
+        fn civil_time_new_alone_passes() {
+            let hour: i8 = kani::any();
+            let minute: i8 = kani::any();
+            let second: i8 = kani::any();
+            let subsec_nanosecond: i32 = kani::any();
+            kani::assume(hour >= 0 && hour <= 23);
+            kani::assume(minute >= 0 && minute <= 59);
+            kani::assume(second >= 0 && second <= 59);
+            kani::assume(subsec_nanosecond >= 0 && subsec_nanosecond <= 999_999_999);
+            let t = jiff::civil::Time::new(hour, minute, second, subsec_nanosecond).expect(
+                "hour/minute/second/subsec_nanosecond are already checked to always be a valid civil::Time",
+            );
+            assert!(t.hour() == hour);
         }
     }
 }

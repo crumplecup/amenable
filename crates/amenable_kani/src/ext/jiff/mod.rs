@@ -340,6 +340,18 @@
 //! (`new`/`smallest`/`mode`/`increment`) are all plain setters; the
 //! actual rounding logic (`round`) is private, and all three fields
 //! (`smallest`/`mode`/`increment`) are private with no getters.
+//!
+//! `jiff::civil::TimeSeries` also stays trusted for Kani specifically,
+//! for the identical real reason as `DateSeries`/`DateTimeSeries` —
+//! `civil::Time`, like `civil::Date`/`civil::DateTime`, is a pure
+//! clock value with no `TimeZone` at all, so `ZonedSeries`'s `Repr`
+//! wall cannot apply here either; `TimeSeries::next()` has the exact
+//! same `checked_mul`/`checked_add` shape as `DateSeries::next()`/
+//! `DateTimeSeries::next()`, confirmed via `gallery::
+//! jiff_error_drop_cost`'s own doc comment to hit the identical
+//! `jiff::Error` Drop-glue wall. Checked on Creusot and Verus instead
+//! (`ext_jiff::civil_time_series`/`ext::jiff::civil_time_series`),
+//! neither of which shares this Rust-Drop-glue mechanism.
 
 mod civil_date;
 mod civil_era;
@@ -386,5 +398,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::DateWith,
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
-    jiff::civil::TimeRound
+    jiff::civil::TimeRound,
+    jiff::civil::TimeSeries
 );

@@ -200,11 +200,22 @@
 //! reason as `DateTimeRound`/`TimestampRound`/`ZonedRound`: its four
 //! public methods are all plain setters, and all three fields are
 //! private with no getters.
+//!
+//! `jiff::civil::TimeSeries` gets a real checked property too (see
+//! `civil_time_series.rs`), an accommodation model — checked here
+//! despite being trusted for Kani specifically, for the identical
+//! real reason `DateSeries`/`DateTimeSeries` are (a `jiff::Error`
+//! Drop-glue wall, confirmed distinct from `ZonedSeries`'s
+//! `TimeZone::Repr` wall since `civil::Time` has no time zone at
+//! all). Modeled as a signed nanosecond count rather than jiff's
+//! real within-a-day wraparound semantics, scoped to a comfortably
+//! safe range that never approaches wraparound.
 
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;
 mod civil_time;
+mod civil_time_series;
 mod date_series;
 mod date_time_series;
 mod error;

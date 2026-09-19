@@ -3,6 +3,8 @@ amenable_kani::gallery::atomic_ptr_compare_exchange::mismatch_does_not_report_th
 amenable_kani::gallery::jiff_error_drop_cost::any_accessor_on_a_deterministic_forgotten_error_times_out,1789418803,false_trail,timeout,timeout,true
 amenable_kani::gallery::jiff_error_drop_cost::civil_date_at_midnight_alone_passes,1789748321,hypothesis,passed,passed,true
 amenable_kani::gallery::jiff_error_drop_cost::civil_date_new_alone_passes,1789524310,hypothesis,passed,passed,true
+amenable_kani::gallery::jiff_error_drop_cost::civil_time_new_alone_passes,1789835640,hypothesis,passed,passed,true
+amenable_kani::gallery::jiff_error_drop_cost::civil_time_series_next_call_times_out,1789835862,false_trail,timeout,timeout,true
 amenable_kani::gallery::jiff_error_drop_cost::date_series_next_call_times_out,1789524528,false_trail,timeout,timeout,true
 amenable_kani::gallery::jiff_error_drop_cost::date_time_series_next_call_times_out,1789748534,false_trail,timeout,timeout,true
 amenable_kani::gallery::jiff_error_drop_cost::mem_forget_of_the_identical_symbolic_result_passes,1789407767,hypothesis,passed,passed,true
