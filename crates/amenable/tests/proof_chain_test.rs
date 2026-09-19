@@ -8927,6 +8927,18 @@ fn ext_civil_time_difference_proof_chain_reports_all_three_verifiers() -> miette
     not(all(feature = "jiff", feature = "creusot", feature = "verus")),
     ignore
 )]
+fn ext_civil_time_round_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::civil::TimeRound>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::civil::TimeRound>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
 fn ext_civil_date_series_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
     amenable::init_tracing();
     let report = support::chain(amenable::proof_chain(
