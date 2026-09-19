@@ -352,6 +352,17 @@
 //! `jiff::Error` Drop-glue wall. Checked on Creusot and Verus instead
 //! (`ext_jiff::civil_time_series`/`ext::jiff::civil_time_series`),
 //! neither of which shares this Rust-Drop-glue mechanism.
+//!
+//! `jiff::civil::TimeWith` stays trusted too, the fourth confirmed
+//! instance of the `ZonedWith`/`DateTimeWith`/`DateWith` pattern:
+//! its fields (`original: Time`, `hour: Option<i8>`, `minute:
+//! Option<i8>`, `second: Option<i8>`, `millisecond: Option<i16>`,
+//! `microsecond: Option<i16>`, `nanosecond: Option<i16>`,
+//! `subsec_nanosecond: Option<i32>`) are private either way, so the
+//! extern_spec/model boundary still can't distinguish "no override"
+//! from "some override" from the outside — the identical soundness
+//! obstacle, checked directly against jiff's real source rather than
+//! assumed from the earlier three.
 
 mod civil_date;
 mod civil_era;
@@ -399,5 +410,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
-    jiff::civil::TimeSeries
+    jiff::civil::TimeSeries,
+    jiff::civil::TimeWith
 );

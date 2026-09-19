@@ -107,8 +107,12 @@
 //! getters. `jiff::civil::TimeRound` also stays trusted, the
 //! identical builder-only shape to `DateTimeRound`/`TimestampRound`/
 //! `jiff::ZonedRound`: four plain-setter public methods, all three
-//! fields private with no getters. Nothing non-tautological to
-//! model about any of the twenty-five on any backend.
+//! fields private with no getters. `jiff::civil::TimeWith` also
+//! stays trusted, the fourth confirmed instance of the `jiff::
+//! ZonedWith`/`DateTimeWith`/`DateWith` pattern: its private
+//! `Option`-wrapped override fields are just as invisible to a model
+//! boundary as the earlier three's. Nothing non-tautological to
+//! model about any of the twenty-six on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -175,7 +179,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::DateWith,
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
-    jiff::civil::TimeRound
+    jiff::civil::TimeRound,
+    jiff::civil::TimeWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -210,6 +210,11 @@
 //! all). Modeled as a signed nanosecond count rather than jiff's
 //! real within-a-day wraparound semantics, scoped to a comfortably
 //! safe range that never approaches wraparound.
+//!
+//! `jiff::civil::TimeWith` stays trusted too, the fourth confirmed
+//! instance of the `ZonedWith`/`DateTimeWith`/`DateWith` pattern:
+//! its private `Option`-wrapped override fields are just as
+//! invisible to a model boundary as the earlier three's.
 
 mod civil_date;
 mod civil_era;
@@ -298,7 +303,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::DateWith,
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
-    jiff::civil::TimeRound
+    jiff::civil::TimeRound,
+    jiff::civil::TimeWith
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
