@@ -237,6 +237,16 @@
 //! (see `civil_weekdays_reverse.rs`), the identical accommodation
 //! model shape — re-verified, not assumed from `WeekdaysForward`'s
 //! own confirmed no-`jiff::Error` shape.
+//!
+//! `jiff::fmt::StdFmtWrite<String>` gets a real checked property too
+//! (see `fmt_std_fmt_write.rs`): a real `extern_spec!` for jiff's own
+//! `fmt::Write::write_str`, checking a genuinely non-tautological
+//! infallibility claim — narrower than `amenable_kani::ext::jiff::
+//! fmt_std_fmt_write`'s own stronger round-trip claim, for a real
+//! design reason (no honest way found to connect an opaque `&str`
+//! content accessor to the harness's concrete single-character
+//! string without a string-content model this crate has no local
+//! precedent for), documented in that module's own doc comment.
 
 mod civil_date;
 mod civil_era;
@@ -249,6 +259,7 @@ mod civil_weekdays_reverse;
 mod date_series;
 mod date_time_series;
 mod error;
+mod fmt_std_fmt_write;
 mod offset;
 mod signed_duration;
 mod span;

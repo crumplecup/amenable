@@ -1,0 +1,75 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 82 8 82 94 *)
+
+let%span sresult = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/result.rs" 20 18 20 55
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
+let%span sfmt_std_fmt_write = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 84 12 84 31
+let%span sfmt_std_fmt_write'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 84 12 84 39
+let%span sfmt_std_fmt_write'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 82 62 82 68
+let%span sfmt_std_fmt_write'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 80 19 80 23
+let%span sfmt_std_fmt_write'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 81 18 81 71
+let%span sfmt_std_fmt_write'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 54 26 54 30
+let%span sfmt_std_fmt_write'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 50 18 53 9
+let%span sfmt_std_fmt_write'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 66 24 66 33
+
+use creusot.prelude.MutBorrow
+use creusot.prelude.Any
+
+type t_String
+
+predicate inv_String (_1: t_String)
+
+type t_Result_unit_Error = Ok () | Err ()
+
+predicate invariant_refmut_String [@inline:trivial] (self: MutBorrow.t t_String) =
+  [%#sinvariant] inv_String self.current /\ inv_String self.final
+
+meta "rewrite_def" predicate invariant_refmut_String
+
+predicate inv_refmut_String [@inline:trivial] (_1: MutBorrow.t t_String) = invariant_refmut_String _1
+
+meta "rewrite_def" predicate inv_refmut_String
+
+let write_str_String (self_: MutBorrow.t t_String) (string': string) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:write_str 'self_' type invariant] [%#sfmt_std_fmt_write'4] inv_refmut_String self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:write_str ensures] [%#sfmt_std_fmt_write'5] match result with
+      | Ok _ -> true
+      | Err _ -> false
+      end}
+    (! return {result}) ]
+
+predicate resolve_String (_1: t_String)
+
+let is_ok_unit (self_: t_Result_unit_Error) (return (x: bool)) = any
+  [ return (result: bool) -> {[@stop_split] [@expl:is_ok ensures] [%#sresult] result = (exists t: (). self_ = Ok t)}
+    (! return {result}) ]
+
+predicate fmt_std_fmt_write_write_str_never_fails_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 65 8 65 81] (succeeded: bool) =
+  [%#sfmt_std_fmt_write'6] succeeded
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_fmt_std_fmt_write_write_str_never_fails [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_std_fmt_write.rs" 82 8 82 94]
+  (string': t_String) (s: string) (return (x: bool)) =
+{[@stop_split] [@expl:verify_fmt_std_fmt_write_write_str_never_fails 'string' type invariant] [%#sfmt_std_fmt_write'1] inv_String string'}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = MutBorrow.borrow_mut <t_String> {string'}
+        (fun (_bor: MutBorrow.t t_String) -> [ &_7 <- _bor ] -{inv_String _bor.final}- [ &string' <- _bor.final ] s1)
+      [ _ck -> (! {[@expl:type invariant] inv_String string'} any) ]
+    | s1 = write_str_String [%#sfmt_std_fmt_write] {_7} {s} (fun (_x: t_Result_unit_Error) -> [ &_6 <- _x ] s2)
+    | s2 = s3 [ _ck -> (! {[@expl:type invariant] inv_String string'} any) ]
+    | s3 = -{resolve_String string'}- s4
+    | s4 = is_ok_unit [%#sfmt_std_fmt_write'0] {_6} (fun (_x: bool) -> [ &_ret <- _x ] s5)
+    | s5 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & string': t_String = string'
+  | & s: string = s
+  | & _6: t_Result_unit_Error = Any.any_l ()
+  | & _7: MutBorrow.t t_String = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_fmt_std_fmt_write_write_str_never_fails ensures] [%#sfmt_std_fmt_write'3] fmt_std_fmt_write_write_str_never_fails_holds result}
+    (! return {result}) ]

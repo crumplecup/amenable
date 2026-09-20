@@ -1,0 +1,23 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_is_ok_unit": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_verify_fmt_std_fmt_write_write_str_never_fails": {
+        "tactic": "compute_specified",
+        "children": [
+          {
+            "tactic": "split_vc",
+            "children": [
+              { "prover": "alt-ergo", "time": 0.024 },
+              { "prover": "z3", "time": 0.011 },
+              { "prover": "alt-ergo", "time": 0.023 },
+              { "prover": "alt-ergo", "time": 0.022 }
+            ]
+          }
+        ]
+      },
+      "vc_write_str_String": { "prover": "alt-ergo", "time": 0.025 }
+    }
+  }
+}

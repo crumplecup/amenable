@@ -21,6 +21,7 @@ pub(crate) mod civil_weekdays_reverse;
 pub(crate) mod date_series;
 pub(crate) mod date_time_series;
 pub(crate) mod error;
+pub(crate) mod fmt_std_fmt_write;
 pub(crate) mod offset;
 pub(crate) mod signed_duration;
 pub(crate) mod span;

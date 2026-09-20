@@ -388,6 +388,16 @@
 //! jiff's real source, `WeekdaysReverse::next()` has the identical
 //! infallible `jcore`-delegation shape, no `Result`/`jiff::Error`
 //! anywhere.
+//!
+//! `jiff::fmt::StdFmtWrite<String>` gets a real checked property too
+//! (see `fmt_std_fmt_write.rs`): a real newtype wrapper adapting any
+//! `core::fmt::Write` value to jiff's own public `jiff::fmt::Write`
+//! trait — checked directly against jiff's real source. Scoped to
+//! `W = String`, whose `core::fmt::Write` implementation never fails,
+//! so the `Err` arm (the only path that would construct a real
+//! `jiff::Error`) is never reached, avoiding the recursive-Arc
+//! Drop-glue wall this module's own opening paragraphs document
+//! rather than needing to work around it.
 
 mod civil_date;
 mod civil_era;
@@ -396,6 +406,7 @@ mod civil_time;
 mod civil_weekday;
 mod civil_weekdays_forward;
 mod civil_weekdays_reverse;
+mod fmt_std_fmt_write;
 mod offset;
 mod signed_duration;
 mod span;

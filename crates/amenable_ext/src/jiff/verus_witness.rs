@@ -13,14 +13,15 @@
 //! ISOWeekDate`/`jiff::civil::Time`/`jiff::civil::Weekday`/`jiff::
 //! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
-//! TimeSeries`/`jiff::tz::Offset`/`jiff::Error`/`jiff::
+//! TimeSeries`/`jiff::fmt::StdFmtWrite<String>`/`jiff::tz::Offset`/
+//! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
 //! exceptions so far — real, hand-verified accommodation models in
 //! `amenable_verus::ext::jiff::{civil_date,civil_era,
 //! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
-//! date_time_series,offset,error,signed_duration,span,
+//! date_time_series,fmt_std_fmt_write,offset,error,signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -124,6 +125,18 @@
 //! `Option`-wrapped override fields are just as invisible to a model
 //! boundary as the earlier three's. Nothing non-tautological to
 //! model about any of the twenty-six on any backend.
+//!
+//! `jiff::fmt::StdFmtWrite<String>`'s model differs from every other
+//! model in this list: it's not a from-scratch hand reproduction, but
+//! uses `vstd`'s own already-contracted `String::append` directly
+//! (real `vstd` coverage confirmed present, unlike jiff itself), and
+//! states the FULL round-trip claim (`amenable_kani::ext::jiff::
+//! fmt_std_fmt_write`'s own stronger claim) rather than
+//! `amenable_creusot::ext_jiff::fmt_std_fmt_write`'s narrower
+//! never-fails-only one — Verus never extern-specs jiff's actual
+//! generic trait impl the way Creusot tried and hit a real "extern
+//! spec generics don't match" wall on, so it has no reason to scope
+//! down to match.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -311,6 +324,12 @@ impl_verus_witness_checked_ext!(
     jiff::civil::DateTimeSeries,
     "verify_date_time_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/date_time_series.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::StdFmtWrite<String>,
+    "verify_fmt_std_fmt_write_write_str_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_std_fmt_write.rs"
 );
 
 impl_verus_witness_checked_ext!(

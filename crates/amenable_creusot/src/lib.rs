@@ -58,6 +58,8 @@ pub use ext_jiff::error::{
     VERIFY_ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_SRC,
 };
 #[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_std_fmt_write::VERIFY_FMT_STD_FMT_WRITE_WRITE_STR_NEVER_FAILS_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::offset::{
     OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,
 };
