@@ -13,7 +13,8 @@
 //! ISOWeekDate`/`jiff::civil::Time`/`jiff::civil::Weekday`/`jiff::
 //! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
-//! TimeSeries`/`jiff::fmt::StdFmtWrite<String>`/`jiff::fmt::
+//! TimeSeries`/`jiff::fmt::friendly::FractionalUnit`/`jiff::fmt::
+//! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
@@ -22,7 +23,8 @@
 //! `amenable_verus::ext::jiff::{civil_date,civil_era,
 //! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
-//! date_time_series,fmt_std_fmt_write,fmt_std_io_write,offset,error,
+//! date_time_series,fmt_friendly_fractional_unit,fmt_std_fmt_write,
+//! fmt_std_io_write,offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
 //! is still unreachable, but each
@@ -157,6 +159,13 @@
 //! source, a fieldless, `#[non_exhaustive]` config-marker enum
 //! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
 //! method (`sign`) is private.
+//!
+//! `jiff::fmt::friendly::FractionalUnit`'s model reuses `unit.rs`'s
+//! existing `UnitModel` directly rather than modeling `Unit`'s ten
+//! variants a second time — the same claim `amenable_kani::ext::jiff::
+//! fmt_friendly_fractional_unit` and `amenable_creusot::ext_jiff::
+//! fmt_friendly_fractional_unit` check against jiff's real
+//! `From<FractionalUnit> for Unit` conversion.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -346,6 +355,12 @@ impl_verus_witness_checked_ext!(
     jiff::civil::DateTimeSeries,
     "verify_date_time_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/date_time_series.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::friendly::FractionalUnit,
+    "verify_fmt_friendly_fractional_unit_from_matches_documented_mapping_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_friendly_fractional_unit.rs"
 );
 
 impl_verus_witness_checked_ext!(

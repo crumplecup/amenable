@@ -423,6 +423,14 @@
 //! source, it's a fieldless, `#[non_exhaustive]` config-marker enum
 //! (`Auto`/`Sign`/`ForceSign`/`Suffix`) deriving only `Clone`/`Copy`/
 //! `Debug`; its one `impl Direction` method (`sign`) is private.
+//!
+//! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
+//! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
+//! from `Designator`/`Direction`: checked directly against jiff's
+//! real source, it has no `impl FractionalUnit` block at all, but it
+//! DOES have one real public conversion, `impl From<FractionalUnit>
+//! for Unit`, a documented per-variant mapping — checked by exhaustive
+//! enumeration of all 5 variants.
 
 mod civil_date;
 mod civil_era;
@@ -431,6 +439,7 @@ mod civil_time;
 mod civil_weekday;
 mod civil_weekdays_forward;
 mod civil_weekdays_reverse;
+mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod offset;

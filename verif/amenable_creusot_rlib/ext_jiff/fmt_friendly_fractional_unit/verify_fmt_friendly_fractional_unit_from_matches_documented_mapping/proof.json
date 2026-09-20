@@ -1,0 +1,13 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_from_Unit": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_into_FractionalUnit": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_verify_fmt_friendly_fractional_unit_from_matches_documented_mapping": {
+        "prover": "alt-ergo",
+        "time": 0.033
+      }
+    }
+  }
+}

@@ -9069,3 +9069,21 @@ fn ext_fmt_friendly_direction_proof_chain_reports_all_three_verifiers() -> miett
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::friendly::Direction>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_friendly_fractional_unit_proof_chain_reports_all_three_verifiers() -> miette::Result<()>
+{
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::friendly::FractionalUnit>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(
+        &report,
+        "ExtStandard<jiff::fmt::friendly::FractionalUnit>",
+    );
+    Ok(())
+}

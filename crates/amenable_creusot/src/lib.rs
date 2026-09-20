@@ -59,6 +59,8 @@ pub use ext_jiff::error::{
     VERIFY_ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_SRC,
 };
 #[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_friendly_fractional_unit::VERIFY_FMT_FRIENDLY_FRACTIONAL_UNIT_FROM_MATCHES_DOCUMENTED_MAPPING_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_std_fmt_write::VERIFY_FMT_STD_FMT_WRITE_WRITE_STR_NEVER_FAILS_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_std_io_write::VERIFY_FMT_STD_IO_WRITE_WRITE_STR_NEVER_FAILS_SRC;

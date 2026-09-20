@@ -270,6 +270,14 @@
 //! source, a fieldless, `#[non_exhaustive]` config-marker enum
 //! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
 //! method (`sign`) is private.
+//!
+//! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
+//! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
+//! for jiff's own `From<FractionalUnit> for Unit`, checking the same
+//! documented per-variant mapping `amenable_kani::ext::jiff::
+//! fmt_friendly_fractional_unit` checks by exhaustive enumeration —
+//! both the `extern_spec!` ensures and the harness body need a
+//! wildcard arm (`FractionalUnit` is `#[non_exhaustive]`).
 
 mod civil_date;
 mod civil_era;
@@ -282,6 +290,7 @@ mod civil_weekdays_reverse;
 mod date_series;
 mod date_time_series;
 mod error;
+mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod offset;
