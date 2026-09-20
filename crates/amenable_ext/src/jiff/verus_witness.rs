@@ -160,6 +160,12 @@
 //! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
 //! method (`sign`) is private.
 //!
+//! `jiff::fmt::friendly::Spacing` stays trusted, the identical shape
+//! to `Designator`/`Direction`: checked directly against jiff's real
+//! source, a fieldless, `#[non_exhaustive]` config-marker enum
+//! deriving only `Clone`/`Copy`/`Debug`; both `impl Spacing` methods
+//! (`between_units`/`between_units_and_designators`) are private.
+//!
 //! `jiff::fmt::friendly::FractionalUnit`'s model reuses `unit.rs`'s
 //! existing `UnitModel` directly rather than modeling `Unit`'s ten
 //! variants a second time — the same claim `amenable_kani::ext::jiff::
@@ -235,7 +241,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::TimeRound,
     jiff::civil::TimeWith,
     jiff::fmt::friendly::Designator,
-    jiff::fmt::friendly::Direction
+    jiff::fmt::friendly::Direction,
+    jiff::fmt::friendly::Spacing
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

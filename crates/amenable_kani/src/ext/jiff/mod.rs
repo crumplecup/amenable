@@ -424,6 +424,13 @@
 //! (`Auto`/`Sign`/`ForceSign`/`Suffix`) deriving only `Clone`/`Copy`/
 //! `Debug`; its one `impl Direction` method (`sign`) is private.
 //!
+//! `jiff::fmt::friendly::Spacing` stays trusted, the identical shape
+//! to `Designator`/`Direction`: checked directly against jiff's real
+//! source, it's a fieldless, `#[non_exhaustive]` config-marker enum
+//! (`None`/`BetweenUnits`/`BetweenUnitsAndDesignators`) deriving only
+//! `Clone`/`Copy`/`Debug`; both `impl Spacing` methods
+//! (`between_units`/`between_units_and_designators`) are private.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -487,5 +494,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::TimeSeries,
     jiff::civil::TimeWith,
     jiff::fmt::friendly::Designator,
-    jiff::fmt::friendly::Direction
+    jiff::fmt::friendly::Direction,
+    jiff::fmt::friendly::Spacing
 );

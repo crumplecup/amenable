@@ -271,6 +271,12 @@
 //! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
 //! method (`sign`) is private.
 //!
+//! `jiff::fmt::friendly::Spacing` stays trusted, the identical shape
+//! to `Designator`/`Direction`: checked directly against jiff's real
+//! source, a fieldless, `#[non_exhaustive]` config-marker enum
+//! deriving only `Clone`/`Copy`/`Debug`; both `impl Spacing` methods
+//! (`between_units`/`between_units_and_designators`) are private.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -375,7 +381,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::TimeRound,
     jiff::civil::TimeWith,
     jiff::fmt::friendly::Designator,
-    jiff::fmt::friendly::Direction
+    jiff::fmt::friendly::Direction,
+    jiff::fmt::friendly::Spacing
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
