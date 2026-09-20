@@ -297,6 +297,15 @@
 //! methods have the same disproportionate-reproduction shape
 //! `SpanParser`/`TimestampDisplayWithOffset` already established.
 //!
+//! `jiff::fmt::rfc2822::DateTimeParser` stays trusted, the identical
+//! combined shape to `SpanParser`/`SpanPrinter`: checked directly
+//! against jiff's real source, its one public method
+//! (`relaxed_weekday(self, bool) -> Self`) is a plain setter over its
+//! one private field, with no getter — and its real parsing methods
+//! (`parse_zoned`/`parse_timestamp`) have the same disproportionate-
+//! reproduction shape, reproducing jiff's real RFC 2822 grammar this
+//! time.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -404,7 +413,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,
     jiff::fmt::friendly::SpanParser,
-    jiff::fmt::friendly::SpanPrinter
+    jiff::fmt::friendly::SpanPrinter,
+    jiff::fmt::rfc2822::DateTimeParser
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

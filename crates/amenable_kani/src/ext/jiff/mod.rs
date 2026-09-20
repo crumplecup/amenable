@@ -457,6 +457,16 @@
 //! disproportionate-reproduction shape `SpanParser`/
 //! `TimestampDisplayWithOffset` already established.
 //!
+//! `jiff::fmt::rfc2822::DateTimeParser` stays trusted, the identical
+//! combined shape to `SpanParser`/`SpanPrinter`: checked directly
+//! against jiff's real source (`src/fmt/rfc2822.rs`), its one public
+//! method (`relaxed_weekday(self, bool) -> Self`) is a plain setter
+//! over its one private field, with no getter — and its real parsing
+//! methods (`parse_zoned`/`parse_timestamp`) have the same
+//! disproportionate-reproduction shape `SpanParser` already
+//! established, reproducing jiff's real RFC 2822 grammar this time
+//! rather than the friendly-duration one.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -523,5 +533,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,
     jiff::fmt::friendly::SpanParser,
-    jiff::fmt::friendly::SpanPrinter
+    jiff::fmt::friendly::SpanPrinter,
+    jiff::fmt::rfc2822::DateTimeParser
 );
