@@ -247,6 +247,15 @@
 //! content accessor to the harness's concrete single-character
 //! string without a string-content model this crate has no local
 //! precedent for), documented in that module's own doc comment.
+//!
+//! `jiff::fmt::StdIoWrite<Vec<u8>>` gets a real checked property too
+//! (see `fmt_std_io_write.rs`): the identical generics-matching wall
+//! as `StdFmtWrite<String>`'s own, but `Vec<u8>`'s own `std::io::
+//! Write` impl is ALSO generic (`impl<A: Allocator> Write for
+//! Vec<u8, A>`, confirmed against std's real source), so the fix here
+//! extern-specs that generic impl directly (matching `creusot-std`'s
+//! own established pattern for `Vec<T, A>::push`/`len`), rather than
+//! `StdFmtWrite<String>`'s non-generic-impl workaround.
 
 mod civil_date;
 mod civil_era;
@@ -260,6 +269,7 @@ mod date_series;
 mod date_time_series;
 mod error;
 mod fmt_std_fmt_write;
+mod fmt_std_io_write;
 mod offset;
 mod signed_duration;
 mod span;

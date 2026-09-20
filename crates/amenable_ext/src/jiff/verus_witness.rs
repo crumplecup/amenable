@@ -13,7 +13,8 @@
 //! ISOWeekDate`/`jiff::civil::Time`/`jiff::civil::Weekday`/`jiff::
 //! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
-//! TimeSeries`/`jiff::fmt::StdFmtWrite<String>`/`jiff::tz::Offset`/
+//! TimeSeries`/`jiff::fmt::StdFmtWrite<String>`/`jiff::fmt::
+//! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -21,7 +22,8 @@
 //! `amenable_verus::ext::jiff::{civil_date,civil_era,
 //! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
-//! date_time_series,fmt_std_fmt_write,offset,error,signed_duration,span,
+//! date_time_series,fmt_std_fmt_write,fmt_std_io_write,offset,error,
+//! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -137,6 +139,12 @@
 //! generic trait impl the way Creusot tried and hit a real "extern
 //! spec generics don't match" wall on, so it has no reason to scope
 //! down to match.
+//!
+//! `jiff::fmt::StdIoWrite<Vec<u8>>`'s model is the identical shape,
+//! using `vstd`'s own already-contracted `Vec::extend_from_slice`
+//! instead of `String::append` — also states the FULL round-trip
+//! claim, unlike `amenable_creusot::ext_jiff::fmt_std_io_write`'s
+//! narrower never-fails-only one.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -330,6 +338,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::StdFmtWrite<String>,
     "verify_fmt_std_fmt_write_write_str_model",
     "../../../amenable_verus/src/ext/jiff/fmt_std_fmt_write.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::StdIoWrite<Vec<u8>>,
+    "verify_fmt_std_io_write_write_str_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_std_io_write.rs"
 );
 
 impl_verus_witness_checked_ext!(

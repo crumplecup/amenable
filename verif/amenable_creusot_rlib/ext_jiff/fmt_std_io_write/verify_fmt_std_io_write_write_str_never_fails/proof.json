@@ -1,0 +1,13 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_is_ok_unit": { "prover": "alt-ergo", "time": 0.037 },
+      "vc_verify_fmt_std_io_write_write_str_never_fails": {
+        "prover": "z3",
+        "time": 0.014
+      },
+      "vc_write_all_Vec_u8_Global": { "prover": "alt-ergo", "time": 0.033 }
+    }
+  }
+}

@@ -17,6 +17,7 @@
 //! `rust_std/` holds the actual harness functions; `witness.rs` holds
 //! the trait/marker definitions `rust_std_witness` implements against.
 
+#![cfg_attr(creusot, feature(allocator_api))]
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
@@ -59,6 +60,8 @@ pub use ext_jiff::error::{
 };
 #[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_std_fmt_write::VERIFY_FMT_STD_FMT_WRITE_WRITE_STR_NEVER_FAILS_SRC;
+#[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_std_io_write::VERIFY_FMT_STD_IO_WRITE_WRITE_STR_NEVER_FAILS_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::offset::{
     OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,

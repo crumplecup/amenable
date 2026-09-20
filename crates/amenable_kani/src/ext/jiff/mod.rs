@@ -398,6 +398,13 @@
 //! `jiff::Error`) is never reached, avoiding the recursive-Arc
 //! Drop-glue wall this module's own opening paragraphs document
 //! rather than needing to work around it.
+//!
+//! `jiff::fmt::StdIoWrite<Vec<u8>>` gets a real checked property too
+//! (see `fmt_std_io_write.rs`), the identical shape to `StdFmtWrite<
+//! String>`'s own: a real newtype wrapper adapting any `std::io::
+//! Write` value to jiff's `jiff::fmt::Write` trait, scoped to
+//! `W = Vec<u8>`, whose `write_all` is documented to never fail (it
+//! just extends the vector), so the `Err` arm is never reached.
 
 mod civil_date;
 mod civil_era;
@@ -407,6 +414,7 @@ mod civil_weekday;
 mod civil_weekdays_forward;
 mod civil_weekdays_reverse;
 mod fmt_std_fmt_write;
+mod fmt_std_io_write;
 mod offset;
 mod signed_duration;
 mod span;

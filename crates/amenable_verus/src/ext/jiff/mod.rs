@@ -13,6 +13,7 @@ pub mod date_series;
 pub mod date_time_series;
 pub mod error;
 pub mod fmt_std_fmt_write;
+pub mod fmt_std_io_write;
 pub mod offset;
 pub mod signed_duration;
 pub mod span;

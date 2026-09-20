@@ -9027,3 +9027,17 @@ fn ext_fmt_std_fmt_write_proof_chain_reports_all_three_verifiers() -> miette::Re
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::StdFmtWrite<String>>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_std_io_write_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::StdIoWrite<Vec<u8>>>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::StdIoWrite<Vec<u8>>>");
+    Ok(())
+}

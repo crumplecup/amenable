@@ -12,6 +12,7 @@ amenable_kani::ext::jiff::civil_weekdays_reverse::verify_civil_weekdays_reverse_
 amenable_kani::ext::jiff::error::diagnostic_error_from_args_construct_and_drop,1789417703,timeout
 amenable_kani::ext::jiff::error::verify_error_from_args_round_trips_through_display,1789418427,timeout
 amenable_kani::ext::jiff::fmt_std_fmt_write::verify_fmt_std_fmt_write_write_str_appends_the_written_byte,1789923675,passed
+amenable_kani::ext::jiff::fmt_std_io_write::verify_fmt_std_io_write_write_str_appends_the_written_byte,1789926552,passed
 amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed
 amenable_kani::ext::jiff::signed_duration::verify_signed_duration_new_normalizes_nanos_and_carries_into_secs,1789421600,passed
 amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789441687,passed
