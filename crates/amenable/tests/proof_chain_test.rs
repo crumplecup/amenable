@@ -9101,3 +9101,17 @@ fn ext_fmt_friendly_spacing_proof_chain_reports_all_three_verifiers() -> miette:
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::friendly::Spacing>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_friendly_span_parser_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::friendly::SpanParser>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::friendly::SpanParser>");
+    Ok(())
+}

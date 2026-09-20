@@ -431,6 +431,20 @@
 //! `Clone`/`Copy`/`Debug`; both `impl Spacing` methods
 //! (`between_units`/`between_units_and_designators`) are private.
 //!
+//! `jiff::fmt::friendly::SpanParser` stays trusted, a genuinely
+//! different reason from every other type in this file: unlike the
+//! builder/config-marker shapes above, it has real, substantial
+//! documented behavior (`parse_span`/`parse_duration`/
+//! `parse_unsigned_duration`, jiff's real friendly-duration parsing
+//! grammar) — but checked directly against jiff's real source, the
+//! struct itself carries zero configurable state (`_private: ()`,
+//! and jiff's own doc comment says outright "there are no available
+//! configuration options for this parser"). Checking its exact
+//! parsing behavior would mean reproducing jiff's entire grammar,
+//! the same disproportionate-reproduction reason `jiff::
+//! TimestampDisplayWithOffset` already established for formatting
+//! output.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -495,5 +509,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::TimeWith,
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
-    jiff::fmt::friendly::Spacing
+    jiff::fmt::friendly::Spacing,
+    jiff::fmt::friendly::SpanParser
 );

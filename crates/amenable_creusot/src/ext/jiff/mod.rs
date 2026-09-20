@@ -277,6 +277,17 @@
 //! deriving only `Clone`/`Copy`/`Debug`; both `impl Spacing` methods
 //! (`between_units`/`between_units_and_designators`) are private.
 //!
+//! `jiff::fmt::friendly::SpanParser` stays trusted, a genuinely
+//! different reason from every other type in this file: real,
+//! substantial documented behavior (`parse_span`/`parse_duration`/
+//! `parse_unsigned_duration`), but checked directly against jiff's
+//! real source, the struct carries zero configurable state
+//! (`_private: ()`, and jiff's own doc comment confirms no
+//! configuration options exist). Checking its exact parsing behavior
+//! would mean reproducing jiff's entire grammar, the same
+//! disproportionate-reproduction reason `jiff::
+//! TimestampDisplayWithOffset` already established.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -382,7 +393,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::TimeWith,
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
-    jiff::fmt::friendly::Spacing
+    jiff::fmt::friendly::Spacing,
+    jiff::fmt::friendly::SpanParser
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
