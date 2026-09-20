@@ -405,6 +405,18 @@
 //! Write` value to jiff's `jiff::fmt::Write` trait, scoped to
 //! `W = Vec<u8>`, whose `write_all` is documented to never fail (it
 //! just extends the vector), so the `Err` arm is never reached.
+//!
+//! `jiff::fmt::friendly::Designator` stays trusted, the first
+//! `jiff::fmt::*` type to land here rather than get a checked
+//! property: checked directly against jiff's real source
+//! (`src/fmt/friendly/printer.rs`), it's a fieldless, `#[non_exhaustive]`
+//! config-marker enum (`Verbose`/`Short`/`Compact`/`HumanTime`)
+//! deriving only `Clone`/`Copy`/`Debug` — no `impl Designator` block
+//! at all, only consumed by `SpanPrinter::designator(self, Designator)
+//! -> SpanPrinter`. The identical "no public methods beyond the
+//! standard derives" shape `RoundMode`'s own trusted reasoning rests
+//! on, not the "fieldless enum" shortcut `Era`/`Weekday` already
+//! showed is the wrong lesson to draw.
 
 mod civil_date;
 mod civil_era;
@@ -458,5 +470,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
     jiff::civil::TimeSeries,
-    jiff::civil::TimeWith
+    jiff::civil::TimeWith,
+    jiff::fmt::friendly::Designator
 );

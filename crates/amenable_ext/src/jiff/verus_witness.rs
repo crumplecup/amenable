@@ -145,6 +145,12 @@
 //! instead of `String::append` — also states the FULL round-trip
 //! claim, unlike `amenable_creusot::ext_jiff::fmt_std_io_write`'s
 //! narrower never-fails-only one.
+//!
+//! `jiff::fmt::friendly::Designator` stays trusted, the same
+//! "no public methods beyond standard derives" shape as `RoundMode`:
+//! checked directly against jiff's real source, it's a fieldless,
+//! `#[non_exhaustive]` config-marker enum with no `impl Designator`
+//! block at all, only consumed by `SpanPrinter::designator`.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -212,7 +218,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
-    jiff::civil::TimeWith
+    jiff::civil::TimeWith,
+    jiff::fmt::friendly::Designator
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

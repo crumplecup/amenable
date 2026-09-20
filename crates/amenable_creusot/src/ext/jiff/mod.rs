@@ -256,6 +256,14 @@
 //! extern-specs that generic impl directly (matching `creusot-std`'s
 //! own established pattern for `Vec<T, A>::push`/`len`), rather than
 //! `StdFmtWrite<String>`'s non-generic-impl workaround.
+//!
+//! `jiff::fmt::friendly::Designator` stays trusted, checked directly
+//! against jiff's real source (`src/fmt/friendly/printer.rs`): a
+//! fieldless, `#[non_exhaustive]` config-marker enum deriving only
+//! `Clone`/`Copy`/`Debug`, no `impl Designator` block at all — only
+//! consumed by `SpanPrinter::designator`. The same "no public methods
+//! beyond standard derives" shape as `RoundMode`, not the "fieldless
+//! enum" shortcut `Era`/`Weekday` already showed is the wrong lesson.
 
 mod civil_date;
 mod civil_era;
@@ -350,7 +358,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::TimeArithmetic,
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
-    jiff::civil::TimeWith
+    jiff::civil::TimeWith,
+    jiff::fmt::friendly::Designator
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
