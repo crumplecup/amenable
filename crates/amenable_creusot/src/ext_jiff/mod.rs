@@ -17,6 +17,7 @@ pub(crate) mod civil_time;
 pub(crate) mod civil_time_series;
 pub(crate) mod civil_weekday;
 pub(crate) mod civil_weekdays_forward;
+pub(crate) mod civil_weekdays_reverse;
 pub(crate) mod date_series;
 pub(crate) mod date_time_series;
 pub(crate) mod error;

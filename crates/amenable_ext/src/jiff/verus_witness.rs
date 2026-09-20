@@ -11,16 +11,18 @@
 //! registrations have nothing beyond `Evidence::basis().audit()` to
 //! rest on. `jiff::civil::Date`/`jiff::civil::Era`/`jiff::civil::
 //! ISOWeekDate`/`jiff::civil::Time`/`jiff::civil::Weekday`/`jiff::
-//! civil::WeekdaysForward`/`jiff::civil::DateSeries`/`jiff::civil::
-//! DateTimeSeries`/`jiff::civil::TimeSeries`/`jiff::tz::Offset`/
-//! `jiff::Error`/`jiff::SignedDuration`/`jiff::Span`/`jiff::
-//! SpanFieldwise`/`jiff::TimestampSeries`/`jiff::Unit`/`jiff::
-//! ZonedSeries` are the exceptions so far — real, hand-verified
-//! accommodation models in `amenable_verus::ext::jiff::{civil_date,
-//! civil_era,civil_iso_week_date,civil_time,civil_time_series,
-//! civil_weekday,civil_weekdays_forward,date_series,date_time_series,
-//! offset,error,signed_duration,span,span_fieldwise,timestamp_series,
-//! unit,zoned_series}` (jiff itself is still unreachable, but each
+//! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
+//! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
+//! TimeSeries`/`jiff::tz::Offset`/`jiff::Error`/`jiff::
+//! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
+//! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
+//! exceptions so far — real, hand-verified accommodation models in
+//! `amenable_verus::ext::jiff::{civil_date,civil_era,
+//! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
+//! civil_weekdays_forward,civil_weekdays_reverse,date_series,
+//! date_time_series,offset,error,signed_duration,span,
+//! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
+//! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
 //! against the real API by the Kani/Creusot proofs for the identical
 //! claim where those backends could check it at all — `TimestampSeries`,
@@ -28,11 +30,12 @@
 //! are all Kani-uncheckable (`TimestampSeries`/`DateSeries`/
 //! `DateTimeSeries`/`TimeSeries` share a `jiff::Error` Drop-glue
 //! wall; `ZonedSeries` hits a different one, `TimeZone`'s
-//! pointer-tagged `Repr`) — `WeekdaysForward` is a DIFFERENT case:
-//! genuinely Kani-CHECKABLE (no `jiff::Error` anywhere in its call
-//! chain, confirmed by reading jiff's real source), its Verus model
-//! exists purely because Verus can't reach jiff at all, the same
-//! reason every model here needs one — and `Unit` is
+//! pointer-tagged `Repr`) — `WeekdaysForward`/`WeekdaysReverse` are
+//! DIFFERENT cases: genuinely Kani-CHECKABLE (no `jiff::Error`
+//! anywhere in either's call chain, confirmed by reading jiff's real
+//! source for both, not assumed from resemblance), their Verus
+//! models exist purely because Verus can't reach jiff at all, the
+//! same reason every model here needs one — and `Unit` is
 //! Creusot-uncheckable, each for a real, confirmed reason, see
 //! `amenable_kani::ext::jiff`'s and `amenable_creusot::ext::jiff`'s
 //! own doc comments; `ZonedSeries`'s model is also honestly scoped to
@@ -272,6 +275,12 @@ impl_verus_witness_checked_ext!(
     jiff::civil::Time,
     "verify_civil_time_new_hour_minute_second_subsec_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/civil_time.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::civil::WeekdaysReverse,
+    "verify_civil_weekdays_reverse_next_yields_start_then_its_predecessor",
+    "../../../amenable_verus/src/ext/jiff/civil_weekdays_reverse.rs"
 );
 
 impl_verus_witness_checked_ext!(

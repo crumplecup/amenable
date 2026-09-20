@@ -381,6 +381,13 @@
 //! `DateSeries`/`DateTimeSeries`/`TimeSeries` Kani-uncheckable never
 //! applies here — not assumed trusted-and-why by resemblance to that
 //! family just because it's also an "iterator over a jiff type."
+//!
+//! `jiff::civil::WeekdaysReverse` gets a real checked property too
+//! (see `civil_weekdays_reverse.rs`) — re-verified, not assumed from
+//! `WeekdaysForward`'s own confirmed shape: checked directly against
+//! jiff's real source, `WeekdaysReverse::next()` has the identical
+//! infallible `jcore`-delegation shape, no `Result`/`jiff::Error`
+//! anywhere.
 
 mod civil_date;
 mod civil_era;
@@ -388,6 +395,7 @@ mod civil_iso_week_date;
 mod civil_time;
 mod civil_weekday;
 mod civil_weekdays_forward;
+mod civil_weekdays_reverse;
 mod offset;
 mod signed_duration;
 mod span;

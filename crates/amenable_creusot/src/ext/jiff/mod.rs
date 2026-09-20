@@ -232,6 +232,11 @@
 //! `*Series` family's Kani side; modeled purely in terms of the
 //! plain `i8` Monday-one offset, matching `civil_weekday.rs`'s own
 //! choice.
+//!
+//! `jiff::civil::WeekdaysReverse` gets a real checked property too
+//! (see `civil_weekdays_reverse.rs`), the identical accommodation
+//! model shape — re-verified, not assumed from `WeekdaysForward`'s
+//! own confirmed no-`jiff::Error` shape.
 
 mod civil_date;
 mod civil_era;
@@ -240,6 +245,7 @@ mod civil_time;
 mod civil_time_series;
 mod civil_weekday;
 mod civil_weekdays_forward;
+mod civil_weekdays_reverse;
 mod date_series;
 mod date_time_series;
 mod error;

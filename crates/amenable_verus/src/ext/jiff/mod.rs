@@ -8,6 +8,7 @@ pub mod civil_time;
 pub mod civil_time_series;
 pub mod civil_weekday;
 pub mod civil_weekdays_forward;
+pub mod civil_weekdays_reverse;
 pub mod date_series;
 pub mod date_time_series;
 pub mod error;
