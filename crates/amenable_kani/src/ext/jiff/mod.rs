@@ -445,6 +445,18 @@
 //! TimestampDisplayWithOffset` already established for formatting
 //! output.
 //!
+//! `jiff::fmt::friendly::SpanPrinter` stays trusted too, combining
+//! BOTH real reasons already established elsewhere in this file:
+//! checked directly against jiff's real source, its nine public
+//! methods (`designator`/`spacing`/`direction`/`fractional`/
+//! `comma_after_designator`/`hours_minutes_seconds`/`padding`/
+//! `precision`/`zero_unit`) are all plain setters over its nine
+//! private fields — no getters at all, the same builder-only shape
+//! `SpanRound`/`TimestampRound`/etc. share — AND its real formatted-
+//! output methods (`span_to_string`/`print_span`/etc.) have the same
+//! disproportionate-reproduction shape `SpanParser`/
+//! `TimestampDisplayWithOffset` already established.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -510,5 +522,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,
-    jiff::fmt::friendly::SpanParser
+    jiff::fmt::friendly::SpanParser,
+    jiff::fmt::friendly::SpanPrinter
 );

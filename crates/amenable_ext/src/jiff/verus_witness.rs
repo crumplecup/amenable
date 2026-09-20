@@ -177,6 +177,15 @@
 //! disproportionate-reproduction reason `jiff::
 //! TimestampDisplayWithOffset` already established.
 //!
+//! `jiff::fmt::friendly::SpanPrinter` stays trusted too, combining
+//! BOTH real reasons already established elsewhere in this file:
+//! checked directly against jiff's real source, its nine public
+//! methods are all plain setters over nine private fields — no
+//! getters at all, the same builder-only shape `SpanRound`/
+//! `TimestampRound`/etc. share — AND its real formatted-output
+//! methods have the same disproportionate-reproduction shape
+//! `SpanParser`/`TimestampDisplayWithOffset` already established.
+//!
 //! `jiff::fmt::friendly::FractionalUnit`'s model reuses `unit.rs`'s
 //! existing `UnitModel` directly rather than modeling `Unit`'s ten
 //! variants a second time — the same claim `amenable_kani::ext::jiff::
@@ -254,7 +263,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,
-    jiff::fmt::friendly::SpanParser
+    jiff::fmt::friendly::SpanParser,
+    jiff::fmt::friendly::SpanPrinter
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
