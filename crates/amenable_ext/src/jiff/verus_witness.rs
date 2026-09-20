@@ -151,6 +151,12 @@
 //! checked directly against jiff's real source, it's a fieldless,
 //! `#[non_exhaustive]` config-marker enum with no `impl Designator`
 //! block at all, only consumed by `SpanPrinter::designator`.
+//!
+//! `jiff::fmt::friendly::Direction` stays trusted, the identical
+//! shape to `Designator`: checked directly against jiff's real
+//! source, a fieldless, `#[non_exhaustive]` config-marker enum
+//! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
+//! method (`sign`) is private.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -219,7 +225,8 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
     jiff::civil::TimeWith,
-    jiff::fmt::friendly::Designator
+    jiff::fmt::friendly::Designator,
+    jiff::fmt::friendly::Direction
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

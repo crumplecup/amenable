@@ -264,6 +264,12 @@
 //! consumed by `SpanPrinter::designator`. The same "no public methods
 //! beyond standard derives" shape as `RoundMode`, not the "fieldless
 //! enum" shortcut `Era`/`Weekday` already showed is the wrong lesson.
+//!
+//! `jiff::fmt::friendly::Direction` stays trusted, the identical
+//! shape to `Designator`: checked directly against jiff's real
+//! source, a fieldless, `#[non_exhaustive]` config-marker enum
+//! deriving only `Clone`/`Copy`/`Debug`; its one `impl Direction`
+//! method (`sign`) is private.
 
 mod civil_date;
 mod civil_era;
@@ -359,7 +365,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
     jiff::civil::TimeWith,
-    jiff::fmt::friendly::Designator
+    jiff::fmt::friendly::Designator,
+    jiff::fmt::friendly::Direction
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

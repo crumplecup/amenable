@@ -417,6 +417,12 @@
 //! standard derives" shape `RoundMode`'s own trusted reasoning rests
 //! on, not the "fieldless enum" shortcut `Era`/`Weekday` already
 //! showed is the wrong lesson to draw.
+//!
+//! `jiff::fmt::friendly::Direction` stays trusted, the identical
+//! shape to `Designator`: checked directly against jiff's real
+//! source, it's a fieldless, `#[non_exhaustive]` config-marker enum
+//! (`Auto`/`Sign`/`ForceSign`/`Suffix`) deriving only `Clone`/`Copy`/
+//! `Debug`; its one `impl Direction` method (`sign`) is private.
 
 mod civil_date;
 mod civil_era;
@@ -471,5 +477,6 @@ impl_kani_witness_trusted_ext!(
     jiff::civil::TimeRound,
     jiff::civil::TimeSeries,
     jiff::civil::TimeWith,
-    jiff::fmt::friendly::Designator
+    jiff::fmt::friendly::Designator,
+    jiff::fmt::friendly::Direction
 );
