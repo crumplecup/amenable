@@ -195,6 +195,13 @@
 //! reproduction shape, reproducing jiff's real RFC 2822 grammar this
 //! time.
 //!
+//! `jiff::fmt::rfc2822::DateTimePrinter` stays trusted, the identical
+//! shape to `SpanParser`: checked directly against jiff's real
+//! source, its `_private: ()` field carries zero configurable state
+//! (jiff's own inline comment says "the RFC 2822 printer has no
+//! configuration at present") — and its real formatting methods have
+//! the same disproportionate-reproduction shape.
+//!
 //! `jiff::fmt::friendly::FractionalUnit`'s model reuses `unit.rs`'s
 //! existing `UnitModel` directly rather than modeling `Unit`'s ten
 //! variants a second time — the same claim `amenable_kani::ext::jiff::
@@ -274,7 +281,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::friendly::Spacing,
     jiff::fmt::friendly::SpanParser,
     jiff::fmt::friendly::SpanPrinter,
-    jiff::fmt::rfc2822::DateTimeParser
+    jiff::fmt::rfc2822::DateTimeParser,
+    jiff::fmt::rfc2822::DateTimePrinter
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

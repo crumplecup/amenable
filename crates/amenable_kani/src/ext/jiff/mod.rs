@@ -467,6 +467,15 @@
 //! established, reproducing jiff's real RFC 2822 grammar this time
 //! rather than the friendly-duration one.
 //!
+//! `jiff::fmt::rfc2822::DateTimePrinter` stays trusted, the identical
+//! shape to `SpanParser`: checked directly against jiff's real
+//! source, its `_private: ()` field carries zero configurable state
+//! (jiff's own inline comment says "the RFC 2822 printer has no
+//! configuration at present") — and its real formatting methods
+//! (`zoned_to_string`/`timestamp_to_string`/
+//! `timestamp_to_rfc9110_string`/etc.) have the same disproportionate-
+//! reproduction shape.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -534,5 +543,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::friendly::Spacing,
     jiff::fmt::friendly::SpanParser,
     jiff::fmt::friendly::SpanPrinter,
-    jiff::fmt::rfc2822::DateTimeParser
+    jiff::fmt::rfc2822::DateTimeParser,
+    jiff::fmt::rfc2822::DateTimePrinter
 );
