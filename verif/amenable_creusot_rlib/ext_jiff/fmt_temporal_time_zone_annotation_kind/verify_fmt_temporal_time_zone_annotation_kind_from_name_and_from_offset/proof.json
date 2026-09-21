@@ -1,0 +1,23 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Offset": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_from_TimeZoneAnnotationKind": {
+        "prover": "alt-ergo",
+        "time": 0.022
+      },
+      "vc_from_TimeZoneAnnotationKind'0": {
+        "prover": "alt-ergo",
+        "time": 0.028
+      },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_verify_fmt_temporal_time_zone_annotation_kind_from_name_and_from_offset": {
+        "prover": "alt-ergo",
+        "time": 0.093
+      }
+    }
+  }
+}

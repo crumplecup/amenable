@@ -19,6 +19,7 @@
 //! temporal::PiecesNumericOffset`/`jiff::fmt::
 //! temporal::PiecesOffset`/`jiff::fmt::
 //! temporal::TimeZoneAnnotation<'static>`/`jiff::fmt::
+//! temporal::TimeZoneAnnotationKind<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -33,6 +34,7 @@
 //! fmt_temporal_pieces,fmt_temporal_pieces_numeric_offset,
 //! fmt_temporal_pieces_offset,
 //! fmt_temporal_time_zone_annotation,
+//! fmt_temporal_time_zone_annotation_kind,
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
@@ -273,6 +275,14 @@
 //! `amenable_kani::ext::jiff::fmt_temporal_time_zone_annotation` and
 //! `amenable_creusot::ext_jiff::fmt_temporal_time_zone_annotation`
 //! both check against jiff's real `From<&str>`/`From<Offset>` API.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotationKind<'static>`'s model
+//! reproduces it as the same plain struct shape (`{ is_named: bool,
+//! offset_seconds: i32 }`, no `critical` field since this enum has
+//! none) — the same claim `amenable_kani::ext::jiff::
+//! fmt_temporal_time_zone_annotation_kind` and `amenable_creusot::
+//! ext_jiff::fmt_temporal_time_zone_annotation_kind` both check
+//! against jiff's real `From<&str>`/`From<Offset>` API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -580,6 +590,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::TimeZoneAnnotation<'static>,
     "verify_fmt_temporal_time_zone_annotation_from_name_and_from_offset_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::temporal::TimeZoneAnnotationKind<'static>,
+    "verify_fmt_temporal_time_zone_annotation_kind_from_name_and_from_offset_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_kind.rs"
 );
 
 impl_verus_witness_checked_ext!(

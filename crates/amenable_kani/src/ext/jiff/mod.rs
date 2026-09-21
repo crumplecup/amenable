@@ -614,6 +614,15 @@
 //! `is_critical() == false`, `From<Offset>` always builds `Offset`
 //! (carrying the wrapped offset's own seconds) with
 //! `is_critical() == false`.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotationKind<'static>` gets a real
+//! checked property too (see
+//! `fmt_temporal_time_zone_annotation_kind.rs`): unlike
+//! `TimeZoneAnnotation<'static>`, this `#[non_exhaustive]` enum's own
+//! variants are public (no private-field indirection), so
+//! `From<&str>`'s exact name content is checked directly by
+//! matching — `From<Offset>` always builds `Offset` carrying the
+//! wrapped offset's own seconds.
 
 mod civil_date;
 mod civil_era;
@@ -631,6 +640,7 @@ mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
 mod fmt_temporal_time_zone_annotation;
+mod fmt_temporal_time_zone_annotation_kind;
 mod offset;
 mod signed_duration;
 mod span;

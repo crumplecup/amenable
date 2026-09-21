@@ -20,6 +20,7 @@ amenable_kani::ext::jiff::fmt_temporal_pieces::verify_fmt_temporal_pieces_with_d
 amenable_kani::ext::jiff::fmt_temporal_pieces_numeric_offset::verify_fmt_temporal_pieces_numeric_offset_from_and_with_negative_zero,1790028214,passed
 amenable_kani::ext::jiff::fmt_temporal_pieces_offset::verify_fmt_temporal_pieces_offset_zulu_and_from_offset_round_trip,1790028996,passed
 amenable_kani::ext::jiff::fmt_temporal_time_zone_annotation::verify_fmt_temporal_time_zone_annotation_from_name_and_from_offset,1790030300,passed
+amenable_kani::ext::jiff::fmt_temporal_time_zone_annotation_kind::verify_fmt_temporal_time_zone_annotation_kind_from_name_and_from_offset,1790030966,passed
 amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed
 amenable_kani::ext::jiff::signed_duration::verify_signed_duration_new_normalizes_nanos_and_carries_into_secs,1789421600,passed
 amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789441687,passed

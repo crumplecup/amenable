@@ -421,6 +421,16 @@
 //! `TimeZoneAnnotationName` are later, not-yet-assessed checklist
 //! entries).
 //!
+//! `jiff::fmt::temporal::TimeZoneAnnotationKind<'static>` gets a real
+//! checked property too (see
+//! `fmt_temporal_time_zone_annotation_kind.rs`): unlike
+//! `TimeZoneAnnotation<'static>`, this `#[non_exhaustive]` enum's own
+//! variants are the public API — `result` in each constructor's own
+//! `extern_spec!` ensures IS the value being constructed, so this
+//! matches directly on it, needing NO opaque accessor at all for the
+//! discriminant. Reuses `offset.rs`'s own `offset_seconds_value` for
+//! the `Offset` variant's payload.
+//!
 //! `jiff::fmt::temporal::SpanParser` stays trusted, checked directly
 //! against jiff's real source: a DIFFERENT type from `fmt::friendly::
 //! SpanParser` despite the same name (verified independently, not
@@ -455,6 +465,7 @@ mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
 mod fmt_temporal_time_zone_annotation;
+mod fmt_temporal_time_zone_annotation_kind;
 mod offset;
 mod signed_duration;
 mod span;
