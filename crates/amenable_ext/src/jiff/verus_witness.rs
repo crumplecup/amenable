@@ -251,6 +251,15 @@
 //! methods at all, only `#[derive(Clone, Debug)]` — jiff's own doc
 //! comment confirms this is deliberate: "if you have use cases for
 //! introspecting this type, please open an issue."
+//!
+//! `jiff::fmt::strtime::PosixCustom` stays trusted too: checked
+//! directly against jiff's real source, `PosixCustom(())` mirrors
+//! `DefaultCustom`'s zero-field shape — but unlike `DefaultCustom`,
+//! its `impl Custom for PosixCustom` DOES override four format
+//! methods, each just delegating to `BrokenDownTime::
+//! format_with_config` with a fixed POSIX format string. The same
+//! disproportionate-reproduction reason `SpanParser`/`Display`
+//! already established, one level removed.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -329,7 +338,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
     jiff::fmt::strtime::Display<'static>,
-    jiff::fmt::strtime::Extension
+    jiff::fmt::strtime::Extension,
+    jiff::fmt::strtime::PosixCustom
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -519,6 +519,17 @@
 //! confirms this is deliberate: "if you have use cases for
 //! introspecting this type, please open an issue."
 //!
+//! `jiff::fmt::strtime::PosixCustom` stays trusted too: checked
+//! directly against jiff's real source, `PosixCustom(())` mirrors
+//! `DefaultCustom`'s own zero-field shape (its own value type has no
+//! methods beyond `new()`) — but unlike `DefaultCustom`, its `impl
+//! Custom for PosixCustom` DOES override `format_datetime`/
+//! `format_date`/`format_time`/`format_12hour_time`, each just
+//! delegating to `BrokenDownTime::format_with_config` with a fixed
+//! POSIX format string. Checking that exactly would mean reproducing
+//! the same `strtime` formatting engine `SpanParser`/`Display`
+//! already established as disproportionate, one level removed.
+//!
 //! `jiff::fmt::strtime::Meridiem` gets a real checked property too
 //! (see `fmt_strtime_meridiem.rs`), the "small enums aren't
 //! automatically trusted" lesson `civil::Era`/`civil::Weekday`
@@ -601,5 +612,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
     jiff::fmt::strtime::Display<'static>,
-    jiff::fmt::strtime::Extension
+    jiff::fmt::strtime::Extension,
+    jiff::fmt::strtime::PosixCustom
 );

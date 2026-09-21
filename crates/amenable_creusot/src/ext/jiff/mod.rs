@@ -344,6 +344,15 @@
 //! comment confirms this is deliberate: "if you have use cases for
 //! introspecting this type, please open an issue."
 //!
+//! `jiff::fmt::strtime::PosixCustom` stays trusted too: checked
+//! directly against jiff's real source, `PosixCustom(())` mirrors
+//! `DefaultCustom`'s zero-field shape — but unlike `DefaultCustom`,
+//! its `impl Custom for PosixCustom` DOES override four format
+//! methods, each just delegating to `BrokenDownTime::
+//! format_with_config` with a fixed POSIX format string. The same
+//! disproportionate-reproduction reason `SpanParser`/`Display`
+//! already established, one level removed.
+//!
 //! `jiff::fmt::strtime::Meridiem` gets a real checked property too
 //! (see `fmt_strtime_meridiem.rs`): a real `extern_spec!` for jiff's
 //! own `From<civil::Time> for Meridiem`, reusing `civil_time.rs`'s
@@ -467,7 +476,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
     jiff::fmt::strtime::Display<'static>,
-    jiff::fmt::strtime::Extension
+    jiff::fmt::strtime::Extension,
+    jiff::fmt::strtime::PosixCustom
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
