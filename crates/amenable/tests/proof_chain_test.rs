@@ -9279,3 +9279,21 @@ fn ext_fmt_strtime_posix_custom_proof_chain_reports_all_three_verifiers() -> mie
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::fmt::strtime::PosixCustom>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_temporal_date_time_parser_proof_chain_reports_all_three_verifiers() -> miette::Result<()>
+{
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::temporal::DateTimeParser>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(
+        &report,
+        "ExtStandard<jiff::fmt::temporal::DateTimeParser>",
+    );
+    Ok(())
+}

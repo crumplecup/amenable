@@ -545,6 +545,15 @@
 //! DOES have one real public conversion, `impl From<FractionalUnit>
 //! for Unit`, a documented per-variant mapping — checked by exhaustive
 //! enumeration of all 5 variants.
+//!
+//! `jiff::fmt::temporal::DateTimeParser` stays trusted, the identical
+//! combined shape to `SpanParser`/`rfc2822::DateTimeParser`: checked
+//! directly against jiff's real source, its two public methods
+//! (`offset_conflict`/`disambiguation`) are plain setters over three
+//! private fields, no getters — and its real parsing methods
+//! (`parse_zoned`/`parse_timestamp`/`parse_datetime`/etc.) have the
+//! same disproportionate-reproduction shape, reproducing jiff's real
+//! ISO 8601/RFC 9557 temporal grammar this time.
 
 mod civil_date;
 mod civil_era;
@@ -613,5 +622,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::strtime::DefaultCustom,
     jiff::fmt::strtime::Display<'static>,
     jiff::fmt::strtime::Extension,
-    jiff::fmt::strtime::PosixCustom
+    jiff::fmt::strtime::PosixCustom,
+    jiff::fmt::temporal::DateTimeParser
 );

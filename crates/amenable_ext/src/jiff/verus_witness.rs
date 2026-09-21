@@ -260,6 +260,14 @@
 //! format_with_config` with a fixed POSIX format string. The same
 //! disproportionate-reproduction reason `SpanParser`/`Display`
 //! already established, one level removed.
+//!
+//! `jiff::fmt::temporal::DateTimeParser` stays trusted, the identical
+//! combined shape to `SpanParser`/`rfc2822::DateTimeParser`: checked
+//! directly against jiff's real source, its two public methods
+//! (`offset_conflict`/`disambiguation`) are plain setters over three
+//! private fields, no getters — and its real parsing methods have the
+//! same disproportionate-reproduction shape, reproducing jiff's real
+//! ISO 8601/RFC 9557 temporal grammar this time.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -339,7 +347,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::strtime::DefaultCustom,
     jiff::fmt::strtime::Display<'static>,
     jiff::fmt::strtime::Extension,
-    jiff::fmt::strtime::PosixCustom
+    jiff::fmt::strtime::PosixCustom,
+    jiff::fmt::temporal::DateTimeParser
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
