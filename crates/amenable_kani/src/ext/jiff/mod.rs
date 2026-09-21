@@ -588,6 +588,24 @@
 //! PiecesNumericOffset)`) — `Zulu.to_numeric_offset()` is always
 //! `Offset::UTC`, and `From<Offset>` always builds `Numeric`,
 //! round-tripping through `to_numeric_offset()`.
+//!
+//! `jiff::fmt::temporal::SpanParser` stays trusted, checked directly
+//! against jiff's real source: a DIFFERENT type from `fmt::friendly::
+//! SpanParser` despite the same name (verified independently, not
+//! assumed) — one private field (`p: parser::SpanParser`, the
+//! internal engine), zero setters at all this time, and its real
+//! parsing methods (`parse_span`/`parse_duration`/
+//! `parse_unsigned_duration`) have the same disproportionate-
+//! reproduction shape, reproducing jiff's real ISO 8601 duration
+//! grammar.
+//!
+//! `jiff::fmt::temporal::SpanPrinter` stays trusted, the identical
+//! combined shape to every other `*Printer` in this checklist:
+//! checked directly against jiff's real source, its one public
+//! method (`lowercase`) is a plain setter over a private field, no
+//! getter — and its real formatting methods (`span_to_string`/
+//! `duration_to_string`/`unsigned_duration_to_string`/`print_span`/
+//! etc.) have the same disproportionate-reproduction shape.
 
 mod civil_date;
 mod civil_era;
@@ -661,5 +679,7 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::strtime::Extension,
     jiff::fmt::strtime::PosixCustom,
     jiff::fmt::temporal::DateTimeParser,
-    jiff::fmt::temporal::DateTimePrinter
+    jiff::fmt::temporal::DateTimePrinter,
+    jiff::fmt::temporal::SpanParser,
+    jiff::fmt::temporal::SpanPrinter
 );

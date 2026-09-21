@@ -310,6 +310,20 @@
 //! (`lowercase`/`separator`/`precision`) are plain setters over one
 //! private field, no getters — and its real formatting methods have
 //! the same disproportionate-reproduction shape.
+//!
+//! `jiff::fmt::temporal::SpanParser` stays trusted, checked directly
+//! against jiff's real source: a DIFFERENT type from `fmt::friendly::
+//! SpanParser` despite the same name (verified independently, not
+//! assumed) — one private field, zero setters, and its real parsing
+//! methods have the same disproportionate-reproduction shape,
+//! reproducing jiff's real ISO 8601 duration grammar.
+//!
+//! `jiff::fmt::temporal::SpanPrinter` stays trusted, the identical
+//! combined shape to every other `*Printer` in this checklist:
+//! checked directly against jiff's real source, its one public method
+//! (`lowercase`) is a plain setter over a private field, no getter —
+//! and its real formatting methods have the same
+//! disproportionate-reproduction shape.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -391,7 +405,9 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::strtime::Extension,
     jiff::fmt::strtime::PosixCustom,
     jiff::fmt::temporal::DateTimeParser,
-    jiff::fmt::temporal::DateTimePrinter
+    jiff::fmt::temporal::DateTimePrinter,
+    jiff::fmt::temporal::SpanParser,
+    jiff::fmt::temporal::SpanPrinter
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
