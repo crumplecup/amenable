@@ -75,6 +75,8 @@ pub use ext_jiff::fmt_temporal_pieces_numeric_offset::VERIFY_FMT_TEMPORAL_PIECES
 #[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_temporal_pieces_offset::VERIFY_FMT_TEMPORAL_PIECES_OFFSET_ZULU_AND_FROM_OFFSET_ROUND_TRIP_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_temporal_time_zone_annotation::VERIFY_FMT_TEMPORAL_TIME_ZONE_ANNOTATION_FROM_NAME_AND_FROM_OFFSET_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::offset::{
     OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,
 };

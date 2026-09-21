@@ -18,6 +18,7 @@
 //! temporal::Pieces<'static>`/`jiff::fmt::
 //! temporal::PiecesNumericOffset`/`jiff::fmt::
 //! temporal::PiecesOffset`/`jiff::fmt::
+//! temporal::TimeZoneAnnotation<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -31,6 +32,7 @@
 //! fmt_std_io_write,fmt_strtime_broken_down_time,fmt_strtime_meridiem,
 //! fmt_temporal_pieces,fmt_temporal_pieces_numeric_offset,
 //! fmt_temporal_pieces_offset,
+//! fmt_temporal_time_zone_annotation,
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
@@ -262,6 +264,15 @@
 //! fmt_temporal_pieces_offset` and `amenable_creusot::ext_jiff::
 //! fmt_temporal_pieces_offset` both check against jiff's real
 //! `Zulu`/`From<Offset>`/`to_numeric_offset` API.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotation<'static>`'s model
+//! reproduces it as a plain struct (`{ is_named: bool,
+//! offset_seconds: i32 }`), at the same NARROWER scope
+//! `fmt_temporal_time_zone_annotation.rs`'s own Creusot doc comment
+//! documents (no string content modeled at all) — the same claim
+//! `amenable_kani::ext::jiff::fmt_temporal_time_zone_annotation` and
+//! `amenable_creusot::ext_jiff::fmt_temporal_time_zone_annotation`
+//! both check against jiff's real `From<&str>`/`From<Offset>` API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -563,6 +574,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::PiecesOffset,
     "verify_fmt_temporal_pieces_offset_zulu_and_from_offset_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces_offset.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::temporal::TimeZoneAnnotation<'static>,
+    "verify_fmt_temporal_time_zone_annotation_from_name_and_from_offset_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation.rs"
 );
 
 impl_verus_witness_checked_ext!(

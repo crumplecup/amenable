@@ -20,6 +20,7 @@ pub mod fmt_strtime_meridiem;
 pub mod fmt_temporal_pieces;
 pub mod fmt_temporal_pieces_numeric_offset;
 pub mod fmt_temporal_pieces_offset;
+pub mod fmt_temporal_time_zone_annotation;
 pub mod offset;
 pub mod signed_duration;
 pub mod span;

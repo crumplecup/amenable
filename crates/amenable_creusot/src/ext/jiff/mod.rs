@@ -410,6 +410,17 @@
 //! `fmt_temporal_pieces_numeric_offset.rs`'s own
 //! `pno_offset_seconds_value` opaque accessor.
 //!
+//! `jiff::fmt::temporal::TimeZoneAnnotation<'static>` gets a real
+//! checked property too (see `fmt_temporal_time_zone_annotation.rs`),
+//! at a NARROWER scope than its own Kani harness: checks which
+//! variant `kind()` reports (and, for `Offset`, its numeric payload)
+//! with `is_critical() == false`, but not the exact `Named` string
+//! content — no existing file in this crate compares `&str` content
+//! inside a Pearlite `#[ensures(..)]` clause, and there's no sibling
+//! accessor to decompose through yet (`TimeZoneAnnotationKind`/
+//! `TimeZoneAnnotationName` are later, not-yet-assessed checklist
+//! entries).
+//!
 //! `jiff::fmt::temporal::SpanParser` stays trusted, checked directly
 //! against jiff's real source: a DIFFERENT type from `fmt::friendly::
 //! SpanParser` despite the same name (verified independently, not
@@ -443,6 +454,7 @@ mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
+mod fmt_temporal_time_zone_annotation;
 mod offset;
 mod signed_duration;
 mod span;

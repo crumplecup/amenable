@@ -606,6 +606,14 @@
 //! getter — and its real formatting methods (`span_to_string`/
 //! `duration_to_string`/`unsigned_duration_to_string`/`print_span`/
 //! etc.) have the same disproportionate-reproduction shape.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotation<'static>` gets a real
+//! checked property too (see `fmt_temporal_time_zone_annotation.rs`):
+//! a real data-carrying type (`kind`, `critical`, both `pub(crate)`
+//! to jiff) — `From<&str>` always builds `Named` with
+//! `is_critical() == false`, `From<Offset>` always builds `Offset`
+//! (carrying the wrapped offset's own seconds) with
+//! `is_critical() == false`.
 
 mod civil_date;
 mod civil_era;
@@ -622,6 +630,7 @@ mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
+mod fmt_temporal_time_zone_annotation;
 mod offset;
 mod signed_duration;
 mod span;

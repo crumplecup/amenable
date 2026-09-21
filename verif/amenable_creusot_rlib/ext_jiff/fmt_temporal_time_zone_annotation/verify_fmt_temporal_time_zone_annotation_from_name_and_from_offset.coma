@@ -1,0 +1,276 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 127 4 127 95 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span spieces = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/temporal/pieces.rs" 1624 4 1624 54
+let%span spieces'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/temporal/pieces.rs" 1488 4 1488 53
+let%span spieces'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/temporal/pieces.rs" 1631 4 1631 58
+let%span soffset = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/offset.rs" 304 4 304 62
+let%span soffset'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 46 18 49 9
+let%span soffset'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 54 19 54 23
+let%span soffset'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 53 18 53 55
+let%span sfmt_temporal_time_zone_annotation = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 128 70 128 73
+let%span sfmt_temporal_time_zone_annotation'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 128 24 128 74
+let%span sfmt_temporal_time_zone_annotation'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 129 24 129 47
+let%span sfmt_temporal_time_zone_annotation'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 129 23 133 13
+let%span sfmt_temporal_time_zone_annotation'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 131 16 131 32
+let%span sfmt_temporal_time_zone_annotation'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 135 14 135 53
+let%span sfmt_temporal_time_zone_annotation'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 138 33 138 86
+let%span sfmt_temporal_time_zone_annotation'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 139 33 139 57
+let%span sfmt_temporal_time_zone_annotation'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 139 32 145 21
+let%span sfmt_temporal_time_zone_annotation'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 140 29 140 46
+let%span sfmt_temporal_time_zone_annotation'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 144 29 144 34
+let%span sfmt_temporal_time_zone_annotation'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 142 28 142 39
+let%span sfmt_temporal_time_zone_annotation'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 146 16 146 37
+let%span sfmt_temporal_time_zone_annotation'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 125 15 125 19
+let%span sfmt_temporal_time_zone_annotation'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 126 14 126 87
+let%span sfmt_temporal_time_zone_annotation'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 90 12 91 54
+let%span sfmt_temporal_time_zone_annotation'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 71 24 71 28
+let%span sfmt_temporal_time_zone_annotation'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 70 18 70 56
+let%span sfmt_temporal_time_zone_annotation'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 84 24 84 28
+let%span sfmt_temporal_time_zone_annotation'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 74 18 83 9
+let%span sfmt_temporal_time_zone_annotation'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 103 16 103 22
+let%span sfmt_temporal_time_zone_annotation'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 99 12 101 54
+let%span sfmt_temporal_time_zone_annotation'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 113 20 113 27
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_TimeZoneAnnotation
+
+predicate inv_TimeZoneAnnotation (_1: t_TimeZoneAnnotation)
+
+predicate tza_kind_is_named_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 55 0 55 89] (_t: t_TimeZoneAnnotation)
+
+predicate tza_is_critical_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 48 0 48 87] (_t: t_TimeZoneAnnotation)
+
+let from_TimeZoneAnnotation (string': string) (return (x: t_TimeZoneAnnotation)) = any
+  [ return (result: t_TimeZoneAnnotation) ->
+  {[@stop_split] [@expl:from_TimeZoneAnnotation ensures] ([@stop_split] [@expl:from result type invariant] [%#spieces] inv_TimeZoneAnnotation result)
+    /\ ([@stop_split] [@expl:from ensures] [%#sfmt_temporal_time_zone_annotation'14] tza_kind_is_named_value result
+      = true
+    /\ tza_is_critical_value result = false)}
+    (! return {result}) ]
+
+predicate invariant_ref_TimeZoneAnnotation [@inline:trivial] (self: t_TimeZoneAnnotation) =
+  [%#sinvariant] inv_TimeZoneAnnotation self
+
+meta "rewrite_def" predicate invariant_ref_TimeZoneAnnotation
+
+predicate inv_ref_TimeZoneAnnotation [@inline:trivial] (_1: t_TimeZoneAnnotation) = invariant_ref_TimeZoneAnnotation _1
+
+meta "rewrite_def" predicate inv_ref_TimeZoneAnnotation
+
+let is_critical (self_: t_TimeZoneAnnotation) (return (x: bool)) =
+{[@stop_split] [@expl:is_critical 'self_' type invariant] [%#sfmt_temporal_time_zone_annotation'15] inv_ref_TimeZoneAnnotation self_}
+  any
+  [ return (result: bool) -> {[@stop_split] [@expl:is_critical ensures] [%#sfmt_temporal_time_zone_annotation'16] result
+    = tza_is_critical_value self_}
+    (! return {result}) ]
+
+predicate resolve_TimeZoneAnnotation (_1: t_TimeZoneAnnotation)
+
+type t_TimeZoneAnnotationName
+
+type t_Offset
+
+type t_TimeZoneAnnotationKind = Named t_TimeZoneAnnotationName | Offset t_Offset
+
+predicate inv_TimeZoneAnnotationName (_1: t_TimeZoneAnnotationName)
+
+predicate inv_Offset (_1: t_Offset)
+
+predicate inv_TimeZoneAnnotationKind (_1: t_TimeZoneAnnotationKind)
+
+axiom inv_axiom [@rewrite]:
+  forall x: t_TimeZoneAnnotationKind [inv_TimeZoneAnnotationKind x]. inv_TimeZoneAnnotationKind x
+    = match x with
+      | Named f0 -> inv_TimeZoneAnnotationName f0
+      | Offset f0 -> inv_Offset f0
+      end
+
+predicate invariant_ref_TimeZoneAnnotationKind [@inline:trivial] (self: t_TimeZoneAnnotationKind) =
+  [%#sinvariant] inv_TimeZoneAnnotationKind self
+
+meta "rewrite_def" predicate invariant_ref_TimeZoneAnnotationKind
+
+predicate inv_ref_TimeZoneAnnotationKind [@inline:trivial] (_1: t_TimeZoneAnnotationKind) =
+  invariant_ref_TimeZoneAnnotationKind _1
+
+meta "rewrite_def" predicate inv_ref_TimeZoneAnnotationKind
+
+function offset_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 34 0 34 64] (_o: t_Offset) : Int32.t
+
+function tza_kind_offset_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 62 0 62 94] (_t: t_TimeZoneAnnotation) : Int32.t
+
+let kind (self_: t_TimeZoneAnnotation) (return (x: t_TimeZoneAnnotationKind)) =
+{[@stop_split] [@expl:kind 'self_' type invariant] [%#sfmt_temporal_time_zone_annotation'17] inv_ref_TimeZoneAnnotation self_}
+  any
+  [ return (result: t_TimeZoneAnnotationKind) ->
+  {[@stop_split] [@expl:kind ensures] ([@stop_split] [@expl:kind result type invariant] [%#spieces'0] inv_ref_TimeZoneAnnotationKind result)
+    /\ ([@stop_split] [@expl:kind ensures] [%#sfmt_temporal_time_zone_annotation'18] match result with
+      | Named _ -> tza_kind_is_named_value self_ = true
+      | Offset o -> tza_kind_is_named_value self_ = false
+      /\ offset_seconds_value o = tza_kind_offset_seconds_value self_
+      | _ -> true
+      end)}
+    (! return {result}) ]
+
+type t_Error
+
+type t_Result_Offset_Error = Ok t_Offset | Err t_Error
+
+predicate inv_Error (_1: t_Error)
+
+predicate inv_Result_Offset_Error (_1: t_Result_Offset_Error)
+
+axiom inv_axiom'0 [@rewrite]: forall x: t_Result_Offset_Error [inv_Result_Offset_Error x]. inv_Result_Offset_Error x
+    = match x with
+      | Ok f0 -> inv_Offset f0
+      | Err f0 -> inv_Error f0
+      end
+
+predicate gt_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.lt other self
+
+meta "rewrite_def" predicate gt_log_i32
+
+let from_seconds (seconds: Int32.t) (return (x: t_Result_Offset_Error)) = any
+  [ return (result: t_Result_Offset_Error) ->
+  {[@stop_split] [@expl:from_seconds ensures] ([@stop_split] [@expl:from_seconds result type invariant] [%#soffset] inv_Result_Offset_Error result)
+    /\ ([@stop_split] [@expl:from_seconds ensures] [%#soffset'0] match result with
+      | Ok offset -> offset_seconds_value offset = seconds
+      | Err _ -> Int32.lt seconds (Int32.neg (93599: Int32.t)) \/ gt_log_i32 seconds (93599: Int32.t)
+      end)}
+    (! return {result}) ]
+
+predicate resolve_Offset (_1: t_Offset)
+
+predicate resolve_Error (_1: t_Error)
+
+predicate resolve_Result_Offset_Error (_1: t_Result_Offset_Error)
+
+axiom resolve_axiom [@rewrite]:
+  forall x: t_Result_Offset_Error [resolve_Result_Offset_Error x]. resolve_Result_Offset_Error x
+    = match x with
+      | Ok x0 -> resolve_Offset x0
+      | Err x0 -> resolve_Error x0
+      end
+
+let elim_Ok (_x: t_Result_Offset_Error) (return (f0: t_Offset)) = any
+  [ _k (f0: t_Offset) -> {Ok f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Ok] match _x with
+      | Ok _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let from_TimeZoneAnnotation'0 (offset: t_Offset) (return (x: t_TimeZoneAnnotation)) =
+{[@stop_split] [@expl:from 'offset' type invariant] [%#sfmt_temporal_time_zone_annotation'19] inv_Offset offset}
+  any
+  [ return (result: t_TimeZoneAnnotation) ->
+  {[@stop_split] [@expl:from_TimeZoneAnnotation ensures] ([@stop_split] [@expl:from result type invariant] [%#spieces'1] inv_TimeZoneAnnotation result)
+    /\ ([@stop_split] [@expl:from ensures] [%#sfmt_temporal_time_zone_annotation'20] tza_kind_is_named_value result
+      = false
+    /\ tza_kind_offset_seconds_value result = offset_seconds_value offset /\ tza_is_critical_value result = false)}
+    (! return {result}) ]
+
+let elim_Offset (_x: t_TimeZoneAnnotationKind) (return (f0: t_Offset)) = any
+  [ _k (f0: t_Offset) -> {Offset f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Offset] match _x with
+      | Offset _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let seconds (self_: t_Offset) (return (x: Int32.t)) =
+{[@stop_split] [@expl:seconds 'self_' type invariant] [%#soffset'1] inv_Offset self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:seconds ensures] [%#soffset'2] result
+    = offset_seconds_value self_}
+    (! return {result}) ]
+
+predicate fmt_temporal_time_zone_annotation_from_name_and_from_offset_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 112 4 112 95] (matches: bool) =
+  [%#sfmt_temporal_time_zone_annotation'21] matches
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_fmt_temporal_time_zone_annotation_from_name_and_from_offset [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_temporal_time_zone_annotation.rs" 127 4 127 95]
+  (seconds'0: Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = from_TimeZoneAnnotation [%#sfmt_temporal_time_zone_annotation'0] {[%#sfmt_temporal_time_zone_annotation] "x"}
+        (fun (_x: t_TimeZoneAnnotation) -> [ &ann_named <- _x ] s1)
+    | s1 = is_critical [%#sfmt_temporal_time_zone_annotation'1] {ann_named} (fun (_x: bool) -> [ &_6 <- _x ] s2)
+    | s2 = any [ br0 -> {_6 = false} (! bb4) | br1 -> {_6} (! bb3) ] ]
+  | bb3 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_TimeZoneAnnotation ann_named} any) ]
+    | s1 = -{resolve_TimeZoneAnnotation ann_named}- s2
+    | s2 = [ &named_ok <- [%#sfmt_temporal_time_zone_annotation'2] false ] s3
+    | s3 = bb10 ]
+  | bb4 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_TimeZoneAnnotation ann_named} any) ]
+    | s1 = -{resolve_TimeZoneAnnotation ann_named}- s2
+    | s2 = kind [%#sfmt_temporal_time_zone_annotation'3] {ann_named}
+        (fun (_x: t_TimeZoneAnnotationKind) -> [ &_8 <- _x ] s3)
+    | s3 = any
+      [ br0 (x0: t_TimeZoneAnnotationName) -> {_8 = Named x0} (! bb8)
+      | br1 (x0: t_Offset) -> {_8 = Offset x0} (! bb6) ] ]
+  | bb6 = s0 [ s0 = [ &named_ok <- false ] s1 | s1 = bb10 ]
+  | bb8 = s0 [ s0 = [ &named_ok <- true ] s1 | s1 = bb10 ]
+  | bb10 = s0
+    [ s0 = from_seconds [%#sfmt_temporal_time_zone_annotation'4] {seconds'0}
+        (fun (_x: t_Result_Offset_Error) -> [ &_11 <- _x ] s1)
+    | s1 = any [ br0 (x0: t_Offset) -> {_11 = Ok x0} (! bb14) | br1 (x0: t_Error) -> {_11 = Err x0} (! bb13) ] ]
+  | bb13 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Offset_Error _11} any) ]
+    | s1 = -{resolve_Result_Offset_Error _11}- s2
+    | s2 = [ &_ret <- named_ok ] s3
+    | s3 = return {_ret} ]
+  | bb14 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Offset_Error _11} any) ]
+    | s1 = -{resolve_Result_Offset_Error _11}- s2
+    | s2 = elim_Ok {_11} (fun (r0: t_Offset) -> [ &offset <- r0 ] s3)
+    | s3 = from_TimeZoneAnnotation'0 [%#sfmt_temporal_time_zone_annotation'5] {offset}
+        (fun (_x: t_TimeZoneAnnotation) -> [ &ann_offset <- _x ] s4)
+    | s4 = is_critical [%#sfmt_temporal_time_zone_annotation'6] {ann_offset} (fun (_x: bool) -> [ &_18 <- _x ] s5)
+    | s5 = any [ br0 -> {_18 = false} (! bb19) | br1 -> {_18} (! bb18) ] ]
+  | bb18 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_TimeZoneAnnotation ann_offset} any) ]
+    | s1 = -{resolve_TimeZoneAnnotation ann_offset}- s2
+    | s2 = [ &offset_ok <- [%#sfmt_temporal_time_zone_annotation'7] false ] s3
+    | s3 = bb26 ]
+  | bb19 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_TimeZoneAnnotation ann_offset} any) ]
+    | s1 = -{resolve_TimeZoneAnnotation ann_offset}- s2
+    | s2 = kind [%#sfmt_temporal_time_zone_annotation'8] {ann_offset}
+        (fun (_x: t_TimeZoneAnnotationKind) -> [ &_20 <- _x ] s3)
+    | s3 = any
+      [ br0 (x0: t_TimeZoneAnnotationName) -> {_20 = Named x0} (! bb21)
+      | br1 (x0: t_Offset) -> {_20 = Offset x0} (! bb23) ] ]
+  | bb21 = s0 [ s0 = [ &offset_ok <- [%#sfmt_temporal_time_zone_annotation'9] false ] s1 | s1 = bb26 ]
+  | bb23 = s0
+    [ s0 = elim_Offset {_20} (fun (r0: t_Offset) -> [ &o <- r0 ] s1)
+    | s1 = seconds [%#sfmt_temporal_time_zone_annotation'10] {o} (fun (_x: Int32.t) -> [ &_24 <- _x ] s2)
+    | s2 = [ &offset_ok <- _24 = seconds'0 ] s3
+    | s3 = bb26 ]
+  | bb26 = any [ br0 -> {named_ok = false} (! bb28) | br1 -> {named_ok} (! bb27) ]
+  | bb27 = s0 [ s0 = [ &_ret <- offset_ok ] s1 | s1 = return {_ret} ]
+  | bb28 = s0 [ s0 = [ &_ret <- [%#sfmt_temporal_time_zone_annotation'11] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & seconds'0: Int32.t = seconds'0
+  | & ann_named: t_TimeZoneAnnotation = Any.any_l ()
+  | & named_ok: bool = Any.any_l ()
+  | & _6: bool = Any.any_l ()
+  | & _8: t_TimeZoneAnnotationKind = Any.any_l ()
+  | & _11: t_Result_Offset_Error = Any.any_l ()
+  | & offset: t_Offset = Any.any_l ()
+  | & ann_offset: t_TimeZoneAnnotation = Any.any_l ()
+  | & offset_ok: bool = Any.any_l ()
+  | & _18: bool = Any.any_l ()
+  | & _20: t_TimeZoneAnnotationKind = Any.any_l ()
+  | & o: t_Offset = Any.any_l ()
+  | & _24: Int32.t = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_fmt_temporal_time_zone_annotation_from_name_and_from_offset ensures] [%#sfmt_temporal_time_zone_annotation'13] fmt_temporal_time_zone_annotation_from_name_and_from_offset_holds result}
+    (! return {result}) ]
