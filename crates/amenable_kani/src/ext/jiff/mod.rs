@@ -512,6 +512,13 @@
 //! reproducing jiff's whole `strtime` formatting algorithm, the same
 //! disproportionate-reproduction reason already established.
 //!
+//! `jiff::fmt::strtime::Extension` stays trusted, checked directly
+//! against jiff's real source: three private fields, zero `pub`
+//! methods at all (`parse_flag`/`parse_width`/`parse_colons` are all
+//! private), only `#[derive(Clone, Debug)]` — jiff's own doc comment
+//! confirms this is deliberate: "if you have use cases for
+//! introspecting this type, please open an issue."
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -584,5 +591,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::rfc2822::DateTimePrinter,
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
-    jiff::fmt::strtime::Display<'static>
+    jiff::fmt::strtime::Display<'static>,
+    jiff::fmt::strtime::Extension
 );

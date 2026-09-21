@@ -338,6 +338,12 @@
 //! output would mean reproducing jiff's whole `strtime` formatting
 //! algorithm.
 //!
+//! `jiff::fmt::strtime::Extension` stays trusted, checked directly
+//! against jiff's real source: three private fields, zero `pub`
+//! methods at all, only `#[derive(Clone, Debug)]` — jiff's own doc
+//! comment confirms this is deliberate: "if you have use cases for
+//! introspecting this type, please open an issue."
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -451,7 +457,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::rfc2822::DateTimePrinter,
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
-    jiff::fmt::strtime::Display<'static>
+    jiff::fmt::strtime::Display<'static>,
+    jiff::fmt::strtime::Extension
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

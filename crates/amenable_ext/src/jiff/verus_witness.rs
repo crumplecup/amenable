@@ -237,6 +237,12 @@
 //! `impl core::fmt::Display`/`Debug` — checking its exact formatted
 //! output would mean reproducing jiff's whole `strtime` formatting
 //! algorithm.
+//!
+//! `jiff::fmt::strtime::Extension` stays trusted, checked directly
+//! against jiff's real source: three private fields, zero `pub`
+//! methods at all, only `#[derive(Clone, Debug)]` — jiff's own doc
+//! comment confirms this is deliberate: "if you have use cases for
+//! introspecting this type, please open an issue."
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -314,7 +320,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::rfc2822::DateTimePrinter,
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
     jiff::fmt::strtime::DefaultCustom,
-    jiff::fmt::strtime::Display<'static>
+    jiff::fmt::strtime::Display<'static>,
+    jiff::fmt::strtime::Extension
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
