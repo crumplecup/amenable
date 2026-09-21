@@ -562,6 +562,17 @@
 //! private field, no getters — and its real formatting methods
 //! (`zoned_to_string`/`timestamp_to_string`/`print_zoned`/etc.) have
 //! the same disproportionate-reproduction shape.
+//!
+//! `jiff::fmt::temporal::Pieces<'static>` gets a real checked
+//! property too (see `fmt_temporal_pieces.rs`), genuinely different
+//! from every other `fmt::*` type assessed so far: a real,
+//! substantial data-carrying type (four private fields), checked
+//! directly against jiff's real source — `with_date`/`with_time` are
+//! real, unconditional setters (`Pieces { date, ..self }`/`Pieces {
+//! time: Some(time), ..self }`) round-tripping through their matching
+//! `date()`/`time()` getters. Scoped to those two fields
+//! deliberately, not `offset`/`time_zone_annotation` — their own
+//! types are separate, not-yet-assessed checklist entries.
 
 mod civil_date;
 mod civil_era;
@@ -575,6 +586,7 @@ mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
+mod fmt_temporal_pieces;
 mod offset;
 mod signed_duration;
 mod span;

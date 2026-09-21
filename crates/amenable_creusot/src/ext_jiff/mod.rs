@@ -26,6 +26,7 @@ pub(crate) mod fmt_std_fmt_write;
 pub(crate) mod fmt_std_io_write;
 pub(crate) mod fmt_strtime_broken_down_time;
 pub(crate) mod fmt_strtime_meridiem;
+pub(crate) mod fmt_temporal_pieces;
 pub(crate) mod offset;
 pub(crate) mod signed_duration;
 pub(crate) mod span;

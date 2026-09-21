@@ -17,6 +17,7 @@ pub mod fmt_std_fmt_write;
 pub mod fmt_std_io_write;
 pub mod fmt_strtime_broken_down_time;
 pub mod fmt_strtime_meridiem;
+pub mod fmt_temporal_pieces;
 pub mod offset;
 pub mod signed_duration;
 pub mod span;

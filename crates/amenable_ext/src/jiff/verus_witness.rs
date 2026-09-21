@@ -15,6 +15,7 @@
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
 //! TimeSeries`/`jiff::fmt::friendly::FractionalUnit`/`jiff::fmt::
 //! strtime::BrokenDownTime`/`jiff::fmt::strtime::Meridiem`/`jiff::fmt::
+//! temporal::Pieces<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -26,6 +27,7 @@
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
 //! date_time_series,fmt_friendly_fractional_unit,fmt_std_fmt_write,
 //! fmt_std_io_write,fmt_strtime_broken_down_time,fmt_strtime_meridiem,
+//! fmt_temporal_pieces,
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
@@ -227,6 +229,17 @@
 //! fmt_strtime_meridiem` and `amenable_creusot::ext_jiff::
 //! fmt_strtime_meridiem` check against jiff's real `From<civil::Time>
 //! for Meridiem` conversion.
+//!
+//! `jiff::fmt::temporal::Pieces<'static>`'s model reproduces
+//! `date`/`time` as plain tuples (`(i16, i8, i8)`/`Option<(i8, i8,
+//! i8, i32)>`) rather than reusing `civil_date.rs`'s/`civil_time.rs`'s
+//! own model types, exercising `with_date`/`with_time` independently
+//! on their own fresh instance each — the same claim
+//! `amenable_kani::ext::jiff::fmt_temporal_pieces` and
+//! `amenable_creusot::ext_jiff::fmt_temporal_pieces` both check
+//! against jiff's real API, scoped to `date`/`time` only (see either
+//! module's own doc comment for why `offset`/`time_zone_annotation`
+//! are deliberately excluded).
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -494,6 +507,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::strtime::Meridiem,
     "verify_fmt_strtime_meridiem_from_time_matches_hour_threshold_model",
     "../../../amenable_verus/src/ext/jiff/fmt_strtime_meridiem.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::temporal::Pieces<'static>,
+    "verify_fmt_temporal_pieces_with_date_with_time_round_trip_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces.rs"
 );
 
 impl_verus_witness_checked_ext!(

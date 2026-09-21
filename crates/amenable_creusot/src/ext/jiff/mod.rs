@@ -383,6 +383,16 @@
 //! (`lowercase`/`separator`/`precision`) are plain setters over one
 //! private field, no getters — and its real formatting methods have
 //! the same disproportionate-reproduction shape.
+//!
+//! `jiff::fmt::temporal::Pieces<'static>` gets a real checked property
+//! too (see `fmt_temporal_pieces.rs`), the first real data-carrying
+//! `fmt::*` type in this checklist: real `extern_spec!`s for
+//! `date`/`time`/`with_date`/`with_time` using Pieces-specific
+//! DECOMPOSED opaque accessors (`i16`/`i8`/`Option<i8>`/etc.) rather
+//! than the `Date`/`Time` type directly, since comparing two `Date`/
+//! `Time` values via `==` hits the same `DeepModel` wall `unit.rs`
+//! already documents — reuses `civil_date.rs`'s/`civil_time.rs`'s
+//! existing accessors to decompose both sides.
 
 mod civil_date;
 mod civil_era;
@@ -400,6 +410,7 @@ mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
+mod fmt_temporal_pieces;
 mod offset;
 mod signed_duration;
 mod span;
