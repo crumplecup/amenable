@@ -331,6 +331,13 @@
 //! field — with one constructor and an empty `impl Custom for
 //! DefaultCustom {}` using only the trait's own inherited defaults.
 //!
+//! `jiff::fmt::strtime::Display<'static>` stays trusted, the same
+//! reason as `TimestampDisplayWithOffset`: checked directly against
+//! jiff's real source, both fields are `pub(crate)` with only
+//! `impl core::fmt::Display`/`Debug` — checking its exact formatted
+//! output would mean reproducing jiff's whole `strtime` formatting
+//! algorithm.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -443,7 +450,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::rfc2822::DateTimeParser,
     jiff::fmt::rfc2822::DateTimePrinter,
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
-    jiff::fmt::strtime::DefaultCustom
+    jiff::fmt::strtime::DefaultCustom,
+    jiff::fmt::strtime::Display<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

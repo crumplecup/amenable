@@ -504,6 +504,14 @@
 //! defaults, no overrides at all. Nothing publicly inspectable to
 //! state a property about.
 //!
+//! `jiff::fmt::strtime::Display<'static>` stays trusted, the same
+//! reason as `TimestampDisplayWithOffset`: checked directly against
+//! jiff's real source, both fields (`fmt`/`tm`) are `pub(crate)`
+//! (invisible outside jiff), with only `impl core::fmt::Display`/
+//! `Debug` — checking its exact formatted output would mean
+//! reproducing jiff's whole `strtime` formatting algorithm, the same
+//! disproportionate-reproduction reason already established.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -575,5 +583,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::rfc2822::DateTimeParser,
     jiff::fmt::rfc2822::DateTimePrinter,
     jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
-    jiff::fmt::strtime::DefaultCustom
+    jiff::fmt::strtime::DefaultCustom,
+    jiff::fmt::strtime::Display<'static>
 );
