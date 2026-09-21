@@ -29,5 +29,6 @@ pub mod span;
 pub mod span_fieldwise;
 pub mod timestamp_series;
 pub mod tz_ambiguous_timestamp;
+pub mod tz_ambiguous_zoned;
 pub mod unit;
 pub mod zoned_series;

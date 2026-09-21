@@ -652,6 +652,14 @@
 //! around it. Checked on Creusot and Verus instead (`ext_jiff::
 //! tz_ambiguous_timestamp`/`ext::jiff::tz_ambiguous_timestamp`),
 //! neither of which shares this Rust-CBMC-specific mechanism.
+//!
+//! `jiff::tz::AmbiguousZoned` also stays trusted for Kani, without a
+//! redundant fresh confirmation run this time: real jiff source
+//! confirms `TimeZone::to_ambiguous_zoned` calls `self.clone().
+//! into_ambiguous_zoned(dt)`, which calls `self.to_ambiguous_
+//! timestamp(dt)` directly — the SAME real function just confirmed
+//! above to time out under CBMC even for a fully concrete call.
+//! Checked on Creusot and Verus instead.
 
 mod civil_date;
 mod civil_era;
@@ -732,5 +740,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
-    jiff::tz::AmbiguousTimestamp
+    jiff::tz::AmbiguousTimestamp,
+    jiff::tz::AmbiguousZoned
 );

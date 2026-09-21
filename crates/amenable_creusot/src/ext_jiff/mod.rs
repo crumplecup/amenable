@@ -38,4 +38,5 @@ pub(crate) mod span;
 pub(crate) mod span_fieldwise;
 pub(crate) mod timestamp_series;
 pub(crate) mod tz_ambiguous_timestamp;
+pub(crate) mod tz_ambiguous_zoned;
 pub(crate) mod zoned_series;

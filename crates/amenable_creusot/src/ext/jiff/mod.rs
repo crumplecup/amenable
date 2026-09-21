@@ -471,6 +471,14 @@
 //! are checked, decomposed via fresh opaque accessors tied to a
 //! `TimeZone::fixed`-specific one (`tz_fixed_seconds_value`, hoisted
 //! `pub(crate)` for `TimeZone`'s own future checklist entry to reuse).
+//!
+//! `jiff::tz::AmbiguousZoned` gets a real checked property too (see
+//! `tz_ambiguous_zoned.rs`), the same shape and scope as
+//! `AmbiguousTimestamp`: reuses that file's own `tz_fixed_seconds_
+//! value` accessor. Trusted for Kani too, without a redundant fresh
+//! confirmation run — real jiff source confirms `to_ambiguous_zoned`
+//! calls `to_ambiguous_timestamp` directly, the SAME real function
+//! already empirically confirmed to time out under CBMC.
 
 mod civil_date;
 mod civil_era;
@@ -500,6 +508,7 @@ mod span;
 mod span_fieldwise;
 mod timestamp_series;
 mod tz_ambiguous_timestamp;
+mod tz_ambiguous_zoned;
 mod zoned_series;
 
 use crate::CreusotWitness;

@@ -1,0 +1,19 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.024 },
+      "vc_elim_Unambiguous": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_fixed": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_is_ambiguous": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_offset": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_to_ambiguous_zoned": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_verify_tz_ambiguous_zoned_from_fixed_time_zone_is_always_unambiguous": {
+        "prover": "alt-ergo",
+        "time": 0.095
+      }
+    }
+  }
+}

@@ -23,7 +23,8 @@
 //! temporal::TimeZoneAnnotationName<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/`jiff::
-//! tz::AmbiguousTimestamp`/
+//! tz::AmbiguousTimestamp`/`jiff::
+//! tz::AmbiguousZoned`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -40,7 +41,8 @@
 //! fmt_temporal_time_zone_annotation_name,
 //! offset,error,
 //! signed_duration,span,
-//! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,unit,
+//! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,
+//! tz_ambiguous_zoned,unit,
 //! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -305,6 +307,11 @@
 //! (Kani can't check this claim at all — see `amenable_kani::
 //! ext::jiff`'s own doc comment for the real `TimeZone`
 //! `Repr`-dispatch CBMC wall).
+//!
+//! `jiff::tz::AmbiguousZoned`'s model is the same shape and scope —
+//! the same claim `amenable_creusot::ext_jiff::tz_ambiguous_zoned`
+//! checks against jiff's real API, also trusted for Kani (calls the
+//! same already-confirmed-timing-out function directly).
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -637,6 +644,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::AmbiguousTimestamp,
     "verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_model",
     "../../../amenable_verus/src/ext/jiff/tz_ambiguous_timestamp.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::AmbiguousZoned,
+    "verify_tz_ambiguous_zoned_from_fixed_time_zone_is_always_unambiguous_model",
+    "../../../amenable_verus/src/ext/jiff/tz_ambiguous_zoned.rs"
 );
 
 impl_verus_witness_checked_ext!(
