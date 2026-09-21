@@ -459,6 +459,18 @@
 //! against jiff's real source, it has *no* public methods at all —
 //! only a `pub(crate) from_jcore` conversion. Nothing
 //! non-tautological to state about it on any backend.
+//!
+//! `jiff::tz::AmbiguousTimestamp` gets a real checked property too
+//! (see `tz_ambiguous_timestamp.rs`), checked here despite being
+//! trusted for Kani specifically — see `amenable_kani::ext::jiff`'s
+//! own doc comment for the real, confirmed `TimeZone` `Repr`-dispatch
+//! CBMC wall. Deliberately NARROWER than a full claim would be:
+//! `civil::DateTime` stays opaque (trusted, no decomposition
+//! accessors) by deliberate Phase 1 design, so `dt` passes through
+//! this proof entirely unexamined; only `.offset()`/`.is_ambiguous()`
+//! are checked, decomposed via fresh opaque accessors tied to a
+//! `TimeZone::fixed`-specific one (`tz_fixed_seconds_value`, hoisted
+//! `pub(crate)` for `TimeZone`'s own future checklist entry to reuse).
 
 mod civil_date;
 mod civil_era;
@@ -487,6 +499,7 @@ mod signed_duration;
 mod span;
 mod span_fieldwise;
 mod timestamp_series;
+mod tz_ambiguous_timestamp;
 mod zoned_series;
 
 use crate::CreusotWitness;

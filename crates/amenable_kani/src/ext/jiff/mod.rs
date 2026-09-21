@@ -639,6 +639,19 @@
 //! (`Clone`/`Copy`/`Debug`/`Eq`/`PartialEq`) producing or consuming
 //! this type from outside jiff, there is nothing non-tautological to
 //! state about it on any backend.
+//!
+//! `jiff::tz::AmbiguousTimestamp` stays trusted for Kani
+//! specifically, for a real reason confirmed empirically (not the
+//! default): the only way to build one from outside jiff is via
+//! `TimeZone::to_ambiguous_timestamp(dt)`, and even a fully
+//! CONCRETE `TimeZone::UTC.to_offset(..)` call already times out
+//! per `gallery::jiff_error_drop_cost`'s own doc comment — the wall
+//! is in `TimeZone`'s own hand-rolled pointer-tagged `Repr`-dispatch
+//! machinery (`repr::each!`), not in symbolic-input complexity or
+//! Drop glue, so no bounds-check-before-construct trick routes
+//! around it. Checked on Creusot and Verus instead (`ext_jiff::
+//! tz_ambiguous_timestamp`/`ext::jiff::tz_ambiguous_timestamp`),
+//! neither of which shares this Rust-CBMC-specific mechanism.
 
 mod civil_date;
 mod civil_era;
@@ -718,5 +731,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::temporal::DateTimePrinter,
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
-    jiff::tz::AmbiguousOffset
+    jiff::tz::AmbiguousOffset,
+    jiff::tz::AmbiguousTimestamp
 );

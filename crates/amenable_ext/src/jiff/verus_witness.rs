@@ -22,7 +22,8 @@
 //! temporal::TimeZoneAnnotationKind<'static>`/`jiff::fmt::
 //! temporal::TimeZoneAnnotationName<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
-//! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
+//! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/`jiff::
+//! tz::AmbiguousTimestamp`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -39,7 +40,8 @@
 //! fmt_temporal_time_zone_annotation_name,
 //! offset,error,
 //! signed_duration,span,
-//! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
+//! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,unit,
+//! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
 //! against the real API by the Kani/Creusot proofs for the identical
@@ -294,6 +296,15 @@
 //! fmt_temporal_time_zone_annotation_name` and `amenable_creusot::
 //! ext_jiff::fmt_temporal_time_zone_annotation_name` both check
 //! against jiff's real `From<&str>`/`as_str` API.
+//!
+//! `jiff::tz::AmbiguousTimestamp`'s model is scoped to the
+//! `TimeZone::fixed` case only (no `DateTime`/`dt` payload modeled
+//! at all — `civil::DateTime` stays opaque/trusted here by
+//! deliberate Phase 1 design) — the same claim `amenable_creusot::
+//! ext_jiff::tz_ambiguous_timestamp` checks against jiff's real API
+//! (Kani can't check this claim at all — see `amenable_kani::
+//! ext::jiff`'s own doc comment for the real `TimeZone`
+//! `Repr`-dispatch CBMC wall).
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -620,6 +631,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::TimeZoneAnnotationName<'static>,
     "verify_fmt_temporal_time_zone_annotation_name_from_str_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_name.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::AmbiguousTimestamp,
+    "verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_model",
+    "../../../amenable_verus/src/ext/jiff/tz_ambiguous_timestamp.rs"
 );
 
 impl_verus_witness_checked_ext!(

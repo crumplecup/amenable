@@ -1,0 +1,253 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 109 4 112 13 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span soffset = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/offset.rs" 304 4 304 62
+let%span soffset'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 46 18 49 9
+let%span soffset'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 54 19 54 23
+let%span soffset'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 53 18 53 55
+let%span stz_ambiguous_timestamp = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 113 14 113 53
+let%span stz_ambiguous_timestamp'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 114 22 114 26
+let%span stz_ambiguous_timestamp'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 116 25 116 58
+let%span stz_ambiguous_timestamp'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 117 25 117 54
+let%span stz_ambiguous_timestamp'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 119 38 119 49
+let%span stz_ambiguous_timestamp'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 123 25 123 30
+let%span stz_ambiguous_timestamp'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 121 24 121 35
+let%span stz_ambiguous_timestamp'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 125 30 125 47
+let%span stz_ambiguous_timestamp'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 125 16 125 47
+let%span stz_ambiguous_timestamp'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 110 8 110 10
+let%span stz_ambiguous_timestamp'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 107 15 107 19
+let%span stz_ambiguous_timestamp'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 108 14 108 93
+let%span stz_ambiguous_timestamp'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 62 17 62 23
+let%span stz_ambiguous_timestamp'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 61 18 61 82
+let%span stz_ambiguous_timestamp'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 69 35 69 39
+let%span stz_ambiguous_timestamp'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 69 41 69 43
+let%span stz_ambiguous_timestamp'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 66 12 67 84
+let%span stz_ambiguous_timestamp'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 81 19 81 23
+let%span stz_ambiguous_timestamp'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 74 18 80 9
+let%span stz_ambiguous_timestamp'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 85 25 85 29
+let%span stz_ambiguous_timestamp'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 84 18 84 80
+let%span stz_ambiguous_timestamp'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 95 20 95 27
+let%span stimezone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/timezone.rs" 457 4 457 50
+let%span stimezone'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/timezone.rs" 1197 4 1197 76
+let%span sambiguous = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/ambiguous.rs" 391 4 391 43
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_Offset
+
+type t_Error
+
+type t_Result_Offset_Error = Ok t_Offset | Err t_Error
+
+predicate inv_Offset (_1: t_Offset)
+
+predicate inv_Error (_1: t_Error)
+
+predicate inv_Result_Offset_Error (_1: t_Result_Offset_Error)
+
+axiom inv_axiom [@rewrite]: forall x: t_Result_Offset_Error [inv_Result_Offset_Error x]. inv_Result_Offset_Error x
+    = match x with
+      | Ok f0 -> inv_Offset f0
+      | Err f0 -> inv_Error f0
+      end
+
+function offset_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/offset.rs" 34 0 34 64] (_o: t_Offset) : Int32.t
+
+predicate gt_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.lt other self
+
+meta "rewrite_def" predicate gt_log_i32
+
+let from_seconds (seconds: Int32.t) (return (x: t_Result_Offset_Error)) = any
+  [ return (result: t_Result_Offset_Error) ->
+  {[@stop_split] [@expl:from_seconds ensures] ([@stop_split] [@expl:from_seconds result type invariant] [%#soffset] inv_Result_Offset_Error result)
+    /\ ([@stop_split] [@expl:from_seconds ensures] [%#soffset'0] match result with
+      | Ok offset -> offset_seconds_value offset = seconds
+      | Err _ -> Int32.lt seconds (Int32.neg (93599: Int32.t)) \/ gt_log_i32 seconds (93599: Int32.t)
+      end)}
+    (! return {result}) ]
+
+predicate resolve_Offset (_1: t_Offset)
+
+predicate resolve_Error (_1: t_Error)
+
+predicate resolve_Result_Offset_Error (_1: t_Result_Offset_Error)
+
+axiom resolve_axiom [@rewrite]:
+  forall x: t_Result_Offset_Error [resolve_Result_Offset_Error x]. resolve_Result_Offset_Error x
+    = match x with
+      | Ok x0 -> resolve_Offset x0
+      | Err x0 -> resolve_Error x0
+      end
+
+let elim_Ok (_x: t_Result_Offset_Error) (return (f0: t_Offset)) = any
+  [ _k (f0: t_Offset) -> {Ok f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Ok] match _x with
+      | Ok _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+type t_TimeZone
+
+predicate inv_TimeZone (_1: t_TimeZone)
+
+function tz_fixed_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 39 0 39 69] (_tz: t_TimeZone) : Int32.t
+
+let fixed (offset: t_Offset) (return (x: t_TimeZone)) =
+{[@stop_split] [@expl:fixed 'offset' type invariant] [%#stz_ambiguous_timestamp'11] inv_Offset offset}
+  any
+  [ return (result: t_TimeZone) ->
+  {[@stop_split] [@expl:fixed ensures] ([@stop_split] [@expl:fixed result type invariant] [%#stimezone] inv_TimeZone result)
+    /\ ([@stop_split] [@expl:fixed ensures] [%#stz_ambiguous_timestamp'12] tz_fixed_seconds_value result
+    = offset_seconds_value offset)}
+    (! return {result}) ]
+
+predicate resolve_TimeZone (_1: t_TimeZone)
+
+type t_DateTime
+
+type t_AmbiguousTimestamp
+
+predicate invariant_ref_TimeZone [@inline:trivial] (self: t_TimeZone) = [%#sinvariant] inv_TimeZone self
+
+meta "rewrite_def" predicate invariant_ref_TimeZone
+
+predicate inv_ref_TimeZone [@inline:trivial] (_1: t_TimeZone) = invariant_ref_TimeZone _1
+
+meta "rewrite_def" predicate inv_ref_TimeZone
+
+predicate inv_DateTime (_1: t_DateTime)
+
+predicate inv_AmbiguousTimestamp (_1: t_AmbiguousTimestamp)
+
+predicate amb_ts_offset_is_unambiguous_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 46 0 46 80] (_t: t_AmbiguousTimestamp)
+
+function amb_ts_offset_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 53 0 53 72] (_t: t_AmbiguousTimestamp) : Int32.t
+
+let to_ambiguous_timestamp (self_: t_TimeZone) (dt: t_DateTime) (return (x: t_AmbiguousTimestamp)) =
+{[@stop_split] [@expl:to_ambiguous_timestamp requires] ([@stop_split] [@expl:to_ambiguous_timestamp 'self_' type invariant] [%#stz_ambiguous_timestamp'13] inv_ref_TimeZone self_)
+  /\ ([@stop_split] [@expl:to_ambiguous_timestamp 'dt' type invariant] [%#stz_ambiguous_timestamp'14] inv_DateTime dt)}
+  any
+  [ return (result: t_AmbiguousTimestamp) ->
+  {[@stop_split] [@expl:to_ambiguous_timestamp ensures] ([@stop_split] [@expl:to_ambiguous_timestamp result type invariant] [%#stimezone'0] inv_AmbiguousTimestamp result)
+    /\ ([@stop_split] [@expl:to_ambiguous_timestamp ensures] [%#stz_ambiguous_timestamp'15] amb_ts_offset_is_unambiguous_value result
+      = true
+    /\ amb_ts_offset_seconds_value result = tz_fixed_seconds_value self_)}
+    (! return {result}) ]
+
+type t_AmbiguousOffset = Unambiguous t_Offset | Gap t_Offset t_Offset | Fold t_Offset t_Offset
+
+predicate invariant_ref_AmbiguousTimestamp [@inline:trivial] (self: t_AmbiguousTimestamp) =
+  [%#sinvariant] inv_AmbiguousTimestamp self
+
+meta "rewrite_def" predicate invariant_ref_AmbiguousTimestamp
+
+predicate inv_ref_AmbiguousTimestamp [@inline:trivial] (_1: t_AmbiguousTimestamp) = invariant_ref_AmbiguousTimestamp _1
+
+meta "rewrite_def" predicate inv_ref_AmbiguousTimestamp
+
+predicate inv_AmbiguousOffset (_1: t_AmbiguousOffset)
+
+axiom inv_axiom'0 [@rewrite]: forall x: t_AmbiguousOffset [inv_AmbiguousOffset x]. inv_AmbiguousOffset x
+    = match x with
+      | Unambiguous offset -> inv_Offset offset
+      | Gap before after -> inv_Offset before /\ inv_Offset after
+      | Fold before after -> inv_Offset before /\ inv_Offset after
+      end
+
+let offset (self_: t_AmbiguousTimestamp) (return (x: t_AmbiguousOffset)) =
+{[@stop_split] [@expl:offset 'self_' type invariant] [%#stz_ambiguous_timestamp'16] inv_ref_AmbiguousTimestamp self_}
+  any
+  [ return (result: t_AmbiguousOffset) ->
+  {[@stop_split] [@expl:offset ensures] ([@stop_split] [@expl:offset result type invariant] [%#sambiguous] inv_AmbiguousOffset result)
+    /\ ([@stop_split] [@expl:offset ensures] [%#stz_ambiguous_timestamp'17] match result with
+      | Unambiguous offset -> amb_ts_offset_is_unambiguous_value self_ = true
+      /\ offset_seconds_value offset = amb_ts_offset_seconds_value self_
+      | _ -> amb_ts_offset_is_unambiguous_value self_ = false
+      end)}
+    (! return {result}) ]
+
+let elim_Unambiguous (_x: t_AmbiguousOffset) (return (offset'0: t_Offset)) = any
+  [ _k (offset'0: t_Offset) -> {Unambiguous offset'0 = _x} (! return {offset'0})
+  | _chk -> (! {[@expl:elim Unambiguous] match _x with
+      | Unambiguous _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let seconds (self_: t_Offset) (return (x: Int32.t)) =
+{[@stop_split] [@expl:seconds 'self_' type invariant] [%#soffset'1] inv_Offset self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:seconds ensures] [%#soffset'2] result
+    = offset_seconds_value self_}
+    (! return {result}) ]
+
+let is_ambiguous (self_: t_AmbiguousTimestamp) (return (x: bool)) =
+{[@stop_split] [@expl:is_ambiguous 'self_' type invariant] [%#stz_ambiguous_timestamp'18] inv_ref_AmbiguousTimestamp self_}
+  any
+  [ return (result: bool) -> {[@stop_split] [@expl:is_ambiguous ensures] [%#stz_ambiguous_timestamp'19] result
+    = (amb_ts_offset_is_unambiguous_value self_ = false)}
+    (! return {result}) ]
+
+predicate tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 94 4 94 101] (matches: bool) =
+  [%#stz_ambiguous_timestamp'20] matches
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_ambiguous_timestamp.rs" 109 4 112 13]
+  (dt: t_DateTime) (seconds'0: Int32.t) (return (x: bool)) =
+{[@stop_split] [@expl:verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous 'dt' type invariant] [%#stz_ambiguous_timestamp'8] inv_DateTime dt}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = from_seconds [%#stz_ambiguous_timestamp] {seconds'0} (fun (_x: t_Result_Offset_Error) -> [ &_5 <- _x ] s1)
+    | s1 = any [ br0 (x0: t_Offset) -> {_5 = Ok x0} (! bb4) | br1 (x0: t_Error) -> {_5 = Err x0} (! bb3) ] ]
+  | bb3 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Offset_Error _5} any) ]
+    | s1 = -{resolve_Result_Offset_Error _5}- s2
+    | s2 = [ &_ret <- [%#stz_ambiguous_timestamp'0] true ] s3
+    | s3 = return {_ret} ]
+  | bb4 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_Result_Offset_Error _5} any) ]
+    | s1 = -{resolve_Result_Offset_Error _5}- s2
+    | s2 = elim_Ok {_5} (fun (r0: t_Offset) -> [ &offset'0 <- r0 ] s3)
+    | s3 = fixed [%#stz_ambiguous_timestamp'1] {offset'0} (fun (_x: t_TimeZone) -> [ &tz <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_TimeZone tz} any) ]
+    | s5 = -{resolve_TimeZone tz}- s6
+    | s6 = to_ambiguous_timestamp [%#stz_ambiguous_timestamp'2] {tz} {dt}
+        (fun (_x: t_AmbiguousTimestamp) -> [ &ts <- _x ] s7)
+    | s7 = offset [%#stz_ambiguous_timestamp'3] {ts} (fun (_x: t_AmbiguousOffset) -> [ &_15 <- _x ] s8)
+    | s8 = any
+      [ br0 (x0: t_Offset) -> {_15 = Unambiguous x0} (! bb11)
+      | br1 (x0: t_Offset) (x1: t_Offset) -> {_15 = Gap x0 x1} (! bb9)
+      | br2 (x0: t_Offset) (x1: t_Offset) -> {_15 = Fold x0 x1} (! bb9) ] ]
+  | bb9 = s0 [ s0 = [ &offset_ok <- [%#stz_ambiguous_timestamp'4] false ] s1 | s1 = bb13 ]
+  | bb11 = s0
+    [ s0 = elim_Unambiguous {_15} (fun (roffset: t_Offset) -> [ &o <- roffset ] s1)
+    | s1 = seconds [%#stz_ambiguous_timestamp'5] {o} (fun (_x: Int32.t) -> [ &_19 <- _x ] s2)
+    | s2 = [ &offset_ok <- _19 = seconds'0 ] s3
+    | s3 = bb13 ]
+  | bb13 = any [ br0 -> {offset_ok = false} (! bb15) | br1 -> {offset_ok} (! bb14) ]
+  | bb14 = s0
+    [ s0 = is_ambiguous [%#stz_ambiguous_timestamp'6] {ts} (fun (_x: bool) -> [ &_23 <- _x ] s1)
+    | s1 = [ &_ret <- not _23 ] s2
+    | s2 = return {_ret} ]
+  | bb15 = s0 [ s0 = [ &_ret <- [%#stz_ambiguous_timestamp'7] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & dt: t_DateTime = dt
+  | & seconds'0: Int32.t = seconds'0
+  | & _5: t_Result_Offset_Error = Any.any_l ()
+  | & offset'0: t_Offset = Any.any_l ()
+  | & tz: t_TimeZone = Any.any_l ()
+  | & ts: t_AmbiguousTimestamp = Any.any_l ()
+  | & offset_ok: bool = Any.any_l ()
+  | & _15: t_AmbiguousOffset = Any.any_l ()
+  | & o: t_Offset = Any.any_l ()
+  | & _19: Int32.t = Any.any_l ()
+  | & _23: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous ensures] [%#stz_ambiguous_timestamp'10] tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_holds result}
+    (! return {result}) ]
