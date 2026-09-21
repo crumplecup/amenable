@@ -629,6 +629,16 @@
 //! `fmt_temporal_time_zone_annotation_name.rs`): wraps one private
 //! field, with a real, checkable round trip —
 //! `TimeZoneAnnotationName::from(s).as_str() == s` for every `&str`.
+//!
+//! `jiff::tz::AmbiguousOffset` stays trusted, the same "zero public
+//! methods beyond derives" shape as `RoundMode`: checked directly
+//! against jiff's real source, it has *no* public methods at all —
+//! only a `pub(crate) from_jcore` conversion. Its three variants
+//! (`Unambiguous`/`Gap`/`Fold`) do have public struct-style fields,
+//! but with nothing beyond the standard derives
+//! (`Clone`/`Copy`/`Debug`/`Eq`/`PartialEq`) producing or consuming
+//! this type from outside jiff, there is nothing non-tautological to
+//! state about it on any backend.
 
 mod civil_date;
 mod civil_era;
@@ -707,5 +717,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::temporal::DateTimeParser,
     jiff::fmt::temporal::DateTimePrinter,
     jiff::fmt::temporal::SpanParser,
-    jiff::fmt::temporal::SpanPrinter
+    jiff::fmt::temporal::SpanPrinter,
+    jiff::tz::AmbiguousOffset
 );

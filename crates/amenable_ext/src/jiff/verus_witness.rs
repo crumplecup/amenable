@@ -356,6 +356,12 @@
 //! (`lowercase`) is a plain setter over a private field, no getter —
 //! and its real formatting methods have the same
 //! disproportionate-reproduction shape.
+//!
+//! `jiff::tz::AmbiguousOffset` stays trusted, the same "zero public
+//! methods beyond derives" shape as `RoundMode`: checked directly
+//! against jiff's real source, it has *no* public methods at all —
+//! only a `pub(crate) from_jcore` conversion. Nothing
+//! non-tautological to state about it on any backend.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -439,7 +445,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::temporal::DateTimeParser,
     jiff::fmt::temporal::DateTimePrinter,
     jiff::fmt::temporal::SpanParser,
-    jiff::fmt::temporal::SpanPrinter
+    jiff::fmt::temporal::SpanPrinter,
+    jiff::tz::AmbiguousOffset
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
