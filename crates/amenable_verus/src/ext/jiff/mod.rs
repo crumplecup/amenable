@@ -19,6 +19,7 @@ pub mod fmt_strtime_broken_down_time;
 pub mod fmt_strtime_meridiem;
 pub mod fmt_temporal_pieces;
 pub mod fmt_temporal_pieces_numeric_offset;
+pub mod fmt_temporal_pieces_offset;
 pub mod offset;
 pub mod signed_duration;
 pub mod span;

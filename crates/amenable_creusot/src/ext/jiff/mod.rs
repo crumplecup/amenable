@@ -400,6 +400,15 @@
 //! `offset.rs`'s own `offset_seconds_value` opaque accessor (hoisted
 //! to `pub(crate)` at that module's top level for this purpose)
 //! rather than a disconnected copy.
+//!
+//! `jiff::fmt::temporal::PiecesOffset` gets a real checked property
+//! too (see `fmt_temporal_pieces_offset.rs`): a real, `#[non_
+//! exhaustive]` two-variant enum, matched directly on its own
+//! variants inside the `extern_spec!`'s `#[ensures(..)]` clause —
+//! the same `fmt_friendly_fractional_unit.rs`-established technique
+//! for sidestepping a foreign enum's `DeepModel` wall — reusing
+//! `fmt_temporal_pieces_numeric_offset.rs`'s own
+//! `pno_offset_seconds_value` opaque accessor.
 
 mod civil_date;
 mod civil_era;
@@ -419,6 +428,7 @@ mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
+mod fmt_temporal_pieces_offset;
 mod offset;
 mod signed_duration;
 mod span;

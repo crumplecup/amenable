@@ -1,0 +1,16 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_from_PiecesOffset": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.024 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_to_numeric_offset": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_verify_fmt_temporal_pieces_offset_zulu_and_from_offset_round_trip": {
+        "prover": "alt-ergo",
+        "time": 0.05
+      }
+    }
+  }
+}

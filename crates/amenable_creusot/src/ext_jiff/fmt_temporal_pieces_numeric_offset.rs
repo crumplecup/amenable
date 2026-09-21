@@ -23,6 +23,13 @@
 //! body (`self.inner.is_negative()`) and doc examples (`offset(5)` →
 //! `false`, `offset(0)` → `false`, `offset(-5)` → `true`) confirm this
 //! is exactly what it means for a seconds-backed offset.
+//!
+//! `pno_offset_seconds_value` is `pub(crate)` (not module-private):
+//! `fmt_temporal_pieces_offset.rs` needs to reuse it (its own
+//! `PiecesOffset::to_numeric_offset` extern_spec needs to relate to
+//! the real `PiecesNumericOffset` its `Numeric` variant wraps), the
+//! same cross-file-reuse shape `offset.rs`'s own `offset_seconds_value`
+//! now has.
 
 #[cfg(creusot)]
 mod mirror {
@@ -36,7 +43,7 @@ use mirror::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
-fn pno_offset_seconds_value(_p: &jiff::fmt::temporal::PiecesNumericOffset) -> i32 {
+pub(crate) fn pno_offset_seconds_value(_p: &jiff::fmt::temporal::PiecesNumericOffset) -> i32 {
     dead
 }
 

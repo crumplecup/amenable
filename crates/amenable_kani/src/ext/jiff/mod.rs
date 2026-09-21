@@ -581,6 +581,13 @@
 //! seconds and sets `is_negative` to whether it's negative, and
 //! `with_negative_zero` preserves the wrapped offset while forcing
 //! `is_negative` to `true`.
+//!
+//! `jiff::fmt::temporal::PiecesOffset` gets a real checked property
+//! too (see `fmt_temporal_pieces_offset.rs`): a real, `#[non_
+//! exhaustive]` two-variant enum (`Zulu`, `Numeric(
+//! PiecesNumericOffset)`) — `Zulu.to_numeric_offset()` is always
+//! `Offset::UTC`, and `From<Offset>` always builds `Numeric`,
+//! round-tripping through `to_numeric_offset()`.
 
 mod civil_date;
 mod civil_era;
@@ -596,6 +603,7 @@ mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
 mod fmt_temporal_pieces_numeric_offset;
+mod fmt_temporal_pieces_offset;
 mod offset;
 mod signed_duration;
 mod span;

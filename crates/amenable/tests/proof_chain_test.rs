@@ -9350,3 +9350,20 @@ fn ext_fmt_temporal_pieces_numeric_offset_proof_chain_reports_all_three_verifier
     );
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_temporal_pieces_offset_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::temporal::PiecesOffset>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(
+        &report,
+        "ExtStandard<jiff::fmt::temporal::PiecesOffset>",
+    );
+    Ok(())
+}
