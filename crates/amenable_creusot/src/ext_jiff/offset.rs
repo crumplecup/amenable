@@ -14,19 +14,26 @@
 //! `from_seconds`'s postcondition and `seconds`'s postcondition both
 //! reference the same opaque `offset_seconds_value` axiom instead of
 //! calling each other.
+//!
+//! `offset_seconds_value` is `pub(crate)` at this module's own top
+//! level, not nested in a private `mirror` module: `fmt_temporal_
+//! pieces_numeric_offset.rs` needs to reuse it (its own
+//! `PiecesNumericOffset` extern_specs need to relate to the real
+//! `Offset` a `PiecesNumericOffset` wraps), and Creusot only allows one
+//! `extern_spec!` per real function crate-wide, so `Offset::seconds()`'s
+//! own contract can't be redeclared there. The `pub(crate)`-at-top-level
+//! shape is `civil_date.rs`'s own established fix for the identical
+//! class of problem — see that file's own doc comment.
 
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
+use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn offset_seconds_value(_o: &jiff::tz::Offset) -> i32 {
-        dead
-    }
+#[cfg(creusot)]
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn offset_seconds_value(_o: &jiff::tz::Offset) -> i32 {
+    dead
 }
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, offset_seconds_value, requires};
 
 // jiff's own documented valid range for `Offset::from_seconds`
 // (`-25:59:59..=25:59:59`, in seconds) — the same constant the Kani

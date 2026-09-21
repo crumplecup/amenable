@@ -1,0 +1,18 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_from_PiecesNumericOffset": { "prover": "alt-ergo", "time": 0.022 },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_is_negative": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_offset": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_verify_fmt_temporal_pieces_numeric_offset_from_and_with_negative_zero": {
+        "prover": "alt-ergo",
+        "time": 0.1
+      },
+      "vc_with_negative_zero": { "prover": "alt-ergo", "time": 0.027 }
+    }
+  }
+}

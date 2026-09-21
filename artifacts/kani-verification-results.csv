@@ -17,6 +17,7 @@ amenable_kani::ext::jiff::fmt_std_io_write::verify_fmt_std_io_write_write_str_ap
 amenable_kani::ext::jiff::fmt_strtime_broken_down_time::verify_fmt_strtime_broken_down_time_numeric_setters_round_trip,1789949433,passed
 amenable_kani::ext::jiff::fmt_strtime_meridiem::verify_fmt_strtime_meridiem_from_time_matches_hour_threshold,1790001774,passed
 amenable_kani::ext::jiff::fmt_temporal_pieces::verify_fmt_temporal_pieces_with_date_with_time_round_trip,1790003074,passed
+amenable_kani::ext::jiff::fmt_temporal_pieces_numeric_offset::verify_fmt_temporal_pieces_numeric_offset_from_and_with_negative_zero,1790028214,passed
 amenable_kani::ext::jiff::offset::verify_offset_from_seconds_round_trips,1789419747,passed
 amenable_kani::ext::jiff::signed_duration::verify_signed_duration_new_normalizes_nanos_and_carries_into_secs,1789421600,passed
 amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789441687,passed

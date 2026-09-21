@@ -16,6 +16,7 @@
 //! TimeSeries`/`jiff::fmt::friendly::FractionalUnit`/`jiff::fmt::
 //! strtime::BrokenDownTime`/`jiff::fmt::strtime::Meridiem`/`jiff::fmt::
 //! temporal::Pieces<'static>`/`jiff::fmt::
+//! temporal::PiecesNumericOffset`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -27,7 +28,7 @@
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
 //! date_time_series,fmt_friendly_fractional_unit,fmt_std_fmt_write,
 //! fmt_std_io_write,fmt_strtime_broken_down_time,fmt_strtime_meridiem,
-//! fmt_temporal_pieces,
+//! fmt_temporal_pieces,fmt_temporal_pieces_numeric_offset,
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
@@ -240,6 +241,14 @@
 //! against jiff's real API, scoped to `date`/`time` only (see either
 //! module's own doc comment for why `offset`/`time_zone_annotation`
 //! are deliberately excluded).
+//!
+//! `jiff::fmt::temporal::PiecesNumericOffset`'s model reproduces it as
+//! `{ offset_seconds: i32, is_negative: bool }`, self-contained rather
+//! than cross-importing `offset.rs`'s own range spec fn — the same
+//! claim `amenable_kani::ext::jiff::
+//! fmt_temporal_pieces_numeric_offset` and `amenable_creusot::
+//! ext_jiff::fmt_temporal_pieces_numeric_offset` both check against
+//! jiff's real `From<Offset>`/`with_negative_zero` API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -513,6 +522,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::Pieces<'static>,
     "verify_fmt_temporal_pieces_with_date_with_time_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::temporal::PiecesNumericOffset,
+    "verify_fmt_temporal_pieces_numeric_offset_from_and_with_negative_zero_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces_numeric_offset.rs"
 );
 
 impl_verus_witness_checked_ext!(

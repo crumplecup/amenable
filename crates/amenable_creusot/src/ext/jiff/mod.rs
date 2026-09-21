@@ -393,6 +393,13 @@
 //! `Time` values via `==` hits the same `DeepModel` wall `unit.rs`
 //! already documents — reuses `civil_date.rs`'s/`civil_time.rs`'s
 //! existing accessors to decompose both sides.
+//!
+//! `jiff::fmt::temporal::PiecesNumericOffset` gets a real checked
+//! property too (see `fmt_temporal_pieces_numeric_offset.rs`): a real
+//! data-carrying type wrapping a real `jiff::tz::Offset`, reusing
+//! `offset.rs`'s own `offset_seconds_value` opaque accessor (hoisted
+//! to `pub(crate)` at that module's top level for this purpose)
+//! rather than a disconnected copy.
 
 mod civil_date;
 mod civil_era;
@@ -411,6 +418,7 @@ mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
+mod fmt_temporal_pieces_numeric_offset;
 mod offset;
 mod signed_duration;
 mod span;

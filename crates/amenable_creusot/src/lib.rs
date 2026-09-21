@@ -71,6 +71,8 @@ pub use ext_jiff::fmt_strtime_meridiem::VERIFY_FMT_STRTIME_MERIDIEM_FROM_TIME_MA
 #[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_temporal_pieces::VERIFY_FMT_TEMPORAL_PIECES_WITH_DATE_WITH_TIME_ROUND_TRIP_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_temporal_pieces_numeric_offset::VERIFY_FMT_TEMPORAL_PIECES_NUMERIC_OFFSET_FROM_AND_WITH_NEGATIVE_ZERO_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::offset::{
     OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,
 };

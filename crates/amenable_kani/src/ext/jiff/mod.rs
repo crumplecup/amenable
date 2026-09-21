@@ -573,6 +573,14 @@
 //! `date()`/`time()` getters. Scoped to those two fields
 //! deliberately, not `offset`/`time_zone_annotation` — their own
 //! types are separate, not-yet-assessed checklist entries.
+//!
+//! `jiff::fmt::temporal::PiecesNumericOffset` gets a real checked
+//! property too (see `fmt_temporal_pieces_numeric_offset.rs`): a real
+//! data-carrying type (`offset: Offset`, `is_negative: bool`), not a
+//! parser/printer — `From<Offset>` round-trips the wrapped offset's
+//! seconds and sets `is_negative` to whether it's negative, and
+//! `with_negative_zero` preserves the wrapped offset while forcing
+//! `is_negative` to `true`.
 
 mod civil_date;
 mod civil_era;
@@ -587,6 +595,7 @@ mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
 mod fmt_strtime_meridiem;
 mod fmt_temporal_pieces;
+mod fmt_temporal_pieces_numeric_offset;
 mod offset;
 mod signed_duration;
 mod span;
