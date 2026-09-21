@@ -224,6 +224,12 @@
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
 //! the same shape as `SpanRound`/`TimestampRound`/etc.
+//!
+//! `jiff::fmt::strtime::DefaultCustom` stays trusted, even more
+//! opaque than `RoundMode`: checked directly against jiff's real
+//! source, it's `DefaultCustom(())` — a single private zero-sized
+//! field — with one constructor and an empty `impl Custom for
+//! DefaultCustom {}` using only the trait's own inherited defaults.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -299,7 +305,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::friendly::SpanPrinter,
     jiff::fmt::rfc2822::DateTimeParser,
     jiff::fmt::rfc2822::DateTimePrinter,
-    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>
+    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
+    jiff::fmt::strtime::DefaultCustom
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

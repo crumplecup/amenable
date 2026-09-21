@@ -9203,3 +9203,20 @@ fn ext_fmt_strtime_config_proof_chain_reports_all_three_verifiers() -> miette::R
     );
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_fmt_strtime_default_custom_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::fmt::strtime::DefaultCustom>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(
+        &report,
+        "ExtStandard<jiff::fmt::strtime::DefaultCustom>",
+    );
+    Ok(())
+}

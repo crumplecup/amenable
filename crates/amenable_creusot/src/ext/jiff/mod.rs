@@ -325,6 +325,12 @@
 //! private with no getters, its two public methods plain setters —
 //! the same shape as `SpanRound`/`TimestampRound`/etc.
 //!
+//! `jiff::fmt::strtime::DefaultCustom` stays trusted, even more
+//! opaque than `RoundMode`: checked directly against jiff's real
+//! source, it's `DefaultCustom(())` — a single private zero-sized
+//! field — with one constructor and an empty `impl Custom for
+//! DefaultCustom {}` using only the trait's own inherited defaults.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -436,7 +442,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::friendly::SpanPrinter,
     jiff::fmt::rfc2822::DateTimeParser,
     jiff::fmt::rfc2822::DateTimePrinter,
-    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>
+    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>,
+    jiff::fmt::strtime::DefaultCustom
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
