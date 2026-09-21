@@ -519,6 +519,14 @@
 //! confirms this is deliberate: "if you have use cases for
 //! introspecting this type, please open an issue."
 //!
+//! `jiff::fmt::strtime::Meridiem` gets a real checked property too
+//! (see `fmt_strtime_meridiem.rs`), the "small enums aren't
+//! automatically trusted" lesson `civil::Era`/`civil::Weekday`
+//! already established recurring here: checked directly against
+//! jiff's real source, it has one real public conversion, `impl
+//! From<civil::Time> for Meridiem`, a documented threshold (`AM` for
+//! `hour < 12`, `PM` otherwise).
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -538,6 +546,7 @@ mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
+mod fmt_strtime_meridiem;
 mod offset;
 mod signed_duration;
 mod span;

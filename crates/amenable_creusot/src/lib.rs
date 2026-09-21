@@ -67,6 +67,8 @@ pub use ext_jiff::fmt_std_io_write::VERIFY_FMT_STD_IO_WRITE_WRITE_STR_NEVER_FAIL
 #[cfg(feature = "jiff")]
 pub use ext_jiff::fmt_strtime_broken_down_time::VERIFY_FMT_STRTIME_BROKEN_DOWN_TIME_NUMERIC_SETTERS_ROUND_TRIP_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::fmt_strtime_meridiem::VERIFY_FMT_STRTIME_MERIDIEM_FROM_TIME_MATCHES_HOUR_THRESHOLD_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::offset::{
     OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC,
 };

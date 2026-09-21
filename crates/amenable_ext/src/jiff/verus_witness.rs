@@ -14,7 +14,7 @@
 //! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
 //! TimeSeries`/`jiff::fmt::friendly::FractionalUnit`/`jiff::fmt::
-//! strtime::BrokenDownTime`/`jiff::fmt::
+//! strtime::BrokenDownTime`/`jiff::fmt::strtime::Meridiem`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -25,7 +25,8 @@
 //! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
 //! date_time_series,fmt_friendly_fractional_unit,fmt_std_fmt_write,
-//! fmt_std_io_write,fmt_strtime_broken_down_time,offset,error,
+//! fmt_std_io_write,fmt_strtime_broken_down_time,fmt_strtime_meridiem,
+//! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
 //! is still unreachable, but each
@@ -219,6 +220,13 @@
 //! instantly, unlike `amenable_kani::ext::jiff::
 //! fmt_strtime_broken_down_time`'s own real CBMC wall for the
 //! identical claim).
+//!
+//! `jiff::fmt::strtime::Meridiem`'s model reproduces its documented
+//! `hour < 12` threshold directly with its own small `MeridiemModel`
+//! enum (`Am`/`Pm`) — the same claim `amenable_kani::ext::jiff::
+//! fmt_strtime_meridiem` and `amenable_creusot::ext_jiff::
+//! fmt_strtime_meridiem` check against jiff's real `From<civil::Time>
+//! for Meridiem` conversion.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -453,6 +461,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::strtime::BrokenDownTime,
     "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::strtime::Meridiem,
+    "verify_fmt_strtime_meridiem_from_time_matches_hour_threshold_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_strtime_meridiem.rs"
 );
 
 impl_verus_witness_checked_ext!(

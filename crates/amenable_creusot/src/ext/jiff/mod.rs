@@ -344,6 +344,14 @@
 //! comment confirms this is deliberate: "if you have use cases for
 //! introspecting this type, please open an issue."
 //!
+//! `jiff::fmt::strtime::Meridiem` gets a real checked property too
+//! (see `fmt_strtime_meridiem.rs`): a real `extern_spec!` for jiff's
+//! own `From<civil::Time> for Meridiem`, reusing `civil_time.rs`'s
+//! existing `civil_time_hour_value` accessor directly. `Meridiem` is
+//! NOT `#[non_exhaustive]`, so matching its two variants needs no
+//! wildcard arm — the same pure pattern-matching technique
+//! `fmt_friendly_fractional_unit.rs` already established.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -367,6 +375,7 @@ mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
 mod fmt_strtime_broken_down_time;
+mod fmt_strtime_meridiem;
 mod offset;
 mod signed_duration;
 mod span;
