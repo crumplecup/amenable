@@ -313,6 +313,11 @@
 //! checks against jiff's real API, also trusted for Kani (calls the
 //! same already-confirmed-timing-out function directly).
 //!
+//! `jiff::tz::Disambiguation` stays trusted, the same "zero public
+//! methods beyond derives" shape as `RoundMode`/`AmbiguousOffset`:
+//! there is no `impl Disambiguation` block at all — a real
+//! configuration marker enum consumed only by other types' methods.
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -464,7 +469,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::temporal::DateTimePrinter,
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
-    jiff::tz::AmbiguousOffset
+    jiff::tz::AmbiguousOffset,
+    jiff::tz::Disambiguation
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

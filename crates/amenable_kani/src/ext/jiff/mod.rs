@@ -660,6 +660,17 @@
 //! timestamp(dt)` directly — the SAME real function just confirmed
 //! above to time out under CBMC even for a fully concrete call.
 //! Checked on Creusot and Verus instead.
+//!
+//! `jiff::tz::Disambiguation` stays trusted, the same "zero public
+//! methods beyond derives" shape as `RoundMode`/`AmbiguousOffset`:
+//! checked directly against jiff's real source, there is no `impl
+//! Disambiguation` block at all — a real, `#[non_exhaustive]`
+//! four-variant configuration marker enum (`Compatible`/`Earlier`/
+//! `Later`/`Reject`) consumed only by OTHER types' methods
+//! (`AmbiguousTimestamp::compatible`/`DateTimeParser::
+//! disambiguation`/etc.), never producing or inspecting anything of
+//! its own beyond the standard derives (`Clone`/`Copy`/`Debug`/
+//! `Default`).
 
 mod civil_date;
 mod civil_era;
@@ -741,5 +752,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
     jiff::tz::AmbiguousTimestamp,
-    jiff::tz::AmbiguousZoned
+    jiff::tz::AmbiguousZoned,
+    jiff::tz::Disambiguation
 );

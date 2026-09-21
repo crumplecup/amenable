@@ -479,6 +479,13 @@
 //! confirmation run — real jiff source confirms `to_ambiguous_zoned`
 //! calls `to_ambiguous_timestamp` directly, the SAME real function
 //! already empirically confirmed to time out under CBMC.
+//!
+//! `jiff::tz::Disambiguation` stays trusted, the same "zero public
+//! methods beyond derives" shape as `RoundMode`/`AmbiguousOffset`:
+//! there is no `impl Disambiguation` block at all — a real,
+//! `#[non_exhaustive]` four-variant configuration marker enum
+//! consumed only by OTHER types' methods, never producing or
+//! inspecting anything of its own beyond the standard derives.
 
 mod civil_date;
 mod civil_era;
@@ -601,7 +608,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::temporal::DateTimePrinter,
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
-    jiff::tz::AmbiguousOffset
+    jiff::tz::AmbiguousOffset,
+    jiff::tz::Disambiguation
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
