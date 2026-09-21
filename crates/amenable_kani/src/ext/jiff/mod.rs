@@ -554,6 +554,14 @@
 //! (`parse_zoned`/`parse_timestamp`/`parse_datetime`/etc.) have the
 //! same disproportionate-reproduction shape, reproducing jiff's real
 //! ISO 8601/RFC 9557 temporal grammar this time.
+//!
+//! `jiff::fmt::temporal::DateTimePrinter` stays trusted, the identical
+//! combined shape to `SpanPrinter`/`rfc2822::DateTimePrinter`: checked
+//! directly against jiff's real source, its three public methods
+//! (`lowercase`/`separator`/`precision`) are plain setters over one
+//! private field, no getters — and its real formatting methods
+//! (`zoned_to_string`/`timestamp_to_string`/`print_zoned`/etc.) have
+//! the same disproportionate-reproduction shape.
 
 mod civil_date;
 mod civil_era;
@@ -623,5 +631,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::strtime::Display<'static>,
     jiff::fmt::strtime::Extension,
     jiff::fmt::strtime::PosixCustom,
-    jiff::fmt::temporal::DateTimeParser
+    jiff::fmt::temporal::DateTimeParser,
+    jiff::fmt::temporal::DateTimePrinter
 );
