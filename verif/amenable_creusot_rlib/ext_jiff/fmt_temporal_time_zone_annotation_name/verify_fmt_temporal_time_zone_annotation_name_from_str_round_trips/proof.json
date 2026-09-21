@@ -1,0 +1,17 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_as_str": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_eq_ref_str": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_from_TimeZoneAnnotationName": {
+        "prover": "alt-ergo",
+        "time": 0.027
+      },
+      "vc_verify_fmt_temporal_time_zone_annotation_name_from_str_round_trips": {
+        "prover": "alt-ergo",
+        "time": 0.024
+      }
+    }
+  }
+}

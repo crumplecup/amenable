@@ -431,6 +431,15 @@
 //! discriminant. Reuses `offset.rs`'s own `offset_seconds_value` for
 //! the `Offset` variant's payload.
 //!
+//! `jiff::fmt::temporal::TimeZoneAnnotationName<'static>` gets a real
+//! checked property too (see
+//! `fmt_temporal_time_zone_annotation_name.rs`), at the FULL scope
+//! this time (no enum-matching escape hatch for this struct): `&str`/
+//! `str` themselves ARE std/core types with real `creusot-std`
+//! coverage (unlike jiff's own foreign types), so `==` between two
+//! `&str` values inside a Pearlite `#[ensures(..)]` clause works —
+//! confirmed by this being the first file in this crate to try it.
+//!
 //! `jiff::fmt::temporal::SpanParser` stays trusted, checked directly
 //! against jiff's real source: a DIFFERENT type from `fmt::friendly::
 //! SpanParser` despite the same name (verified independently, not
@@ -466,6 +475,7 @@ mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
 mod fmt_temporal_time_zone_annotation;
 mod fmt_temporal_time_zone_annotation_kind;
+mod fmt_temporal_time_zone_annotation_name;
 mod offset;
 mod signed_duration;
 mod span;

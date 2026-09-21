@@ -623,6 +623,12 @@
 //! `From<&str>`'s exact name content is checked directly by
 //! matching — `From<Offset>` always builds `Offset` carrying the
 //! wrapped offset's own seconds.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotationName<'static>` gets a real
+//! checked property too (see
+//! `fmt_temporal_time_zone_annotation_name.rs`): wraps one private
+//! field, with a real, checkable round trip —
+//! `TimeZoneAnnotationName::from(s).as_str() == s` for every `&str`.
 
 mod civil_date;
 mod civil_era;
@@ -641,6 +647,7 @@ mod fmt_temporal_pieces_numeric_offset;
 mod fmt_temporal_pieces_offset;
 mod fmt_temporal_time_zone_annotation;
 mod fmt_temporal_time_zone_annotation_kind;
+mod fmt_temporal_time_zone_annotation_name;
 mod offset;
 mod signed_duration;
 mod span;

@@ -31,6 +31,7 @@ pub(crate) mod fmt_temporal_pieces_numeric_offset;
 pub(crate) mod fmt_temporal_pieces_offset;
 pub(crate) mod fmt_temporal_time_zone_annotation;
 pub(crate) mod fmt_temporal_time_zone_annotation_kind;
+pub(crate) mod fmt_temporal_time_zone_annotation_name;
 pub(crate) mod offset;
 pub(crate) mod signed_duration;
 pub(crate) mod span;

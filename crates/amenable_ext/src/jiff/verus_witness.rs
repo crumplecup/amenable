@@ -20,6 +20,7 @@
 //! temporal::PiecesOffset`/`jiff::fmt::
 //! temporal::TimeZoneAnnotation<'static>`/`jiff::fmt::
 //! temporal::TimeZoneAnnotationKind<'static>`/`jiff::fmt::
+//! temporal::TimeZoneAnnotationName<'static>`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -35,6 +36,7 @@
 //! fmt_temporal_pieces_offset,
 //! fmt_temporal_time_zone_annotation,
 //! fmt_temporal_time_zone_annotation_kind,
+//! fmt_temporal_time_zone_annotation_name,
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
@@ -283,6 +285,15 @@
 //! fmt_temporal_time_zone_annotation_kind` and `amenable_creusot::
 //! ext_jiff::fmt_temporal_time_zone_annotation_kind` both check
 //! against jiff's real `From<&str>`/`From<Offset>` API.
+//!
+//! `jiff::fmt::temporal::TimeZoneAnnotationName<'static>`'s model is
+//! a trivial `&str` wrapper — the real type's own round trip is a
+//! store-and-return-back with no transformation, so the model is the
+//! identity function over the borrowed string itself — the same
+//! claim `amenable_kani::ext::jiff::
+//! fmt_temporal_time_zone_annotation_name` and `amenable_creusot::
+//! ext_jiff::fmt_temporal_time_zone_annotation_name` both check
+//! against jiff's real `From<&str>`/`as_str` API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -596,6 +607,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::TimeZoneAnnotationKind<'static>,
     "verify_fmt_temporal_time_zone_annotation_kind_from_name_and_from_offset_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_kind.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::temporal::TimeZoneAnnotationName<'static>,
+    "verify_fmt_temporal_time_zone_annotation_name_from_str_round_trips_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_name.rs"
 );
 
 impl_verus_witness_checked_ext!(
