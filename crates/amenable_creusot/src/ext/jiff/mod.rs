@@ -320,6 +320,11 @@
 //! Creusot's `^self` ("final") prophecy operator, the same mechanism
 //! `creusot-std`'s own `Vec::push` extern_spec uses for its `View`.
 //!
+//! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
+//! directly against jiff's real source: a pure builder, both fields
+//! private with no getters, its two public methods plain setters —
+//! the same shape as `SpanRound`/`TimestampRound`/etc.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -430,7 +435,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::friendly::SpanParser,
     jiff::fmt::friendly::SpanPrinter,
     jiff::fmt::rfc2822::DateTimeParser,
-    jiff::fmt::rfc2822::DateTimePrinter
+    jiff::fmt::rfc2822::DateTimePrinter,
+    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -490,6 +490,12 @@
 //! whose setters are plain unconditional field assignments with no
 //! validation logic at all.
 //!
+//! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
+//! directly against jiff's real source: a pure builder — both fields
+//! (`custom`/`lenient`) are private with no getters at all, and its
+//! two public methods (`custom<U: Custom>`/`lenient(bool)`) are plain
+//! setters, the same shape as `SpanRound`/`TimestampRound`/etc.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -559,5 +565,6 @@ impl_kani_witness_trusted_ext!(
     jiff::fmt::friendly::SpanParser,
     jiff::fmt::friendly::SpanPrinter,
     jiff::fmt::rfc2822::DateTimeParser,
-    jiff::fmt::rfc2822::DateTimePrinter
+    jiff::fmt::rfc2822::DateTimePrinter,
+    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>
 );

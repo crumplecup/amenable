@@ -219,6 +219,11 @@
 //! instantly, unlike `amenable_kani::ext::jiff::
 //! fmt_strtime_broken_down_time`'s own real CBMC wall for the
 //! identical claim).
+//!
+//! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
+//! directly against jiff's real source: a pure builder, both fields
+//! private with no getters, its two public methods plain setters —
+//! the same shape as `SpanRound`/`TimestampRound`/etc.
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -293,7 +298,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::friendly::SpanParser,
     jiff::fmt::friendly::SpanPrinter,
     jiff::fmt::rfc2822::DateTimeParser,
-    jiff::fmt::rfc2822::DateTimePrinter
+    jiff::fmt::rfc2822::DateTimePrinter,
+    jiff::fmt::strtime::Config<jiff::fmt::strtime::DefaultCustom>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
