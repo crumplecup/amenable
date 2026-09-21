@@ -1,0 +1,40 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_day": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_day_of_year": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_default_BrokenDownTime": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_eq_Option_i16": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_eq_Option_i32": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_eq_Option_i8": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_hour": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_is_err_unit": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_iso_week": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_iso_week_year": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_minute": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_monday_based_week": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_month": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_second": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_set_day": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_set_day_of_year": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_set_hour": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_set_iso_week": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_set_iso_week_year": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_set_minute": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_set_monday_based_week": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_set_month": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_set_second": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_set_subsec_nanosecond": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_set_sunday_based_week": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_set_year": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_subsec_nanosecond": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_sunday_based_week": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_verify_fmt_strtime_broken_down_time_numeric_setters_round_trip": {
+        "prover": "z3",
+        "time": 0.28
+      },
+      "vc_year": { "prover": "alt-ergo", "time": 0.036 }
+    }
+  }
+}

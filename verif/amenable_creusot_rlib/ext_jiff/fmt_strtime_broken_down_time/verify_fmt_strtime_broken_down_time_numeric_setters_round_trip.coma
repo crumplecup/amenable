@@ -1,0 +1,1034 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 317 8 330 17 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
+let%span sresult = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/result.rs" 25 19 25 23
+let%span sresult'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/result.rs" 24 18 24 56
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
+let%span sinvariant'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sfmt_strtime_broken_down_time = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 331 26 331 71
+let%span sfmt_strtime_broken_down_time'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 333 16 333 40
+let%span sfmt_strtime_broken_down_time'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 333 16 333 49
+let%span sfmt_strtime_broken_down_time'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 333 16 333 77
+let%span sfmt_strtime_broken_down_time'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 333 53 333 63
+let%span sfmt_strtime_broken_down_time'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 333 53 333 77
+let%span sfmt_strtime_broken_down_time'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 335 26 335 71
+let%span sfmt_strtime_broken_down_time'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 337 16 337 42
+let%span sfmt_strtime_broken_down_time'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 337 16 337 51
+let%span sfmt_strtime_broken_down_time'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 337 16 337 81
+let%span sfmt_strtime_broken_down_time'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 337 55 337 66
+let%span sfmt_strtime_broken_down_time'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 337 55 337 81
+let%span sfmt_strtime_broken_down_time'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 339 26 339 71
+let%span sfmt_strtime_broken_down_time'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 340 25 340 47
+let%span sfmt_strtime_broken_down_time'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 340 25 340 56
+let%span sfmt_strtime_broken_down_time'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 340 25 340 82
+let%span sfmt_strtime_broken_down_time'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 340 60 340 69
+let%span sfmt_strtime_broken_down_time'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 340 60 340 82
+let%span sfmt_strtime_broken_down_time'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 342 26 342 71
+let%span sfmt_strtime_broken_down_time'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 343 33 343 71
+let%span sfmt_strtime_broken_down_time'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 343 33 343 80
+let%span sfmt_strtime_broken_down_time'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 343 33 344 57
+let%span sfmt_strtime_broken_down_time'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 344 19 344 36
+let%span sfmt_strtime_broken_down_time'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 344 19 344 57
+let%span sfmt_strtime_broken_down_time'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 346 26 346 71
+let%span sfmt_strtime_broken_down_time'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 347 35 347 77
+let%span sfmt_strtime_broken_down_time'25 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 347 35 347 86
+let%span sfmt_strtime_broken_down_time'26 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 347 35 348 61
+let%span sfmt_strtime_broken_down_time'27 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 348 19 348 38
+let%span sfmt_strtime_broken_down_time'28 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 348 19 348 61
+let%span sfmt_strtime_broken_down_time'29 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 350 26 350 71
+let%span sfmt_strtime_broken_down_time'30 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 351 30 351 62
+let%span sfmt_strtime_broken_down_time'31 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 351 30 351 71
+let%span sfmt_strtime_broken_down_time'32 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 351 30 352 51
+let%span sfmt_strtime_broken_down_time'33 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 352 19 352 33
+let%span sfmt_strtime_broken_down_time'34 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 352 19 352 51
+let%span sfmt_strtime_broken_down_time'35 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 354 26 354 71
+let%span sfmt_strtime_broken_down_time'36 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 355 30 355 71
+let%span sfmt_strtime_broken_down_time'37 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 355 30 355 80
+let%span sfmt_strtime_broken_down_time'38 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 355 30 356 60
+let%span sfmt_strtime_broken_down_time'39 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 356 19 356 42
+let%span sfmt_strtime_broken_down_time'40 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 356 19 356 60
+let%span sfmt_strtime_broken_down_time'41 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 358 26 358 71
+let%span sfmt_strtime_broken_down_time'42 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 359 30 359 71
+let%span sfmt_strtime_broken_down_time'43 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 359 30 359 80
+let%span sfmt_strtime_broken_down_time'44 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 359 30 360 60
+let%span sfmt_strtime_broken_down_time'45 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 360 19 360 42
+let%span sfmt_strtime_broken_down_time'46 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 360 19 360 60
+let%span sfmt_strtime_broken_down_time'47 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 362 26 362 71
+let%span sfmt_strtime_broken_down_time'48 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 363 26 363 50
+let%span sfmt_strtime_broken_down_time'49 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 363 26 363 59
+let%span sfmt_strtime_broken_down_time'50 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 363 26 363 87
+let%span sfmt_strtime_broken_down_time'51 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 363 63 363 73
+let%span sfmt_strtime_broken_down_time'52 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 363 63 363 87
+let%span sfmt_strtime_broken_down_time'53 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 365 27 365 72
+let%span sfmt_strtime_broken_down_time'54 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 367 16 367 45
+let%span sfmt_strtime_broken_down_time'55 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 367 16 367 54
+let%span sfmt_strtime_broken_down_time'56 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 367 16 367 87
+let%span sfmt_strtime_broken_down_time'57 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 367 58 367 71
+let%span sfmt_strtime_broken_down_time'58 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 367 58 367 87
+let%span sfmt_strtime_broken_down_time'59 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 369 27 369 72
+let%span sfmt_strtime_broken_down_time'60 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 371 16 371 45
+let%span sfmt_strtime_broken_down_time'61 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 371 16 371 54
+let%span sfmt_strtime_broken_down_time'62 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 371 16 371 87
+let%span sfmt_strtime_broken_down_time'63 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 371 58 371 71
+let%span sfmt_strtime_broken_down_time'64 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 371 58 371 87
+let%span sfmt_strtime_broken_down_time'65 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 373 27 373 72
+let%span sfmt_strtime_broken_down_time'66 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 374 39 374 90
+let%span sfmt_strtime_broken_down_time'67 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 374 39 374 99
+let%span sfmt_strtime_broken_down_time'68 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 374 39 375 70
+let%span sfmt_strtime_broken_down_time'69 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 375 19 375 43
+let%span sfmt_strtime_broken_down_time'70 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 375 19 375 70
+let%span sfmt_strtime_broken_down_time'71 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 377 12 388 39
+let%span sfmt_strtime_broken_down_time'72 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 315 19 315 23
+let%span sfmt_strtime_broken_down_time'73 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 316 18 316 87
+let%span sfmt_strtime_broken_down_time'74 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 131 25 131 29
+let%span sfmt_strtime_broken_down_time'75 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 124 18 130 9
+let%span sfmt_strtime_broken_down_time'76 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 121 17 121 21
+let%span sfmt_strtime_broken_down_time'77 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 120 18 120 61
+let%span sfmt_strtime_broken_down_time'78 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 145 26 145 30
+let%span sfmt_strtime_broken_down_time'79 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 138 18 144 9
+let%span sfmt_strtime_broken_down_time'80 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 135 18 135 22
+let%span sfmt_strtime_broken_down_time'81 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 134 18 134 62
+let%span sfmt_strtime_broken_down_time'82 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 159 24 159 28
+let%span sfmt_strtime_broken_down_time'83 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 152 18 158 9
+let%span sfmt_strtime_broken_down_time'84 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 149 16 149 20
+let%span sfmt_strtime_broken_down_time'85 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 148 18 148 60
+let%span sfmt_strtime_broken_down_time'86 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 173 32 173 36
+let%span sfmt_strtime_broken_down_time'87 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 166 18 172 9
+let%span sfmt_strtime_broken_down_time'88 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 163 24 163 28
+let%span sfmt_strtime_broken_down_time'89 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 162 18 162 68
+let%span sfmt_strtime_broken_down_time'90 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 187 34 187 38
+let%span sfmt_strtime_broken_down_time'91 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 180 18 186 9
+let%span sfmt_strtime_broken_down_time'92 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 177 26 177 30
+let%span sfmt_strtime_broken_down_time'93 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 176 18 176 70
+let%span sfmt_strtime_broken_down_time'94 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 201 29 201 33
+let%span sfmt_strtime_broken_down_time'95 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 194 18 200 9
+let%span sfmt_strtime_broken_down_time'96 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 191 21 191 25
+let%span sfmt_strtime_broken_down_time'97 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 190 18 190 65
+let%span sfmt_strtime_broken_down_time'98 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 215 38 215 42
+let%span sfmt_strtime_broken_down_time'99 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 208 18 214 9
+let%span sfmt_strtime_broken_down_time'100 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 205 30 205 34
+let%span sfmt_strtime_broken_down_time'101 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 204 18 204 65
+let%span sfmt_strtime_broken_down_time'102 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 229 38 229 42
+let%span sfmt_strtime_broken_down_time'103 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 222 18 228 9
+let%span sfmt_strtime_broken_down_time'104 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 219 30 219 34
+let%span sfmt_strtime_broken_down_time'105 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 218 18 218 65
+let%span sfmt_strtime_broken_down_time'106 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 243 25 243 29
+let%span sfmt_strtime_broken_down_time'107 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 236 18 242 9
+let%span sfmt_strtime_broken_down_time'108 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 233 17 233 21
+let%span sfmt_strtime_broken_down_time'109 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 232 18 232 61
+let%span sfmt_strtime_broken_down_time'110 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 257 27 257 31
+let%span sfmt_strtime_broken_down_time'111 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 250 18 256 9
+let%span sfmt_strtime_broken_down_time'112 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 247 19 247 23
+let%span sfmt_strtime_broken_down_time'113 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 246 18 246 63
+let%span sfmt_strtime_broken_down_time'114 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 271 27 271 31
+let%span sfmt_strtime_broken_down_time'115 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 264 18 270 9
+let%span sfmt_strtime_broken_down_time'116 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 261 19 261 23
+let%span sfmt_strtime_broken_down_time'117 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 260 18 260 63
+let%span sfmt_strtime_broken_down_time'118 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 286 17 286 21
+let%span sfmt_strtime_broken_down_time'119 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 278 18 284 9
+let%span sfmt_strtime_broken_down_time'120 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 275 30 275 34
+let%span sfmt_strtime_broken_down_time'121 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 274 18 274 74
+let%span sfmt_strtime_broken_down_time'122 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 300 24 300 31
+let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 890 16 890 23
+let%span smod'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2577 4 2577 70
+let%span smod'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2602 4 2602 71
+let%span smod'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2638 4 2638 67
+let%span smod'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2673 4 2673 76
+let%span smod'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2698 4 2701 26
+let%span smod'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2735 4 2738 26
+let%span smod'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2763 4 2766 26
+let%span smod'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2791 4 2794 26
+let%span smod'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2820 4 2820 69
+let%span smod'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2850 4 2850 73
+let%span smod'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2879 4 2879 73
+let%span smod'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/fmt/strtime/mod.rs" 2906 4 2909 26
+let%span scmp = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/cmp.rs" 14 26 14 75
+let%span smodel = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/model.rs" 37 8 37 28
+let%span soption = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 15 8 18 9
+let%span snum = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/num.rs" 27 28 27 33
+let%span snum'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/num.rs" 27 28 27 33
+let%span snum'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/num.rs" 27 28 27 33
+
+use creusot.int.Int16
+use creusot.prelude.MutBorrow
+use creusot.int.Int8
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_BrokenDownTime
+
+predicate inv_BrokenDownTime (_1: t_BrokenDownTime)
+
+let default_BrokenDownTime (return (x: t_BrokenDownTime)) = any
+  [ return (result: t_BrokenDownTime) ->
+  {[@stop_split] [@expl:default result type invariant] [%#smod] inv_BrokenDownTime result}
+    (! return {result}) ]
+
+type t_Option_i16 = None | Some Int16.t
+
+type t_Error
+
+type t_Result_unit_Error = Ok () | Err t_Error
+
+predicate invariant_refmut_BrokenDownTime [@inline:trivial] (self: MutBorrow.t t_BrokenDownTime) =
+  [%#sinvariant] inv_BrokenDownTime self.current /\ inv_BrokenDownTime self.final
+
+meta "rewrite_def" predicate invariant_refmut_BrokenDownTime
+
+predicate inv_refmut_BrokenDownTime [@inline:trivial] (_1: MutBorrow.t t_BrokenDownTime) =
+  invariant_refmut_BrokenDownTime _1
+
+meta "rewrite_def" predicate inv_refmut_BrokenDownTime
+
+predicate inv_Error (_1: t_Error)
+
+predicate inv_Result_unit_Error (_1: t_Result_unit_Error)
+
+axiom inv_axiom [@rewrite]: forall x: t_Result_unit_Error [inv_Result_unit_Error x]. inv_Result_unit_Error x
+    = match x with
+      | Ok f0 -> true
+      | Err f0 -> inv_Error f0
+      end
+
+function broken_down_time_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 33 0 33 87] (_tm: t_BrokenDownTime) : t_Option_i16
+
+predicate gt_log_i16 [@inline:trivial] (self: Int16.t) (other: Int16.t) = [%#sord] Int16.lt other self
+
+meta "rewrite_def" predicate gt_log_i16
+
+let set_year (self_: MutBorrow.t t_BrokenDownTime) (year: t_Option_i16) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'74] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_year ensures] ([@stop_split] [@expl:set_year result type invariant] [%#smod'0] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_year ensures] [%#sfmt_strtime_broken_down_time'75] match result with
+      | Ok _ -> broken_down_time_year_value self_.final = year
+      | Err _ -> match year with
+        | Some y -> Int16.lt y (Int16.neg (9999: Int16.t)) \/ gt_log_i16 y (9999: Int16.t)
+        | None -> false
+        end
+      end)}
+    (! return {result}) ]
+
+predicate resolve_Error (_1: t_Error)
+
+predicate resolve_Result_unit_Error (_1: t_Result_unit_Error)
+
+axiom resolve_axiom [@rewrite]: forall x: t_Result_unit_Error [resolve_Result_unit_Error x]. resolve_Result_unit_Error x
+    = match x with
+      | Ok x0 -> true
+      | Err x0 -> resolve_Error x0
+      end
+
+predicate invariant_ref_Result_unit_Error [@inline:trivial] (self: t_Result_unit_Error) =
+  [%#sinvariant'0] inv_Result_unit_Error self
+
+meta "rewrite_def" predicate invariant_ref_Result_unit_Error
+
+predicate inv_ref_Result_unit_Error [@inline:trivial] (_1: t_Result_unit_Error) = invariant_ref_Result_unit_Error _1
+
+meta "rewrite_def" predicate inv_ref_Result_unit_Error
+
+let is_err_unit (self_: t_Result_unit_Error) (return (x: bool)) =
+{[@stop_split] [@expl:is_err 'self_' type invariant] [%#sresult] inv_ref_Result_unit_Error self_}
+  any
+  [ return (result: bool) -> {[@stop_split] [@expl:is_err ensures] [%#sresult'0] result
+    = (exists e: t_Error. self_ = Err e)}
+    (! return {result}) ]
+
+predicate resolve_BrokenDownTime (_1: t_BrokenDownTime)
+
+predicate invariant_ref_BrokenDownTime [@inline:trivial] (self: t_BrokenDownTime) =
+  [%#sinvariant'0] inv_BrokenDownTime self
+
+meta "rewrite_def" predicate invariant_ref_BrokenDownTime
+
+predicate inv_ref_BrokenDownTime [@inline:trivial] (_1: t_BrokenDownTime) = invariant_ref_BrokenDownTime _1
+
+meta "rewrite_def" predicate inv_ref_BrokenDownTime
+
+let year (self_: t_BrokenDownTime) (return (x: t_Option_i16)) =
+{[@stop_split] [@expl:year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'76] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i16) -> {[@stop_split] [@expl:year ensures] [%#sfmt_strtime_broken_down_time'77] result
+    = broken_down_time_year_value self_}
+    (! return {result}) ]
+
+type t_Option_Int = None'0 | Some'0 int
+
+function deep_model_i16 [@inline:trivial] (self: Int16.t) : int = [%#snum] Int16.to_int self
+
+meta "rewrite_def" function deep_model_i16
+
+function deep_model_Option_i16 [@inline:trivial] (self: t_Option_i16) : t_Option_Int = [%#soption] match self with
+    | Some t -> Some'0 (deep_model_i16 t)
+    | None -> None'0
+    end
+
+meta "rewrite_def" function deep_model_Option_i16
+
+function deep_model_ref_Option_i16 [@inline:trivial] (self: t_Option_i16) : t_Option_Int =
+  [%#smodel] deep_model_Option_i16 self
+
+meta "rewrite_def" function deep_model_ref_Option_i16
+
+let eq_Option_i16 (self_: t_Option_i16) (rhs: t_Option_i16) (return (x: bool)) = any
+  [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] [%#scmp] result
+    = (deep_model_ref_Option_i16 self_ = deep_model_ref_Option_i16 rhs)}
+    (! return {result}) ]
+
+type t_Option_i8 = None'1 | Some'1 Int8.t
+
+function broken_down_time_month_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 40 0 40 87] (_tm: t_BrokenDownTime) : t_Option_i8
+
+predicate gt_log_i8 [@inline:trivial] (self: Int8.t) (other: Int8.t) = [%#sord] Int8.lt other self
+
+meta "rewrite_def" predicate gt_log_i8
+
+let set_month (self_: MutBorrow.t t_BrokenDownTime) (month: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_month 'self_' type invariant] [%#sfmt_strtime_broken_down_time'78] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_month ensures] ([@stop_split] [@expl:set_month result type invariant] [%#smod'1] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_month ensures] [%#sfmt_strtime_broken_down_time'79] match result with
+      | Ok _ -> broken_down_time_month_value self_.final = month
+      | Err _ -> match month with
+        | Some'1 m -> Int8.lt m (1: Int8.t) \/ gt_log_i8 m (12: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let month (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:month 'self_' type invariant] [%#sfmt_strtime_broken_down_time'80] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:month ensures] [%#sfmt_strtime_broken_down_time'81] result
+    = broken_down_time_month_value self_}
+    (! return {result}) ]
+
+function deep_model_i8 [@inline:trivial] (self: Int8.t) : int = [%#snum'0] Int8.to_int self
+
+meta "rewrite_def" function deep_model_i8
+
+function deep_model_Option_i8 [@inline:trivial] (self: t_Option_i8) : t_Option_Int = [%#soption] match self with
+    | Some'1 t -> Some'0 (deep_model_i8 t)
+    | None'1 -> None'0
+    end
+
+meta "rewrite_def" function deep_model_Option_i8
+
+function deep_model_ref_Option_i8 [@inline:trivial] (self: t_Option_i8) : t_Option_Int =
+  [%#smodel] deep_model_Option_i8 self
+
+meta "rewrite_def" function deep_model_ref_Option_i8
+
+let eq_Option_i8 (self_: t_Option_i8) (rhs: t_Option_i8) (return (x: bool)) = any
+  [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] [%#scmp] result
+    = (deep_model_ref_Option_i8 self_ = deep_model_ref_Option_i8 rhs)}
+    (! return {result}) ]
+
+function broken_down_time_day_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 47 0 47 85] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_day (self_: MutBorrow.t t_BrokenDownTime) (day: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_day 'self_' type invariant] [%#sfmt_strtime_broken_down_time'82] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_day ensures] ([@stop_split] [@expl:set_day result type invariant] [%#smod'2] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_day ensures] [%#sfmt_strtime_broken_down_time'83] match result with
+      | Ok _ -> broken_down_time_day_value self_.final = day
+      | Err _ -> match day with
+        | Some'1 d -> Int8.lt d (1: Int8.t) \/ gt_log_i8 d (31: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let day (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:day 'self_' type invariant] [%#sfmt_strtime_broken_down_time'84] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:day ensures] [%#sfmt_strtime_broken_down_time'85] result
+    = broken_down_time_day_value self_}
+    (! return {result}) ]
+
+function broken_down_time_day_of_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 54 0 54 94] (_tm: t_BrokenDownTime) : t_Option_i16
+
+let set_day_of_year (self_: MutBorrow.t t_BrokenDownTime) (day'0: t_Option_i16) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_day_of_year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'86] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_day_of_year ensures] ([@stop_split] [@expl:set_day_of_year result type invariant] [%#smod'3] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_day_of_year ensures] [%#sfmt_strtime_broken_down_time'87] match result with
+      | Ok _ -> broken_down_time_day_of_year_value self_.final = day'0
+      | Err _ -> match day'0 with
+        | Some d -> Int16.lt d (1: Int16.t) \/ gt_log_i16 d (366: Int16.t)
+        | None -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let day_of_year (self_: t_BrokenDownTime) (return (x: t_Option_i16)) =
+{[@stop_split] [@expl:day_of_year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'88] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i16) ->
+  {[@stop_split] [@expl:day_of_year ensures] [%#sfmt_strtime_broken_down_time'89] result
+    = broken_down_time_day_of_year_value self_}
+    (! return {result}) ]
+
+function broken_down_time_iso_week_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 61 0 61 96] (_tm: t_BrokenDownTime) : t_Option_i16
+
+let set_iso_week_year (self_: MutBorrow.t t_BrokenDownTime) (year'0: t_Option_i16) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_iso_week_year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'90] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_iso_week_year ensures] ([@stop_split] [@expl:set_iso_week_year result type invariant] [%#smod'4] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_iso_week_year ensures] [%#sfmt_strtime_broken_down_time'91] match result with
+      | Ok _ -> broken_down_time_iso_week_year_value self_.final = year'0
+      | Err _ -> match year'0 with
+        | Some y -> Int16.lt y (Int16.neg (9999: Int16.t)) \/ gt_log_i16 y (9999: Int16.t)
+        | None -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let iso_week_year (self_: t_BrokenDownTime) (return (x: t_Option_i16)) =
+{[@stop_split] [@expl:iso_week_year 'self_' type invariant] [%#sfmt_strtime_broken_down_time'92] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i16) ->
+  {[@stop_split] [@expl:iso_week_year ensures] [%#sfmt_strtime_broken_down_time'93] result
+    = broken_down_time_iso_week_year_value self_}
+    (! return {result}) ]
+
+function broken_down_time_iso_week_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 68 0 68 90] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_iso_week (self_: MutBorrow.t t_BrokenDownTime) (week_number: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_iso_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'94] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_iso_week ensures] ([@stop_split] [@expl:set_iso_week result type invariant] [%#smod'5] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_iso_week ensures] [%#sfmt_strtime_broken_down_time'95] match result with
+      | Ok _ -> broken_down_time_iso_week_value self_.final = week_number
+      | Err _ -> match week_number with
+        | Some'1 w -> Int8.lt w (1: Int8.t) \/ gt_log_i8 w (53: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let iso_week (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:iso_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'96] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:iso_week ensures] [%#sfmt_strtime_broken_down_time'97] result
+    = broken_down_time_iso_week_value self_}
+    (! return {result}) ]
+
+function broken_down_time_week_sun_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 75 0 75 90] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_sunday_based_week (self_: MutBorrow.t t_BrokenDownTime) (week_number: t_Option_i8)
+  (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_sunday_based_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'98] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_sunday_based_week ensures] ([@stop_split] [@expl:set_sunday_based_week result type invariant] [%#smod'6] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_sunday_based_week ensures] [%#sfmt_strtime_broken_down_time'99] match result with
+      | Ok _ -> broken_down_time_week_sun_value self_.final = week_number
+      | Err _ -> match week_number with
+        | Some'1 w -> Int8.lt w (0: Int8.t) \/ gt_log_i8 w (53: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let sunday_based_week (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:sunday_based_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'100] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) ->
+  {[@stop_split] [@expl:sunday_based_week ensures] [%#sfmt_strtime_broken_down_time'101] result
+    = broken_down_time_week_sun_value self_}
+    (! return {result}) ]
+
+function broken_down_time_week_mon_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 82 0 82 90] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_monday_based_week (self_: MutBorrow.t t_BrokenDownTime) (week_number: t_Option_i8)
+  (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_monday_based_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'102] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_monday_based_week ensures] ([@stop_split] [@expl:set_monday_based_week result type invariant] [%#smod'7] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_monday_based_week ensures] [%#sfmt_strtime_broken_down_time'103] match result with
+      | Ok _ -> broken_down_time_week_mon_value self_.final = week_number
+      | Err _ -> match week_number with
+        | Some'1 w -> Int8.lt w (0: Int8.t) \/ gt_log_i8 w (53: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let monday_based_week (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:monday_based_week 'self_' type invariant] [%#sfmt_strtime_broken_down_time'104] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) ->
+  {[@stop_split] [@expl:monday_based_week ensures] [%#sfmt_strtime_broken_down_time'105] result
+    = broken_down_time_week_mon_value self_}
+    (! return {result}) ]
+
+function broken_down_time_hour_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 89 0 89 86] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_hour (self_: MutBorrow.t t_BrokenDownTime) (hour: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_hour 'self_' type invariant] [%#sfmt_strtime_broken_down_time'106] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_hour ensures] ([@stop_split] [@expl:set_hour result type invariant] [%#smod'8] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_hour ensures] [%#sfmt_strtime_broken_down_time'107] match result with
+      | Ok _ -> broken_down_time_hour_value self_.final = hour
+      | Err _ -> match hour with
+        | Some'1 h -> Int8.lt h (0: Int8.t) \/ gt_log_i8 h (23: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let hour (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:hour 'self_' type invariant] [%#sfmt_strtime_broken_down_time'108] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:hour ensures] [%#sfmt_strtime_broken_down_time'109] result
+    = broken_down_time_hour_value self_}
+    (! return {result}) ]
+
+function broken_down_time_minute_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 96 0 96 88] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_minute (self_: MutBorrow.t t_BrokenDownTime) (minute: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_minute 'self_' type invariant] [%#sfmt_strtime_broken_down_time'110] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_minute ensures] ([@stop_split] [@expl:set_minute result type invariant] [%#smod'9] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_minute ensures] [%#sfmt_strtime_broken_down_time'111] match result with
+      | Ok _ -> broken_down_time_minute_value self_.final = minute
+      | Err _ -> match minute with
+        | Some'1 m -> Int8.lt m (0: Int8.t) \/ gt_log_i8 m (59: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let minute (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:minute 'self_' type invariant] [%#sfmt_strtime_broken_down_time'112] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:minute ensures] [%#sfmt_strtime_broken_down_time'113] result
+    = broken_down_time_minute_value self_}
+    (! return {result}) ]
+
+function broken_down_time_second_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 103 0 103 88] (_tm: t_BrokenDownTime) : t_Option_i8
+
+let set_second (self_: MutBorrow.t t_BrokenDownTime) (second: t_Option_i8) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_second 'self_' type invariant] [%#sfmt_strtime_broken_down_time'114] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_second ensures] ([@stop_split] [@expl:set_second result type invariant] [%#smod'10] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_second ensures] [%#sfmt_strtime_broken_down_time'115] match result with
+      | Ok _ -> broken_down_time_second_value self_.final = second
+      | Err _ -> match second with
+        | Some'1 s -> Int8.lt s (0: Int8.t) \/ gt_log_i8 s (59: Int8.t)
+        | None'1 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let second (self_: t_BrokenDownTime) (return (x: t_Option_i8)) =
+{[@stop_split] [@expl:second 'self_' type invariant] [%#sfmt_strtime_broken_down_time'116] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i8) -> {[@stop_split] [@expl:second ensures] [%#sfmt_strtime_broken_down_time'117] result
+    = broken_down_time_second_value self_}
+    (! return {result}) ]
+
+type t_Option_i32 = None'2 | Some'2 Int32.t
+
+function broken_down_time_subsec_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 110 0 112 16] (_tm: t_BrokenDownTime) : t_Option_i32
+
+predicate gt_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.lt other self
+
+meta "rewrite_def" predicate gt_log_i32
+
+let set_subsec_nanosecond (self_: MutBorrow.t t_BrokenDownTime) (subsec_nanosecond: t_Option_i32)
+  (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:set_subsec_nanosecond 'self_' type invariant] [%#sfmt_strtime_broken_down_time'118] inv_refmut_BrokenDownTime self_}
+  any
+  [ return (result: t_Result_unit_Error) ->
+  {[@stop_split] [@expl:set_subsec_nanosecond ensures] ([@stop_split] [@expl:set_subsec_nanosecond result type invariant] [%#smod'11] inv_Result_unit_Error result)
+    /\ ([@stop_split] [@expl:set_subsec_nanosecond ensures] [%#sfmt_strtime_broken_down_time'119] match result with
+      | Ok _ -> broken_down_time_subsec_nanosecond_value self_.final = subsec_nanosecond
+      | Err _ -> match subsec_nanosecond with
+        | Some'2 n -> Int32.lt n (0: Int32.t) \/ gt_log_i32 n (999999999: Int32.t)
+        | None'2 -> false
+        end
+      end)}
+    (! return {result}) ]
+
+let subsec_nanosecond (self_: t_BrokenDownTime) (return (x: t_Option_i32)) =
+{[@stop_split] [@expl:subsec_nanosecond 'self_' type invariant] [%#sfmt_strtime_broken_down_time'120] inv_ref_BrokenDownTime self_}
+  any
+  [ return (result: t_Option_i32) ->
+  {[@stop_split] [@expl:subsec_nanosecond ensures] [%#sfmt_strtime_broken_down_time'121] result
+    = broken_down_time_subsec_nanosecond_value self_}
+    (! return {result}) ]
+
+function deep_model_i32 [@inline:trivial] (self: Int32.t) : int = [%#snum'1] Int32.to_int self
+
+meta "rewrite_def" function deep_model_i32
+
+function deep_model_Option_i32 [@inline:trivial] (self: t_Option_i32) : t_Option_Int = [%#soption] match self with
+    | Some'2 t -> Some'0 (deep_model_i32 t)
+    | None'2 -> None'0
+    end
+
+meta "rewrite_def" function deep_model_Option_i32
+
+function deep_model_ref_Option_i32 [@inline:trivial] (self: t_Option_i32) : t_Option_Int =
+  [%#smodel] deep_model_Option_i32 self
+
+meta "rewrite_def" function deep_model_ref_Option_i32
+
+let eq_Option_i32 (self_: t_Option_i32) (rhs: t_Option_i32) (return (x: bool)) = any
+  [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] [%#scmp] result
+    = (deep_model_ref_Option_i32 self_ = deep_model_ref_Option_i32 rhs)}
+    (! return {result}) ]
+
+predicate fmt_strtime_broken_down_time_numeric_setters_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 299 8 299 95] (matches: bool) =
+  [%#sfmt_strtime_broken_down_time'122] matches
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_fmt_strtime_broken_down_time_numeric_setters_round_trip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/fmt_strtime_broken_down_time.rs" 317 8 330 17]
+  (year'0: Int16.t) (month'0: Int8.t) (day'0: Int8.t) (day_of_year'0: Int16.t) (iso_week_year'0: Int16.t)
+  (iso_week'0: Int8.t) (week_sun: Int8.t) (week_mon: Int8.t) (hour'0: Int8.t) (minute'0: Int8.t) (second'0: Int8.t)
+  (subsec_nanosecond'0: Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time] (fun (_x: t_BrokenDownTime) -> [ &tm1 <- _x ] s1)
+    | s1 = [ &_21 <- Some year'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm1}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_20 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm1 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm1} any) ]
+    | s3 = set_year [%#sfmt_strtime_broken_down_time'0] {_20} {_21} (fun (_x: t_Result_unit_Error) -> [ &_19 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _19} any) ]
+    | s5 = -{resolve_Result_unit_Error _19}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'1] {_19} (fun (_x: bool) -> [ &_17 <- _x ] s7)
+    | s7 = any [ br0 -> {_17 = false} (! bb7) | br1 -> {_17} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm1} any) ]
+    | s1 = -{resolve_BrokenDownTime tm1}- s2
+    | s2 = [ &year_ok <- [%#sfmt_strtime_broken_down_time'2] true ] s3
+    | s3 = bb10 ]
+  | bb7 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm1} any) ]
+    | s1 = -{resolve_BrokenDownTime tm1}- s2
+    | s2 = year [%#sfmt_strtime_broken_down_time'3] {tm1} (fun (_x: t_Option_i16) -> [ &_24 <- _x ] s3)
+    | s3 = [ &_27 <- Some year'0 ] s4
+    | s4 = eq_Option_i16 [%#sfmt_strtime_broken_down_time'4] {_24} {_27} (fun (_x: bool) -> [ &year_ok <- _x ] s5)
+    | s5 = bb10 ]
+  | bb10 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'5] (fun (_x: t_BrokenDownTime) -> [ &tm2 <- _x ] s1)
+    | s1 = [ &_35 <- Some'1 month'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm2}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_34 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm2 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm2} any) ]
+    | s3 = set_month [%#sfmt_strtime_broken_down_time'6] {_34} {_35}
+        (fun (_x: t_Result_unit_Error) -> [ &_33 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _33} any) ]
+    | s5 = -{resolve_Result_unit_Error _33}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'7] {_33} (fun (_x: bool) -> [ &_31 <- _x ] s7)
+    | s7 = any [ br0 -> {_31 = false} (! bb17) | br1 -> {_31} (! bb14) ] ]
+  | bb14 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm2} any) ]
+    | s1 = -{resolve_BrokenDownTime tm2}- s2
+    | s2 = [ &month_ok <- [%#sfmt_strtime_broken_down_time'8] true ] s3
+    | s3 = bb20 ]
+  | bb17 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm2} any) ]
+    | s1 = -{resolve_BrokenDownTime tm2}- s2
+    | s2 = month [%#sfmt_strtime_broken_down_time'9] {tm2} (fun (_x: t_Option_i8) -> [ &_38 <- _x ] s3)
+    | s3 = [ &_41 <- Some'1 month'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'10] {_38} {_41} (fun (_x: bool) -> [ &month_ok <- _x ] s5)
+    | s5 = bb20 ]
+  | bb20 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'11] (fun (_x: t_BrokenDownTime) -> [ &tm3 <- _x ] s1)
+    | s1 = [ &_49 <- Some'1 day'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm3}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_48 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm3 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm3} any) ]
+    | s3 = set_day [%#sfmt_strtime_broken_down_time'12] {_48} {_49} (fun (_x: t_Result_unit_Error) -> [ &_47 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _47} any) ]
+    | s5 = -{resolve_Result_unit_Error _47}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'13] {_47} (fun (_x: bool) -> [ &_45 <- _x ] s7)
+    | s7 = any [ br0 -> {_45 = false} (! bb27) | br1 -> {_45} (! bb24) ] ]
+  | bb24 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm3} any) ]
+    | s1 = -{resolve_BrokenDownTime tm3}- s2
+    | s2 = [ &day_ok <- [%#sfmt_strtime_broken_down_time'14] true ] s3
+    | s3 = bb30 ]
+  | bb27 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm3} any) ]
+    | s1 = -{resolve_BrokenDownTime tm3}- s2
+    | s2 = day [%#sfmt_strtime_broken_down_time'15] {tm3} (fun (_x: t_Option_i8) -> [ &_52 <- _x ] s3)
+    | s3 = [ &_55 <- Some'1 day'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'16] {_52} {_55} (fun (_x: bool) -> [ &day_ok <- _x ] s5)
+    | s5 = bb30 ]
+  | bb30 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'17] (fun (_x: t_BrokenDownTime) -> [ &tm4 <- _x ] s1)
+    | s1 = [ &_63 <- Some day_of_year'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm4}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_62 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm4 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm4} any) ]
+    | s3 = set_day_of_year [%#sfmt_strtime_broken_down_time'18] {_62} {_63}
+        (fun (_x: t_Result_unit_Error) -> [ &_61 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _61} any) ]
+    | s5 = -{resolve_Result_unit_Error _61}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'19] {_61} (fun (_x: bool) -> [ &_59 <- _x ] s7)
+    | s7 = any [ br0 -> {_59 = false} (! bb37) | br1 -> {_59} (! bb34) ] ]
+  | bb34 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm4} any) ]
+    | s1 = -{resolve_BrokenDownTime tm4}- s2
+    | s2 = [ &day_of_year_ok <- [%#sfmt_strtime_broken_down_time'20] true ] s3
+    | s3 = bb40 ]
+  | bb37 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm4} any) ]
+    | s1 = -{resolve_BrokenDownTime tm4}- s2
+    | s2 = day_of_year [%#sfmt_strtime_broken_down_time'21] {tm4} (fun (_x: t_Option_i16) -> [ &_66 <- _x ] s3)
+    | s3 = [ &_69 <- Some day_of_year'0 ] s4
+    | s4 = eq_Option_i16 [%#sfmt_strtime_broken_down_time'22] {_66} {_69}
+        (fun (_x: bool) -> [ &day_of_year_ok <- _x ] s5)
+    | s5 = bb40 ]
+  | bb40 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'23] (fun (_x: t_BrokenDownTime) -> [ &tm5 <- _x ] s1)
+    | s1 = [ &_77 <- Some iso_week_year'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm5}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_76 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm5 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm5} any) ]
+    | s3 = set_iso_week_year [%#sfmt_strtime_broken_down_time'24] {_76} {_77}
+        (fun (_x: t_Result_unit_Error) -> [ &_75 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _75} any) ]
+    | s5 = -{resolve_Result_unit_Error _75}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'25] {_75} (fun (_x: bool) -> [ &_73 <- _x ] s7)
+    | s7 = any [ br0 -> {_73 = false} (! bb47) | br1 -> {_73} (! bb44) ] ]
+  | bb44 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm5} any) ]
+    | s1 = -{resolve_BrokenDownTime tm5}- s2
+    | s2 = [ &iso_week_year_ok <- [%#sfmt_strtime_broken_down_time'26] true ] s3
+    | s3 = bb50 ]
+  | bb47 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm5} any) ]
+    | s1 = -{resolve_BrokenDownTime tm5}- s2
+    | s2 = iso_week_year [%#sfmt_strtime_broken_down_time'27] {tm5} (fun (_x: t_Option_i16) -> [ &_80 <- _x ] s3)
+    | s3 = [ &_83 <- Some iso_week_year'0 ] s4
+    | s4 = eq_Option_i16 [%#sfmt_strtime_broken_down_time'28] {_80} {_83}
+        (fun (_x: bool) -> [ &iso_week_year_ok <- _x ] s5)
+    | s5 = bb50 ]
+  | bb50 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'29] (fun (_x: t_BrokenDownTime) -> [ &tm6 <- _x ] s1)
+    | s1 = [ &_91 <- Some'1 iso_week'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm6}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_90 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm6 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm6} any) ]
+    | s3 = set_iso_week [%#sfmt_strtime_broken_down_time'30] {_90} {_91}
+        (fun (_x: t_Result_unit_Error) -> [ &_89 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _89} any) ]
+    | s5 = -{resolve_Result_unit_Error _89}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'31] {_89} (fun (_x: bool) -> [ &_87 <- _x ] s7)
+    | s7 = any [ br0 -> {_87 = false} (! bb57) | br1 -> {_87} (! bb54) ] ]
+  | bb54 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm6} any) ]
+    | s1 = -{resolve_BrokenDownTime tm6}- s2
+    | s2 = [ &iso_week_ok <- [%#sfmt_strtime_broken_down_time'32] true ] s3
+    | s3 = bb60 ]
+  | bb57 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm6} any) ]
+    | s1 = -{resolve_BrokenDownTime tm6}- s2
+    | s2 = iso_week [%#sfmt_strtime_broken_down_time'33] {tm6} (fun (_x: t_Option_i8) -> [ &_94 <- _x ] s3)
+    | s3 = [ &_97 <- Some'1 iso_week'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'34] {_94} {_97} (fun (_x: bool) -> [ &iso_week_ok <- _x ] s5)
+    | s5 = bb60 ]
+  | bb60 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'35] (fun (_x: t_BrokenDownTime) -> [ &tm7 <- _x ] s1)
+    | s1 = [ &_105 <- Some'1 week_sun ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm7}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_104 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm7 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm7} any) ]
+    | s3 = set_sunday_based_week [%#sfmt_strtime_broken_down_time'36] {_104} {_105}
+        (fun (_x: t_Result_unit_Error) -> [ &_103 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _103} any) ]
+    | s5 = -{resolve_Result_unit_Error _103}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'37] {_103} (fun (_x: bool) -> [ &_101 <- _x ] s7)
+    | s7 = any [ br0 -> {_101 = false} (! bb67) | br1 -> {_101} (! bb64) ] ]
+  | bb64 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm7} any) ]
+    | s1 = -{resolve_BrokenDownTime tm7}- s2
+    | s2 = [ &week_sun_ok <- [%#sfmt_strtime_broken_down_time'38] true ] s3
+    | s3 = bb70 ]
+  | bb67 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm7} any) ]
+    | s1 = -{resolve_BrokenDownTime tm7}- s2
+    | s2 = sunday_based_week [%#sfmt_strtime_broken_down_time'39] {tm7} (fun (_x: t_Option_i8) -> [ &_108 <- _x ] s3)
+    | s3 = [ &_111 <- Some'1 week_sun ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'40] {_108} {_111} (fun (_x: bool) -> [ &week_sun_ok <- _x ] s5)
+    | s5 = bb70 ]
+  | bb70 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'41] (fun (_x: t_BrokenDownTime) -> [ &tm8 <- _x ] s1)
+    | s1 = [ &_119 <- Some'1 week_mon ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm8}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_118 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm8 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm8} any) ]
+    | s3 = set_monday_based_week [%#sfmt_strtime_broken_down_time'42] {_118} {_119}
+        (fun (_x: t_Result_unit_Error) -> [ &_117 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _117} any) ]
+    | s5 = -{resolve_Result_unit_Error _117}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'43] {_117} (fun (_x: bool) -> [ &_115 <- _x ] s7)
+    | s7 = any [ br0 -> {_115 = false} (! bb77) | br1 -> {_115} (! bb74) ] ]
+  | bb74 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm8} any) ]
+    | s1 = -{resolve_BrokenDownTime tm8}- s2
+    | s2 = [ &week_mon_ok <- [%#sfmt_strtime_broken_down_time'44] true ] s3
+    | s3 = bb80 ]
+  | bb77 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm8} any) ]
+    | s1 = -{resolve_BrokenDownTime tm8}- s2
+    | s2 = monday_based_week [%#sfmt_strtime_broken_down_time'45] {tm8} (fun (_x: t_Option_i8) -> [ &_122 <- _x ] s3)
+    | s3 = [ &_125 <- Some'1 week_mon ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'46] {_122} {_125} (fun (_x: bool) -> [ &week_mon_ok <- _x ] s5)
+    | s5 = bb80 ]
+  | bb80 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'47] (fun (_x: t_BrokenDownTime) -> [ &tm9 <- _x ] s1)
+    | s1 = [ &_133 <- Some'1 hour'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm9}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_132 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm9 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm9} any) ]
+    | s3 = set_hour [%#sfmt_strtime_broken_down_time'48] {_132} {_133}
+        (fun (_x: t_Result_unit_Error) -> [ &_131 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _131} any) ]
+    | s5 = -{resolve_Result_unit_Error _131}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'49] {_131} (fun (_x: bool) -> [ &_129 <- _x ] s7)
+    | s7 = any [ br0 -> {_129 = false} (! bb87) | br1 -> {_129} (! bb84) ] ]
+  | bb84 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm9} any) ]
+    | s1 = -{resolve_BrokenDownTime tm9}- s2
+    | s2 = [ &hour_ok <- [%#sfmt_strtime_broken_down_time'50] true ] s3
+    | s3 = bb90 ]
+  | bb87 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm9} any) ]
+    | s1 = -{resolve_BrokenDownTime tm9}- s2
+    | s2 = hour [%#sfmt_strtime_broken_down_time'51] {tm9} (fun (_x: t_Option_i8) -> [ &_136 <- _x ] s3)
+    | s3 = [ &_139 <- Some'1 hour'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'52] {_136} {_139} (fun (_x: bool) -> [ &hour_ok <- _x ] s5)
+    | s5 = bb90 ]
+  | bb90 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'53]
+        (fun (_x: t_BrokenDownTime) -> [ &tm10 <- _x ] s1)
+    | s1 = [ &_147 <- Some'1 minute'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm10}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_146 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm10 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm10} any) ]
+    | s3 = set_minute [%#sfmt_strtime_broken_down_time'54] {_146} {_147}
+        (fun (_x: t_Result_unit_Error) -> [ &_145 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _145} any) ]
+    | s5 = -{resolve_Result_unit_Error _145}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'55] {_145} (fun (_x: bool) -> [ &_143 <- _x ] s7)
+    | s7 = any [ br0 -> {_143 = false} (! bb97) | br1 -> {_143} (! bb94) ] ]
+  | bb94 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm10} any) ]
+    | s1 = -{resolve_BrokenDownTime tm10}- s2
+    | s2 = [ &minute_ok <- [%#sfmt_strtime_broken_down_time'56] true ] s3
+    | s3 = bb100 ]
+  | bb97 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm10} any) ]
+    | s1 = -{resolve_BrokenDownTime tm10}- s2
+    | s2 = minute [%#sfmt_strtime_broken_down_time'57] {tm10} (fun (_x: t_Option_i8) -> [ &_150 <- _x ] s3)
+    | s3 = [ &_153 <- Some'1 minute'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'58] {_150} {_153} (fun (_x: bool) -> [ &minute_ok <- _x ] s5)
+    | s5 = bb100 ]
+  | bb100 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'59]
+        (fun (_x: t_BrokenDownTime) -> [ &tm11 <- _x ] s1)
+    | s1 = [ &_161 <- Some'1 second'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm11}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_160 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm11 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm11} any) ]
+    | s3 = set_second [%#sfmt_strtime_broken_down_time'60] {_160} {_161}
+        (fun (_x: t_Result_unit_Error) -> [ &_159 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _159} any) ]
+    | s5 = -{resolve_Result_unit_Error _159}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'61] {_159} (fun (_x: bool) -> [ &_157 <- _x ] s7)
+    | s7 = any [ br0 -> {_157 = false} (! bb107) | br1 -> {_157} (! bb104) ] ]
+  | bb104 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm11} any) ]
+    | s1 = -{resolve_BrokenDownTime tm11}- s2
+    | s2 = [ &second_ok <- [%#sfmt_strtime_broken_down_time'62] true ] s3
+    | s3 = bb110 ]
+  | bb107 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm11} any) ]
+    | s1 = -{resolve_BrokenDownTime tm11}- s2
+    | s2 = second [%#sfmt_strtime_broken_down_time'63] {tm11} (fun (_x: t_Option_i8) -> [ &_164 <- _x ] s3)
+    | s3 = [ &_167 <- Some'1 second'0 ] s4
+    | s4 = eq_Option_i8 [%#sfmt_strtime_broken_down_time'64] {_164} {_167} (fun (_x: bool) -> [ &second_ok <- _x ] s5)
+    | s5 = bb110 ]
+  | bb110 = s0
+    [ s0 = default_BrokenDownTime [%#sfmt_strtime_broken_down_time'65]
+        (fun (_x: t_BrokenDownTime) -> [ &tm12 <- _x ] s1)
+    | s1 = [ &_175 <- Some'2 subsec_nanosecond'0 ] s2
+    | s2 = MutBorrow.borrow_mut <t_BrokenDownTime> {tm12}
+        (fun (_bor: MutBorrow.t t_BrokenDownTime) ->
+          [ &_174 <- _bor ] -{inv_BrokenDownTime _bor.final}-
+          [ &tm12 <- _bor.final ] s3) [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm12} any) ]
+    | s3 = set_subsec_nanosecond [%#sfmt_strtime_broken_down_time'66] {_174} {_175}
+        (fun (_x: t_Result_unit_Error) -> [ &_173 <- _x ] s4)
+    | s4 = s5 [ _ck -> (! {[@expl:type invariant] inv_Result_unit_Error _173} any) ]
+    | s5 = -{resolve_Result_unit_Error _173}- s6
+    | s6 = is_err_unit [%#sfmt_strtime_broken_down_time'67] {_173} (fun (_x: bool) -> [ &_171 <- _x ] s7)
+    | s7 = any [ br0 -> {_171 = false} (! bb117) | br1 -> {_171} (! bb114) ] ]
+  | bb114 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm12} any) ]
+    | s1 = -{resolve_BrokenDownTime tm12}- s2
+    | s2 = [ &subsec_nanosecond_ok <- [%#sfmt_strtime_broken_down_time'68] true ] s3
+    | s3 = bb120 ]
+  | bb117 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_BrokenDownTime tm12} any) ]
+    | s1 = -{resolve_BrokenDownTime tm12}- s2
+    | s2 = subsec_nanosecond [%#sfmt_strtime_broken_down_time'69] {tm12} (fun (_x: t_Option_i32) -> [ &_178 <- _x ] s3)
+    | s3 = [ &_181 <- Some'2 subsec_nanosecond'0 ] s4
+    | s4 = eq_Option_i32 [%#sfmt_strtime_broken_down_time'70] {_178} {_181}
+        (fun (_x: bool) -> [ &subsec_nanosecond_ok <- _x ] s5)
+    | s5 = bb120 ]
+  | bb120 = any [ br0 -> {year_ok = false} (! bb132) | br1 -> {year_ok} (! bb121) ]
+  | bb121 = any [ br0 -> {month_ok = false} (! bb132) | br1 -> {month_ok} (! bb122) ]
+  | bb122 = any [ br0 -> {day_ok = false} (! bb132) | br1 -> {day_ok} (! bb123) ]
+  | bb123 = any [ br0 -> {day_of_year_ok = false} (! bb132) | br1 -> {day_of_year_ok} (! bb124) ]
+  | bb124 = any [ br0 -> {iso_week_year_ok = false} (! bb132) | br1 -> {iso_week_year_ok} (! bb125) ]
+  | bb125 = any [ br0 -> {iso_week_ok = false} (! bb132) | br1 -> {iso_week_ok} (! bb126) ]
+  | bb126 = any [ br0 -> {week_sun_ok = false} (! bb132) | br1 -> {week_sun_ok} (! bb127) ]
+  | bb127 = any [ br0 -> {week_mon_ok = false} (! bb132) | br1 -> {week_mon_ok} (! bb128) ]
+  | bb128 = any [ br0 -> {hour_ok = false} (! bb132) | br1 -> {hour_ok} (! bb129) ]
+  | bb129 = any [ br0 -> {minute_ok = false} (! bb132) | br1 -> {minute_ok} (! bb130) ]
+  | bb130 = any [ br0 -> {second_ok = false} (! bb132) | br1 -> {second_ok} (! bb131) ]
+  | bb131 = s0 [ s0 = [ &_ret <- subsec_nanosecond_ok ] s1 | s1 = return {_ret} ]
+  | bb132 = s0 [ s0 = [ &_ret <- [%#sfmt_strtime_broken_down_time'71] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year'0: Int16.t = year'0
+  | & month'0: Int8.t = month'0
+  | & day'0: Int8.t = day'0
+  | & day_of_year'0: Int16.t = day_of_year'0
+  | & iso_week_year'0: Int16.t = iso_week_year'0
+  | & iso_week'0: Int8.t = iso_week'0
+  | & week_sun: Int8.t = week_sun
+  | & week_mon: Int8.t = week_mon
+  | & hour'0: Int8.t = hour'0
+  | & minute'0: Int8.t = minute'0
+  | & second'0: Int8.t = second'0
+  | & subsec_nanosecond'0: Int32.t = subsec_nanosecond'0
+  | & tm1: t_BrokenDownTime = Any.any_l ()
+  | & year_ok: bool = Any.any_l ()
+  | & _17: bool = Any.any_l ()
+  | & _19: t_Result_unit_Error = Any.any_l ()
+  | & _20: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _21: t_Option_i16 = Any.any_l ()
+  | & _24: t_Option_i16 = Any.any_l ()
+  | & _27: t_Option_i16 = Any.any_l ()
+  | & tm2: t_BrokenDownTime = Any.any_l ()
+  | & month_ok: bool = Any.any_l ()
+  | & _31: bool = Any.any_l ()
+  | & _33: t_Result_unit_Error = Any.any_l ()
+  | & _34: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _35: t_Option_i8 = Any.any_l ()
+  | & _38: t_Option_i8 = Any.any_l ()
+  | & _41: t_Option_i8 = Any.any_l ()
+  | & tm3: t_BrokenDownTime = Any.any_l ()
+  | & day_ok: bool = Any.any_l ()
+  | & _45: bool = Any.any_l ()
+  | & _47: t_Result_unit_Error = Any.any_l ()
+  | & _48: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _49: t_Option_i8 = Any.any_l ()
+  | & _52: t_Option_i8 = Any.any_l ()
+  | & _55: t_Option_i8 = Any.any_l ()
+  | & tm4: t_BrokenDownTime = Any.any_l ()
+  | & day_of_year_ok: bool = Any.any_l ()
+  | & _59: bool = Any.any_l ()
+  | & _61: t_Result_unit_Error = Any.any_l ()
+  | & _62: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _63: t_Option_i16 = Any.any_l ()
+  | & _66: t_Option_i16 = Any.any_l ()
+  | & _69: t_Option_i16 = Any.any_l ()
+  | & tm5: t_BrokenDownTime = Any.any_l ()
+  | & iso_week_year_ok: bool = Any.any_l ()
+  | & _73: bool = Any.any_l ()
+  | & _75: t_Result_unit_Error = Any.any_l ()
+  | & _76: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _77: t_Option_i16 = Any.any_l ()
+  | & _80: t_Option_i16 = Any.any_l ()
+  | & _83: t_Option_i16 = Any.any_l ()
+  | & tm6: t_BrokenDownTime = Any.any_l ()
+  | & iso_week_ok: bool = Any.any_l ()
+  | & _87: bool = Any.any_l ()
+  | & _89: t_Result_unit_Error = Any.any_l ()
+  | & _90: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _91: t_Option_i8 = Any.any_l ()
+  | & _94: t_Option_i8 = Any.any_l ()
+  | & _97: t_Option_i8 = Any.any_l ()
+  | & tm7: t_BrokenDownTime = Any.any_l ()
+  | & week_sun_ok: bool = Any.any_l ()
+  | & _101: bool = Any.any_l ()
+  | & _103: t_Result_unit_Error = Any.any_l ()
+  | & _104: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _105: t_Option_i8 = Any.any_l ()
+  | & _108: t_Option_i8 = Any.any_l ()
+  | & _111: t_Option_i8 = Any.any_l ()
+  | & tm8: t_BrokenDownTime = Any.any_l ()
+  | & week_mon_ok: bool = Any.any_l ()
+  | & _115: bool = Any.any_l ()
+  | & _117: t_Result_unit_Error = Any.any_l ()
+  | & _118: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _119: t_Option_i8 = Any.any_l ()
+  | & _122: t_Option_i8 = Any.any_l ()
+  | & _125: t_Option_i8 = Any.any_l ()
+  | & tm9: t_BrokenDownTime = Any.any_l ()
+  | & hour_ok: bool = Any.any_l ()
+  | & _129: bool = Any.any_l ()
+  | & _131: t_Result_unit_Error = Any.any_l ()
+  | & _132: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _133: t_Option_i8 = Any.any_l ()
+  | & _136: t_Option_i8 = Any.any_l ()
+  | & _139: t_Option_i8 = Any.any_l ()
+  | & tm10: t_BrokenDownTime = Any.any_l ()
+  | & minute_ok: bool = Any.any_l ()
+  | & _143: bool = Any.any_l ()
+  | & _145: t_Result_unit_Error = Any.any_l ()
+  | & _146: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _147: t_Option_i8 = Any.any_l ()
+  | & _150: t_Option_i8 = Any.any_l ()
+  | & _153: t_Option_i8 = Any.any_l ()
+  | & tm11: t_BrokenDownTime = Any.any_l ()
+  | & second_ok: bool = Any.any_l ()
+  | & _157: bool = Any.any_l ()
+  | & _159: t_Result_unit_Error = Any.any_l ()
+  | & _160: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _161: t_Option_i8 = Any.any_l ()
+  | & _164: t_Option_i8 = Any.any_l ()
+  | & _167: t_Option_i8 = Any.any_l ()
+  | & tm12: t_BrokenDownTime = Any.any_l ()
+  | & subsec_nanosecond_ok: bool = Any.any_l ()
+  | & _171: bool = Any.any_l ()
+  | & _173: t_Result_unit_Error = Any.any_l ()
+  | & _174: MutBorrow.t t_BrokenDownTime = Any.any_l ()
+  | & _175: t_Option_i32 = Any.any_l ()
+  | & _178: t_Option_i32 = Any.any_l ()
+  | & _181: t_Option_i32 = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_fmt_strtime_broken_down_time_numeric_setters_round_trip ensures] [%#sfmt_strtime_broken_down_time'73] fmt_strtime_broken_down_time_numeric_setters_round_trip_holds result}
+    (! return {result}) ]

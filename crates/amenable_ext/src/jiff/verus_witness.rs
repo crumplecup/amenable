@@ -14,6 +14,7 @@
 //! civil::WeekdaysForward`/`jiff::civil::WeekdaysReverse`/`jiff::
 //! civil::DateSeries`/`jiff::civil::DateTimeSeries`/`jiff::civil::
 //! TimeSeries`/`jiff::fmt::friendly::FractionalUnit`/`jiff::fmt::
+//! strtime::BrokenDownTime`/`jiff::fmt::
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/
 //! `jiff::Error`/`jiff::
@@ -24,7 +25,7 @@
 //! civil_iso_week_date,civil_time,civil_time_series,civil_weekday,
 //! civil_weekdays_forward,civil_weekdays_reverse,date_series,
 //! date_time_series,fmt_friendly_fractional_unit,fmt_std_fmt_write,
-//! fmt_std_io_write,offset,error,
+//! fmt_std_io_write,fmt_strtime_broken_down_time,offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,unit,zoned_series}` (jiff itself
 //! is still unreachable, but each
@@ -208,6 +209,16 @@
 //! fmt_friendly_fractional_unit` and `amenable_creusot::ext_jiff::
 //! fmt_friendly_fractional_unit` check against jiff's real
 //! `From<FractionalUnit> for Unit` conversion.
+//!
+//! `jiff::fmt::strtime::BrokenDownTime`'s model is the first `&mut
+//! self`-setter model in this checklist: unlike every prior model
+//! (pure functions building a fresh value), it uses Verus's own
+//! `old(self)`/final-`self` convention directly — no `mem::forget`/
+//! `ManuallyDrop` workaround needed at all, since Verus has no
+//! CBMC-style Drop-glue cost (confirmed: this model verifies
+//! instantly, unlike `amenable_kani::ext::jiff::
+//! fmt_strtime_broken_down_time`'s own real CBMC wall for the
+//! identical claim).
 
 use amenable_core::{
     ClassifiedWitness, Evidence, Metadata, VerusVerifier, Witness, WitnessSupportSummary,
@@ -408,6 +419,12 @@ impl_verus_witness_checked_ext!(
     jiff::fmt::friendly::FractionalUnit,
     "verify_fmt_friendly_fractional_unit_from_matches_documented_mapping_model",
     "../../../amenable_verus/src/ext/jiff/fmt_friendly_fractional_unit.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::fmt::strtime::BrokenDownTime,
+    "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model",
+    "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time.rs"
 );
 
 impl_verus_witness_checked_ext!(

@@ -476,6 +476,20 @@
 //! `timestamp_to_rfc9110_string`/etc.) have the same disproportionate-
 //! reproduction shape.
 //!
+//! `jiff::fmt::strtime::BrokenDownTime` gets a real checked property
+//! too (see `fmt_strtime_broken_down_time.rs`), the biggest single
+//! type assessed since `Span` itself: 12 numeric fields, each with a
+//! real, independently-validated `Result`-returning setter/getter
+//! pair, checked directly against jiff's real source and `jiff-core`'s
+//! own bounds table (not assumed) — no cross-field interdependency at
+//! all, confirmed by reading `set_day`'s own doc comment: "setting a
+//! day to a value that is legal in any context is always valid, even
+//! if it isn't valid for the year, month." Deliberately scoped to
+//! these 12 numeric round trips, not the 5 reference-type fields
+//! (`offset`/`weekday`/`meridiem`/`timestamp`/`iana_time_zone`),
+//! whose setters are plain unconditional field assignments with no
+//! validation logic at all.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`), genuinely different
 //! from `Designator`/`Direction`: checked directly against jiff's
@@ -494,6 +508,7 @@ mod civil_weekdays_reverse;
 mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
+mod fmt_strtime_broken_down_time;
 mod offset;
 mod signed_duration;
 mod span;

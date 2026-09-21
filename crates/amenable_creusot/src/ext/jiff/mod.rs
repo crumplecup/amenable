@@ -313,6 +313,13 @@
 //! configuration at present") — and its real formatting methods have
 //! the same disproportionate-reproduction shape.
 //!
+//! `jiff::fmt::strtime::BrokenDownTime` gets a real checked property
+//! too (see `fmt_strtime_broken_down_time.rs`), the first `&mut self`
+//! setter extern-spec'd anywhere in this checklist: 12 numeric
+//! setter/getter pairs, each via an opaque per-field accessor plus
+//! Creusot's `^self` ("final") prophecy operator, the same mechanism
+//! `creusot-std`'s own `Vec::push` extern_spec uses for its `View`.
+//!
 //! `jiff::fmt::friendly::FractionalUnit` gets a real checked property
 //! too (see `fmt_friendly_fractional_unit.rs`): a real `extern_spec!`
 //! for jiff's own `From<FractionalUnit> for Unit`, checking the same
@@ -335,6 +342,7 @@ mod error;
 mod fmt_friendly_fractional_unit;
 mod fmt_std_fmt_write;
 mod fmt_std_io_write;
+mod fmt_strtime_broken_down_time;
 mod offset;
 mod signed_duration;
 mod span;
