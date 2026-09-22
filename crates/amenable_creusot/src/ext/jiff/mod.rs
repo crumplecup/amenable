@@ -577,6 +577,16 @@
 //! `Dst::No`. Trusted for Kani specifically — real jiff source
 //! confirms `to_offset_info` dispatches through the SAME `repr::each!`
 //! macro already confirmed to time out under CBMC.
+//!
+//! `jiff::tz::TimeZonePrecedingTransitions<'static>` stays trusted
+//! here too, the exact structural mirror of
+//! `TimeZoneFollowingTransitions` confirmed by reading jiff's real
+//! source directly (not assumed from the name): `preceding` is an
+//! identical trivial constructor, and `next()` calls `TimeZone::
+//! previous_transition`, which has the identical `UTC => None` match
+//! arm `next_transition` has — the same `IteratorSpec`-not-satisfied
+//! wall and content-free fallback carve-out apply unchanged (a
+//! general `extern_spec!` limitation, not type-specific).
 
 mod civil_date;
 mod civil_era;
@@ -710,7 +720,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::tz::OffsetRound,
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
-    jiff::tz::TimeZoneNameIter<'static>
+    jiff::tz::TimeZoneNameIter<'static>,
+    jiff::tz::TimeZonePrecedingTransitions<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

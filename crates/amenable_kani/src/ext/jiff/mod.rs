@@ -764,6 +764,21 @@
 //! Checked on Creusot and Verus instead (`ext_jiff::
 //! tz_time_zone_offset_info`/`ext::jiff::tz_time_zone_offset_info`),
 //! neither of which executes the real body at all.
+//!
+//! `jiff::tz::TimeZonePrecedingTransitions<'static>` stays trusted on
+//! ALL THREE backends too, the exact structural mirror of
+//! `TimeZoneFollowingTransitions` confirmed by reading jiff's real
+//! source directly (not assumed from the name): `preceding` is an
+//! identical trivial, dispatch-free constructor
+//! (`TimeZonePrecedingTransitions { tz: self, cur: timestamp }`), and
+//! its iterator's own `next()` calls `TimeZone::previous_transition`,
+//! which dispatches through the SAME `repr::each!` macro, with the
+//! identical `UTC => None` match arm — so the same content-free
+//! carve-out applies on Creusot/Verus (see `amenable_creusot::
+//! ext::jiff`'s own doc comment for `TimeZoneFollowingTransitions`'s
+//! full toolchain findings, which apply here unchanged: `extern_spec!`
+//! fundamentally cannot support ANY third-party `Iterator` impl,
+//! a general toolchain limitation, not one specific to that type).
 
 mod civil_date;
 mod civil_era;
@@ -856,5 +871,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::TimeZone,
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
-    jiff::tz::TimeZoneOffsetInfo<'static>
+    jiff::tz::TimeZoneOffsetInfo<'static>,
+    jiff::tz::TimeZonePrecedingTransitions<'static>
 );

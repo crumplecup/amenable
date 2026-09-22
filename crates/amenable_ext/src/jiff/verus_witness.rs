@@ -386,6 +386,12 @@
 //! seconds round-trip, DST always inactive. Trusted on Kani
 //! specifically (the `TimeZone::Repr`-dispatch CBMC wall).
 //!
+//! `jiff::tz::TimeZonePrecedingTransitions<'static>` also stays
+//! trusted, for consistency with the same content-free reasoning
+//! already established for `TimeZoneFollowingTransitions` (a
+//! confirmed structural mirror, not assumed — see `amenable_kani::
+//! ext::jiff`'s own doc comment).
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -543,7 +549,8 @@ impl_verus_witness_trusted_ext!(
     jiff::tz::OffsetRound,
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
-    jiff::tz::TimeZoneNameIter<'static>
+    jiff::tz::TimeZoneNameIter<'static>,
+    jiff::tz::TimeZonePrecedingTransitions<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
