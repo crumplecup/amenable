@@ -699,6 +699,18 @@
 //! `mode`/`increment`) are all plain setters, and all three fields
 //! (`smallest`/`mode`/`increment`) are private with no getters —
 //! `round` (the real rounding logic) is private too.
+//!
+//! `jiff::tz::TimeZone` also stays trusted for Kani, the type
+//! underlying every `Repr`-dispatch CBMC wall already confirmed this
+//! session for `AmbiguousTimestamp`/`AmbiguousZoned`/
+//! `OffsetConflict` (all three call into it directly), plus the
+//! original `gallery::jiff_error_drop_cost` confirmation of a fully
+//! concrete `TimeZone::UTC.to_offset(..)` call timing out —
+//! `to_fixed_offset`'s own real body ALSO dispatches through the same
+//! `repr::each!` macro (confirmed by reading jiff's real source
+//! directly). Checked on Creusot and Verus instead (`ext_jiff::
+//! tz_time_zone`/`ext::jiff::tz_time_zone`), neither of which
+//! executes the real body at all.
 
 mod civil_date;
 mod civil_era;
@@ -785,5 +797,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
     jiff::tz::OffsetConflict,
-    jiff::tz::OffsetRound
+    jiff::tz::OffsetRound,
+    jiff::tz::TimeZone
 );

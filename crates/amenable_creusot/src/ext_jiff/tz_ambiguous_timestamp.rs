@@ -23,6 +23,13 @@
 //! Matches directly on `AmbiguousOffset`'s own public variants (the
 //! `fmt_friendly_fractional_unit.rs`-established technique) rather
 //! than comparing whole `AmbiguousOffset` values via `==`.
+//!
+//! `fixed`'s own `extern_spec!` lives here (the first file to need
+//! it), so `tz_time_zone.rs`'s own `unknown`/`is_unknown` claim
+//! (`fixed`-constructed values are never unknown) extends THIS
+//! ensures clause with an extra conjunct rather than redeclaring
+//! `fixed` itself — only one `extern_spec!` per real function
+//! crate-wide.
 
 #[cfg(creusot)]
 mod mirror {
@@ -30,6 +37,8 @@ mod mirror {
 }
 #[cfg(creusot)]
 use crate::ext_jiff::offset::offset_seconds_value;
+#[cfg(creusot)]
+use crate::ext_jiff::tz_time_zone::tz_is_unknown_value;
 #[cfg(creusot)]
 use mirror::{check, ensures, extern_spec, logic, requires, trusted};
 
@@ -58,7 +67,10 @@ fn amb_ts_offset_seconds_value(_t: &jiff::tz::AmbiguousTimestamp) -> i32 {
 extern_spec! {
     impl jiff::tz::TimeZone {
         #[check(ghost)]
-        #[ensures(tz_fixed_seconds_value(&result) == offset_seconds_value(&offset))]
+        #[ensures(
+            tz_fixed_seconds_value(&result) == offset_seconds_value(&offset)
+            && tz_is_unknown_value(&result) == false
+        )]
         fn fixed(offset: jiff::tz::Offset) -> jiff::tz::TimeZone;
 
         #[check(ghost)]

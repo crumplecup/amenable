@@ -1,0 +1,18 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.029 },
+      "vc_fixed": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_is_unknown": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_to_fixed_offset": { "prover": "alt-ergo", "time": 0.026 },
+      "vc_unknown": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_verify_tz_time_zone_unknown_and_fixed_round_trip": {
+        "prover": "alt-ergo",
+        "time": 0.089
+      }
+    }
+  }
+}

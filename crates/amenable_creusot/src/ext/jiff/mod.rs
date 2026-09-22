@@ -510,6 +510,18 @@
 //! builder-only shape to `TimestampRound`/`ZonedRound`: its four
 //! public methods are all plain setters, and all three fields are
 //! private with no getters.
+//!
+//! `jiff::tz::TimeZone` gets a real checked property too (see
+//! `tz_time_zone.rs`), checked despite being trusted for Kani
+//! specifically (the type underlying every `Repr`-dispatch CBMC wall
+//! already confirmed this session): `unknown().is_unknown()` is
+//! always `true`, `fixed(offset)` is never unknown, and its own
+//! `to_fixed_offset()` always round-trips `offset`'s own seconds.
+//! `fixed`/`to_ambiguous_timestamp`/`to_ambiguous_zoned`/
+//! `into_ambiguous_zoned` are already extern-spec'd in `tz_ambiguous_
+//! timestamp.rs`/`tz_ambiguous_zoned.rs`; this file adds `unknown`/
+//! `is_unknown`/`to_fixed_offset`, extending `fixed`'s own ensures
+//! clause with an extra conjunct there rather than redeclaring it.
 
 mod civil_date;
 mod civil_era;
@@ -542,6 +554,7 @@ mod tz_ambiguous_timestamp;
 mod tz_ambiguous_zoned;
 mod tz_dst;
 mod tz_offset_conflict;
+mod tz_time_zone;
 mod zoned_series;
 
 use crate::CreusotWitness;

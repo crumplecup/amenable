@@ -26,7 +26,8 @@
 //! tz::AmbiguousTimestamp`/`jiff::
 //! tz::AmbiguousZoned`/`jiff::
 //! tz::Dst`/`jiff::
-//! tz::OffsetConflict`/
+//! tz::OffsetConflict`/`jiff::
+//! tz::TimeZone`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -44,7 +45,7 @@
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,
-//! tz_ambiguous_zoned,tz_dst,tz_offset_conflict,unit,
+//! tz_ambiguous_zoned,tz_dst,tz_offset_conflict,tz_time_zone,unit,
 //! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -342,6 +343,13 @@
 //! builder-only shape to `TimestampRound`/`ZonedRound`: four
 //! plain-setter public methods, all three fields private with no
 //! getters.
+//!
+//! `jiff::tz::TimeZone`'s model reproduces `unknown`/`fixed` as a
+//! plain struct (`{ is_unknown: bool, fixed_offset_seconds: i32 }`)
+//! — the same claim `amenable_creusot::ext_jiff::tz_time_zone` checks
+//! against jiff's real API, also trusted for Kani (the type
+//! underlying every `Repr`-dispatch CBMC wall confirmed this
+//! session).
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -695,6 +703,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::OffsetConflict,
     "verify_tz_offset_conflict_always_offset_and_always_time_zone_model",
     "../../../amenable_verus/src/ext/jiff/tz_offset_conflict.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::TimeZone,
+    "verify_tz_time_zone_unknown_and_fixed_round_trip_model",
+    "../../../amenable_verus/src/ext/jiff/tz_time_zone.rs"
 );
 
 impl_verus_witness_checked_ext!(

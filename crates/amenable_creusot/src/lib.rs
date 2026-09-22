@@ -104,6 +104,8 @@ pub use ext_jiff::tz_dst::VERIFY_TZ_DST_FROM_BOOL_ROUND_TRIPS_SRC;
 #[cfg(feature = "jiff")]
 pub use ext_jiff::tz_offset_conflict::VERIFY_TZ_OFFSET_CONFLICT_ALWAYS_OFFSET_AND_ALWAYS_TIME_ZONE_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::tz_time_zone::VERIFY_TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::zoned_series::VERIFY_ZONED_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_UNDER_UTC_SRC;
 pub use ledger::{
     ACCOUNTS_DISTINCT_HOLDS_SRC, AMOUNT_POSITIVE_HOLDS_SRC, BALANCED_ENTRIES_HOLDS_SRC,
