@@ -553,6 +553,18 @@
 //! new`) is completely private — no way to build one from outside
 //! jiff at all, only reachable via real IANA tzdb data through
 //! `TimeZoneNameIter`.
+//!
+//! `jiff::tz::TimeZoneNameIter<'static>` also stays trusted here, for
+//! a DIFFERENT real reason from `TimeZoneName`: checked on Kani
+//! instead (`amenable_kani::ext::jiff::tz_time_zone_name_iter`, real
+//! and passing — `TimeZoneDatabase::none().available().next() ==
+//! None` is genuinely cheap/dispatch-free, no `TimeZone::Repr`
+//! involved) — trusted here only because `extern_spec!` doesn't
+//! support third-party `Iterator` trait impls at all (the same real
+//! "`IteratorSpec` is not satisfied" error already confirmed for
+//! `TimeZoneFollowingTransitions`), and the fallback accommodation-
+//! model pattern would be genuinely content-free for this
+//! unconditional-constant claim.
 
 mod civil_date;
 mod civil_era;
@@ -684,7 +696,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::tz::OffsetArithmetic,
     jiff::tz::OffsetRound,
     jiff::tz::TimeZoneFollowingTransitions<'static>,
-    jiff::tz::TimeZoneName<'static>
+    jiff::tz::TimeZoneName<'static>,
+    jiff::tz::TimeZoneNameIter<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

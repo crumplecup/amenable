@@ -30,6 +30,7 @@ amenable_kani::ext::jiff::timestamp_series::verify_timestamp_series_next_yields_
 amenable_kani::ext::jiff::tz_ambiguous_timestamp::verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous,1790033152,timeout
 amenable_kani::ext::jiff::tz_dst::verify_tz_dst_from_bool_round_trips,1790051204,passed
 amenable_kani::ext::jiff::tz_time_zone_database::verify_tz_time_zone_database_none_is_definitively_empty,1790053664,passed
+amenable_kani::ext::jiff::tz_time_zone_name_iter::verify_tz_time_zone_name_iter_next_is_none_for_empty_database,1790089355,passed
 amenable_kani::ext::jiff::unit::verify_unit_ordering_matches_discriminant_order,1789503716,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788632993,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788633003,passed

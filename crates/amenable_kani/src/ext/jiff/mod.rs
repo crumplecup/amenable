@@ -745,6 +745,13 @@
 //! tzdb data through `TimeZoneDatabase::available()`, deliberately
 //! out of scope for this checklist). Its one real public method
 //! (`as_str`) can never be exercised without a real instance.
+//!
+//! `jiff::tz::TimeZoneNameIter<'static>` gets a real checked property
+//! too (see `tz_time_zone_name_iter.rs`): `TimeZoneDatabase::
+//! none().available().next() == None` — real jiff source confirms
+//! this is genuinely cheap and dispatch-free (a real, empty `Vec::
+//! new().into_iter()`), unlike `TimeZoneFollowingTransitions`'s own
+//! `TimeZone::Repr`-dispatching `next()`.
 
 mod civil_date;
 mod civil_era;
@@ -770,6 +777,7 @@ mod span;
 mod span_fieldwise;
 mod tz_dst;
 mod tz_time_zone_database;
+mod tz_time_zone_name_iter;
 mod unit;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;
