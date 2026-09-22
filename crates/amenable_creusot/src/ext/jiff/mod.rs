@@ -496,6 +496,15 @@
 //! shape to `TimestampArithmetic`/`ZonedArithmetic`: it has no public
 //! methods of its own at all, and its one field is private with no
 //! getter.
+//!
+//! `jiff::tz::OffsetConflict` gets a real checked property too (see
+//! `tz_offset_conflict.rs`), checked despite being trusted for Kani
+//! specifically (real jiff source shows `resolve_with`'s
+//! `AlwaysTimeZone` branch calls `TimeZone::into_ambiguous_zoned`
+//! directly, the same already-confirmed-timing-out function).
+//! Scoped to `AlwaysOffset`/`AlwaysTimeZone` only — `PreferOffset`/
+//! `Reject` delegate to private helpers with their own separately
+//! nontrivial logic, disproportionate to add here.
 
 mod civil_date;
 mod civil_era;
@@ -527,6 +536,7 @@ mod timestamp_series;
 mod tz_ambiguous_timestamp;
 mod tz_ambiguous_zoned;
 mod tz_dst;
+mod tz_offset_conflict;
 mod zoned_series;
 
 use crate::CreusotWitness;

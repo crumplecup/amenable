@@ -25,7 +25,8 @@
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/`jiff::
 //! tz::AmbiguousTimestamp`/`jiff::
 //! tz::AmbiguousZoned`/`jiff::
-//! tz::Dst`/
+//! tz::Dst`/`jiff::
+//! tz::OffsetConflict`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -43,7 +44,7 @@
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,
-//! tz_ambiguous_zoned,tz_dst,unit,
+//! tz_ambiguous_zoned,tz_dst,tz_offset_conflict,unit,
 //! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -328,6 +329,14 @@
 //! `jiff::tz::OffsetArithmetic` also stays trusted, the identical
 //! shape to `TimestampArithmetic`/`ZonedArithmetic`: no public
 //! methods at all, one private field, only `From` impls public.
+//!
+//! `jiff::tz::OffsetConflict`'s model reproduces just the resolved
+//! offset seconds directly (no `AmbiguousZoned`/`TimeZone`/
+//! `DateTime` payload at all), scoped to `AlwaysOffset`/
+//! `AlwaysTimeZone` only — the same claim `amenable_creusot::
+//! ext_jiff::tz_offset_conflict` checks against jiff's real API,
+//! also trusted for Kani (calls the same already-confirmed-
+//! timing-out function directly).
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -674,6 +683,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::Dst,
     "verify_tz_dst_from_bool_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/tz_dst.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::OffsetConflict,
+    "verify_tz_offset_conflict_always_offset_and_always_time_zone_model",
+    "../../../amenable_verus/src/ext/jiff/tz_offset_conflict.rs"
 );
 
 impl_verus_witness_checked_ext!(

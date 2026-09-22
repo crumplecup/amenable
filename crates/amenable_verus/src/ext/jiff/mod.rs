@@ -31,5 +31,6 @@ pub mod timestamp_series;
 pub mod tz_ambiguous_timestamp;
 pub mod tz_ambiguous_zoned;
 pub mod tz_dst;
+pub mod tz_offset_conflict;
 pub mod unit;
 pub mod zoned_series;

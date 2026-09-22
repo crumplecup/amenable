@@ -683,6 +683,15 @@
 //! — `checked_add`/`checked_neg`/`is_negative` are all private; only
 //! the `From` impls (construction, not inspection) are public. Its
 //! one field (`duration`) is private with no getter.
+//!
+//! `jiff::tz::OffsetConflict` also stays trusted for Kani, without a
+//! redundant fresh confirmation run: real jiff source shows
+//! `resolve_with`'s `AlwaysTimeZone` branch calls `TimeZone::
+//! into_ambiguous_zoned` directly, the SAME real function already
+//! confirmed to time out under CBMC. Checked on Creusot and Verus
+//! instead (scoped to `AlwaysOffset`/`AlwaysTimeZone` — see
+//! `ext_jiff::tz_offset_conflict`'s own doc comment for why
+//! `PreferOffset`/`Reject` are out of scope).
 
 mod civil_date;
 mod civil_era;
@@ -767,5 +776,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::AmbiguousTimestamp,
     jiff::tz::AmbiguousZoned,
     jiff::tz::Disambiguation,
-    jiff::tz::OffsetArithmetic
+    jiff::tz::OffsetArithmetic,
+    jiff::tz::OffsetConflict
 );

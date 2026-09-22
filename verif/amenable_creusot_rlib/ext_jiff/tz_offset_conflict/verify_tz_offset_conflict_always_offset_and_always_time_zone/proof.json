@@ -1,0 +1,20 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_clone_TimeZone": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_elim_Ok": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_elim_Ok'0": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_elim_Unambiguous": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_fixed": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_from_seconds": { "prover": "alt-ergo", "time": 0.025 },
+      "vc_offset": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_resolve": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_seconds": { "prover": "alt-ergo", "time": 0.037 },
+      "vc_verify_tz_offset_conflict_always_offset_and_always_time_zone": {
+        "prover": "z3",
+        "time": 0.03
+      }
+    }
+  }
+}

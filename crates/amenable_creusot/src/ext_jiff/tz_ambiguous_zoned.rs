@@ -25,6 +25,15 @@
 //! completely opaque (`civil::DateTime` is trusted by deliberate
 //! Phase 1 design). Reuses `offset.rs`'s own `offset_seconds_value`
 //! and `tz_ambiguous_timestamp.rs`'s own `tz_fixed_seconds_value`.
+//!
+//! `amb_zoned_offset_is_unambiguous_value`/`amb_zoned_offset_seconds_
+//! value` are `pub(crate)`: `tz_offset_conflict.rs` needs to reuse
+//! them (its own `OffsetConflict::resolve` extern_spec needs to
+//! relate to the real `AmbiguousZoned` it returns). Also extern-specs
+//! `TimeZone::into_ambiguous_zoned` (the by-value sibling of
+//! `to_ambiguous_zoned`, a DIFFERENT real function, not yet
+//! contracted anywhere) for the same reason — `OffsetConflict::
+//! resolve_with`'s real `AlwaysTimeZone` branch calls it directly.
 
 #[cfg(creusot)]
 mod mirror {
@@ -40,14 +49,14 @@ use mirror::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
-fn amb_zoned_offset_is_unambiguous_value(_z: &jiff::tz::AmbiguousZoned) -> bool {
+pub(crate) fn amb_zoned_offset_is_unambiguous_value(_z: &jiff::tz::AmbiguousZoned) -> bool {
     dead
 }
 
 #[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
-fn amb_zoned_offset_seconds_value(_z: &jiff::tz::AmbiguousZoned) -> i32 {
+pub(crate) fn amb_zoned_offset_seconds_value(_z: &jiff::tz::AmbiguousZoned) -> i32 {
     dead
 }
 
@@ -60,6 +69,13 @@ extern_spec! {
             && amb_zoned_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
         )]
         fn to_ambiguous_zoned(&self, dt: jiff::civil::DateTime) -> jiff::tz::AmbiguousZoned;
+
+        #[check(ghost)]
+        #[ensures(
+            amb_zoned_offset_is_unambiguous_value(&result) == true
+            && amb_zoned_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
+        )]
+        fn into_ambiguous_zoned(self, dt: jiff::civil::DateTime) -> jiff::tz::AmbiguousZoned;
     }
 
     impl jiff::tz::AmbiguousZoned {

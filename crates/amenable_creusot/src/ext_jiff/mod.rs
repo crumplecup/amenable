@@ -40,4 +40,5 @@ pub(crate) mod timestamp_series;
 pub(crate) mod tz_ambiguous_timestamp;
 pub(crate) mod tz_ambiguous_zoned;
 pub(crate) mod tz_dst;
+pub(crate) mod tz_offset_conflict;
 pub(crate) mod zoned_series;
