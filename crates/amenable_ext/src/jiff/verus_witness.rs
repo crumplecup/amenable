@@ -338,6 +338,11 @@
 //! also trusted for Kani (calls the same already-confirmed-
 //! timing-out function directly).
 //!
+//! `jiff::tz::OffsetRound` also stays trusted, the identical
+//! builder-only shape to `TimestampRound`/`ZonedRound`: four
+//! plain-setter public methods, all three fields private with no
+//! getters.
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -491,7 +496,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
     jiff::tz::Disambiguation,
-    jiff::tz::OffsetArithmetic
+    jiff::tz::OffsetArithmetic,
+    jiff::tz::OffsetRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

@@ -9548,3 +9548,15 @@ fn ext_tz_offset_conflict_proof_chain_reports_all_three_verifiers() -> miette::R
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::tz::OffsetConflict>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_tz_offset_round_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<jiff::tz::OffsetRound>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::tz::OffsetRound>");
+    Ok(())
+}

@@ -692,6 +692,13 @@
 //! instead (scoped to `AlwaysOffset`/`AlwaysTimeZone` — see
 //! `ext_jiff::tz_offset_conflict`'s own doc comment for why
 //! `PreferOffset`/`Reject` are out of scope).
+//!
+//! `jiff::tz::OffsetRound` stays trusted for the same builder-only
+//! reason as `TimestampRound`/`ZonedRound`: checked directly against
+//! jiff's real source, its four public methods (`new`/`smallest`/
+//! `mode`/`increment`) are all plain setters, and all three fields
+//! (`smallest`/`mode`/`increment`) are private with no getters —
+//! `round` (the real rounding logic) is private too.
 
 mod civil_date;
 mod civil_era;
@@ -777,5 +784,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::AmbiguousZoned,
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
-    jiff::tz::OffsetConflict
+    jiff::tz::OffsetConflict,
+    jiff::tz::OffsetRound
 );

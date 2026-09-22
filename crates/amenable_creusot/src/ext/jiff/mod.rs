@@ -505,6 +505,11 @@
 //! Scoped to `AlwaysOffset`/`AlwaysTimeZone` only — `PreferOffset`/
 //! `Reject` delegate to private helpers with their own separately
 //! nontrivial logic, disproportionate to add here.
+//!
+//! `jiff::tz::OffsetRound` also stays trusted, the identical
+//! builder-only shape to `TimestampRound`/`ZonedRound`: its four
+//! public methods are all plain setters, and all three fields are
+//! private with no getters.
 
 mod civil_date;
 mod civil_era;
@@ -631,7 +636,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
     jiff::tz::Disambiguation,
-    jiff::tz::OffsetArithmetic
+    jiff::tz::OffsetArithmetic,
+    jiff::tz::OffsetRound
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
