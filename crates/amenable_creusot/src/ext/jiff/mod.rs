@@ -547,6 +547,12 @@
 //! consistency of) — the case this codebase's own tautological-model
 //! policy says to accept trusted for rather than build a thin model
 //! for its own sake.
+//!
+//! `jiff::tz::TimeZoneName<'static>` also stays trusted, checked
+//! directly against jiff's real source: its own constructor (`fn
+//! new`) is completely private — no way to build one from outside
+//! jiff at all, only reachable via real IANA tzdb data through
+//! `TimeZoneNameIter`.
 
 mod civil_date;
 mod civil_era;
@@ -677,7 +683,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
     jiff::tz::OffsetRound,
-    jiff::tz::TimeZoneFollowingTransitions<'static>
+    jiff::tz::TimeZoneFollowingTransitions<'static>,
+    jiff::tz::TimeZoneName<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

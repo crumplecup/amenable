@@ -736,6 +736,15 @@
 //! doc comment for the full toolchain findings. Verus — for
 //! consistency with the same content-free reasoning (no real
 //! internal branching to model beyond a constant).
+//!
+//! `jiff::tz::TimeZoneName<'static>` stays trusted too, checked
+//! directly against jiff's real source: its own constructor (`fn
+//! new`) is completely PRIVATE (not even `pub(crate)`) — there is no
+//! way to build one from outside jiff at all. The only way to obtain
+//! one is via `TimeZoneNameIter` (itself only populated by real IANA
+//! tzdb data through `TimeZoneDatabase::available()`, deliberately
+//! out of scope for this checklist). Its one real public method
+//! (`as_str`) can never be exercised without a real instance.
 
 mod civil_date;
 mod civil_era;
@@ -825,5 +834,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::OffsetConflict,
     jiff::tz::OffsetRound,
     jiff::tz::TimeZone,
-    jiff::tz::TimeZoneFollowingTransitions<'static>
+    jiff::tz::TimeZoneFollowingTransitions<'static>,
+    jiff::tz::TimeZoneName<'static>
 );

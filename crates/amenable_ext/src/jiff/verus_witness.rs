@@ -367,6 +367,11 @@
 //! genuinely different real toolchain walls first; see that doc
 //! comment for both.
 //!
+//! `jiff::tz::TimeZoneName<'static>` also stays trusted, checked
+//! directly against jiff's real source: its own constructor is
+//! completely private — no way to build one from outside jiff at
+//! all, only reachable via real IANA tzdb data.
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -522,7 +527,8 @@ impl_verus_witness_trusted_ext!(
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
     jiff::tz::OffsetRound,
-    jiff::tz::TimeZoneFollowingTransitions<'static>
+    jiff::tz::TimeZoneFollowingTransitions<'static>,
+    jiff::tz::TimeZoneName<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
