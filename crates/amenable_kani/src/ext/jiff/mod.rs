@@ -719,6 +719,23 @@
 //! a DIFFERENT (simpler) internal repr from `TimeZone`'s own
 //! pointer-tagged union, checked directly rather than assumed unsafe
 //! by resemblance.
+//!
+//! `jiff::tz::TimeZoneFollowingTransitions<'static>` stays trusted on
+//! ALL THREE backends, for genuinely different, confirmed reasons
+//! each: Kani — real jiff source confirms `TimeZone::following` is a
+//! trivial, dispatch-free constructor, but the iterator's own
+//! `next()` calls `TimeZone::next_transition`, which dispatches
+//! through the SAME `repr::each!` macro already confirmed to time
+//! out under CBMC. Creusot — a first attempt to `extern_spec!` its
+//! `Iterator::next` hit a real "`IteratorSpec` is not satisfied"
+//! error (`extern_spec!` doesn't support third-party `Iterator`
+//! impls at all), and the fallback accommodation-model pattern
+//! (`timestamp_series.rs`'s own precedent) would be genuinely
+//! content-free here (`next()` is unconditionally `None`, no formula
+//! to check consistency of) — see `amenable_creusot::ext::jiff`'s own
+//! doc comment for the full toolchain findings. Verus — for
+//! consistency with the same content-free reasoning (no real
+//! internal branching to model beyond a constant).
 
 mod civil_date;
 mod civil_era;
@@ -807,5 +824,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::OffsetArithmetic,
     jiff::tz::OffsetConflict,
     jiff::tz::OffsetRound,
-    jiff::tz::TimeZone
+    jiff::tz::TimeZone,
+    jiff::tz::TimeZoneFollowingTransitions<'static>
 );

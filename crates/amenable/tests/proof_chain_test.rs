@@ -9586,3 +9586,21 @@ fn ext_tz_time_zone_database_proof_chain_reports_all_three_verifiers() -> miette
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<jiff::tz::TimeZoneDatabase>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "jiff", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_tz_time_zone_following_transitions_proof_chain_reports_all_three_verifiers()
+-> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain(
+        "ExtStandard<jiff::tz::TimeZoneFollowingTransitions<'static>>",
+    ))?;
+    assert_root_has_kani_creusot_and_verus(
+        &report,
+        "ExtStandard<jiff::tz::TimeZoneFollowingTransitions<'static>>",
+    );
+    Ok(())
+}

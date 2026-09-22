@@ -528,6 +528,25 @@
 //! empty()` are the checked subset — see `amenable_kani::ext::jiff::
 //! tz_time_zone_database`'s own doc comment for the real reason
 //! `get()`/`bundled()`/etc. are out of scope.
+//!
+//! `jiff::tz::TimeZoneFollowingTransitions<'static>` stays trusted
+//! here too, for a genuinely different, confirmed reason: a first
+//! attempt to `extern_spec!` its `Iterator::next` directly hit TWO
+//! real toolchain walls in succession — (1) a real E0716 "temporary
+//! value dropped while borrowed" for `TimeZone::UTC.following(..)`
+//! (fixed via `Box::leak` for a genuine `&'static TimeZone`, itself
+//! blocked by a second, real "unsupported constant value" error when
+//! tried via a local `static` instead), then (2) a real "the trait
+//! bound `TimeZoneFollowingTransitions<'_>: creusot_std::prelude::
+//! IteratorSpec` is not satisfied" error — `extern_spec!` doesn't
+//! support third-party `Iterator` trait impls at all. The fallback
+//! accommodation-model pattern `timestamp_series.rs` established for
+//! iterator types (compute the expected value directly, never
+//! calling the real `next()`) would be genuinely content-free here
+//! (`next()` is unconditionally `None`, no formula to check
+//! consistency of) — the case this codebase's own tautological-model
+//! policy says to accept trusted for rather than build a thin model
+//! for its own sake.
 
 mod civil_date;
 mod civil_era;
@@ -657,7 +676,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::tz::AmbiguousOffset,
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
-    jiff::tz::OffsetRound
+    jiff::tz::OffsetRound,
+    jiff::tz::TimeZoneFollowingTransitions<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

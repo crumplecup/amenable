@@ -358,6 +358,15 @@
 //! and `amenable_creusot::ext_jiff::tz_time_zone_database` both check
 //! against jiff's real API.
 //!
+//! `jiff::tz::TimeZoneFollowingTransitions<'static>` stays trusted
+//! here too, for consistency with the same real, confirmed
+//! content-free reasoning `amenable_kani::ext::jiff`'s own doc
+//! comment documents (`next()` is unconditionally `None` for this
+//! type's own real behavior, no internal branching left to model
+//! beyond a constant) — Kani and Creusot each hit their own separate,
+//! genuinely different real toolchain walls first; see that doc
+//! comment for both.
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -512,7 +521,8 @@ impl_verus_witness_trusted_ext!(
     jiff::tz::AmbiguousOffset,
     jiff::tz::Disambiguation,
     jiff::tz::OffsetArithmetic,
-    jiff::tz::OffsetRound
+    jiff::tz::OffsetRound,
+    jiff::tz::TimeZoneFollowingTransitions<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
