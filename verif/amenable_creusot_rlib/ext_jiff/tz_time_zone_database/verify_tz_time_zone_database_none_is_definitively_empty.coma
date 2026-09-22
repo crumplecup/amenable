@@ -1,0 +1,63 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 55 4 55 72 *)
+
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jiff-0.2.35/src/tz/db/mod.rs" 257 4 257 43
+let%span stz_time_zone_database = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 56 8 56 42
+let%span stz_time_zone_database'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 56 8 56 66
+let%span stz_time_zone_database'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 53 15 53 19
+let%span stz_time_zone_database'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 54 14 54 76
+let%span stz_time_zone_database'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 30 18 30 67
+let%span stz_time_zone_database'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 35 34 35 38
+let%span stz_time_zone_database'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 34 18 34 67
+let%span stz_time_zone_database'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 45 20 45 27
+
+use creusot.prelude.Any
+
+type t_TimeZoneDatabase
+
+predicate inv_TimeZoneDatabase (_1: t_TimeZoneDatabase)
+
+predicate tzdb_is_definitively_empty_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 22 0 22 77] (_db: t_TimeZoneDatabase)
+
+let none (return (x: t_TimeZoneDatabase)) = any
+  [ return (result: t_TimeZoneDatabase) ->
+  {[@stop_split] [@expl:none ensures] ([@stop_split] [@expl:none result type invariant] [%#smod] inv_TimeZoneDatabase result)
+    /\ ([@stop_split] [@expl:none ensures] [%#stz_time_zone_database'3] tzdb_is_definitively_empty_value result = true)}
+    (! return {result}) ]
+
+predicate resolve_TimeZoneDatabase (_1: t_TimeZoneDatabase)
+
+predicate invariant_ref_TimeZoneDatabase [@inline:trivial] (self: t_TimeZoneDatabase) =
+  [%#sinvariant] inv_TimeZoneDatabase self
+
+meta "rewrite_def" predicate invariant_ref_TimeZoneDatabase
+
+predicate inv_ref_TimeZoneDatabase [@inline:trivial] (_1: t_TimeZoneDatabase) = invariant_ref_TimeZoneDatabase _1
+
+meta "rewrite_def" predicate inv_ref_TimeZoneDatabase
+
+let is_definitively_empty (self_: t_TimeZoneDatabase) (return (x: bool)) =
+{[@stop_split] [@expl:is_definitively_empty 'self_' type invariant] [%#stz_time_zone_database'4] inv_ref_TimeZoneDatabase self_}
+  any
+  [ return (result: bool) -> {[@stop_split] [@expl:is_definitively_empty ensures] [%#stz_time_zone_database'5] result
+    = tzdb_is_definitively_empty_value self_}
+    (! return {result}) ]
+
+predicate tz_time_zone_database_none_is_definitively_empty_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 44 4 44 84] (matches: bool) =
+  [%#stz_time_zone_database'6] matches
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_tz_time_zone_database_none_is_definitively_empty [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_jiff/tz_time_zone_database.rs" 55 4 55 72]
+  (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = none [%#stz_time_zone_database] (fun (_x: t_TimeZoneDatabase) -> [ &_4 <- _x ] s1)
+    | s1 = s2 [ _ck -> (! {[@expl:type invariant] inv_TimeZoneDatabase _4} any) ]
+    | s2 = -{resolve_TimeZoneDatabase _4}- s3
+    | s3 = is_definitively_empty [%#stz_time_zone_database'0] {_4} (fun (_x: bool) -> [ &_ret <- _x ] s4)
+    | s4 = return {_ret} ] ] [ & _ret: bool = Any.any_l () | & _4: t_TimeZoneDatabase = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_tz_time_zone_database_none_is_definitively_empty ensures] [%#stz_time_zone_database'2] tz_time_zone_database_none_is_definitively_empty_holds result}
+    (! return {result}) ]

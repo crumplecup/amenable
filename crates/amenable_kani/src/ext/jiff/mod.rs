@@ -711,6 +711,14 @@
 //! directly). Checked on Creusot and Verus instead (`ext_jiff::
 //! tz_time_zone`/`ext::jiff::tz_time_zone`), neither of which
 //! executes the real body at all.
+//!
+//! `jiff::tz::TimeZoneDatabase` gets a real checked property too
+//! (see `tz_time_zone_database.rs`): `none()`/`is_definitively_
+//! empty()` are the checked subset — real jiff source confirms both
+//! are genuinely cheap and dispatch-free for the `Repr::Empty` case,
+//! a DIFFERENT (simpler) internal repr from `TimeZone`'s own
+//! pointer-tagged union, checked directly rather than assumed unsafe
+//! by resemblance.
 
 mod civil_date;
 mod civil_era;
@@ -735,6 +743,7 @@ mod signed_duration;
 mod span;
 mod span_fieldwise;
 mod tz_dst;
+mod tz_time_zone_database;
 mod unit;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;

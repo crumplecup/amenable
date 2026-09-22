@@ -27,7 +27,8 @@
 //! tz::AmbiguousZoned`/`jiff::
 //! tz::Dst`/`jiff::
 //! tz::OffsetConflict`/`jiff::
-//! tz::TimeZone`/
+//! tz::TimeZone`/`jiff::
+//! tz::TimeZoneDatabase`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -45,7 +46,8 @@
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,
-//! tz_ambiguous_zoned,tz_dst,tz_offset_conflict,tz_time_zone,unit,
+//! tz_ambiguous_zoned,tz_dst,tz_offset_conflict,tz_time_zone,
+//! tz_time_zone_database,unit,
 //! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -350,6 +352,11 @@
 //! against jiff's real API, also trusted for Kani (the type
 //! underlying every `Repr`-dispatch CBMC wall confirmed this
 //! session).
+//!
+//! `jiff::tz::TimeZoneDatabase`'s model is scoped to `none()` only —
+//! the same claim `amenable_kani::ext::jiff::tz_time_zone_database`
+//! and `amenable_creusot::ext_jiff::tz_time_zone_database` both check
+//! against jiff's real API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -709,6 +716,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::TimeZone,
     "verify_tz_time_zone_unknown_and_fixed_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/tz_time_zone.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::TimeZoneDatabase,
+    "verify_tz_time_zone_database_none_is_definitively_empty_model",
+    "../../../amenable_verus/src/ext/jiff/tz_time_zone_database.rs"
 );
 
 impl_verus_witness_checked_ext!(

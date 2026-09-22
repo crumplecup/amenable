@@ -1,0 +1,13 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_is_definitively_empty": { "prover": "alt-ergo", "time": 0.023 },
+      "vc_none": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_verify_tz_time_zone_database_none_is_definitively_empty": {
+        "prover": "alt-ergo",
+        "time": 0.023
+      }
+    }
+  }
+}

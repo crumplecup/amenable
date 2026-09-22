@@ -522,6 +522,12 @@
 //! timestamp.rs`/`tz_ambiguous_zoned.rs`; this file adds `unknown`/
 //! `is_unknown`/`to_fixed_offset`, extending `fixed`'s own ensures
 //! clause with an extra conjunct there rather than redeclaring it.
+//!
+//! `jiff::tz::TimeZoneDatabase` gets a real checked property too
+//! (see `tz_time_zone_database.rs`): `none()`/`is_definitively_
+//! empty()` are the checked subset — see `amenable_kani::ext::jiff::
+//! tz_time_zone_database`'s own doc comment for the real reason
+//! `get()`/`bundled()`/etc. are out of scope.
 
 mod civil_date;
 mod civil_era;
@@ -555,6 +561,7 @@ mod tz_ambiguous_zoned;
 mod tz_dst;
 mod tz_offset_conflict;
 mod tz_time_zone;
+mod tz_time_zone_database;
 mod zoned_series;
 
 use crate::CreusotWitness;

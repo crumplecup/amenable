@@ -33,5 +33,6 @@ pub mod tz_ambiguous_zoned;
 pub mod tz_dst;
 pub mod tz_offset_conflict;
 pub mod tz_time_zone;
+pub mod tz_time_zone_database;
 pub mod unit;
 pub mod zoned_series;
