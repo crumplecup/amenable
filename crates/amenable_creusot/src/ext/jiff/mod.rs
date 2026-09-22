@@ -587,6 +587,14 @@
 //! arm `next_transition` has — the same `IteratorSpec`-not-satisfied
 //! wall and content-free fallback carve-out apply unchanged (a
 //! general `extern_spec!` limitation, not type-specific).
+//!
+//! `jiff::tz::TimeZoneTransition<'static>` stays trusted too, the
+//! LAST type in this checklist: confirmed directly against jiff's
+//! real source, its only real constructor (`from_jcore`) is
+//! `pub(crate)` — not reachable from outside jiff at all, and neither
+//! transition iterator (both trusted here, scoped to `TimeZone::UTC`)
+//! ever actually yields one. The same "no reachable constructor"
+//! category `TimeZoneName<'static>` already established.
 
 mod civil_date;
 mod civil_era;
@@ -721,7 +729,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
     jiff::tz::TimeZoneNameIter<'static>,
-    jiff::tz::TimeZonePrecedingTransitions<'static>
+    jiff::tz::TimeZonePrecedingTransitions<'static>,
+    jiff::tz::TimeZoneTransition<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

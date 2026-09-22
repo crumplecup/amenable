@@ -779,6 +779,20 @@
 //! full toolchain findings, which apply here unchanged: `extern_spec!`
 //! fundamentally cannot support ANY third-party `Iterator` impl,
 //! a general toolchain limitation, not one specific to that type).
+//!
+//! `jiff::tz::TimeZoneTransition<'static>` stays trusted too, the
+//! LAST type in this checklist: confirmed by reading jiff's real
+//! source directly, its only real constructor (`from_jcore`) is
+//! `pub(crate)` — not reachable from outside jiff at all. The only
+//! public production paths are `TimeZoneFollowingTransitions::next()`/
+//! `TimeZonePrecedingTransitions::next()`, both already trusted this
+//! session and scoped honestly to `TimeZone::UTC`, where neither ever
+//! actually yields an item (`UTC => None` in both `next_transition`
+//! and `previous_transition`) — so there is no way to construct or
+//! inspect a real instance within this checklist's own real-tzdb-
+//! avoidance scope. The same "no reachable constructor" category
+//! `TimeZoneName<'static>` already established, confirmed
+//! independently rather than assumed from that resemblance.
 
 mod civil_date;
 mod civil_era;
@@ -872,5 +886,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
     jiff::tz::TimeZoneOffsetInfo<'static>,
-    jiff::tz::TimeZonePrecedingTransitions<'static>
+    jiff::tz::TimeZonePrecedingTransitions<'static>,
+    jiff::tz::TimeZoneTransition<'static>
 );

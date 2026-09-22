@@ -392,6 +392,11 @@
 //! confirmed structural mirror, not assumed — see `amenable_kani::
 //! ext::jiff`'s own doc comment).
 //!
+//! `jiff::tz::TimeZoneTransition<'static>` also stays trusted, the
+//! LAST type in this checklist: no reachable constructor from outside
+//! jiff at all (see `amenable_kani::ext::jiff`'s own doc comment for
+//! the full confirmation).
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -550,7 +555,8 @@ impl_verus_witness_trusted_ext!(
     jiff::tz::TimeZoneFollowingTransitions<'static>,
     jiff::tz::TimeZoneName<'static>,
     jiff::tz::TimeZoneNameIter<'static>,
-    jiff::tz::TimeZonePrecedingTransitions<'static>
+    jiff::tz::TimeZonePrecedingTransitions<'static>,
+    jiff::tz::TimeZoneTransition<'static>
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
