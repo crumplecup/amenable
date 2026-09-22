@@ -676,6 +676,13 @@
 //! `tz_dst.rs`): a real, plain two-variant enum (`No`/`Yes`) —
 //! `From<bool>` always builds `Yes` for `true`/`No` for `false`, and
 //! `is_dst()`/`is_std()` are each other's exact complement.
+//!
+//! `jiff::tz::OffsetArithmetic` stays trusted, the identical shape to
+//! `TimestampArithmetic`/`ZonedArithmetic`: checked directly against
+//! jiff's real source, it has *no* public methods of its own at all
+//! — `checked_add`/`checked_neg`/`is_negative` are all private; only
+//! the `From` impls (construction, not inspection) are public. Its
+//! one field (`duration`) is private with no getter.
 
 mod civil_date;
 mod civil_era;
@@ -759,5 +766,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::AmbiguousOffset,
     jiff::tz::AmbiguousTimestamp,
     jiff::tz::AmbiguousZoned,
-    jiff::tz::Disambiguation
+    jiff::tz::Disambiguation,
+    jiff::tz::OffsetArithmetic
 );

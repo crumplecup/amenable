@@ -491,6 +491,11 @@
 //! `tz_dst.rs`): a real, plain (NOT `#[non_exhaustive]`) two-variant
 //! enum — matches exhaustively on `self`/`result` directly, needing
 //! no opaque accessor and no wildcard arm.
+//!
+//! `jiff::tz::OffsetArithmetic` also stays trusted, the identical
+//! shape to `TimestampArithmetic`/`ZonedArithmetic`: it has no public
+//! methods of its own at all, and its one field is private with no
+//! getter.
 
 mod civil_date;
 mod civil_era;
@@ -615,7 +620,8 @@ impl_creusot_witness_trusted_ext!(
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
-    jiff::tz::Disambiguation
+    jiff::tz::Disambiguation,
+    jiff::tz::OffsetArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,

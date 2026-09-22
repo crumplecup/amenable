@@ -325,6 +325,10 @@
 //! `amenable_creusot::ext_jiff::tz_dst` both check against jiff's
 //! real `From<bool>`/`is_dst`/`is_std` API.
 //!
+//! `jiff::tz::OffsetArithmetic` also stays trusted, the identical
+//! shape to `TimestampArithmetic`/`ZonedArithmetic`: no public
+//! methods at all, one private field, only `From` impls public.
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -477,7 +481,8 @@ impl_verus_witness_trusted_ext!(
     jiff::fmt::temporal::SpanParser,
     jiff::fmt::temporal::SpanPrinter,
     jiff::tz::AmbiguousOffset,
-    jiff::tz::Disambiguation
+    jiff::tz::Disambiguation,
+    jiff::tz::OffsetArithmetic
 );
 
 /// Proof artifact for an `ExtStandard<T>` carrier with a real,
