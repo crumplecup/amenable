@@ -43,4 +43,5 @@ pub(crate) mod tz_dst;
 pub(crate) mod tz_offset_conflict;
 pub(crate) mod tz_time_zone;
 pub(crate) mod tz_time_zone_database;
+pub(crate) mod tz_time_zone_offset_info;
 pub(crate) mod zoned_series;

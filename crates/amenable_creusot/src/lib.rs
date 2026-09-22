@@ -108,6 +108,8 @@ pub use ext_jiff::tz_time_zone::VERIFY_TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP
 #[cfg(feature = "jiff")]
 pub use ext_jiff::tz_time_zone_database::VERIFY_TZ_TIME_ZONE_DATABASE_NONE_IS_DEFINITIVELY_EMPTY_SRC;
 #[cfg(feature = "jiff")]
+pub use ext_jiff::tz_time_zone_offset_info::VERIFY_TZ_TIME_ZONE_OFFSET_INFO_FROM_FIXED_TIME_ZONE_SRC;
+#[cfg(feature = "jiff")]
 pub use ext_jiff::zoned_series::VERIFY_ZONED_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_UNDER_UTC_SRC;
 pub use ledger::{
     ACCOUNTS_DISTINCT_HOLDS_SRC, AMOUNT_POSITIVE_HOLDS_SRC, BALANCED_ENTRIES_HOLDS_SRC,

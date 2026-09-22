@@ -752,6 +752,18 @@
 //! this is genuinely cheap and dispatch-free (a real, empty `Vec::
 //! new().into_iter()`), unlike `TimeZoneFollowingTransitions`'s own
 //! `TimeZone::Repr`-dispatching `next()`.
+//!
+//! `jiff::tz::TimeZoneOffsetInfo<'static>` also stays trusted for
+//! Kani specifically, for the same `TimeZone::Repr`-dispatch reason
+//! as `TimeZone`/`AmbiguousTimestamp`/`AmbiguousZoned`/
+//! `OffsetConflict`: its only real production path,
+//! `TimeZone::to_offset_info(timestamp)`, dispatches through the SAME
+//! `repr::each!` macro already confirmed to time out under CBMC
+//! (confirmed by reading jiff's real source directly — every match
+//! arm, including the `FIXED` case, routes through that macro).
+//! Checked on Creusot and Verus instead (`ext_jiff::
+//! tz_time_zone_offset_info`/`ext::jiff::tz_time_zone_offset_info`),
+//! neither of which executes the real body at all.
 
 mod civil_date;
 mod civil_era;
@@ -843,5 +855,6 @@ impl_kani_witness_trusted_ext!(
     jiff::tz::OffsetRound,
     jiff::tz::TimeZone,
     jiff::tz::TimeZoneFollowingTransitions<'static>,
-    jiff::tz::TimeZoneName<'static>
+    jiff::tz::TimeZoneName<'static>,
+    jiff::tz::TimeZoneOffsetInfo<'static>
 );

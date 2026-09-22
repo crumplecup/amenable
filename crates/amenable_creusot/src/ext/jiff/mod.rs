@@ -565,6 +565,18 @@
 //! `TimeZoneFollowingTransitions`), and the fallback accommodation-
 //! model pattern would be genuinely content-free for this
 //! unconditional-constant claim.
+//!
+//! `jiff::tz::TimeZoneOffsetInfo<'static>` gets a real checked
+//! property too (see `tz_time_zone_offset_info.rs`): unlike
+//! `TimeZoneFollowingTransitions`, this is an ordinary STRUCT method
+//! (`TimeZone::to_offset_info`), not a third-party `Iterator` impl, so
+//! the `IteratorSpec` wall doesn't apply — `extern_spec!` works
+//! directly. Scoped to the `TimeZone::fixed(offset)` case, reusing
+//! `tz_time_zone.rs`'s own `tz_fixed_seconds_value`: `.offset()`
+//! always reports `offset`'s own seconds and `.dst()` is always
+//! `Dst::No`. Trusted for Kani specifically — real jiff source
+//! confirms `to_offset_info` dispatches through the SAME `repr::each!`
+//! macro already confirmed to time out under CBMC.
 
 mod civil_date;
 mod civil_era;
@@ -599,6 +611,7 @@ mod tz_dst;
 mod tz_offset_conflict;
 mod tz_time_zone;
 mod tz_time_zone_database;
+mod tz_time_zone_offset_info;
 mod zoned_series;
 
 use crate::CreusotWitness;

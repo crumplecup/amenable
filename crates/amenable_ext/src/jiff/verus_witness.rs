@@ -378,6 +378,14 @@
 //! instead, trusted on Creusot for a real, confirmed toolchain
 //! reason (see `amenable_creusot::ext::jiff`'s own doc comment).
 //!
+//! `jiff::tz::TimeZoneOffsetInfo<'static>` gets a real checked
+//! property too (see `tz_time_zone_offset_info.rs`): a hand-verified
+//! model of `TimeZone::fixed(offset).to_offset_info(ts)`, scoped
+//! identically to `amenable_creusot::ext_jiff::
+//! tz_time_zone_offset_info`'s own real `extern_spec!` — offset
+//! seconds round-trip, DST always inactive. Trusted on Kani
+//! specifically (the `TimeZone::Repr`-dispatch CBMC wall).
+//!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
 //! private with no getters, its two public methods plain setters —
@@ -745,6 +753,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::TimeZoneDatabase,
     "verify_tz_time_zone_database_none_is_definitively_empty_model",
     "../../../amenable_verus/src/ext/jiff/tz_time_zone_database.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::TimeZoneOffsetInfo<'static>,
+    "verify_tz_time_zone_offset_info_from_fixed_time_zone_model",
+    "../../../amenable_verus/src/ext/jiff/tz_time_zone_offset_info.rs"
 );
 
 impl_verus_witness_checked_ext!(
