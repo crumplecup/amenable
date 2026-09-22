@@ -671,6 +671,11 @@
 //! disambiguation`/etc.), never producing or inspecting anything of
 //! its own beyond the standard derives (`Clone`/`Copy`/`Debug`/
 //! `Default`).
+//!
+//! `jiff::tz::Dst` gets a real checked property too (see
+//! `tz_dst.rs`): a real, plain two-variant enum (`No`/`Yes`) —
+//! `From<bool>` always builds `Yes` for `true`/`No` for `false`, and
+//! `is_dst()`/`is_std()` are each other's exact complement.
 
 mod civil_date;
 mod civil_era;
@@ -694,6 +699,7 @@ mod offset;
 mod signed_duration;
 mod span;
 mod span_fieldwise;
+mod tz_dst;
 mod unit;
 
 use crate::ext::macros::impl_kani_witness_trusted_ext;

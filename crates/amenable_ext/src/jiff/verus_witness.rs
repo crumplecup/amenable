@@ -24,7 +24,8 @@
 //! StdFmtWrite<String>`/`jiff::fmt::
 //! StdIoWrite<Vec<u8>>`/`jiff::tz::Offset`/`jiff::
 //! tz::AmbiguousTimestamp`/`jiff::
-//! tz::AmbiguousZoned`/
+//! tz::AmbiguousZoned`/`jiff::
+//! tz::Dst`/
 //! `jiff::Error`/`jiff::
 //! SignedDuration`/`jiff::Span`/`jiff::SpanFieldwise`/`jiff::
 //! TimestampSeries`/`jiff::Unit`/`jiff::ZonedSeries` are the
@@ -42,7 +43,7 @@
 //! offset,error,
 //! signed_duration,span,
 //! span_fieldwise,timestamp_series,tz_ambiguous_timestamp,
-//! tz_ambiguous_zoned,unit,
+//! tz_ambiguous_zoned,tz_dst,unit,
 //! zoned_series}` (jiff itself
 //! is still unreachable, but each
 //! model's own law is genuinely checked, and independently confirmed
@@ -317,6 +318,12 @@
 //! methods beyond derives" shape as `RoundMode`/`AmbiguousOffset`:
 //! there is no `impl Disambiguation` block at all — a real
 //! configuration marker enum consumed only by other types' methods.
+//!
+//! `jiff::tz::Dst`'s model is a plain, field-less two-variant enum
+//! (matches `fmt_strtime_meridiem.rs`'s own `MeridiemModel` shape) —
+//! the same claim `amenable_kani::ext::jiff::tz_dst` and
+//! `amenable_creusot::ext_jiff::tz_dst` both check against jiff's
+//! real `From<bool>`/`is_dst`/`is_std` API.
 //!
 //! `jiff::fmt::strtime::Config<DefaultCustom>` stays trusted, checked
 //! directly against jiff's real source: a pure builder, both fields
@@ -656,6 +663,12 @@ impl_verus_witness_checked_ext!(
     jiff::tz::AmbiguousZoned,
     "verify_tz_ambiguous_zoned_from_fixed_time_zone_is_always_unambiguous_model",
     "../../../amenable_verus/src/ext/jiff/tz_ambiguous_zoned.rs"
+);
+
+impl_verus_witness_checked_ext!(
+    jiff::tz::Dst,
+    "verify_tz_dst_from_bool_round_trips_model",
+    "../../../amenable_verus/src/ext/jiff/tz_dst.rs"
 );
 
 impl_verus_witness_checked_ext!(

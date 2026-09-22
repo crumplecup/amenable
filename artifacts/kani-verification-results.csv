@@ -28,6 +28,7 @@ amenable_kani::ext::jiff::span::verify_span_unit_setters_round_trip,1789441687,p
 amenable_kani::ext::jiff::span_fieldwise::verify_span_fieldwise_negation_negates_every_unit_getter,1789441835,passed
 amenable_kani::ext::jiff::timestamp_series::verify_timestamp_series_next_yields_start_then_advances_by_period,1789502012,passed
 amenable_kani::ext::jiff::tz_ambiguous_timestamp::verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous,1790033152,timeout
+amenable_kani::ext::jiff::tz_dst::verify_tz_dst_from_bool_round_trips,1790051204,passed
 amenable_kani::ext::jiff::unit::verify_unit_ordering_matches_discriminant_order,1789503716,passed
 amenable_kani::gaap_ledger::verify_gaap_check_amount_positive,1788632993,passed
 amenable_kani::gaap_ledger::verify_gaap_check_sufficient_funds,1788633003,passed

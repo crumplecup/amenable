@@ -486,6 +486,11 @@
 //! `#[non_exhaustive]` four-variant configuration marker enum
 //! consumed only by OTHER types' methods, never producing or
 //! inspecting anything of its own beyond the standard derives.
+//!
+//! `jiff::tz::Dst` gets a real checked property too (see
+//! `tz_dst.rs`): a real, plain (NOT `#[non_exhaustive]`) two-variant
+//! enum — matches exhaustively on `self`/`result` directly, needing
+//! no opaque accessor and no wildcard arm.
 
 mod civil_date;
 mod civil_era;
@@ -516,6 +521,7 @@ mod span_fieldwise;
 mod timestamp_series;
 mod tz_ambiguous_timestamp;
 mod tz_ambiguous_zoned;
+mod tz_dst;
 mod zoned_series;
 
 use crate::CreusotWitness;
