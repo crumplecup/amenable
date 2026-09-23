@@ -46,7 +46,11 @@ offset-date-time type of its own). Phase 3 done (2026-09-23, commit
 {Date,Time,DateTime,ISOWeekDate}`, covering all three complete-date
 forms (calendar/ordinal/week) via jiff's own real cross-representation
 support — widened Phase 2's own calendar-only `LocalDateTime` bridge for
-free since both share the same helper. Full-surface map of
+free since both share the same helper. Phase 4 done (2026-09-23, commit
+`96137de6`): `TemporalZoneProps`/`NativeBridge` over `jiff::tz::
+TimeZone`/`jiff::Zoned` — real IANA tzdb lookups, the biggest capability
+jump over the canary yet; `TemporalZoneFactory`/`NativeZoneFactory` split
+out as a separate Phase 4b rather than bundled in. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

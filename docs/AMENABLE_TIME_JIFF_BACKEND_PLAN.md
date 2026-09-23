@@ -4,10 +4,11 @@
 
 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
-`8277401e`). This doc is the full-surface map and checklist; execution
-proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
-plan steps" convention — no check-in needed between phases once a
-phase's own real work is verified and committed.
+`8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). This doc is
+the full-surface map and checklist; execution proceeds phase by phase
+per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
+no check-in needed between phases once a phase's own real work is
+verified and committed.
 
 **Phase 2 real findings, worth carrying into later phases:** jiff has no
 first-class "offset date-time" type of its own — `JiffOffsetDateTime`
@@ -48,6 +49,34 @@ that `jiff::civil::Time` (whole seconds/nanoseconds only) cannot
 represent at all — flagged for Phase 9 to reject, not solved now, since
 `ReducedCalendarDate`/`ReducedLocalTime` have no `Exchange` edge to
 realize/reflect through until `TemporalParser` lands.
+
+**Phase 4 real findings, worth carrying into later phases:** named-zone
+realize goes through jiff's real IANA lookup (`TimeZone::get`); zoned-
+date-time realize pins the exact instant through a fixed-offset zone
+first (never ambiguous) via `TimeZone::fixed(offset).to_zoned(local)
+.timestamp()`, then re-attaches the real named zone via the infallible
+`Timestamp::to_zoned` — composing Phase 2's own offset-date-time
+conversion (now factored into two shared helpers,
+`offset_date_time_descriptor_to_jiff_parts`/`jiff_parts_to_offset_
+date_time_descriptor`) rather than duplicating it a third time. A real,
+caught-by-testing-not-assumed finding: `TimeZone::UTC.iana_name()`
+returns `Some("UTC")`, not `None` — confirmed via jiff's own `iana_name`
+match arms; a first test wrongly assumed UTC had no identifier by
+resemblance to `Offset`'s own unrelated "no identifier" shape, and the
+real test run caught it. The genuinely-no-identifier cases are only
+`TimeZone::unknown()` and any `TimeZone::fixed(offset)`. The
+descriptor's own `tzdb_revision` field is un-honorable in either
+direction: jiff's real `TimeZone::get` has no revision parameter, and
+jiff exposes no public API to query the linked tzdb's own revision
+string at all (checked its real `tz::db` module directly) — ignored on
+realize, always `None` on reflect, matching `TemporalReporter::
+current_tzdb_revision`'s own planned `None`. `jiff::tz::TimeZone`
+derives only `Clone`/`Eq`/`PartialEq` (no `Copy`/`Hash`/`Default`) —
+needed the same `basis_ctor` treatment as `JiffOffset`
+(`TimeZone::UTC`); `jiff::Zoned` derives only `Clone` but DOES have a
+manual `Default` — `JiffZoned` just needed `Default` actually added to
+its own derive list (an own oversight a real compile error caught, not
+a jiff gap).
 
 **Phase 1 real findings, worth carrying into later phases:** `jiff::Span`'s
 setters (`years()`/`months()`/etc) *panic* once a component exceeds
@@ -222,9 +251,17 @@ surface is the actual checklist below.
       `JiffDate`/`JiffTime`/`JiffDateTime`/`JiffISOWeekDate`, plus the two
       reduced-precision wrappers and the real ordinal-date round trip via
       `Date::day_of_year`.
-- [ ] **Phase 4 — Zone.** `TemporalZoneProps`/`NativeBridge`/`Factory`/
-      `NativeZoneFactory` over `JiffTimeZone`/`JiffZoned` — the biggest
-      genuine capability jump (real IANA tzdb, DST resolution).
+- [x] **Phase 4 — Zone.** `TemporalZoneProps`/`NativeBridge` over
+      `JiffTimeZone`/`JiffZoned` — the biggest genuine capability jump
+      (real IANA tzdb, real named-zone resolution). `TemporalZoneFactory`/
+      `TemporalNativeZoneFactory` (the higher-order `resolve_local_date_
+      time`/`attach_named_zone`/`confirm_named_zone_revision` factory
+      edges) turned out to be a separate, real unit of work — split out
+      as Phase 4b below rather than bundled in, to keep each commit
+      honestly scoped to what's actually tested.
+- [ ] **Phase 4b — Zone factory.** `TemporalZoneFactory` (5 edges) +
+      `TemporalNativeZoneFactory` (3 edges) — the higher-order zone-
+      resolution factory built on top of Phase 4's own carriers.
 - [ ] **Phase 5 — Conversion.** `NativeConversionFactory`/
       `ConversionFactory` (UTC normalize, zone-strip, precision adjust).
 - [ ] **Phase 6 — Reporter.** Real capability declaration; verify the two
