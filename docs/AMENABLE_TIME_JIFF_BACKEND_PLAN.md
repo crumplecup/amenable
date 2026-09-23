@@ -2,11 +2,30 @@
 
 ## Status
 
-🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). This doc is
-the full-surface map and checklist; execution proceeds phase by phase per
+🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
+done (2026-09-23, commit `2d29ec9f`). This doc is the full-surface map
+and checklist; execution proceeds phase by phase per
 `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
 check-in needed between phases once a phase's own real work is verified
 and committed.
+
+**Phase 2 real findings, worth carrying into later phases:** jiff has no
+first-class "offset date-time" type of its own — `JiffOffsetDateTime`
+is a small new composite (`{ local: jiff::civil::DateTime, offset:
+jiff::tz::Offset }`), and later phases building composite carriers
+should expect the same. `#[derive(amenable_derive::Evidence)]`'s own
+`basis = "Self"` mode needs `Self: Default` UNLESS a `basis_ctor` is
+given explicitly (confirmed via the real macro expansion) — `jiff::tz::
+Offset` has no `Default` at all, so any carrier wrapping it (directly or
+in a composite) needs an explicit `basis_ctor` supplying a real jiff
+constant (`Offset::UTC`), not a bare `#[evidence(basis = "Self")]`.
+`UtcOffsetDescriptor`'s RFC 9557 unknown-local-offset case has no
+`jiff::tz::Offset` representation at all — a real `Unsupported`, not a
+silent default. The realize direction's own calendar-date-only scoping
+(mirroring the canary's precedent) means Phase 3's own ordinal/week-date
+carriers should come back and OPTIONALLY widen `local_date_time_
+descriptor_to_jiff_civil_datetime` once they land, rather than
+duplicating that conversion logic separately.
 
 **Phase 1 real findings, worth carrying into later phases:** `jiff::Span`'s
 setters (`years()`/`months()`/etc) *panic* once a component exceeds
@@ -173,7 +192,7 @@ surface is the actual checklist below.
       `JiffSpan`. Real round trip via `jiff::Span`'s own descriptor↔span
       conversion (richer than `std::time::Duration`'s whole-seconds-only
       shape).
-- [ ] **Phase 2 — Instant.** `TemporalInstantProps`/`NativeBridge` over
+- [x] **Phase 2 — Instant.** `TemporalInstantProps`/`NativeBridge` over
       `JiffTimestamp`/`JiffOffset`/`JiffOffsetDateTime`. Real jiff
       arithmetic replaces the canary's own hand-rolled `days_from_civil`
       for the endpoint-ordering exchange.
