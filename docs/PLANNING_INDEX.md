@@ -41,7 +41,12 @@ a real `JiffTimeBackend`/`JiffVerifier`, `TemporalDurationProps` +
 need. Phase 2 done (2026-09-23, commit `2d29ec9f`):
 `TemporalInstantProps`/`NativeBridge` over `jiff::Timestamp`/`jiff::tz::
 Offset`/a new `JiffOffsetDateTime` composite (jiff has no first-class
-offset-date-time type of its own). Full-surface map of
+offset-date-time type of its own). Phase 3 done (2026-09-23, commit
+`8277401e`): `TemporalCivilProps`/`NativeBridge` over `jiff::civil::
+{Date,Time,DateTime,ISOWeekDate}`, covering all three complete-date
+forms (calendar/ordinal/week) via jiff's own real cross-representation
+support — widened Phase 2's own calendar-only `LocalDateTime` bridge for
+free since both share the same helper. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

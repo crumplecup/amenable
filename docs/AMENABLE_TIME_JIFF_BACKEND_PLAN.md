@@ -3,11 +3,11 @@
 ## Status
 
 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
-done (2026-09-23, commit `2d29ec9f`). This doc is the full-surface map
-and checklist; execution proceeds phase by phase per
-`docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
-check-in needed between phases once a phase's own real work is verified
-and committed.
+done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
+`8277401e`). This doc is the full-surface map and checklist; execution
+proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
+plan steps" convention — no check-in needed between phases once a
+phase's own real work is verified and committed.
 
 **Phase 2 real findings, worth carrying into later phases:** jiff has no
 first-class "offset date-time" type of its own — `JiffOffsetDateTime`
@@ -26,6 +26,28 @@ silent default. The realize direction's own calendar-date-only scoping
 carriers should come back and OPTIONALLY widen `local_date_time_
 descriptor_to_jiff_civil_datetime` once they land, rather than
 duplicating that conversion logic separately.
+
+**Phase 3 real findings, worth carrying into later phases:** the
+predicted Phase 2 widening happened for real — `complete_date_descriptor_
+to_jiff_date` now covers all three complete-date forms using jiff's own
+real cross-representation support (`Date::new(year,1,1).with().
+day_of_year(n).build()` for ordinal; `Weekday::from_monday_one_offset` +
+`ISOWeekDate::new(..).date()` for week), and Phase 2's own `TemporalInstant
+NativeBridge` picked up ordinal/week support for free since it calls the
+same shared helper — confirmed by a real regression in Phase 2's own test
+suite (an obsolete rejection test that now needed to become a success
+test) rather than assumed. The reflect direction always canonicalizes
+back to calendar form, regardless of source form, for the same
+precision-not-preserved reason Phase 2's own offset-minutes
+canonicalization established. `#[derive(Default)]`'s `#[default]`
+attribute only works on unit enum variants, never struct-like ones even
+when every field implements `Default` — any new enum carrier with
+struct-like variants needs a manual `impl Default` instead.
+`ReducedLocalTimeDescriptor` allows a fraction on its hour/minute field
+that `jiff::civil::Time` (whole seconds/nanoseconds only) cannot
+represent at all — flagged for Phase 9 to reject, not solved now, since
+`ReducedCalendarDate`/`ReducedLocalTime` have no `Exchange` edge to
+realize/reflect through until `TemporalParser` lands.
 
 **Phase 1 real findings, worth carrying into later phases:** `jiff::Span`'s
 setters (`years()`/`months()`/etc) *panic* once a component exceeds
@@ -196,7 +218,7 @@ surface is the actual checklist below.
       `JiffTimestamp`/`JiffOffset`/`JiffOffsetDateTime`. Real jiff
       arithmetic replaces the canary's own hand-rolled `days_from_civil`
       for the endpoint-ordering exchange.
-- [ ] **Phase 3 — Civil.** `TemporalCivilProps`/`NativeBridge` over
+- [x] **Phase 3 — Civil.** `TemporalCivilProps`/`NativeBridge` over
       `JiffDate`/`JiffTime`/`JiffDateTime`/`JiffISOWeekDate`, plus the two
       reduced-precision wrappers and the real ordinal-date round trip via
       `Date::day_of_year`.
