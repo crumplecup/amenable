@@ -2,11 +2,31 @@
 
 ## Status
 
-🟡 Planned (2026-09-22), not yet started. This doc is the full-surface
-map and checklist; execution proceeds phase by phase per
+🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). This doc is
+the full-surface map and checklist; execution proceeds phase by phase per
 `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
 check-in needed between phases once a phase's own real work is verified
 and committed.
+
+**Phase 1 real findings, worth carrying into later phases:** `jiff::Span`'s
+setters (`years()`/`months()`/etc) *panic* once a component exceeds
+jiff's own representable range (years beyond ±19,998) — any phase
+converting a `u32`-or-wider descriptor field into a `Span` component
+must use jiff's fallible `try_*` setters throughout, never the panicking
+ones. `jiff::Span` derives only `Clone`/`Copy`/`Default` (manual, non-
+derived `Debug`, deliberately no `PartialEq`/`Eq`/`Hash`) — every native
+carrier wrapping a jiff type needs its own derive list checked against
+the real wrapped type's real derives, not assumed. `jiff::Span` has no
+fractional representation for anything coarser than seconds — a
+descriptor fraction on a coarser component is a real `Unsupported`
+error, not silent truncation. Confirmed by compiling `JiffTimeBackend`
+with NO trust block first: `DurationSemanticBundle`'s own composition
+(via the shared `BackendConversionSemanticBundle` sub-claim every
+`*SemanticBundle` carries) reaches the identical 23 machine-checked
+contracts `amenable_std::std_time_backend`'s own `canary_trusts!`
+already covers — meaning **every** later phase needs the identical
+`jiff_backend_trusts!` block already landed in Phase 1's own
+`backend.rs`, not a per-phase subset.
 
 ## Why this exists
 
@@ -149,7 +169,7 @@ surface is the actual checklist below.
 
 ## Phased checklist
 
-- [ ] **Phase 1 — Duration.** `TemporalDurationProps`/`NativeBridge` over
+- [x] **Phase 1 — Duration.** `TemporalDurationProps`/`NativeBridge` over
       `JiffSpan`. Real round trip via `jiff::Span`'s own descriptor↔span
       conversion (richer than `std::time::Duration`'s whole-seconds-only
       shape).

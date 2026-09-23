@@ -34,7 +34,11 @@ becomes load-bearing once something large actively uses it.
 
 **Document:** [AMENABLE_TIME_JIFF_BACKEND_PLAN.md](AMENABLE_TIME_JIFF_BACKEND_PLAN.md)
 
-**Status:** 🟡 Planned (2026-09-22), not started. Full-surface map of
+**Status:** 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`):
+a real `JiffTimeBackend`/`JiffVerifier`, `TemporalDurationProps` +
+`TemporalDurationNativeBridge` over `jiff::Span`, with the
+`jiff_backend_trusts!` 23-contract block every later phase will also
+need. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are
