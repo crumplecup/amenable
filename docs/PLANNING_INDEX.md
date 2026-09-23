@@ -30,6 +30,27 @@ becomes load-bearing once something large actively uses it.
 (no implementation, no current consumers) covering ISO 8601-1/-2, RFC
 3339, RFC 9557, CalConnect CC 18011, IANA TZDB, SI/BIPM, and LoC EDTF.
 
+### A real jiff-backed `amenable_time` backend
+
+**Document:** [AMENABLE_TIME_JIFF_BACKEND_PLAN.md](AMENABLE_TIME_JIFF_BACKEND_PLAN.md)
+
+**Status:** 🟡 Planned (2026-09-22), not started. Full-surface map of
+`amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
+`NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
+type and Exchange edge classified against jiff's real API: ~95 edges are
+real and buildable (native carriers: `jiff::Span`/`Timestamp`/`tz::Offset`/
+`civil::{Date,Time,DateTime,ISOWeekDate}`/`tz::TimeZone`/`Zoned`, all
+already Kani/Creusot/Verus-assessed via the `amenable-ext-jiff` 90/90
+checklist); ~34 edges (the ISO 8601-2/CalConnect extension family —
+seasons, masked digits, temporal sets, recurrence rules, date-time
+formulas) are permanently out of scope, since jiff (a Level-1 calendar/
+zone library) has no representation for them at all. 10-phase execution
+checklist, one real Exchange family per commit, same "slow but sure"
+discipline as the jiff coverage checklist. This is `AMENABLE_EXT_PLAN.md`'s
+own Phase 3 ("the payoff") and `AMENABLE_TIME_PLAN.md`'s Phase 7 open
+follow-on, worked out in full before execution per explicit user
+direction (a complete map, not a narrow slice).
+
 ### amenable_ext (third-party crate support)
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
@@ -72,6 +93,13 @@ sibling. See the plan doc's cordial section for the full wiring mirror
 note: the coverage report works the moment the `jiff` Cargo dependency
 exists, before any real type registration, and can drive Phase 1's
 backlog the same way `amenable_std`'s own report does today.
+
+**Update (2026-09-22):** Phase 1 is now fully done — all 90 stable jiff
+types have a genuine, per-backend Kani/Creusot/Verus witness assessment
+(`amenable-ext-jiff` coverage checklist, 90/90 Complete), not just the
+original 3-type skeleton. See `AMENABLE_EXT_PLAN.md`'s own body for the
+per-type findings. Phase 3 ("the payoff," a real jiff temporal backend)
+now has its own full plan doc: [AMENABLE_TIME_JIFF_BACKEND_PLAN.md](AMENABLE_TIME_JIFF_BACKEND_PLAN.md).
 
 ### Metadata trait family
 
