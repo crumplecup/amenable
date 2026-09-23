@@ -24,5 +24,5 @@ mod zoned;
 pub use backend::{
     JiffDate, JiffDateTime, JiffISOWeekDate, JiffOffset, JiffOffsetDateTime,
     JiffReducedCalendarDate, JiffReducedLocalTime, JiffSpan, JiffTime, JiffTimeBackend,
-    JiffTimestamp, JiffVerifier, JiffVerifierMetadata,
+    JiffTimeZone, JiffTimestamp, JiffVerifier, JiffVerifierMetadata, JiffZoned,
 };

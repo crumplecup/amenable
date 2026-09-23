@@ -17,15 +17,18 @@
 //! **Phase 1: `TemporalDurationProps` + `TemporalDurationNativeBridge`
 //! over `jiff::Span`.** **Phase 2: `TemporalInstantProps` +
 //! `TemporalInstantNativeBridge` over `jiff::Timestamp`/`jiff::tz::
-//! Offset`/a small `JiffOffsetDateTime` composite.** **Phase 3 (this
-//! file, so far, on top of Phases 1-2): `TemporalCivilProps` +
-//! `TemporalCivilNativeBridge` over `jiff::civil::{Date,Time,DateTime,
-//! ISOWeekDate}` — widens Phase 2's own calendar-date-only
-//! `LocalDateTime` realize/reflect to real ordinal- and week-date
-//! support too.** Every other `Temporal*Props`/`NativeBridge`/`Factory`
-//! family named in the plan doc's checklist lands in later commits,
-//! each widening this same `JiffTimeBackend` struct with its own real
-//! `Exchange` impls.
+//! Offset`/a small `JiffOffsetDateTime` composite.** **Phase 3:
+//! `TemporalCivilProps` + `TemporalCivilNativeBridge` over
+//! `jiff::civil::{Date,Time,DateTime,ISOWeekDate}` — widens Phase 2's
+//! own calendar-date-only `LocalDateTime` realize/reflect to real
+//! ordinal- and week-date support too.** **Phase 4 (this file, so far,
+//! on top of Phases 1-3): `TemporalZoneProps` + `TemporalZoneNativeBridge`
+//! over `jiff::tz::TimeZone`/`jiff::Zoned` — real IANA tzdb lookups and
+//! zoned-instant construction, the biggest genuine capability jump over
+//! the `std::time` canary, which can't touch named zones at all.** Every
+//! other `Temporal*Props`/`NativeBridge`/`Factory` family named in the
+//! plan doc's checklist lands in later commits, each widening this same
+//! `JiffTimeBackend` struct with its own real `Exchange` impls.
 
 use amenable_core::{
     ClassifiedWitness, Exchange, Metadata, OwnedEntry, Provenance, Sidecar, Standard, Verifier,
@@ -34,12 +37,15 @@ use amenable_core::{
 use amenable_time::{
     CalendarDateDescriptor, CompleteDateDescriptor, DurationDescriptor, DurationDescriptorBuilder,
     DurationFractionDescriptor, FractionalSecondDescriptor, LocalDateTimeDescriptor,
-    LocalDateTimeDescriptorBuilder, LocalTimeDescriptorBuilder, OffsetDateTimeDescriptorBuilder,
-    ProvenDurationCarrier, ProvenLocalDateTimeCarrier, ProvenOffsetDateTimeCarrier,
-    ReflectedDuration, ReflectedLocalDateTime, ReflectedOffsetDateTime, TemporalCivilProps,
-    TemporalComponent, TemporalDurationProps, TemporalError, TemporalErrorKind,
-    TemporalInstantProps, TemporalProvenance, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
-    UtcOffsetRelationship, UtcOffsetSign,
+    LocalDateTimeDescriptorBuilder, LocalTimeDescriptorBuilder, NamedTimeZoneDescriptor,
+    NamedTimeZoneDescriptorBuilder, OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder,
+    ProvenDurationCarrier, ProvenLocalDateTimeCarrier, ProvenNamedTimeZoneCarrier,
+    ProvenOffsetDateTimeCarrier, ProvenZonedDateTimeCarrier, ReflectedDuration,
+    ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
+    ReflectedZonedDateTime, TemporalCivilProps, TemporalComponent, TemporalDurationProps,
+    TemporalError, TemporalErrorKind, TemporalInstantProps, TemporalProvenance, TemporalZoneProps,
+    UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign,
+    ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
 };
 
 // ── Phase 3: Civil ───────────────────────────────────────────────────
@@ -158,6 +164,42 @@ impl TemporalCivilProps for JiffTimeBackend {
     type LocalTime = JiffTime;
     type ReducedLocalTime = JiffReducedLocalTime;
     type LocalDateTime = JiffDateTime;
+}
+
+// ── Phase 4: Zone ────────────────────────────────────────────────────
+
+/// A [`jiff::tz::TimeZone`] as a named-time-zone carrier.
+///
+/// `jiff::tz::TimeZone` derives only `Clone, Eq, PartialEq` (confirmed
+/// by reading jiff's real source — no `Copy`, no `Hash`, no `Default`,
+/// consistent with it being a hand-rolled pointer-tagged union that may
+/// own real TZif data) — this wrapper's own derive list matches, and,
+/// same as `JiffOffset`'s own doc comment, needs an explicit
+/// `basis_ctor` (`TimeZone::UTC`, a real jiff constant) since there is
+/// no `Default` to fall back to.
+#[derive(Debug, Clone, PartialEq, Eq, amenable_derive::Evidence)]
+#[evidence(basis = "Self", basis_ctor = "Self(jiff::tz::TimeZone::UTC)")]
+pub struct JiffTimeZone(
+    /// The wrapped time zone.
+    pub jiff::tz::TimeZone,
+);
+
+/// A [`jiff::Zoned`] as a zoned-date-time carrier.
+///
+/// `jiff::Zoned` derives only `Clone` (confirmed by reading jiff's real
+/// source), but DOES have a manual `Default` impl — unlike `JiffTimeZone`
+/// above, a bare `#[evidence(basis = "Self")]` works here without a
+/// `basis_ctor` override.
+#[derive(Debug, Clone, Default, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub struct JiffZoned(
+    /// The wrapped zoned date-time.
+    pub jiff::Zoned,
+);
+
+impl TemporalZoneProps for JiffTimeBackend {
+    type NamedTimeZone = JiffTimeZone;
+    type ZonedDateTime = JiffZoned;
 }
 
 // ── JiffVerifier ─────────────────────────────────────────────────────
@@ -791,6 +833,40 @@ fn jiff_civil_datetime_to_local_date_time_descriptor(
         })
 }
 
+/// Resolve a full offset date-time descriptor to its real jiff parts —
+/// factored out of the `TemporalInstantNativeBridge` realize body so
+/// Phase 4's own `ZonedDateTime` realize (which needs the identical
+/// local + offset pair, pinned to a concrete instant before re-attaching
+/// a real named zone) can reuse it rather than duplicating it.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn offset_date_time_descriptor_to_jiff_parts(
+    descriptor: &OffsetDateTimeDescriptor,
+) -> Result<(jiff::civil::DateTime, jiff::tz::Offset), TemporalError> {
+    let local = local_date_time_descriptor_to_jiff_civil_datetime(descriptor.local())?;
+    let offset = utc_offset_descriptor_to_jiff_offset(descriptor.offset())?;
+    Ok((local, offset))
+}
+
+/// The inverse of [`offset_date_time_descriptor_to_jiff_parts`] —
+/// factored out for the same reuse reason.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn jiff_parts_to_offset_date_time_descriptor(
+    local: jiff::civil::DateTime,
+    offset: jiff::tz::Offset,
+) -> Result<OffsetDateTimeDescriptor, TemporalError> {
+    let local = jiff_civil_datetime_to_local_date_time_descriptor(local)?;
+    let offset = jiff_offset_to_utc_offset_descriptor(offset)?;
+    OffsetDateTimeDescriptorBuilder::default()
+        .local(local)
+        .offset(offset)
+        .build()
+        .map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not build an offset date-time descriptor: {err}"
+            )))
+        })
+}
+
 // ── Instant native bridge ────────────────────────────────────────────
 //
 // `TemporalInstantNativeBridge<JiffVerifier>` is the `realize_offset_
@@ -809,9 +885,7 @@ impl
         &self,
         input: ReflectedOffsetDateTime,
     ) -> Result<ProvenOffsetDateTimeCarrier<JiffOffsetDateTime>, TemporalError> {
-        let descriptor = input.descriptor();
-        let local = local_date_time_descriptor_to_jiff_civil_datetime(descriptor.local())?;
-        let offset = utc_offset_descriptor_to_jiff_offset(descriptor.offset())?;
+        let (local, offset) = offset_date_time_descriptor_to_jiff_parts(input.descriptor())?;
         let token = <ReflectedOffsetDateTime as Sidecar<JiffVerifier>>::sidecar(&input);
         Ok(ProvenOffsetDateTimeCarrier::<JiffOffsetDateTime>::new(
             JiffOffsetDateTime { local, offset },
@@ -832,17 +906,7 @@ impl
         input: ProvenOffsetDateTimeCarrier<JiffOffsetDateTime>,
     ) -> Result<ReflectedOffsetDateTime, TemporalError> {
         let carrier = input.carrier();
-        let local = jiff_civil_datetime_to_local_date_time_descriptor(carrier.local)?;
-        let offset = jiff_offset_to_utc_offset_descriptor(carrier.offset)?;
-        let descriptor = OffsetDateTimeDescriptorBuilder::default()
-            .local(local)
-            .offset(offset)
-            .build()
-            .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                    "could not build an offset date-time descriptor: {err}"
-                )))
-            })?;
+        let descriptor = jiff_parts_to_offset_date_time_descriptor(carrier.local, carrier.offset)?;
         let token =
             <ProvenOffsetDateTimeCarrier<JiffOffsetDateTime> as Sidecar<JiffVerifier>>::sidecar(
                 &input,
@@ -892,5 +956,192 @@ impl Exchange<ProvenLocalDateTimeCarrier<JiffDateTime>, ReflectedLocalDateTime, 
         let token =
             <ProvenLocalDateTimeCarrier<JiffDateTime> as Sidecar<JiffVerifier>>::sidecar(&input);
         Ok(ReflectedLocalDateTime::new(descriptor, token))
+    }
+}
+
+// ── Real conversions to/from jiff's zone types ──────────────────────
+
+/// Resolve a named-time-zone descriptor to a real `jiff::tz::TimeZone`.
+///
+/// Real IANA zone lookup via `TimeZone::get`. The descriptor's own
+/// `tzdb_revision` field is ignored on this direction: jiff's real
+/// `TimeZone::get` has no parameter for selecting a specific tzdb
+/// revision at all — it always resolves against whichever tzdb the
+/// running process is linked against — so there is no honest way to
+/// honor a *different* revision than that one, and pretending
+/// otherwise would be dishonest. This mirrors `TemporalReporter::
+/// current_tzdb_revision` staying `None`: jiff exposes no public API to
+/// query the linked tzdb's own revision string either (confirmed by
+/// checking its real `tz::db` module for a `version`/`revision`
+/// function — none exists).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn named_time_zone_descriptor_to_jiff_time_zone(
+    descriptor: &NamedTimeZoneDescriptor,
+) -> Result<jiff::tz::TimeZone, TemporalError> {
+    jiff::tz::TimeZone::get(descriptor.identifier()).map_err(|err| {
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+            "could not resolve IANA time zone {:?}: {err}",
+            descriptor.identifier()
+        )))
+    })
+}
+
+/// Decompose a real `jiff::tz::TimeZone` back into a named-time-zone
+/// descriptor.
+///
+/// Real, honest scoping: a `TimeZone` with no IANA identifier at all —
+/// `TimeZone::unknown()` (the special, explicitly-non-IANA `Etc/Unknown`
+/// marker) or any `TimeZone::fixed(offset)`-constructed value — has no
+/// named-zone descriptor to decompose into; that is a real `Unsupported`
+/// error, not a fabricated identifier. `TimeZone::UTC` is genuinely
+/// EXEMPT from this — real source confirms `iana_name()`'s own `UTC =>
+/// Some("UTC")` match arm treats it as a real, valid identifier, a
+/// finding this file's own first test attempt got wrong by assuming
+/// resemblance to `Offset`'s unrelated "no identifier" shape rather
+/// than checking `TimeZone::iana_name()`'s real match arms directly.
+/// `tzdb_revision` is always `None` here for the same reason it's
+/// ignored on the realize direction above.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn jiff_time_zone_to_named_time_zone_descriptor(
+    tz: &jiff::tz::TimeZone,
+) -> Result<NamedTimeZoneDescriptor, TemporalError> {
+    let identifier = tz.iana_name().ok_or_else(|| {
+        TemporalError::new(TemporalErrorKind::Unsupported(
+            "this jiff::tz::TimeZone has no IANA identifier to decompose into a named-zone \
+             descriptor (it is unknown, or a fixed offset)"
+                .to_owned(),
+        ))
+    })?;
+    NamedTimeZoneDescriptorBuilder::default()
+        .identifier(identifier)
+        .build()
+        .map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not build a named time zone descriptor: {err}"
+            )))
+        })
+}
+
+/// Resolve a zoned date-time descriptor to a real `jiff::Zoned`.
+///
+/// The descriptor's own offset pins the exact instant (via a fixed-
+/// offset zone, which never has ambiguity — the whole point of carrying
+/// an explicit offset alongside the zone identity); that instant is then
+/// re-attached to the real named zone the descriptor also names, via
+/// `Timestamp::to_zoned` (infallible once the instant itself is known).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn zoned_date_time_descriptor_to_jiff_zoned(
+    descriptor: &ZonedDateTimeDescriptor,
+) -> Result<jiff::Zoned, TemporalError> {
+    let (local, offset) = offset_date_time_descriptor_to_jiff_parts(descriptor.timestamp())?;
+    let timestamp = jiff::tz::TimeZone::fixed(offset)
+        .to_zoned(local)
+        .map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not pin the offset date-time to a fixed instant: {err}"
+            )))
+        })?
+        .timestamp();
+    let named_tz = named_time_zone_descriptor_to_jiff_time_zone(descriptor.zone())?;
+    Ok(timestamp.to_zoned(named_tz))
+}
+
+/// Decompose a real `jiff::Zoned` back into a zoned date-time
+/// descriptor.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn jiff_zoned_to_zoned_date_time_descriptor(
+    zoned: &jiff::Zoned,
+) -> Result<ZonedDateTimeDescriptor, TemporalError> {
+    let timestamp = jiff_parts_to_offset_date_time_descriptor(zoned.datetime(), zoned.offset())?;
+    let zone = jiff_time_zone_to_named_time_zone_descriptor(zoned.time_zone())?;
+    ZonedDateTimeDescriptorBuilder::default()
+        .timestamp(timestamp)
+        .zone(zone)
+        .build()
+        .map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not build a zoned date-time descriptor: {err}"
+            )))
+        })
+}
+
+// ── Zone native bridge ───────────────────────────────────────────────
+//
+// `TemporalZoneNativeBridge<JiffVerifier>` is the `realize_named_time_
+// zone` / `reflect_named_time_zone` / `realize_zoned_date_time` /
+// `reflect_zoned_date_time` four-edge bundle. All real: named-zone
+// resolution goes through jiff's actual IANA tzdb lookup, and the
+// zoned-date-time pair composes it with Phase 2's own offset-date-time
+// conversion.
+
+impl Exchange<ReflectedNamedTimeZone, ProvenNamedTimeZoneCarrier<JiffTimeZone>, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ReflectedNamedTimeZone,
+    ) -> Result<ProvenNamedTimeZoneCarrier<JiffTimeZone>, TemporalError> {
+        let tz = named_time_zone_descriptor_to_jiff_time_zone(input.descriptor())?;
+        let token = <ReflectedNamedTimeZone as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ProvenNamedTimeZoneCarrier::<JiffTimeZone>::new(
+            JiffTimeZone(tz),
+            token,
+        ))
+    }
+}
+
+impl Exchange<ProvenNamedTimeZoneCarrier<JiffTimeZone>, ReflectedNamedTimeZone, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ProvenNamedTimeZoneCarrier<JiffTimeZone>,
+    ) -> Result<ReflectedNamedTimeZone, TemporalError> {
+        let descriptor = jiff_time_zone_to_named_time_zone_descriptor(&input.carrier().0)?;
+        let token =
+            <ProvenNamedTimeZoneCarrier<JiffTimeZone> as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ReflectedNamedTimeZone::new(descriptor, token))
+    }
+}
+
+impl Exchange<ReflectedZonedDateTime, ProvenZonedDateTimeCarrier<JiffZoned>, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ReflectedZonedDateTime,
+    ) -> Result<ProvenZonedDateTimeCarrier<JiffZoned>, TemporalError> {
+        let zoned = zoned_date_time_descriptor_to_jiff_zoned(input.descriptor())?;
+        let token = <ReflectedZonedDateTime as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ProvenZonedDateTimeCarrier::<JiffZoned>::new(
+            JiffZoned(zoned),
+            token,
+        ))
+    }
+}
+
+impl Exchange<ProvenZonedDateTimeCarrier<JiffZoned>, ReflectedZonedDateTime, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ProvenZonedDateTimeCarrier<JiffZoned>,
+    ) -> Result<ReflectedZonedDateTime, TemporalError> {
+        let descriptor = jiff_zoned_to_zoned_date_time_descriptor(&input.carrier().0)?;
+        let token =
+            <ProvenZonedDateTimeCarrier<JiffZoned> as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ReflectedZonedDateTime::new(descriptor, token))
     }
 }

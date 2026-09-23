@@ -35,6 +35,6 @@ pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 pub use jiff::{
     JiffDate, JiffDateTime, JiffISOWeekDate, JiffOffset, JiffOffsetDateTime,
     JiffReducedCalendarDate, JiffReducedLocalTime, JiffSpan, JiffTime, JiffTimeBackend,
-    JiffTimestamp, JiffVerifier, JiffVerifierMetadata,
+    JiffTimeZone, JiffTimestamp, JiffVerifier, JiffVerifierMetadata, JiffZoned,
 };
 pub use provenance_vocab::{Authority, AuthorityKind, SourceCrate, SourceModule, TypeName};
