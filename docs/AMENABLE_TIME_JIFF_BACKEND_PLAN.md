@@ -4,10 +4,11 @@
 
 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
-`8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). This doc is
-the full-surface map and checklist; execution proceeds phase by phase
-per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
-no check-in needed between phases once a phase's own real work is
+`8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
+done (2026-09-23, commit `40086544`). This doc is the full-surface map
+and checklist; execution proceeds phase by phase per
+`docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
+check-in needed between phases once a phase's own real work is
 verified and committed.
 
 **Phase 2 real findings, worth carrying into later phases:** jiff has no
@@ -77,6 +78,44 @@ needed the same `basis_ctor` treatment as `JiffOffset`
 manual `Default` — `JiffZoned` just needed `Default` actually added to
 its own derive list (an own oversight a real compile error caught, not
 a jiff gap).
+
+**Phase 4b real findings, worth carrying into later phases:**
+amenable_time's own `LocalTimeZoneResolutionAuthorityDescriptor` splits
+disambiguation into TWO independent axes (`ambiguity`: earlier/later
+for a fold; `gap`: forward/backward for a gap), where jiff's own
+convenience methods (`.compatible()`/`.earlier()`/`.later()`) apply the
+same direction to both at once — match directly on `jiff::tz::
+AmbiguousOffset`'s own `Gap`/`Fold` variants to honor the two axes
+independently, never assume from resemblance to jiff's own combined
+API. A genuine, significant pre-existing gap in `amenable_time`'s own
+public API, found only by trying to write a real backend against
+`TemporalZoneFactory`/`TemporalNativeZoneFactory` for the first time:
+every `*Request` type these traits pass through had private fields,
+`Getters`-only read access, and NO public constructor at all (not even
+`Default` in the generic native cases) — fixed with a real
+`derive_new::new` constructor added to each, in `amenable_time` itself
+(the real, in-scope fix; confirmed via a workspace-wide grep that
+nothing had ever constructed one before). A real, only-caught-by-
+running-it subtlety: jiff's `AmbiguousZoned::earlier()`/`.later()` (and
+the same `Offset::to_timestamp(local).to_zoned(tz)` idiom this phase's
+own descriptor edges use) compute the resulting INSTANT using the
+chosen Gap/Fold offset, but the FINAL, REDISPLAYED offset in the
+resulting `Zoned`/descriptor is whatever the real named zone's own
+rules say for THAT instant — which can legitimately differ from the
+offset used to compute it, depending on which side of the real UTC
+transition moment the instant falls on. A first test-writing pass
+assumed the redisplayed offset would just echo the chosen Gap/Fold
+field (wrong — confirmed by 3 real test failures), fixed by using
+jiff's own real `AmbiguousZoned::earlier()`/`.later()` doc examples
+(not `AmbiguousTimestamp`'s structurally similar-looking ones, which
+return a bare `Timestamp` with no redisplay step at all) as the source
+of truth. Phase 4's own `zoned_date_time_descriptor_to_jiff_zoned`
+never validated offset/zone consistency at all — `attach_named_zone`/
+`attach_named_zone_native` are the edges that actually prove
+`OffsetConsistentWithNamedZone`, so the real consistency check lives
+here, reused by `confirm_named_zone_revision` too (jiff has no real
+tzdb-revision concept to check, so re-validating consistency is the
+honest substitute for "tracks the tzdb revision").
 
 **Phase 1 real findings, worth carrying into later phases:** `jiff::Span`'s
 setters (`years()`/`months()`/etc) *panic* once a component exceeds
@@ -259,7 +298,7 @@ surface is the actual checklist below.
       edges) turned out to be a separate, real unit of work — split out
       as Phase 4b below rather than bundled in, to keep each commit
       honestly scoped to what's actually tested.
-- [ ] **Phase 4b — Zone factory.** `TemporalZoneFactory` (5 edges) +
+- [x] **Phase 4b — Zone factory.** `TemporalZoneFactory` (5 edges) +
       `TemporalNativeZoneFactory` (3 edges) — the higher-order zone-
       resolution factory built on top of Phase 4's own carriers.
 - [ ] **Phase 5 — Conversion.** `NativeConversionFactory`/

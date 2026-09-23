@@ -50,7 +50,15 @@ free since both share the same helper. Phase 4 done (2026-09-23, commit
 `96137de6`): `TemporalZoneProps`/`NativeBridge` over `jiff::tz::
 TimeZone`/`jiff::Zoned` — real IANA tzdb lookups, the biggest capability
 jump over the canary yet; `TemporalZoneFactory`/`NativeZoneFactory` split
-out as a separate Phase 4b rather than bundled in. Full-surface map of
+out as a separate Phase 4b. Phase 4b done (2026-09-23, commit
+`40086544`): the higher-order zone-resolution factory — real fold/gap
+disambiguation matching amenable_time's own two-axis resolution
+authority against jiff's real `AmbiguousOffset`, plus a genuine
+offset/named-zone consistency check Phase 4's own native bridge never
+performed; also fixed a real, significant pre-existing gap in
+`amenable_time`'s own API (no public constructor at all on the
+zone-factory `*Request` types) via a real `derive_new::new` addition.
+Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are
