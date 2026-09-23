@@ -31,4 +31,6 @@ mod macros;
 mod provenance_vocab;
 
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
+#[cfg(feature = "jiff")]
+pub use jiff::{JiffSpan, JiffTimeBackend, JiffVerifier, JiffVerifierMetadata};
 pub use provenance_vocab::{Authority, AuthorityKind, SourceCrate, SourceModule, TypeName};
