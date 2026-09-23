@@ -15,10 +15,14 @@
 //! surface map and the phased checklist this module works through.
 //!
 //! **Phase 1: `TemporalDurationProps` + `TemporalDurationNativeBridge`
-//! over `jiff::Span`.** **Phase 2 (this file, so far, on top of Phase
-//! 1): `TemporalInstantProps` + `TemporalInstantNativeBridge` over
-//! `jiff::Timestamp`/`jiff::tz::Offset`/a small `JiffOffsetDateTime`
-//! composite.** Every other `Temporal*Props`/`NativeBridge`/`Factory`
+//! over `jiff::Span`.** **Phase 2: `TemporalInstantProps` +
+//! `TemporalInstantNativeBridge` over `jiff::Timestamp`/`jiff::tz::
+//! Offset`/a small `JiffOffsetDateTime` composite.** **Phase 3 (this
+//! file, so far, on top of Phases 1-2): `TemporalCivilProps` +
+//! `TemporalCivilNativeBridge` over `jiff::civil::{Date,Time,DateTime,
+//! ISOWeekDate}` — widens Phase 2's own calendar-date-only
+//! `LocalDateTime` realize/reflect to real ordinal- and week-date
+//! support too.** Every other `Temporal*Props`/`NativeBridge`/`Factory`
 //! family named in the plan doc's checklist lands in later commits,
 //! each widening this same `JiffTimeBackend` struct with its own real
 //! `Exchange` impls.
@@ -31,11 +35,130 @@ use amenable_time::{
     CalendarDateDescriptor, CompleteDateDescriptor, DurationDescriptor, DurationDescriptorBuilder,
     DurationFractionDescriptor, FractionalSecondDescriptor, LocalDateTimeDescriptor,
     LocalDateTimeDescriptorBuilder, LocalTimeDescriptorBuilder, OffsetDateTimeDescriptorBuilder,
-    ProvenDurationCarrier, ProvenOffsetDateTimeCarrier, ReflectedDuration, ReflectedOffsetDateTime,
+    ProvenDurationCarrier, ProvenLocalDateTimeCarrier, ProvenOffsetDateTimeCarrier,
+    ReflectedDuration, ReflectedLocalDateTime, ReflectedOffsetDateTime, TemporalCivilProps,
     TemporalComponent, TemporalDurationProps, TemporalError, TemporalErrorKind,
     TemporalInstantProps, TemporalProvenance, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
     UtcOffsetRelationship, UtcOffsetSign,
 };
+
+// ── Phase 3: Civil ───────────────────────────────────────────────────
+
+/// A [`jiff::civil::Date`] as a calendar (or ordinal) date carrier.
+///
+/// Reused for BOTH `TemporalCivilProps::CalendarDate` and `::OrdinalDate`
+/// — the same real jiff type honestly backs both once resolved to a
+/// concrete value, the same "one carrier, several associated-type
+/// slots" pattern `amenable_std::StdSystemTime` already uses for its
+/// own `Instant`/`OffsetDateTime`.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub struct JiffDate(
+    /// The wrapped date.
+    pub jiff::civil::Date,
+);
+
+/// A [`jiff::civil::Time`] as a local time-of-day carrier.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub struct JiffTime(
+    /// The wrapped time.
+    pub jiff::civil::Time,
+);
+
+/// A [`jiff::civil::DateTime`] as a local date-time carrier.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub struct JiffDateTime(
+    /// The wrapped date-time.
+    pub jiff::civil::DateTime,
+);
+
+/// A [`jiff::civil::ISOWeekDate`] as a week-date carrier.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub struct JiffISOWeekDate(
+    /// The wrapped ISO week date.
+    pub jiff::civil::ISOWeekDate,
+);
+
+/// A reduced-precision calendar date carrier.
+///
+/// `jiff::civil::Date` has no partial (year-only / year-month-only)
+/// representation of its own — this is a real, meaningful shape
+/// (mirroring `amenable_time::ReducedCalendarDateDescriptor`'s own two
+/// forms exactly, using jiff's own `i16`/`i8` component widths), but its
+/// conversion logic isn't wired to any `Exchange` edge yet: no
+/// `Temporal*NativeBridge` trait in Phases 1-3's scope needs a
+/// `ReducedCalendarDate` realize/reflect pair — only `TemporalParser`'s
+/// own `RawInput -> ParsedReducedCalendarDate` edge (Phase 9) will.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub enum JiffReducedCalendarDate {
+    /// Year-only calendar date form.
+    Year {
+        /// Signed calendar year.
+        year: i16,
+    },
+    /// Year-month calendar date form.
+    YearMonth {
+        /// Signed calendar year.
+        year: i16,
+        /// Calendar month number.
+        month: i8,
+    },
+}
+
+impl Default for JiffReducedCalendarDate {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Year { year: 0 }
+    }
+}
+
+/// A reduced-precision local time-of-day carrier.
+///
+/// Same "real shape, not yet wired to an `Exchange` edge" status as
+/// [`JiffReducedCalendarDate`] — and a genuinely harder case besides:
+/// `amenable_time::ReducedLocalTimeDescriptor` allows a fractional
+/// component on its own hour/minute field, which `jiff::civil::Time`
+/// cannot represent at all (its finest fractional unit is the second).
+/// This carrier's own conversion logic, whenever Phase 9 needs it, will
+/// have to reject that case the same way `duration_descriptor_to_jiff_span`
+/// already rejects a duration fraction on a coarser-than-seconds unit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub enum JiffReducedLocalTime {
+    /// Hour-only local time form.
+    Hour {
+        /// Hour of day.
+        hour: i8,
+    },
+    /// Hour-minute local time form.
+    HourMinute {
+        /// Hour of day.
+        hour: i8,
+        /// Minute of hour.
+        minute: i8,
+    },
+}
+
+impl Default for JiffReducedLocalTime {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::Hour { hour: 0 }
+    }
+}
+
+impl TemporalCivilProps for JiffTimeBackend {
+    type CalendarDate = JiffDate;
+    type ReducedCalendarDate = JiffReducedCalendarDate;
+    type OrdinalDate = JiffDate;
+    type WeekDate = JiffISOWeekDate;
+    type LocalTime = JiffTime;
+    type ReducedLocalTime = JiffReducedLocalTime;
+    type LocalDateTime = JiffDateTime;
+}
 
 // ── JiffVerifier ─────────────────────────────────────────────────────
 
@@ -521,36 +644,82 @@ fn jiff_offset_to_utc_offset_descriptor(
     })
 }
 
+/// Resolve a complete-date descriptor (calendar, ordinal, or week form)
+/// to a real `jiff::civil::Date`.
+///
+/// All three forms are real, using jiff's own real cross-representation
+/// support: `Date::new` directly for the calendar form;
+/// `Date::new(year, 1, 1).with().day_of_year(n).build()` for the
+/// ordinal form (confirmed via jiff's real source — this is the
+/// documented, correct way to construct a date from its ordinal day,
+/// not a hand-rolled day-count calculation); `Weekday::
+/// from_monday_one_offset` (the same ISO weekday-number convention
+/// already checked as a real witness for `civil::Weekday`) +
+/// `ISOWeekDate::new(..).date()` for the week form.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn complete_date_descriptor_to_jiff_date(
+    date: CompleteDateDescriptor,
+) -> Result<jiff::civil::Date, TemporalError> {
+    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+            "{field} does not fit jiff::civil::Date's component range: {err}"
+        )))
+    };
+    let range_err = |err: jiff::Error| {
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+            "date out of jiff::civil::Date's representable range: {err}"
+        )))
+    };
+
+    match date {
+        CompleteDateDescriptor::Calendar(cal) => {
+            let year = i16::try_from(cal.year()).map_err(|e| out_of_range("year", e))?;
+            let month = i8::try_from(cal.month()).map_err(|e| out_of_range("month", e))?;
+            let day = i8::try_from(cal.day()).map_err(|e| out_of_range("day", e))?;
+            jiff::civil::Date::new(year, month, day).map_err(range_err)
+        }
+        CompleteDateDescriptor::Ordinal(ord) => {
+            let year = i16::try_from(ord.year()).map_err(|e| out_of_range("year", e))?;
+            let day_of_year =
+                i16::try_from(ord.day_of_year()).map_err(|e| out_of_range("day_of_year", e))?;
+            jiff::civil::Date::new(year, 1, 1)
+                .map_err(range_err)?
+                .with()
+                .day_of_year(day_of_year)
+                .build()
+                .map_err(range_err)
+        }
+        CompleteDateDescriptor::Week(week) => {
+            let week_year =
+                i16::try_from(week.week_year()).map_err(|e| out_of_range("week_year", e))?;
+            let week_number = i8::try_from(week.week()).map_err(|e| out_of_range("week", e))?;
+            let weekday_number =
+                i8::try_from(week.weekday()).map_err(|e| out_of_range("weekday", e))?;
+            let weekday =
+                jiff::civil::Weekday::from_monday_one_offset(weekday_number).map_err(range_err)?;
+            jiff::civil::ISOWeekDate::new(week_year, week_number, weekday)
+                .map(jiff::civil::ISOWeekDate::date)
+                .map_err(range_err)
+        }
+    }
+}
+
 /// Resolve a local date-time descriptor to a real `jiff::civil::DateTime`.
 ///
-/// Real, honest scoping (matching `amenable_std::std_time_backend`'s own
-/// `offset_datetime_to_epoch_seconds` precedent): only complete
-/// *calendar* dates are supported here. Ordinal and week dates need the
-/// same real conversion helpers `TemporalCivilProps` (Phase 3) builds —
-/// this narrows to `Unsupported` for now rather than duplicating that
-/// work ahead of it; Phase 3 can widen this function once those
-/// helpers exist.
+/// Any of the three complete-date forms (calendar, ordinal, week) —
+/// see [`complete_date_descriptor_to_jiff_date`].
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn local_date_time_descriptor_to_jiff_civil_datetime(
     descriptor: &LocalDateTimeDescriptor,
 ) -> Result<jiff::civil::DateTime, TemporalError> {
-    let CompleteDateDescriptor::Calendar(date) = descriptor.date() else {
-        return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            "the jiff backend's Instant phase resolves complete calendar dates only, not ordinal \
-             or week dates (Phase 3's TemporalCivilProps widens this)"
-                .to_owned(),
-        )));
-    };
+    let date = complete_date_descriptor_to_jiff_date(descriptor.date())?;
     let time = descriptor.time();
 
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
         TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "{field} does not fit jiff::civil::DateTime's component range: {err}"
+            "{field} does not fit jiff::civil::Time's component range: {err}"
         )))
     };
-    let year = i16::try_from(date.year()).map_err(|e| out_of_range("year", e))?;
-    let month = i8::try_from(date.month()).map_err(|e| out_of_range("month", e))?;
-    let day = i8::try_from(date.day()).map_err(|e| out_of_range("day", e))?;
     let hour = i8::try_from(time.hour()).map_err(|e| out_of_range("hour", e))?;
     let minute = i8::try_from(time.minute()).map_err(|e| out_of_range("minute", e))?;
     let second = i8::try_from(time.second()).map_err(|e| out_of_range("second", e))?;
@@ -559,19 +728,24 @@ fn local_date_time_descriptor_to_jiff_civil_datetime(
         Some(fraction) => i32::try_from(fractional_seconds_digits_to_nanos(fraction.digits())?)
             .map_err(|e| out_of_range("fractional second", e))?,
     };
+    let time = jiff::civil::Time::new(hour, minute, second, subsec_nanosecond).map_err(|err| {
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+            "local time out of jiff::civil::Time's representable range: {err}"
+        )))
+    })?;
 
-    jiff::civil::DateTime::new(year, month, day, hour, minute, second, subsec_nanosecond).map_err(
-        |err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "local date-time out of jiff::civil::DateTime's representable range: {err}"
-            )))
-        },
-    )
+    Ok(jiff::civil::DateTime::from_parts(date, time))
 }
 
 /// Decompose a real `jiff::civil::DateTime` back into a local date-time
-/// descriptor — always as a complete calendar date (the inverse of
-/// [`local_date_time_descriptor_to_jiff_civil_datetime`]'s own scope).
+/// descriptor — always as a complete CALENDAR date, regardless of which
+/// of the three forms [`local_date_time_descriptor_to_jiff_civil_datetime`]
+/// originally produced it: `jiff::civil::Date` carries no trace of
+/// having been constructed via its ordinal or week-date cross-
+/// representation, so calendar form is the one canonical, always-
+/// available choice (the same precision-is-not-preserved reasoning
+/// `jiff_offset_to_utc_offset_descriptor`'s own doc comment documents
+/// for offset minutes).
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn jiff_civil_datetime_to_local_date_time_descriptor(
     datetime: jiff::civil::DateTime,
@@ -674,5 +848,49 @@ impl
                 &input,
             );
         Ok(ReflectedOffsetDateTime::new(descriptor, token))
+    }
+}
+
+// ── Civil native bridge ──────────────────────────────────────────────
+//
+// `TemporalCivilNativeBridge<JiffVerifier>` is the `realize_local_date_
+// time` / `reflect_local_date_time` inverse pair. Both are real, and
+// both now cover all three complete-date forms (calendar, ordinal,
+// week) via `complete_date_descriptor_to_jiff_date` above — a genuine
+// widening of Phase 2's own calendar-only scope, not a duplicate of it.
+
+impl Exchange<ReflectedLocalDateTime, ProvenLocalDateTimeCarrier<JiffDateTime>, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ReflectedLocalDateTime,
+    ) -> Result<ProvenLocalDateTimeCarrier<JiffDateTime>, TemporalError> {
+        let datetime = local_date_time_descriptor_to_jiff_civil_datetime(input.descriptor())?;
+        let token = <ReflectedLocalDateTime as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ProvenLocalDateTimeCarrier::<JiffDateTime>::new(
+            JiffDateTime(datetime),
+            token,
+        ))
+    }
+}
+
+impl Exchange<ProvenLocalDateTimeCarrier<JiffDateTime>, ReflectedLocalDateTime, JiffVerifier>
+    for JiffTimeBackend
+{
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(
+        &self,
+        input: ProvenLocalDateTimeCarrier<JiffDateTime>,
+    ) -> Result<ReflectedLocalDateTime, TemporalError> {
+        let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(input.carrier().0)?;
+        let token =
+            <ProvenLocalDateTimeCarrier<JiffDateTime> as Sidecar<JiffVerifier>>::sidecar(&input);
+        Ok(ReflectedLocalDateTime::new(descriptor, token))
     }
 }

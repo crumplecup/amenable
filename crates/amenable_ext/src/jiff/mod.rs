@@ -22,6 +22,7 @@ mod verus_witness;
 mod zoned;
 
 pub use backend::{
-    JiffOffset, JiffOffsetDateTime, JiffSpan, JiffTimeBackend, JiffTimestamp, JiffVerifier,
-    JiffVerifierMetadata,
+    JiffDate, JiffDateTime, JiffISOWeekDate, JiffOffset, JiffOffsetDateTime,
+    JiffReducedCalendarDate, JiffReducedLocalTime, JiffSpan, JiffTime, JiffTimeBackend,
+    JiffTimestamp, JiffVerifier, JiffVerifierMetadata,
 };

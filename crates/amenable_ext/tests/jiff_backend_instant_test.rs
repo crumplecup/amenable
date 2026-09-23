@@ -77,7 +77,12 @@ fn realize_offset_date_time_round_trips_a_calendar_date() {
 }
 
 #[test]
-fn realize_offset_date_time_rejects_an_ordinal_or_week_date() {
+fn realize_offset_date_time_resolves_an_ordinal_or_week_date() {
+    // Phase 2 originally rejected these (calendar dates only); Phase 3's
+    // TemporalCivilProps work widened the shared
+    // local_date_time_descriptor_to_jiff_civil_datetime helper this
+    // bridge itself calls, so both now resolve for real -- confirmed
+    // here, not just in jiff_backend_civil_test.rs's own coverage.
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Ordinal(
@@ -104,14 +109,16 @@ fn realize_offset_date_time_rejects_an_ordinal_or_week_date() {
         .build()
         .expect("valid offset date-time descriptor");
 
-    let err: TemporalError = backend
+    let carrier = backend
         .exchange(ReflectedOffsetDateTime::new(
             descriptor,
             offset_date_time_bundle_token(),
         ))
-        .map(|_| ())
-        .expect_err("Phase 2 resolves complete calendar dates only, not ordinal dates");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+        .expect("Phase 3 widened this to resolve ordinal dates too");
+    let jiff_offset_date_time = carrier.carrier();
+    assert_eq!(jiff_offset_date_time.local.year(), 2024);
+    assert_eq!(jiff_offset_date_time.local.month(), 3);
+    assert_eq!(jiff_offset_date_time.local.day(), 10);
 }
 
 #[test]
