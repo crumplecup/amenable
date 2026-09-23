@@ -5,6 +5,14 @@
 //! [`NativeCarrierRequest`] marker, so the compound needs no `Default`);
 //! methods with an extra output proof fold it into a `<M>NativeEstablished`
 //! composite behind a `<M>NativeToken`.
+//!
+//! `ResolveLocalDateTimeNativeRequest<B>`/`AttachNamedZoneNativeRequest<B>`
+//! get a real `derive_new::new` constructor (the same real gap fixed in
+//! `exchange/zone.rs`'s own sibling `*Request` types, for the same
+//! reason: private fields, `Getters`-only read access, no public
+//! constructor of any kind previously).
+
+use derive_new::new;
 
 use crate::{
     DateTimeFormulaEvaluationResultBundle, ExplicitTemporalFormSemanticBundle,
@@ -235,7 +243,7 @@ impl<B: TemporalInstantProps + TemporalZoneProps> TruncateSubsecondsNativeOutput
 }
 
 /// Runtime values the `resolve_local_date_time_native` exchange consumes.
-#[derive(amenable_derive::Evidence, derive_getters::Getters)]
+#[derive(amenable_derive::Evidence, derive_getters::Getters, new)]
 #[evidence(basis = "crate::NativeCarrierRequest")]
 pub struct ResolveLocalDateTimeNativeRequest<
     B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps,
@@ -330,7 +338,7 @@ impl<B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps>
 }
 
 /// Runtime values the `attach_named_zone_native` exchange consumes.
-#[derive(amenable_derive::Evidence, derive_getters::Getters)]
+#[derive(amenable_derive::Evidence, derive_getters::Getters, new)]
 #[evidence(basis = "crate::NativeCarrierRequest")]
 pub struct AttachNamedZoneNativeRequest<
     B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps,

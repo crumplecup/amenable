@@ -4,6 +4,18 @@
 //! and its return-tuple proofs into a `*Established` proposition (the
 //! `proof_composition` fold). The `Exchange` impls live in the backend
 //! crate (`#[capture_exchange_body]`); `amenable_time` ships the shape.
+//!
+//! Each `*Request` type gets a real `derive_new::new` constructor (a
+//! genuine gap fixed while building the first real backend against
+//! this trait, `amenable_ext::jiff`'s own Phase 4b): these fields are
+//! private with only `derive_getters::Getters` read access, and none of
+//! them previously had any public constructor at all, `Default`
+//! included since some fields — the plain-value case — round-trip
+//! fine, but a real caller needs to set genuinely different, specific
+//! field values (an actual IANA identifier, a real resolution
+//! authority), not the all-defaulted case.
+
+use derive_new::new;
 
 use crate::{
     AttachNamedZoneEstablishedToken, AttachNamedZonePreconditionsToken,
@@ -39,7 +51,15 @@ impl ResolvedNamedTimeZone {
 
 /// Descriptors the `confirm_local_time_zone_resolution_authority` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct ConfirmZoneAuthorityRequest {
@@ -130,7 +150,15 @@ impl ConfirmZoneAuthorityOutput {
 
 /// Descriptors the `resolve_local_date_time` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct ResolveLocalDateTimeRequest {
@@ -242,7 +270,15 @@ impl ResolveLocalDateTimeOutput {
 
 /// Descriptors the `attach_named_zone` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct AttachNamedZoneRequest {
@@ -339,7 +375,15 @@ impl AttachNamedZoneOutput {
 
 /// Descriptors the `confirm_named_zone_revision` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct ConfirmNamedZoneRevisionRequest {
