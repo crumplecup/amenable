@@ -90,7 +90,15 @@ breadth. Phase 8 done (2026-09-26, commit `f5c74b81`):
 `JiffTimeInterval`/`JiffRecurringInterval`) reusing every Phase 2-4
 conversion helper for each jiff-representable `TemporalValueDescriptor`
 form; the CalConnect/ISO 8601-2 extension family is a real
-`Unsupported`, not a silent default. Full-surface map of
+`Unsupported`, not a silent default. Phase 9 done (2026-09-26, commit
+`ecccb7ff`): `TemporalParser` — a single blanket-impl'd trait over all
+24 edges, no feasibility split possible, so every edge got a real
+`Exchange` impl in one commit: 13 real (jiff `FromStr` where it
+exists; hand-rolled digit-splitting for ordinal/week/reduced-precision/
+UTC-offset text jiff's own parser won't accept; jiff's real
+`fmt::temporal::Pieces` decomposition for offset/RFC 3339/IXDTF
+timestamps), 11 honestly `Unsupported` (the CalConnect/ISO 8601-2
+extension family, plus `TimeInterval`). Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

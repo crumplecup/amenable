@@ -8,10 +8,36 @@ done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
 `75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). Phase 7 done
 (2026-09-26, commit `caa4f823`). Phase 8 done (2026-09-26, commit
-`f5c74b81`). This doc is the full-surface map and checklist; execution
-proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
-plan steps" convention — no check-in needed between phases once a
-phase's own real work is verified and committed.
+`f5c74b81`). Phase 9 done (2026-09-26, commit `ecccb7ff`). This doc is
+the full-surface map and checklist; execution proceeds phase by phase
+per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
+no check-in needed between phases once a phase's own real work is
+verified and committed.
+
+**Phase 9 real findings, worth carrying into Phase 10:** `TemporalParser<V>`
+is a SINGLE blanket-impl'd trait over all 24 edges, unlike every prior
+family split by feasibility — every edge needed a real `Exchange` impl
+(success path or honest `Unsupported`) before the trait held at all,
+so this phase covered the whole surface in one commit rather than a
+feasibility slice. Two real findings beyond the plan's own prediction:
+(1) `ReducedCalendarDate`/`ReducedLocalTime` turned out real and
+buildable (hand-rolled year/year-month and hour/hour-minute text
+forms), not extension-family — Phase 3's own carriers anticipated this
+exact wiring point, and it held; (2) the UTC-offset parser's own
+validation needed a genuine carve-out the plan didn't anticipate:
+Phase 2's `utc_offset_descriptor_to_jiff_offset` (reused as the range
+oracle for ordinary offsets) unconditionally rejects the RFC 9557
+unknown-local-offset case, because `jiff::tz::Offset` has no
+representation for it at all — but that's a REALIZE-stage limitation,
+not a reason to reject the descriptor as unparseable, so the parser
+skips that oracle call specifically for the unknown-local-offset case.
+Caught by a real failing test, not reasoned out in advance. jiff's
+real `fmt::temporal::Pieces` API (undocumented in the plan doc, found
+by reading jiff's source directly) turned out to be exactly the right
+tool for `OffsetDateTime`/`Rfc3339Timestamp`/`IxdtfTimestamp`: it
+decomposes text into date/time/offset/zone-annotation parts without
+collapsing to an instant, which none of `Date`/`Time`/`DateTime`/
+`Timestamp`/`Zoned`'s own `FromStr` impls do individually.
 
 **Phase 8 real findings, worth carrying into later phases:** unlike
 Phase 7's own full interval-text-parse edges, the `TimeInterval`/
@@ -406,9 +432,12 @@ surface is the actual checklist below.
       carriers — real for every jiff-representable endpoint form,
       honestly `Unsupported` for the CalConnect/ISO 8601-2 extension
       family.
-- [ ] **Phase 9 — Parser.** The ~9 real `TemporalParser` edges, each
-      checked individually against jiff's real parser method before
-      being marked done — no batch shortcut.
+- [x] **Phase 9 — Parser.** All 24 `TemporalParser` edges (a single
+      blanket-impl'd trait, no feasibility split possible): 13 real
+      (calendar/ordinal/week dates, local time, both reduced-precision
+      forms, UTC offset, local/offset date-time, RFC 3339, IXDTF), 11
+      honestly `Unsupported` (the CalConnect/ISO 8601-2 extension
+      family, plus `TimeInterval` per Phase 7's own finding).
 - [ ] **Phase 10 — Formatter.** The matching ~9+ real `TemporalFormatter`
       edges via jiff's `*Printer` types.
 
