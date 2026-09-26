@@ -74,7 +74,15 @@ had never actually done. Phase 6 done (2026-09-26, commit `d741b716`):
 (leap seconds, end-of-day `24:00:00`) resolved to real `false` against
 jiff's own source/docs rather than assumed; `supported_serialization_
 profiles` left honestly empty since no `TemporalParser`/
-`TemporalFormatter` edge exists on this backend yet. Full-surface map of
+`TemporalFormatter` edge exists on this backend yet. Phase 7 done
+(2026-09-26, commit `caa4f823`): `TemporalIntervalFactory` — real
+duration parsing (`jiff::Span: FromStr`) and real `order_offset_
+endpoints` arithmetic (real `jiff::Timestamp: Ord`, replacing the std
+canary's own hand-rolled `days_from_civil`); the two full interval-
+text-parse edges are an honest `Unsupported` for now, a real dependency
+on `TemporalParser` (Phase 9) the plan's own phase-ordering
+underestimated, found by reading `TemporalValueDescriptor`'s actual
+breadth. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

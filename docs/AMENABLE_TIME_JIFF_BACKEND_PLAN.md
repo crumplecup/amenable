@@ -6,11 +6,30 @@
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 `8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
 done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
-`75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). This doc is
-the full-surface map and checklist; execution proceeds phase by phase
-per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
-no check-in needed between phases once a phase's own real work is
+`75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). Phase 7 done
+(2026-09-26, commit `caa4f823`). This doc is the full-surface map and
+checklist; execution proceeds phase by phase per
+`docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
+check-in needed between phases once a phase's own real work is
 verified and committed.
+
+**Phase 7 real findings, worth carrying into later phases:** the
+plan's own optimism about the two full interval-text-parse edges
+("hand-rolled `/`-split over the pieces above") did not survive contact
+with `TemporalValueDescriptor`'s real shape — it is a broad enum
+spanning every temporal form in the whole accord (calendar/ordinal/week
+dates, local/offset/zoned date-times, reduced-precision and
+CalConnect-only forms), so a `TimeIntervalEndpoint::Value` can be
+*any* of those, not just an offset date-time. Parsing arbitrary
+interval-endpoint text into that enum is genuinely `TemporalParser`'s
+own job (Phase 9), not a hand-rolled `/`-split this phase could
+honestly build alone — a real dependency the plan underestimated when
+it was written, found by reading the actual enum rather than assumed.
+Both `ParsedTimeInterval`/`ParsedRecurringInterval` are left as a real,
+honest `Unsupported` for now; revisit once Phase 9 lands. Duration
+parsing and `order_offset_endpoints`, by contrast, needed nothing new:
+`jiff::Span: FromStr` and Phase 2's own `offset_date_time_descriptor_
+to_jiff_parts` + jiff's real `Timestamp: Ord` sufficed outright.
 
 **Phase 6 real findings, worth carrying into later phases:** every one
 of the plan's two flagged unknowns resolved to real, checkable facts
@@ -355,9 +374,11 @@ surface is the actual checklist below.
 - [x] **Phase 6 — Reporter.** Real capability declaration; the two
       flagged unknowns (leap seconds, end-of-day 24:00:00) both resolved
       to real `false` against jiff's own source/docs.
-- [ ] **Phase 7 — Interval factory.** `TemporalIntervalFactory` — real
-      duration/order-endpoints edges; interval/recurring-interval
-      text-parse via hand-rolled `/`-split over the Phase 1-2 carriers.
+- [x] **Phase 7 — Interval factory.** `TemporalIntervalFactory` — real
+      duration/order-endpoints edges; the two interval/recurring-interval
+      text-parse edges are an honest `Unsupported` for now (they need
+      `TemporalParser`, Phase 9, not the hand-rolled `/`-split this plan
+      originally assumed would suffice).
 - [ ] **Phase 8 — Time interval / recurring interval.**
       `TemporalTimeIntervalProps`/`RecurringIntervalProps` +
       `NativeBridge`s + `NativeIntervalFactory`, over the composite
