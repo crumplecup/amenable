@@ -82,7 +82,15 @@ canary's own hand-rolled `days_from_civil`); the two full interval-
 text-parse edges are an honest `Unsupported` for now, a real dependency
 on `TemporalParser` (Phase 9) the plan's own phase-ordering
 underestimated, found by reading `TemporalValueDescriptor`'s actual
-breadth. Full-surface map of
+breadth. Phase 8 done (2026-09-26, commit `f5c74b81`):
+`TemporalTimeIntervalProps`/`TemporalRecurringIntervalProps` plus their
+`NativeBridge`s and `TemporalNativeIntervalFactory`'s own
+`order_offset_endpoints_native` edge — new composite carriers
+(`JiffTimeIntervalEndpoint`/`JiffTimeIntervalRepresentation`/
+`JiffTimeInterval`/`JiffRecurringInterval`) reusing every Phase 2-4
+conversion helper for each jiff-representable `TemporalValueDescriptor`
+form; the CalConnect/ISO 8601-2 extension family is a real
+`Unsupported`, not a silent default. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

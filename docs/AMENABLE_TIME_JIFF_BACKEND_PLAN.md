@@ -7,11 +7,32 @@ done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 `8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
 done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
 `75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). Phase 7 done
-(2026-09-26, commit `caa4f823`). This doc is the full-surface map and
-checklist; execution proceeds phase by phase per
-`docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
-check-in needed between phases once a phase's own real work is
-verified and committed.
+(2026-09-26, commit `caa4f823`). Phase 8 done (2026-09-26, commit
+`f5c74b81`). This doc is the full-surface map and checklist; execution
+proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
+plan steps" convention — no check-in needed between phases once a
+phase's own real work is verified and committed.
+
+**Phase 8 real findings, worth carrying into later phases:** unlike
+Phase 7's own full interval-text-parse edges, the `TimeInterval`/
+`RecurringInterval` *native-bridge* pair (realize/reflect between a
+descriptor and a native carrier, not text parsing) turned out fully
+tractable now — `TimeIntervalEndpoint::Value` wraps the same broad
+`TemporalValueDescriptor` enum Phase 7 found too big to text-parse, but
+realize/reflect only needs to convert already-structured descriptor
+data, not parse raw text, so every jiff-representable
+`TemporalValueDescriptor` variant (`CalendarDate`/`OrdinalDate`/
+`WeekDate`/`LocalDateTime`/`OffsetDateTime`/`ZonedDateTime`) reuses the
+Phase 2-4 conversion helpers directly, with the CalConnect/ISO 8601-2
+extension variants (and any explicitly `Qualified` value) rejected as a
+real `Unsupported`. One genuinely new helper was needed:
+`jiff_date_to_calendar_date_descriptor` — no prior phase ever needed a
+standalone `jiff::civil::Date -> CalendarDateDescriptor` decomposition
+on its own (only ever as part of a larger local-date-time
+decomposition), confirmed by grepping for the shape before writing it.
+`OrderOffsetEndpointsNativeRequest<B>` carried the same missing-
+constructor gap as every other native `*Request<B>` this session has
+found — fixed identically.
 
 **Phase 7 real findings, worth carrying into later phases:** the
 plan's own optimism about the two full interval-text-parse edges
@@ -379,10 +400,12 @@ surface is the actual checklist below.
       text-parse edges are an honest `Unsupported` for now (they need
       `TemporalParser`, Phase 9, not the hand-rolled `/`-split this plan
       originally assumed would suffice).
-- [ ] **Phase 8 — Time interval / recurring interval.**
+- [x] **Phase 8 — Time interval / recurring interval.**
       `TemporalTimeIntervalProps`/`RecurringIntervalProps` +
       `NativeBridge`s + `NativeIntervalFactory`, over the composite
-      carriers.
+      carriers — real for every jiff-representable endpoint form,
+      honestly `Unsupported` for the CalConnect/ISO 8601-2 extension
+      family.
 - [ ] **Phase 9 — Parser.** The ~9 real `TemporalParser` edges, each
       checked individually against jiff's real parser method before
       being marked done — no batch shortcut.
