@@ -6,10 +6,12 @@
 //! methods with an extra output proof fold it into a `<M>NativeEstablished`
 //! composite behind a `<M>NativeToken`.
 //!
-//! `ResolveLocalDateTimeNativeRequest<B>`/`AttachNamedZoneNativeRequest<B>`
-//! get a real `derive_new::new` constructor (the same real gap fixed in
-//! `exchange/zone.rs`'s own sibling `*Request` types, for the same
-//! reason: private fields, `Getters`-only read access, no public
+//! `ResolveLocalDateTimeNativeRequest<B>`/`AttachNamedZoneNativeRequest<B>`/
+//! `AdjustPrecisionLosslesslyNativeRequest<B>`/`TruncateSubsecondsNativeRequest<B>`/
+//! `OrderOffsetEndpointsNativeRequest<B>` all get a real `derive_new::new`
+//! constructor (the same real gap fixed repeatedly in `exchange/zone.rs`
+//! and `exchange/conversion.rs`'s own sibling `*Request` types, for the
+//! same reason: private fields, `Getters`-only read access, no public
 //! constructor of any kind previously).
 
 use derive_new::new;
@@ -394,7 +396,7 @@ impl ConfirmNamedZoneRevisionNativeOutput {
 }
 
 /// Runtime values the `order_offset_endpoints_native` exchange consumes.
-#[derive(amenable_derive::Evidence, derive_getters::Getters)]
+#[derive(amenable_derive::Evidence, derive_getters::Getters, new)]
 #[evidence(basis = "crate::NativeCarrierRequest")]
 pub struct OrderOffsetEndpointsNativeRequest<B: TemporalInstantProps> {
     /// The `start` input.

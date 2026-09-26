@@ -33,8 +33,9 @@ mod provenance_vocab;
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]
 pub use jiff::{
-    JiffDate, JiffDateTime, JiffISOWeekDate, JiffOffset, JiffOffsetDateTime,
+    JiffDate, JiffDateTime, JiffISOWeekDate, JiffOffset, JiffOffsetDateTime, JiffRecurringInterval,
     JiffReducedCalendarDate, JiffReducedLocalTime, JiffSpan, JiffTime, JiffTimeBackend,
-    JiffTimeZone, JiffTimestamp, JiffVerifier, JiffVerifierMetadata, JiffZoned,
+    JiffTimeInterval, JiffTimeIntervalEndpoint, JiffTimeIntervalRepresentation, JiffTimeZone,
+    JiffTimestamp, JiffVerifier, JiffVerifierMetadata, JiffZoned,
 };
 pub use provenance_vocab::{Authority, AuthorityKind, SourceCrate, SourceModule, TypeName};
