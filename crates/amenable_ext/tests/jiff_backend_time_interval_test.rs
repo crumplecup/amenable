@@ -24,6 +24,7 @@ use amenable_time::{
     TimeIntervalRepresentation, TimeIntervalSemanticBundle, TimeIntervalSemanticBundleToken,
     UtcOffsetDescriptorBuilder, UtcOffsetSign,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 // Fails to compile if `JiffTimeBackend` stops resolving as a real
 // `TemporalTimeIntervalNativeBridge<JiffVerifier>`/
@@ -63,7 +64,7 @@ fn offset_date_time_descriptor(
     (year, month, day): (i32, u8, u8),
     (hour, minute, second): (u8, u8, u8),
     (sign, offset_hours): (UtcOffsetSign, u8),
-) -> OffsetDateTimeDescriptor {
+) -> miette::Result<OffsetDateTimeDescriptor> {
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
             CalendarDateDescriptor::new(year, month, day),
@@ -74,20 +75,24 @@ fn offset_date_time_descriptor(
                 .minute(minute)
                 .second(second)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(sign)
         .hours(offset_hours)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor")
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")
 }
 
 fn offset_value_endpoint(descriptor: OffsetDateTimeDescriptor) -> TimeIntervalEndpoint {
@@ -96,18 +101,19 @@ fn offset_value_endpoint(descriptor: OffsetDateTimeDescriptor) -> TimeIntervalEn
     ))
 }
 
-fn one_day_duration() -> DurationDescriptor {
+fn one_day_duration() -> miette::Result<DurationDescriptor> {
     DurationDescriptorBuilder::default()
         .days(1u32)
         .build()
-        .expect("valid duration descriptor")
+        .into_diagnostic()
+        .wrap_err("valid duration descriptor")
 }
 
 #[test]
-fn realizes_and_reflects_a_start_end_interval_of_offset_date_times() {
+fn realizes_and_reflects_a_start_end_interval_of_offset_date_times() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let representation = TimeIntervalRepresentation::StartEnd {
         start: offset_value_endpoint(start),
         end: offset_value_endpoint(end),
@@ -119,16 +125,19 @@ fn realizes_and_reflects_a_start_end_interval_of_offset_date_times() {
             descriptor.clone(),
             time_interval_bundle_token(),
         ))
-        .expect("a real offset-date-time interval realizes");
+        .into_diagnostic()
+        .wrap_err("a real offset-date-time interval realizes")?;
     let reflected: ReflectedTimeInterval = backend
         .exchange(carrier)
-        .expect("the native carrier reflects back");
+        .into_diagnostic()
+        .wrap_err("the native carrier reflects back")?;
 
     assert_eq!(reflected.descriptor(), &descriptor);
+    Ok(())
 }
 
 #[test]
-fn realizes_and_reflects_open_and_unknown_boundaries() {
+fn realizes_and_reflects_open_and_unknown_boundaries() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Open,
@@ -140,21 +149,24 @@ fn realizes_and_reflects_open_and_unknown_boundaries() {
             descriptor.clone(),
             time_interval_bundle_token(),
         ))
-        .expect("Open/Unknown boundaries carry no value to convert, real success");
+        .into_diagnostic()
+        .wrap_err("Open/Unknown boundaries carry no value to convert, real success")?;
     let reflected: ReflectedTimeInterval = backend
         .exchange(carrier)
-        .expect("Open/Unknown round-trip without loss");
+        .into_diagnostic()
+        .wrap_err("Open/Unknown round-trip without loss")?;
 
     assert_eq!(reflected.descriptor(), &descriptor);
+    Ok(())
 }
 
 #[test]
-fn realizes_and_reflects_a_start_duration_interval() {
+fn realizes_and_reflects_a_start_duration_interval() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let descriptor = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartDuration {
         start: offset_value_endpoint(start),
-        duration: one_day_duration(),
+        duration: one_day_duration()?,
     });
 
     let carrier: ProvenTimeIntervalCarrier<JiffTimeInterval> = backend
@@ -162,21 +174,25 @@ fn realizes_and_reflects_a_start_duration_interval() {
             descriptor.clone(),
             time_interval_bundle_token(),
         ))
-        .expect("a real start+duration interval realizes");
+        .into_diagnostic()
+        .wrap_err("a real start+duration interval realizes")?;
     let reflected: ReflectedTimeInterval = backend
         .exchange(carrier)
-        .expect("the native carrier reflects back");
+        .into_diagnostic()
+        .wrap_err("the native carrier reflects back")?;
 
     assert_eq!(reflected.descriptor(), &descriptor);
+    Ok(())
 }
 
 #[test]
-fn rejects_an_out_of_scope_endpoint_form() {
+fn rejects_an_out_of_scope_endpoint_form() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let decade = DecadeDescriptorBuilder::default()
         .ordinal(202u16)
         .build()
-        .expect("valid decade descriptor");
+        .into_diagnostic()
+        .wrap_err("valid decade descriptor")?;
     let descriptor = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Bare(
             TemporalValueDescriptor::Decade(decade),
@@ -189,15 +205,18 @@ fn rejects_an_out_of_scope_endpoint_form() {
             descriptor,
             time_interval_bundle_token(),
         ));
-    let err = result.expect_err("a decade endpoint is the CalConnect/ISO 8601-2 extension family");
+    let err = result.err().ok_or_else(|| {
+        miette::miette!("a decade endpoint is the CalConnect/ISO 8601-2 extension family")
+    })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn realizes_and_reflects_a_bounded_recurring_interval() {
+fn realizes_and_reflects_a_bounded_recurring_interval() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let interval = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: offset_value_endpoint(start),
         end: offset_value_endpoint(end),
@@ -206,26 +225,30 @@ fn realizes_and_reflects_a_bounded_recurring_interval() {
         .repetitions(5u32)
         .interval(interval)
         .build()
-        .expect("valid recurring interval descriptor");
+        .into_diagnostic()
+        .wrap_err("valid recurring interval descriptor")?;
 
     let carrier: ProvenRecurringIntervalCarrier<JiffRecurringInterval> = backend
         .exchange(ReflectedRecurringInterval::new(
             descriptor.clone(),
             recurring_interval_bundle_token(),
         ))
-        .expect("a bounded recurring interval realizes");
+        .into_diagnostic()
+        .wrap_err("a bounded recurring interval realizes")?;
     let reflected: ReflectedRecurringInterval = backend
         .exchange(carrier)
-        .expect("the native carrier reflects back");
+        .into_diagnostic()
+        .wrap_err("the native carrier reflects back")?;
 
     assert_eq!(reflected.descriptor(), &descriptor);
+    Ok(())
 }
 
 #[test]
-fn realizes_and_reflects_an_unbounded_recurring_interval() {
+fn realizes_and_reflects_an_unbounded_recurring_interval() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let interval = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: offset_value_endpoint(start),
         end: offset_value_endpoint(end),
@@ -233,7 +256,8 @@ fn realizes_and_reflects_an_unbounded_recurring_interval() {
     let descriptor = RecurringIntervalDescriptorBuilder::default()
         .interval(interval)
         .build()
-        .expect("valid recurring interval descriptor");
+        .into_diagnostic()
+        .wrap_err("valid recurring interval descriptor")?;
     assert_eq!(descriptor.repetitions(), None);
 
     let carrier: ProvenRecurringIntervalCarrier<JiffRecurringInterval> = backend
@@ -241,19 +265,26 @@ fn realizes_and_reflects_an_unbounded_recurring_interval() {
             descriptor.clone(),
             recurring_interval_bundle_token(),
         ))
-        .expect("an unbounded recurring interval realizes");
+        .into_diagnostic()
+        .wrap_err("an unbounded recurring interval realizes")?;
     let reflected: ReflectedRecurringInterval = backend
         .exchange(carrier)
-        .expect("the native carrier reflects back");
+        .into_diagnostic()
+        .wrap_err("the native carrier reflects back")?;
 
     assert_eq!(reflected.descriptor(), &descriptor);
+    Ok(())
 }
 
 #[test]
-fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() {
+fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 0).expect("valid datetime");
-    let end = jiff::civil::DateTime::new(2024, 1, 2, 0, 0, 0, 0).expect("valid datetime");
+    let start = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
+    let end = jiff::civil::DateTime::new(2024, 1, 2, 0, 0, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let request = OrderOffsetEndpointsNativeRequest::new(
         JiffOffsetDateTime {
@@ -268,14 +299,20 @@ fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() {
             request,
             TemporalInputToken::new(),
         ))
-        .expect("start genuinely precedes end");
+        .into_diagnostic()
+        .wrap_err("start genuinely precedes end")?;
+    Ok(())
 }
 
 #[test]
-fn order_offset_endpoints_native_rejects_a_reversed_pair() {
+fn order_offset_endpoints_native_rejects_a_reversed_pair() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = jiff::civil::DateTime::new(2024, 1, 2, 0, 0, 0, 0).expect("valid datetime");
-    let end = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 0).expect("valid datetime");
+    let start = jiff::civil::DateTime::new(2024, 1, 2, 0, 0, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
+    let end = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let request = OrderOffsetEndpointsNativeRequest::new(
         JiffOffsetDateTime {
@@ -290,9 +327,12 @@ fn order_offset_endpoints_native_rejects_a_reversed_pair() {
             request,
             TemporalInputToken::new(),
         ));
-    let err = result.expect_err("start is genuinely after end");
+    let err = result
+        .err()
+        .ok_or_else(|| miette::miette!("start is genuinely after end"))?;
     assert!(matches!(
         &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
+    Ok(())
 }

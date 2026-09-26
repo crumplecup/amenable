@@ -30,6 +30,7 @@ use amenable_time::{
     UtcOffsetSign, ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
     ZonedDateTimeSemanticBundle, ZonedDateTimeSemanticBundleToken,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 // Fails to compile if `JiffTimeBackend` stops resolving as a real
 // `TemporalConversionFactory<JiffVerifier>` / `TemporalNativeConversionFactory<JiffVerifier>`.
@@ -96,7 +97,7 @@ fn offset_date_time_descriptor(
     (hour, minute, second): (u8, u8, u8),
     fractional_digits: Option<&str>,
     (sign, offset_hours): (UtcOffsetSign, u8),
-) -> OffsetDateTimeDescriptor {
+) -> miette::Result<OffsetDateTimeDescriptor> {
     let mut time_builder = LocalTimeDescriptorBuilder::default()
         .hour(hour)
         .minute(minute)
@@ -108,19 +109,27 @@ fn offset_date_time_descriptor(
         .date(CompleteDateDescriptor::Calendar(
             CalendarDateDescriptor::new(year, month, day),
         ))
-        .time(time_builder.build().expect("valid local time"))
+        .time(
+            time_builder
+                .build()
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
+        )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(sign)
         .hours(offset_hours)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor")
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")
 }
 
 fn fractional_digits_of(descriptor: &OffsetDateTimeDescriptor) -> Option<String> {
@@ -133,34 +142,40 @@ fn fractional_digits_of(descriptor: &OffsetDateTimeDescriptor) -> Option<String>
 }
 
 #[test]
-fn normalize_to_utc_shifts_a_negative_offset_forward() {
+fn normalize_to_utc_shifts_a_negative_offset_forward() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 3, 10),
         (13, 30, 0),
         None,
         (UtcOffsetSign::Negative, 4),
-    );
+    )?;
 
     let output = backend
         .exchange(NormalizeToUtcInput::new(
             NormalizeToUtcRequest::new(descriptor),
             normalize_to_utc_preconditions_token(),
         ))
-        .expect("a real offset date-time normalizes to UTC");
+        .into_diagnostic()
+        .wrap_err("a real offset date-time normalizes to UTC")?;
     let normalized = output.descriptor();
 
     assert_eq!(normalized.offset().sign(), UtcOffsetSign::Positive);
     assert_eq!(normalized.offset().hours(), 0);
     assert_eq!(normalized.local().time().hour(), 17);
     assert_eq!(normalized.local().time().minute(), 30);
+    Ok(())
 }
 
 #[test]
-fn normalize_to_utc_native_matches_the_descriptor_level_result() {
+fn normalize_to_utc_native_matches_the_descriptor_level_result() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let local = jiff::civil::DateTime::new(2024, 3, 10, 13, 30, 0, 0).expect("valid datetime");
-    let offset = jiff::tz::Offset::from_seconds(-4 * 3600).expect("valid offset");
+    let local = jiff::civil::DateTime::new(2024, 3, 10, 13, 30, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
+    let offset = jiff::tz::Offset::from_seconds(-4 * 3600)
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let carrier = ProvenOffsetDateTimeCarrier::<JiffOffsetDateTime>::new(
         JiffOffsetDateTime { local, offset },
         offset_date_time_bundle_token(),
@@ -168,53 +183,66 @@ fn normalize_to_utc_native_matches_the_descriptor_level_result() {
 
     let native: amenable_time::NormalizeToUtcNativeOutput<JiffTimeBackend> = backend
         .exchange(carrier)
-        .expect("a real jiff offset date-time normalizes to UTC natively");
+        .into_diagnostic()
+        .wrap_err("a real jiff offset date-time normalizes to UTC natively")?;
     let native = native.carrier();
 
     assert_eq!(native.offset, jiff::tz::Offset::UTC);
     assert_eq!(native.local.hour(), 17);
     assert_eq!(native.local.minute(), 30);
+    Ok(())
 }
 
 #[test]
-fn strip_named_zone_preserves_the_local_representation_and_offset() {
+fn strip_named_zone_preserves_the_local_representation_and_offset() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let timestamp = offset_date_time_descriptor(
         (2024, 3, 10),
         (13, 30, 0),
         None,
         (UtcOffsetSign::Negative, 4),
-    );
+    )?;
     let zone = NamedTimeZoneDescriptorBuilder::default()
         .identifier("America/New_York")
         .build()
-        .expect("valid named time zone descriptor");
+        .into_diagnostic()
+        .wrap_err("valid named time zone descriptor")?;
     let descriptor: ZonedDateTimeDescriptor = ZonedDateTimeDescriptorBuilder::default()
         .timestamp(timestamp)
         .zone(zone)
         .build()
-        .expect("valid zoned date-time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid zoned date-time descriptor")?;
 
     let output = backend
         .exchange(StripNamedZoneInput::new(
             StripNamedZoneRequest::new(descriptor),
             strip_named_zone_preconditions_token(),
         ))
-        .expect("a real zoned date-time strips to an offset date-time");
+        .into_diagnostic()
+        .wrap_err("a real zoned date-time strips to an offset date-time")?;
     let stripped = output.descriptor();
 
     assert_eq!(stripped.offset().sign(), UtcOffsetSign::Negative);
     assert_eq!(stripped.offset().hours(), 4);
     assert_eq!(stripped.local().time().hour(), 13);
     assert_eq!(stripped.local().time().minute(), 30);
+    Ok(())
 }
 
 #[test]
-fn strip_named_zone_native_matches_the_descriptor_level_result() {
+fn strip_named_zone_native_matches_the_descriptor_level_result() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let tz = jiff::tz::TimeZone::get("America/New_York").expect("a real IANA zone");
-    let local = jiff::civil::DateTime::new(2024, 3, 10, 13, 30, 0, 0).expect("valid datetime");
-    let zoned = tz.to_zoned(local).expect("an unambiguous local time");
+    let tz = jiff::tz::TimeZone::get("America/New_York")
+        .into_diagnostic()
+        .wrap_err("a real IANA zone")?;
+    let local = jiff::civil::DateTime::new(2024, 3, 10, 13, 30, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
+    let zoned = tz
+        .to_zoned(local)
+        .into_diagnostic()
+        .wrap_err("an unambiguous local time")?;
     let carrier = ProvenZonedDateTimeCarrier::<JiffZoned>::new(
         JiffZoned(zoned),
         zoned_date_time_bundle_token(),
@@ -222,55 +250,61 @@ fn strip_named_zone_native_matches_the_descriptor_level_result() {
 
     let stripped: ProvenOffsetDateTimeCarrier<JiffOffsetDateTime> = backend
         .exchange(carrier)
-        .expect("a real jiff::Zoned strips to an offset date-time natively");
+        .into_diagnostic()
+        .wrap_err("a real jiff::Zoned strips to an offset date-time natively")?;
     let stripped = stripped.carrier();
 
     assert_eq!(stripped.local.hour(), 13);
     assert_eq!(stripped.local.minute(), 30);
     assert_eq!(stripped.offset.seconds(), -4 * 3600);
+    Ok(())
 }
 
 #[test]
-fn adjust_precision_losslessly_accepts_an_exact_target() {
+fn adjust_precision_losslessly_accepts_an_exact_target() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
         (0, 0, 0),
         Some("123"),
         (UtcOffsetSign::Positive, 0),
-    );
+    )?;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let output = backend
         .exchange(AdjustPrecisionLosslesslyInput::new(
             AdjustPrecisionLosslesslyRequest::new(descriptor, target),
             adjust_precision_losslessly_preconditions_token(),
         ))
-        .expect("truncating to exactly the represented precision is lossless");
+        .into_diagnostic()
+        .wrap_err("truncating to exactly the represented precision is lossless")?;
     assert_eq!(
         fractional_digits_of(output.descriptor()),
         Some("123".to_owned())
     );
+    Ok(())
 }
 
 #[test]
-fn adjust_precision_losslessly_rejects_a_narrower_target() {
+fn adjust_precision_losslessly_rejects_a_narrower_target() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
         (0, 0, 0),
         Some("123456"),
         (UtcOffsetSign::Positive, 0),
-    );
+    )?;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let err: TemporalError = backend
         .exchange(AdjustPrecisionLosslesslyInput::new(
@@ -278,22 +312,27 @@ fn adjust_precision_losslessly_rejects_a_narrower_target() {
             adjust_precision_losslessly_preconditions_token(),
         ))
         .map(|_| ())
-        .expect_err("truncating away real sub-second precision is not lossless");
+        .err()
+        .ok_or_else(|| {
+            miette::miette!("truncating away real sub-second precision is not lossless")
+        })?;
     assert!(matches!(
         &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
+    Ok(())
 }
 
 #[test]
-fn adjust_precision_losslessly_rejects_a_non_second_component() {
+fn adjust_precision_losslessly_rejects_a_non_second_component() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor =
-        offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), None, (UtcOffsetSign::Positive, 0));
+        offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), None, (UtcOffsetSign::Positive, 0))?;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Minute)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let err: TemporalError = backend
         .exchange(AdjustPrecisionLosslesslyInput::new(
@@ -301,21 +340,27 @@ fn adjust_precision_losslessly_rejects_a_non_second_component() {
             adjust_precision_losslessly_preconditions_token(),
         ))
         .map(|_| ())
-        .expect_err("jiff's precision edges anchor at the second, not the minute");
+        .err()
+        .ok_or_else(|| {
+            miette::miette!("jiff's precision edges anchor at the second, not the minute")
+        })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() {
+fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let local =
-        jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_000_000).expect("valid datetime");
+    let local = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_000_000)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let native = backend
         .exchange(AdjustPrecisionLosslesslyNativeInput::new(
@@ -325,55 +370,61 @@ fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() {
             ),
             TemporalInputToken::new(),
         ))
-        .expect("truncating to exactly the represented precision is lossless natively");
+        .into_diagnostic()
+        .wrap_err("truncating to exactly the represented precision is lossless natively")?;
     let native = native.carrier();
 
     assert_eq!(native.local.subsec_nanosecond(), 123_000_000);
     assert_eq!(native.offset, offset);
+    Ok(())
 }
 
 #[test]
-fn truncate_subseconds_truncates_finer_digits() {
+fn truncate_subseconds_truncates_finer_digits() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
         (0, 0, 0),
         Some("123456789"),
         (UtcOffsetSign::Positive, 0),
-    );
+    )?;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let output = backend
         .exchange(TruncateSubsecondsInput::new(
             TruncateSubsecondsRequest::new(descriptor, target),
             truncate_subseconds_preconditions_token(),
         ))
-        .expect("truncation always succeeds under the default Truncate rounding mode");
+        .into_diagnostic()
+        .wrap_err("truncation always succeeds under the default Truncate rounding mode")?;
     assert_eq!(
         fractional_digits_of(output.descriptor()),
         Some("123".to_owned())
     );
+    Ok(())
 }
 
 #[test]
-fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() {
+fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
         (0, 0, 0),
         Some("123456789"),
         (UtcOffsetSign::Positive, 0),
-    );
+    )?;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .rounding_mode(RoundingModeDescriptor::HalfUp)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let err: TemporalError = backend
         .exchange(TruncateSubsecondsInput::new(
@@ -381,21 +432,25 @@ fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() {
             truncate_subseconds_preconditions_token(),
         ))
         .map(|_| ())
-        .expect_err("this backend only implements Truncate rounding");
+        .err()
+        .ok_or_else(|| miette::miette!("this backend only implements Truncate rounding"))?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn truncate_subseconds_native_matches_the_descriptor_level_result() {
+fn truncate_subseconds_native_matches_the_descriptor_level_result() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let local =
-        jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_456_789).expect("valid datetime");
+    let local = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_456_789)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let target = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(3u8)
         .build()
-        .expect("valid precision descriptor");
+        .into_diagnostic()
+        .wrap_err("valid precision descriptor")?;
 
     let native = backend
         .exchange(TruncateSubsecondsNativeInput::new(
@@ -406,9 +461,11 @@ fn truncate_subseconds_native_matches_the_descriptor_level_result() {
             ),
             TemporalInputToken::new(),
         ))
-        .expect("truncation always succeeds under the default Truncate rounding mode natively");
+        .into_diagnostic()
+        .wrap_err("truncation always succeeds under the default Truncate rounding mode natively")?;
     let native = native.carrier();
 
     assert_eq!(native.local.subsec_nanosecond(), 123_000_000);
     assert_eq!(native.offset, offset);
+    Ok(())
 }

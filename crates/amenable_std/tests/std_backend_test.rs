@@ -6,6 +6,7 @@
 //! accordingly, and round-trips durations through a real
 //! `std::time::Duration`.
 
+use miette::{IntoDiagnostic, WrapErr};
 use std::time::Duration;
 
 use amenable_core::{Establish, Exchange};
@@ -37,20 +38,22 @@ fn timestamp(
     day: u8,
     hour: u8,
     offset_hours: i8,
-) -> OffsetDateTimeDescriptor {
+) -> miette::Result<OffsetDateTimeDescriptor> {
     let time = LocalTimeDescriptorBuilder::default()
         .hour(hour)
         .minute(0u8)
         .second(0u8)
         .build()
-        .expect("valid local time");
+        .into_diagnostic()
+        .wrap_err("valid local time")?;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
             CalendarDateDescriptor::new(year, month, day),
         ))
         .time(time)
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let sign = if offset_hours < 0 {
         UtcOffsetSign::Negative
     } else {
@@ -60,12 +63,14 @@ fn timestamp(
         .sign(sign)
         .hours(offset_hours.unsigned_abs())
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time")
+        .into_diagnostic()
+        .wrap_err("valid offset date-time")
 }
 
 fn order_input(
@@ -117,73 +122,84 @@ fn text_parse_edges_report_unsupported() {
 }
 
 #[test]
-fn ordered_endpoints_establish_the_ordering_proposition() {
+fn ordered_endpoints_establish_the_ordering_proposition() -> miette::Result<()> {
     let backend = StdTimeBackend;
-    let input = order_input(timestamp(2020, 1, 1, 0, 0), timestamp(2021, 6, 15, 12, 0));
+    let input = order_input(timestamp(2020, 1, 1, 0, 0)?, timestamp(2021, 6, 15, 12, 0)?);
     let output = backend
         .exchange(input)
-        .expect("2020-01-01 precedes 2021-06-15");
+        .into_diagnostic()
+        .wrap_err("2020-01-01 precedes 2021-06-15")?;
     let _ = output.established();
+    Ok(())
 }
 
 #[test]
-fn reversed_endpoints_are_rejected() {
+fn reversed_endpoints_are_rejected() -> miette::Result<()> {
     let backend = StdTimeBackend;
-    let input = order_input(timestamp(2021, 6, 15, 12, 0), timestamp(2020, 1, 1, 0, 0));
-    let err = backend
-        .exchange(input)
-        .map(|_| ())
-        .expect_err("a later start than end has no ordering to establish");
+    let input = order_input(timestamp(2021, 6, 15, 12, 0)?, timestamp(2020, 1, 1, 0, 0)?);
+    let err =
+        backend.exchange(input).map(|_| ()).err().ok_or_else(|| {
+            miette::miette!("a later start than end has no ordering to establish")
+        })?;
     assert!(matches!(
         &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
+    Ok(())
 }
 
 #[test]
-fn offsets_are_normalised_before_comparison() {
+fn offsets_are_normalised_before_comparison() -> miette::Result<()> {
     let backend = StdTimeBackend;
     // 2020-01-01T00:00+05:00 is the same instant as 2019-12-31T19:00Z,
     // which precedes 2020-01-01T00:00Z.
-    let input = order_input(timestamp(2020, 1, 1, 0, 5), timestamp(2020, 1, 1, 0, 0));
+    let input = order_input(timestamp(2020, 1, 1, 0, 5)?, timestamp(2020, 1, 1, 0, 0)?);
     backend
         .exchange(input)
-        .expect("the +05:00 start is earlier once normalised to UTC");
+        .into_diagnostic()
+        .wrap_err("the +05:00 start is earlier once normalised to UTC")?;
+    Ok(())
 }
 
 #[test]
-fn realize_duration_converts_whole_second_spans() {
+fn realize_duration_converts_whole_second_spans() -> miette::Result<()> {
     let backend = StdTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .hours(1u32)
         .minutes(30u32)
         .build()
-        .expect("valid duration descriptor");
+        .into_diagnostic()
+        .wrap_err("valid duration descriptor")?;
     let carrier: ProvenDurationCarrier<StdDuration> = backend
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
-        .expect("PT1H30M is a fixed span");
+        .into_diagnostic()
+        .wrap_err("PT1H30M is a fixed span")?;
     assert_eq!(carrier.carrier().0, Duration::from_secs(5400));
+    Ok(())
 }
 
 #[test]
-fn realize_duration_rejects_calendar_variable_components() {
+fn realize_duration_rejects_calendar_variable_components() -> miette::Result<()> {
     let backend = StdTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
         .build()
-        .expect("valid duration descriptor");
+        .into_diagnostic()
+        .wrap_err("valid duration descriptor")?;
     let err = backend
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
         .map(|_| ())
-        .expect_err("a year is not a fixed std::time::Duration");
+        .err()
+        .ok_or_else(|| miette::miette!("a year is not a fixed std::time::Duration"))?;
     assert!(matches!(
         &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
+    Ok(())
 }
 
 #[test]
-fn duration_round_trips_through_std_time() {
+fn duration_round_trips_through_std_time() -> miette::Result<()> {
     let backend = StdTimeBackend;
     let span = Duration::from_secs(86_400 + 3600 + 60 + 1);
     let carrier =
@@ -191,10 +207,13 @@ fn duration_round_trips_through_std_time() {
 
     let reflected: ReflectedDuration = backend
         .exchange(carrier)
-        .expect("a whole-second span reflects to a descriptor");
+        .into_diagnostic()
+        .wrap_err("a whole-second span reflects to a descriptor")?;
     let round_tripped: ProvenDurationCarrier<StdDuration> = backend
         .exchange(reflected)
-        .expect("the descriptor realizes back to a span");
+        .into_diagnostic()
+        .wrap_err("the descriptor realizes back to a span")?;
 
     assert_eq!(round_tripped.carrier().0, span);
+    Ok(())
 }

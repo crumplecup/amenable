@@ -41,6 +41,7 @@ use amenable_time::{
     TimeOfDayWithShiftValid, UnspecifiedComponentExpressionProof, UtcOffsetDescriptorBuilder,
     UtcOffsetSign, UtcOffsetValid, WeekDateDescriptor, WeekDateValid,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 // Fails to compile if `JiffTimeBackend` stops resolving as a real
 // `TemporalFormatter<JiffVerifier>` -- this alone requires all 36
@@ -60,7 +61,7 @@ fn offset_date_time_descriptor(
     (year, month, day): (i32, u8, u8),
     (hour, minute, second): (u8, u8, u8),
     (sign, offset_hours): (UtcOffsetSign, u8),
-) -> amenable_time::OffsetDateTimeDescriptor {
+) -> miette::Result<amenable_time::OffsetDateTimeDescriptor> {
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
             CalendarDateDescriptor::new(year, month, day),
@@ -71,25 +72,29 @@ fn offset_date_time_descriptor(
                 .minute(minute)
                 .second(second)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(sign)
         .hours(offset_hours)
         .minutes(0u8)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor")
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")
 }
 
 #[test]
-fn formats_a_calendar_date_extended_and_basic() {
+fn formats_a_calendar_date_extended_and_basic() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = CalendarDateDescriptor::new(2024, 3, 10);
     let extended: FormattedCalendarDateExtended = backend
@@ -97,19 +102,22 @@ fn formats_a_calendar_date_extended_and_basic() {
             descriptor,
             established_token!(CalendarDateValid),
         ))
-        .expect("a real calendar date formats");
+        .into_diagnostic()
+        .wrap_err("a real calendar date formats")?;
     assert_eq!(extended.text(), "2024-03-10");
     let basic: FormattedCalendarDateBasic = backend
         .exchange(ParsedCalendarDate::new(
             descriptor,
             established_token!(CalendarDateValid),
         ))
-        .expect("the basic form formats too");
+        .into_diagnostic()
+        .wrap_err("the basic form formats too")?;
     assert_eq!(basic.text(), "20240310");
+    Ok(())
 }
 
 #[test]
-fn formats_a_reduced_calendar_date() {
+fn formats_a_reduced_calendar_date() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let year_only = ReducedCalendarDateDescriptor::Year { year: 2024 };
     let extended: FormattedReducedCalendarDateExtended = backend
@@ -117,7 +125,8 @@ fn formats_a_reduced_calendar_date() {
             year_only,
             established_token!(ReducedCalendarDateValid),
         ))
-        .expect("a year-only reduced calendar date formats");
+        .into_diagnostic()
+        .wrap_err("a year-only reduced calendar date formats")?;
     assert_eq!(extended.text(), "2024");
 
     let year_month = ReducedCalendarDateDescriptor::YearMonth {
@@ -129,19 +138,22 @@ fn formats_a_reduced_calendar_date() {
             year_month,
             established_token!(ReducedCalendarDateValid),
         ))
-        .expect("a year-month reduced calendar date formats extended");
+        .into_diagnostic()
+        .wrap_err("a year-month reduced calendar date formats extended")?;
     assert_eq!(extended.text(), "2024-03");
     let basic: FormattedReducedCalendarDateBasic = backend
         .exchange(ParsedReducedCalendarDate::new(
             year_month,
             established_token!(ReducedCalendarDateValid),
         ))
-        .expect("a year-month reduced calendar date formats basic");
+        .into_diagnostic()
+        .wrap_err("a year-month reduced calendar date formats basic")?;
     assert_eq!(basic.text(), "202403");
+    Ok(())
 }
 
 #[test]
-fn formats_an_ordinal_date_extended_and_basic() {
+fn formats_an_ordinal_date_extended_and_basic() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = OrdinalDateDescriptor::new(2024, 70);
     let extended: FormattedOrdinalDateExtended = backend
@@ -149,19 +161,22 @@ fn formats_an_ordinal_date_extended_and_basic() {
             descriptor,
             established_token!(OrdinalDateValid),
         ))
-        .expect("a real ordinal date formats");
+        .into_diagnostic()
+        .wrap_err("a real ordinal date formats")?;
     assert_eq!(extended.text(), "2024-070");
     let basic: FormattedOrdinalDateBasic = backend
         .exchange(ParsedOrdinalDate::new(
             descriptor,
             established_token!(OrdinalDateValid),
         ))
-        .expect("the basic form formats too");
+        .into_diagnostic()
+        .wrap_err("the basic form formats too")?;
     assert_eq!(basic.text(), "2024070");
+    Ok(())
 }
 
 #[test]
-fn formats_a_week_date_extended_and_basic() {
+fn formats_a_week_date_extended_and_basic() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = WeekDateDescriptor::new(2024, 10, 3);
     let extended: FormattedWeekDateExtended = backend
@@ -169,19 +184,22 @@ fn formats_a_week_date_extended_and_basic() {
             descriptor,
             established_token!(WeekDateValid),
         ))
-        .expect("a real week date formats");
+        .into_diagnostic()
+        .wrap_err("a real week date formats")?;
     assert_eq!(extended.text(), "2024-W10-3");
     let basic: FormattedWeekDateBasic = backend
         .exchange(ParsedWeekDate::new(
             descriptor,
             established_token!(WeekDateValid),
         ))
-        .expect("the basic form formats too");
+        .into_diagnostic()
+        .wrap_err("the basic form formats too")?;
     assert_eq!(basic.text(), "2024W103");
+    Ok(())
 }
 
 #[test]
-fn formats_a_local_time_with_a_fractional_second() {
+fn formats_a_local_time_with_a_fractional_second() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = LocalTimeDescriptorBuilder::default()
         .hour(13u8)
@@ -189,18 +207,21 @@ fn formats_a_local_time_with_a_fractional_second() {
         .second(5u8)
         .fractional_second(amenable_time::FractionalSecondDescriptor::new("123"))
         .build()
-        .expect("valid local time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid local time descriptor")?;
     let extended: FormattedLocalTimeExtended = backend
         .exchange(amenable_time::ParsedLocalTime::new(
             descriptor,
             established_token!(LocalTimeValid),
         ))
-        .expect("a real local time with a fraction formats");
+        .into_diagnostic()
+        .wrap_err("a real local time with a fraction formats")?;
     assert_eq!(extended.text(), "13:30:05.123");
+    Ok(())
 }
 
 #[test]
-fn formats_a_reduced_local_time() {
+fn formats_a_reduced_local_time() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let hour_only = ReducedLocalTimeDescriptor::Hour {
         hour: 13,
@@ -211,12 +232,14 @@ fn formats_a_reduced_local_time() {
             hour_only,
             established_token!(ReducedLocalTimeValid),
         ))
-        .expect("an hour-only reduced local time formats");
+        .into_diagnostic()
+        .wrap_err("an hour-only reduced local time formats")?;
     assert_eq!(extended.text(), "13");
+    Ok(())
 }
 
 #[test]
-fn rejects_formatting_a_fractional_reduced_local_time() {
+fn rejects_formatting_a_fractional_reduced_local_time() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = ReducedLocalTimeDescriptor::Hour {
         hour: 13,
@@ -228,72 +251,85 @@ fn rejects_formatting_a_fractional_reduced_local_time() {
     let result: Result<FormattedReducedLocalTimeExtended, TemporalError> = backend.exchange(
         ParsedReducedLocalTime::new(descriptor, established_token!(ReducedLocalTimeValid)),
     );
-    let err = result.expect_err("jiff's civil time has no fractional hour representation");
+    let err = result.err().ok_or_else(|| {
+        miette::miette!("jiff's civil time has no fractional hour representation")
+    })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn formats_a_utc_offset_extended_and_basic() {
+fn formats_a_utc_offset_extended_and_basic() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
         .hours(4u8)
         .minutes(30u8)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let extended: FormattedUtcOffsetExtended = backend
         .exchange(ParsedUtcOffset::new(
             descriptor,
             established_token!(UtcOffsetValid),
         ))
-        .expect("a real UTC offset formats");
+        .into_diagnostic()
+        .wrap_err("a real UTC offset formats")?;
     assert_eq!(extended.text(), "-04:30");
     let basic: FormattedUtcOffsetBasic = backend
         .exchange(ParsedUtcOffset::new(
             descriptor,
             established_token!(UtcOffsetValid),
         ))
-        .expect("the basic form formats too");
+        .into_diagnostic()
+        .wrap_err("the basic form formats too")?;
     assert_eq!(basic.text(), "-0430");
+    Ok(())
 }
 
 #[test]
-fn formats_a_known_zero_offset_as_the_numeric_form_not_z() {
+fn formats_a_known_zero_offset_as_the_numeric_form_not_z() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Positive)
         .hours(0u8)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let extended: FormattedUtcOffsetExtended = backend
         .exchange(ParsedUtcOffset::new(
             descriptor,
             established_token!(UtcOffsetValid),
         ))
-        .expect("a known zero offset formats");
+        .into_diagnostic()
+        .wrap_err("a known zero offset formats")?;
     assert_eq!(extended.text(), "+00");
+    Ok(())
 }
 
 #[test]
-fn formats_an_unknown_local_offset_as_negative_zero() {
+fn formats_an_unknown_local_offset_as_negative_zero() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
         .hours(0u8)
         .relationship(amenable_time::UtcOffsetRelationship::UnknownLocalOffset)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let extended: FormattedUtcOffsetExtended = backend
         .exchange(ParsedUtcOffset::new(
             descriptor,
             established_token!(UtcOffsetValid),
         ))
-        .expect("the unknown-local-offset case formats");
+        .into_diagnostic()
+        .wrap_err("the unknown-local-offset case formats")?;
     assert_eq!(extended.text(), "-00:00");
+    Ok(())
 }
 
 #[test]
-fn formats_a_local_date_time_extended() {
+fn formats_a_local_date_time_extended() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -305,129 +341,149 @@ fn formats_a_local_date_time_extended() {
                 .minute(30u8)
                 .second(0u8)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let extended: FormattedLocalDateTimeExtended = backend
         .exchange(ParsedLocalDateTime::new(
             descriptor,
             established_token!(LocalDateTimeProof),
         ))
-        .expect("a real local date-time formats");
+        .into_diagnostic()
+        .wrap_err("a real local date-time formats")?;
     assert_eq!(extended.text(), "2024-03-10T13:30:00");
+    Ok(())
 }
 
 #[test]
-fn formats_an_offset_date_time_extended_and_basic() {
+fn formats_an_offset_date_time_extended_and_basic() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor =
-        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4));
+        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
     let extended: FormattedOffsetDateTimeExtended = backend
         .exchange(ParsedOffsetDateTime::new(
             descriptor.clone(),
             established_token!(OffsetDateTimeProof),
         ))
-        .expect("a real offset date-time formats");
+        .into_diagnostic()
+        .wrap_err("a real offset date-time formats")?;
     assert_eq!(extended.text(), "2024-03-10T13:30:00-04:00");
     let basic: FormattedOffsetDateTimeBasic = backend
         .exchange(ParsedOffsetDateTime::new(
             descriptor,
             established_token!(OffsetDateTimeProof),
         ))
-        .expect("the basic form formats too");
+        .into_diagnostic()
+        .wrap_err("the basic form formats too")?;
     assert_eq!(basic.text(), "20240310T133000-0400");
+    Ok(())
 }
 
 #[test]
-fn formats_an_rfc3339_timestamp() {
+fn formats_an_rfc3339_timestamp() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor =
-        offset_date_time_descriptor((2024, 3, 10), (17, 30, 0), (UtcOffsetSign::Positive, 0));
+        offset_date_time_descriptor((2024, 3, 10), (17, 30, 0), (UtcOffsetSign::Positive, 0))?;
     let formatted: FormattedRfc3339Timestamp = backend
         .exchange(ParsedRfc3339Timestamp::new(
             descriptor,
             established_token!(Rfc3339TimestampProof),
         ))
-        .expect("a real RFC 3339 timestamp formats");
+        .into_diagnostic()
+        .wrap_err("a real RFC 3339 timestamp formats")?;
     assert_eq!(formatted.text(), "2024-03-10T17:30:00+00:00");
+    Ok(())
 }
 
 #[test]
-fn formats_an_ixdtf_timestamp_with_a_named_zone_annotation() {
+fn formats_an_ixdtf_timestamp_with_a_named_zone_annotation() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let timestamp =
-        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4));
+        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
     let zone = NamedTimeZoneDescriptorBuilder::default()
         .identifier("America/New_York")
         .build()
-        .expect("valid named time zone descriptor");
+        .into_diagnostic()
+        .wrap_err("valid named time zone descriptor")?;
     let descriptor = IxdtfTimestampDescriptorBuilder::default()
         .timestamp(timestamp)
         .time_zone_annotation(IxdtfTimeZoneAnnotationDescriptor::Named(zone))
         .build()
-        .expect("valid IXDTF timestamp descriptor");
+        .into_diagnostic()
+        .wrap_err("valid IXDTF timestamp descriptor")?;
     let formatted: FormattedIxdtfTimestamp = backend
         .exchange(ParsedIxdtfTimestamp::new(
             descriptor,
             established_token!(IxdtfTimestampProof),
         ))
-        .expect("a real IXDTF timestamp formats");
+        .into_diagnostic()
+        .wrap_err("a real IXDTF timestamp formats")?;
     assert_eq!(
         formatted.text(),
         "2024-03-10T13:30:00-04:00[America/New_York]"
     );
+    Ok(())
 }
 
 #[test]
-fn formats_an_ixdtf_zoned_timestamp() {
+fn formats_an_ixdtf_zoned_timestamp() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let timestamp =
-        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4));
+        offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
     let zone = NamedTimeZoneDescriptorBuilder::default()
         .identifier("America/New_York")
         .build()
-        .expect("valid named time zone descriptor");
+        .into_diagnostic()
+        .wrap_err("valid named time zone descriptor")?;
     let descriptor = amenable_time::ZonedDateTimeDescriptorBuilder::default()
         .timestamp(timestamp)
         .zone(zone)
         .build()
-        .expect("valid zoned date-time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid zoned date-time descriptor")?;
     let formatted: FormattedIxdtfZonedTimestamp = backend
         .exchange(ParsedIxdtfZonedTimestamp::new(
             descriptor,
             established_token!(amenable_time::IxdtfZonedTimestampProof),
         ))
-        .expect("a real IXDTF zoned timestamp formats");
+        .into_diagnostic()
+        .wrap_err("a real IXDTF zoned timestamp formats")?;
     assert_eq!(
         formatted.text(),
         "2024-03-10T13:30:00-04:00[America/New_York]"
     );
+    Ok(())
 }
 
 #[test]
-fn formats_a_duration() {
+fn formats_a_duration() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
         .months(2u32)
         .days(3u32)
         .build()
-        .expect("valid duration descriptor");
+        .into_diagnostic()
+        .wrap_err("valid duration descriptor")?;
     let formatted: FormattedDuration = backend
         .exchange(ParsedDuration::new(
             descriptor,
             established_token!(DurationFormValid),
         ))
-        .expect("a real duration formats via jiff::Span::Display");
+        .into_diagnostic()
+        .wrap_err("a real duration formats via jiff::Span::Display")?;
     assert_eq!(formatted.text(), "P1Y2M3D");
+    Ok(())
 }
 
 #[test]
-fn formats_a_time_interval_of_offset_date_times() {
+fn formats_a_time_interval_of_offset_date_times() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let representation = TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Value(
             amenable_time::QualifiedOrBareTemporalValueDescriptor::Bare(
@@ -446,17 +502,19 @@ fn formats_a_time_interval_of_offset_date_times() {
             descriptor,
             established_token!(TimeIntervalProof),
         ))
-        .expect("a real time interval of offset date-times formats");
+        .into_diagnostic()
+        .wrap_err("a real time interval of offset date-times formats")?;
     assert_eq!(
         formatted.text(),
         "2024-01-01T00:00:00+00:00/2024-01-02T00:00:00+00:00"
     );
+    Ok(())
 }
 
 #[test]
-fn rejects_formatting_an_open_boundary() {
+fn rejects_formatting_an_open_boundary() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let representation = TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Open,
         end: TimeIntervalEndpoint::Value(
@@ -469,15 +527,18 @@ fn rejects_formatting_an_open_boundary() {
     let result: Result<FormattedTimeInterval, TemporalError> = backend.exchange(
         ParsedTimeInterval::new(descriptor, established_token!(TimeIntervalProof)),
     );
-    let err = result.expect_err("no independently sourced textual convention for Open exists");
+    let err = result.err().ok_or_else(|| {
+        miette::miette!("no independently sourced textual convention for Open exists")
+    })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn formats_a_bounded_recurring_interval() {
+fn formats_a_bounded_recurring_interval() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0));
-    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0));
+    let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
+    let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let interval = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Value(
             amenable_time::QualifiedOrBareTemporalValueDescriptor::Bare(
@@ -494,21 +555,24 @@ fn formats_a_bounded_recurring_interval() {
         .repetitions(5u32)
         .interval(interval)
         .build()
-        .expect("valid recurring interval descriptor");
+        .into_diagnostic()
+        .wrap_err("valid recurring interval descriptor")?;
     let formatted: FormattedRecurringInterval = backend
         .exchange(ParsedRecurringInterval::new(
             descriptor,
             established_token!(RecurringIntervalFormValid),
         ))
-        .expect("a bounded recurring interval formats");
+        .into_diagnostic()
+        .wrap_err("a bounded recurring interval formats")?;
     assert_eq!(
         formatted.text(),
         "R5/2024-01-01T00:00:00+00:00/2024-01-02T00:00:00+00:00"
     );
+    Ok(())
 }
 
 #[test]
-fn the_calconnect_extension_family_is_honestly_unsupported_when_formatting() {
+fn the_calconnect_extension_family_is_honestly_unsupported_when_formatting() -> miette::Result<()> {
     let backend = JiffTimeBackend;
 
     let extended_year: Result<FormattedExtendedYear, TemporalError> = backend.exchange(
@@ -578,7 +642,10 @@ fn the_calconnect_extension_family_is_honestly_unsupported_when_formatting() {
         grouped_unit.map(|_| ()),
         formula.map(|_| ()),
     ] {
-        let err = result.expect_err("the CalConnect/ISO 8601-2 extension family is out of scope");
+        let err = result.err().ok_or_else(|| {
+            miette::miette!("the CalConnect/ISO 8601-2 extension family is out of scope")
+        })?;
         assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
     }
+    Ok(())
 }

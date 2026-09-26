@@ -4,9 +4,10 @@
 //! features, so which columns are populated depends on the build.
 
 use amenable::TemporalCoverage;
+use amenable_time::TemporalCoverageRow;
 
 #[test]
-fn the_report_covers_every_atomic_temporal_contract() {
+fn the_report_covers_every_atomic_temporal_contract() -> miette::Result<()> {
     amenable::init_tracing();
     let coverage = TemporalCoverage::snapshot();
 
@@ -21,19 +22,20 @@ fn the_report_covers_every_atomic_temporal_contract() {
     // harness, so 23 rows are checked regardless of the other features.
     assert_eq!(coverage.checked(), 23, "machine-checked atomic contracts");
 
-    let row = |name: &str| {
+    let row = |name: &str| -> miette::Result<&TemporalCoverageRow> {
         coverage
             .rows()
             .iter()
             .find(|row| row.contract() == name)
-            .unwrap_or_else(|| panic!("`{name}` should be in the coverage report"))
+            .ok_or_else(|| miette::miette!("`{name}` should be in the coverage report"))
     };
 
-    let month = row("CalendarMonthInRangeOneToTwelve");
+    let month = row("CalendarMonthInRangeOneToTwelve")?;
     assert!(month.is_checked() && month.kani());
 
-    let structural = row("CalendarDateUsesGregorianCalendar");
+    let structural = row("CalendarDateUsesGregorianCalendar")?;
     assert!(!structural.is_checked(), "a shape fact stays citation-only");
+    Ok(())
 }
 
 #[cfg(feature = "creusot")]

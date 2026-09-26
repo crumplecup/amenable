@@ -19,6 +19,7 @@ use amenable_time::{
     ReducedCalendarDateDescriptor, ReducedLocalTimeDescriptor, TemporalError, TemporalErrorKind,
     TemporalParser, UtcOffsetRelationship, UtcOffsetSign,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 // Fails to compile if `JiffTimeBackend` stops resolving as a real
 // `TemporalParser<JiffVerifier>` -- this alone requires all 24 edges
@@ -29,43 +30,51 @@ const _: () = {
 };
 
 #[test]
-fn parse_calendar_date_parses_a_real_iso8601_date() {
+fn parse_calendar_date_parses_a_real_iso8601_date() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedCalendarDate = backend
         .exchange(RawInput::received("2024-03-10"))
-        .expect("a real ISO 8601 calendar date parses via jiff::civil::Date::FromStr");
+        .into_diagnostic()
+        .wrap_err("a real ISO 8601 calendar date parses via jiff::civil::Date::FromStr")?;
     assert_eq!(parsed.descriptor().year(), 2024);
     assert_eq!(parsed.descriptor().month(), 3);
     assert_eq!(parsed.descriptor().day(), 10);
+    Ok(())
 }
 
 #[test]
-fn parse_calendar_date_rejects_malformed_text() {
+fn parse_calendar_date_rejects_malformed_text() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let result: Result<ParsedCalendarDate, TemporalError> =
         backend.exchange(RawInput::received("not a date"));
-    let err = result.expect_err("malformed text is not a real calendar date");
+    let err = result
+        .err()
+        .ok_or_else(|| miette::miette!("malformed text is not a real calendar date"))?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
+    Ok(())
 }
 
 #[test]
-fn parse_reduced_calendar_date_parses_year_only() {
+fn parse_reduced_calendar_date_parses_year_only() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedCalendarDate = backend
         .exchange(RawInput::received("2024"))
-        .expect("a year-only reduced calendar date parses");
+        .into_diagnostic()
+        .wrap_err("a year-only reduced calendar date parses")?;
     assert_eq!(
         parsed.descriptor(),
         &ReducedCalendarDateDescriptor::Year { year: 2024 }
     );
+    Ok(())
 }
 
 #[test]
-fn parse_reduced_calendar_date_parses_year_month() {
+fn parse_reduced_calendar_date_parses_year_month() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedCalendarDate = backend
         .exchange(RawInput::received("2024-03"))
-        .expect("a year-month reduced calendar date parses");
+        .into_diagnostic()
+        .wrap_err("a year-month reduced calendar date parses")?;
     assert_eq!(
         parsed.descriptor(),
         &ReducedCalendarDateDescriptor::YearMonth {
@@ -73,75 +82,90 @@ fn parse_reduced_calendar_date_parses_year_month() {
             month: 3
         }
     );
+    Ok(())
 }
 
 #[test]
-fn parse_ordinal_date_parses_the_extended_form() {
+fn parse_ordinal_date_parses_the_extended_form() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedOrdinalDate = backend
         .exchange(RawInput::received("2024-070"))
-        .expect("jiff's own Date::day_of_year validates this ordinal date is real");
+        .into_diagnostic()
+        .wrap_err("jiff's own Date::day_of_year validates this ordinal date is real")?;
     assert_eq!(parsed.descriptor().year(), 2024);
     assert_eq!(parsed.descriptor().day_of_year(), 70);
+    Ok(())
 }
 
 #[test]
-fn parse_ordinal_date_parses_the_basic_form() {
+fn parse_ordinal_date_parses_the_basic_form() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedOrdinalDate = backend
         .exchange(RawInput::received("2024070"))
-        .expect("the 7-digit basic form parses too");
+        .into_diagnostic()
+        .wrap_err("the 7-digit basic form parses too")?;
     assert_eq!(parsed.descriptor().year(), 2024);
     assert_eq!(parsed.descriptor().day_of_year(), 70);
+    Ok(())
 }
 
 #[test]
-fn parse_ordinal_date_rejects_a_real_out_of_range_day() {
+fn parse_ordinal_date_rejects_a_real_out_of_range_day() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     // 2023 is not a leap year -- day 366 does not exist.
     let result: Result<ParsedOrdinalDate, TemporalError> =
         backend.exchange(RawInput::received("2023-366"));
-    result.expect_err("2023 has only 365 days; jiff's own Date construction rejects this");
+    result.err().ok_or_else(|| {
+        miette::miette!("2023 has only 365 days; jiff's own Date construction rejects this")
+    })?;
+    Ok(())
 }
 
 #[test]
-fn parse_week_date_parses_the_extended_form() {
+fn parse_week_date_parses_the_extended_form() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedWeekDate = backend
         .exchange(RawInput::received("2024-W10-3"))
-        .expect("a real ISO 8601 week date parses");
+        .into_diagnostic()
+        .wrap_err("a real ISO 8601 week date parses")?;
     assert_eq!(parsed.descriptor().week_year(), 2024);
     assert_eq!(parsed.descriptor().week(), 10);
     assert_eq!(parsed.descriptor().weekday(), 3);
+    Ok(())
 }
 
 #[test]
-fn parse_week_date_parses_the_basic_form() {
+fn parse_week_date_parses_the_basic_form() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedWeekDate = backend
         .exchange(RawInput::received("2024W103"))
-        .expect("the basic form parses too");
+        .into_diagnostic()
+        .wrap_err("the basic form parses too")?;
     assert_eq!(parsed.descriptor().week_year(), 2024);
     assert_eq!(parsed.descriptor().week(), 10);
     assert_eq!(parsed.descriptor().weekday(), 3);
+    Ok(())
 }
 
 #[test]
-fn parse_local_time_parses_a_real_iso8601_time() {
+fn parse_local_time_parses_a_real_iso8601_time() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedLocalTime = backend
         .exchange(RawInput::received("13:30:00"))
-        .expect("a real ISO 8601 local time parses via jiff::civil::Time::FromStr");
+        .into_diagnostic()
+        .wrap_err("a real ISO 8601 local time parses via jiff::civil::Time::FromStr")?;
     assert_eq!(parsed.descriptor().hour(), 13);
     assert_eq!(parsed.descriptor().minute(), 30);
+    Ok(())
 }
 
 #[test]
-fn parse_reduced_local_time_parses_hour_only() {
+fn parse_reduced_local_time_parses_hour_only() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedLocalTime = backend
         .exchange(RawInput::received("13"))
-        .expect("an hour-only reduced local time parses");
+        .into_diagnostic()
+        .wrap_err("an hour-only reduced local time parses")?;
     assert_eq!(
         parsed.descriptor(),
         &ReducedLocalTimeDescriptor::Hour {
@@ -149,14 +173,16 @@ fn parse_reduced_local_time_parses_hour_only() {
             fractional_component: None
         }
     );
+    Ok(())
 }
 
 #[test]
-fn parse_reduced_local_time_parses_hour_minute() {
+fn parse_reduced_local_time_parses_hour_minute() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedLocalTime = backend
         .exchange(RawInput::received("13:30"))
-        .expect("an hour-minute reduced local time parses");
+        .into_diagnostic()
+        .wrap_err("an hour-minute reduced local time parses")?;
     assert_eq!(
         parsed.descriptor(),
         &ReducedLocalTimeDescriptor::HourMinute {
@@ -165,142 +191,177 @@ fn parse_reduced_local_time_parses_hour_minute() {
             fractional_component: None
         }
     );
+    Ok(())
 }
 
 #[test]
-fn parse_reduced_local_time_rejects_a_fractional_component() {
+fn parse_reduced_local_time_rejects_a_fractional_component() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let result: Result<ParsedReducedLocalTime, TemporalError> =
         backend.exchange(RawInput::received("13,5"));
-    let err = result.expect_err("jiff's civil time has no fractional hour representation");
+    let err = result.err().ok_or_else(|| {
+        miette::miette!("jiff's civil time has no fractional hour representation")
+    })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn parse_utc_offset_parses_zulu() {
+fn parse_utc_offset_parses_zulu() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("Z"))
-        .expect("Z is a real, known zero offset");
+        .into_diagnostic()
+        .wrap_err("Z is a real, known zero offset")?;
     assert_eq!(parsed.descriptor().sign(), UtcOffsetSign::Positive);
     assert_eq!(parsed.descriptor().hours(), 0);
     assert_eq!(
         parsed.descriptor().relationship(),
         UtcOffsetRelationship::Known
     );
+    Ok(())
 }
 
 #[test]
-fn parse_utc_offset_parses_a_negative_zero_as_unknown_local_offset() {
+fn parse_utc_offset_parses_a_negative_zero_as_unknown_local_offset() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("-00:00"))
-        .expect("a negative zero offset is RFC 9557's unknown-local-offset case");
+        .into_diagnostic()
+        .wrap_err("a negative zero offset is RFC 9557's unknown-local-offset case")?;
     assert_eq!(
         parsed.descriptor().relationship(),
         UtcOffsetRelationship::UnknownLocalOffset
     );
+    Ok(())
 }
 
 #[test]
-fn parse_utc_offset_parses_a_positive_offset_with_minutes() {
+fn parse_utc_offset_parses_a_positive_offset_with_minutes() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("+05:30"))
-        .expect("a real numeric offset with minutes parses");
+        .into_diagnostic()
+        .wrap_err("a real numeric offset with minutes parses")?;
     assert_eq!(parsed.descriptor().sign(), UtcOffsetSign::Positive);
     assert_eq!(parsed.descriptor().hours(), 5);
     assert_eq!(parsed.descriptor().minutes(), Some(30));
+    Ok(())
 }
 
 #[test]
-fn parse_utc_offset_rejects_an_out_of_range_offset() {
+fn parse_utc_offset_rejects_an_out_of_range_offset() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let result: Result<ParsedUtcOffset, TemporalError> =
         backend.exchange(RawInput::received("+99:00"));
-    result.expect_err("a +99:00 offset is not real, jiff's own range check rejects it");
+    result.err().ok_or_else(|| {
+        miette::miette!("a +99:00 offset is not real, jiff's own range check rejects it")
+    })?;
+    Ok(())
 }
 
 #[test]
-fn parse_local_date_time_parses_a_real_iso8601_datetime() {
+fn parse_local_date_time_parses_a_real_iso8601_datetime() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedLocalDateTime = backend
         .exchange(RawInput::received("2024-03-10T13:30:00"))
-        .expect("a real ISO 8601 local date-time parses via jiff::civil::DateTime::FromStr");
+        .into_diagnostic()
+        .wrap_err("a real ISO 8601 local date-time parses via jiff::civil::DateTime::FromStr")?;
     assert_eq!(parsed.descriptor().time().hour(), 13);
+    Ok(())
 }
 
 #[test]
-fn parse_offset_date_time_parses_a_real_offset_date_time() {
+fn parse_offset_date_time_parses_a_real_offset_date_time() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedOffsetDateTime = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00"))
-        .expect("a real offset date-time parses via jiff's real Pieces decomposition");
+        .into_diagnostic()
+        .wrap_err("a real offset date-time parses via jiff's real Pieces decomposition")?;
     assert_eq!(parsed.descriptor().offset().sign(), UtcOffsetSign::Negative);
     assert_eq!(parsed.descriptor().offset().hours(), 4);
+    Ok(())
 }
 
 #[test]
-fn parse_offset_date_time_rejects_a_zone_annotation() {
+fn parse_offset_date_time_rejects_a_zone_annotation() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let result: Result<ParsedOffsetDateTime, TemporalError> = backend.exchange(RawInput::received(
         "2024-03-10T13:30:00-04:00[America/New_York]",
     ));
-    let err =
-        result.expect_err("plain ISO 8601 offset date-times have no [...] zone-bracket syntax");
+    let err = result.err().ok_or_else(|| {
+        miette::miette!("plain ISO 8601 offset date-times have no [...] zone-bracket syntax")
+    })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
+    Ok(())
 }
 
 #[test]
-fn parse_rfc3339_timestamp_parses_a_real_timestamp() {
+fn parse_rfc3339_timestamp_parses_a_real_timestamp() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedRfc3339Timestamp = backend
         .exchange(RawInput::received("2024-03-10T17:30:00Z"))
-        .expect("a real RFC 3339 timestamp parses");
+        .into_diagnostic()
+        .wrap_err("a real RFC 3339 timestamp parses")?;
     assert_eq!(parsed.descriptor().offset().hours(), 0);
+    Ok(())
 }
 
 #[test]
-fn parse_ixdtf_timestamp_parses_a_named_zone_annotation() {
+fn parse_ixdtf_timestamp_parses_a_named_zone_annotation() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received(
             "2024-03-10T13:30:00-04:00[America/New_York]",
         ))
-        .expect("a real IXDTF timestamp with a named zone annotation parses");
+        .into_diagnostic()
+        .wrap_err("a real IXDTF timestamp with a named zone annotation parses")?;
     match parsed.descriptor().time_zone_annotation() {
         Some(IxdtfTimeZoneAnnotationDescriptor::Named(named)) => {
             assert_eq!(named.identifier(), "America/New_York");
         }
-        other => panic!("expected a named zone annotation, got {other:?}"),
+        other => {
+            return Err(miette::miette!(
+                "expected a named zone annotation, got {other:?}"
+            ));
+        }
     }
+    Ok(())
 }
 
 #[test]
-fn parse_ixdtf_timestamp_parses_an_offset_annotation() {
+fn parse_ixdtf_timestamp_parses_an_offset_annotation() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00[-04:00]"))
-        .expect("a real IXDTF timestamp with an offset annotation parses");
+        .into_diagnostic()
+        .wrap_err("a real IXDTF timestamp with an offset annotation parses")?;
     match parsed.descriptor().time_zone_annotation() {
         Some(IxdtfTimeZoneAnnotationDescriptor::Offset(offset)) => {
             assert_eq!(offset.hours(), 4);
         }
-        other => panic!("expected an offset annotation, got {other:?}"),
+        other => {
+            return Err(miette::miette!(
+                "expected an offset annotation, got {other:?}"
+            ));
+        }
     }
+    Ok(())
 }
 
 #[test]
-fn parse_ixdtf_timestamp_without_an_annotation_still_parses() {
+fn parse_ixdtf_timestamp_without_an_annotation_still_parses() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00"))
-        .expect("a zone annotation is optional under IXDTF");
+        .into_diagnostic()
+        .wrap_err("a zone annotation is optional under IXDTF")?;
     assert!(parsed.descriptor().time_zone_annotation().is_none());
+    Ok(())
 }
 
 #[test]
-fn the_calconnect_extension_family_is_honestly_unsupported() {
+fn the_calconnect_extension_family_is_honestly_unsupported() -> miette::Result<()> {
     let backend = JiffTimeBackend;
 
     let extended_year: Result<ParsedExtendedYear, TemporalError> =
@@ -340,7 +401,10 @@ fn the_calconnect_extension_family_is_honestly_unsupported() {
         grouped_unit.map(|_| ()),
         formula.map(|_| ()),
     ] {
-        let err = result.expect_err("the CalConnect/ISO 8601-2 extension family is out of scope");
+        let err = result.err().ok_or_else(|| {
+            miette::miette!("the CalConnect/ISO 8601-2 extension family is out of scope")
+        })?;
         assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
     }
+    Ok(())
 }

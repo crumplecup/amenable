@@ -2812,8 +2812,12 @@ fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), TemporalError> {
             )));
         }
     };
-    let year_str = text.get(year_range).expect("length already checked above");
-    let day_str = text.get(day_range).expect("length already checked above");
+    let year_str = text
+        .get(year_range)
+        .ok_or_else(|| reject(format!("{text:?} has an invalid year slice")))?;
+    let day_str = text
+        .get(day_range)
+        .ok_or_else(|| reject(format!("{text:?} has an invalid day-of-year slice")))?;
     let year = year_str
         .parse::<i32>()
         .map_err(|err| reject(format!("invalid year in {text:?}: {err}")))?;
@@ -2854,11 +2858,15 @@ fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), TemporalError> {
             )));
         }
     };
-    let year_str = text.get(year_range).expect("length already checked above");
-    let week_str = text.get(week_range).expect("length already checked above");
+    let year_str = text
+        .get(year_range)
+        .ok_or_else(|| reject(format!("{text:?} has an invalid week-year slice")))?;
+    let week_str = text
+        .get(week_range)
+        .ok_or_else(|| reject(format!("{text:?} has an invalid week-number slice")))?;
     let weekday_str = text
         .get(weekday_range)
-        .expect("length already checked above");
+        .ok_or_else(|| reject(format!("{text:?} has an invalid weekday slice")))?;
     let week_year = year_str
         .parse::<i32>()
         .map_err(|err| reject(format!("invalid week-year in {text:?}: {err}")))?;
@@ -2902,20 +2910,29 @@ fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, TemporalErro
         b'-' => UtcOffsetSign::Negative,
         _ => return Err(reject(format!("{text:?} must start with '+', '-', or 'Z'"))),
     };
-    let rest = text.get(1..).expect("ASCII text, at least 3 bytes long");
-    let (hours_str, minutes_str) = if let Some(idx) = rest.find(':') {
-        (
-            rest.get(..idx).expect("idx is a valid find() result"),
-            Some(rest.get(idx + 1..).expect("idx is a valid find() result")),
-        )
-    } else if rest.len() == 4 {
-        (
-            rest.get(..2).expect("length checked above"),
-            Some(rest.get(2..).expect("length checked above")),
-        )
-    } else {
-        (rest, None)
-    };
+    let rest = text
+        .get(1..)
+        .ok_or_else(|| reject(format!("{text:?} is too short to be a UTC offset")))?;
+    let (hours_str, minutes_str) =
+        if let Some(idx) = rest.find(':') {
+            (
+                rest.get(..idx)
+                    .ok_or_else(|| reject(format!("{text:?} has an invalid offset-hours slice")))?,
+                Some(rest.get(idx + 1..).ok_or_else(|| {
+                    reject(format!("{text:?} has an invalid offset-minutes slice"))
+                })?),
+            )
+        } else if rest.len() == 4 {
+            (
+                rest.get(..2)
+                    .ok_or_else(|| reject(format!("{text:?} has an invalid offset-hours slice")))?,
+                Some(rest.get(2..).ok_or_else(|| {
+                    reject(format!("{text:?} has an invalid offset-minutes slice"))
+                })?),
+            )
+        } else {
+            (rest, None)
+        };
     let hours: u8 = hours_str
         .parse()
         .map_err(|err| reject(format!("invalid offset hours in {text:?}: {err}")))?;
@@ -3032,8 +3049,13 @@ fn parse_reduced_local_time_text(text: &str) -> Result<ReducedLocalTimeDescripto
         (h, Some(m.to_owned()))
     } else if text.len() == 4 && text.bytes().all(|b| b.is_ascii_digit()) {
         (
-            text.get(0..2).expect("length checked above"),
-            Some(text.get(2..4).expect("length checked above").to_owned()),
+            text.get(0..2)
+                .ok_or_else(|| reject(format!("{text:?} has an invalid hour slice")))?,
+            Some(
+                text.get(2..4)
+                    .ok_or_else(|| reject(format!("{text:?} has an invalid minute slice")))?
+                    .to_owned(),
+            ),
         )
     } else {
         (text, None)

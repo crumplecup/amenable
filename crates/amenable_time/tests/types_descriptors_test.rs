@@ -9,6 +9,7 @@ use amenable_time::{
     LocalTimeDescriptorBuilder, PrecisionDescriptorBuilder, SerializationProfile,
     TemporalComponent, UtcOffsetRelationship, UtcOffsetSign,
 };
+use miette::{IntoDiagnostic, WrapErr};
 use strum::IntoEnumIterator;
 
 #[test]
@@ -23,7 +24,7 @@ fn derive_new_struct_exposes_copy_getters() {
 }
 
 #[test]
-fn builder_defaults_the_optional_fields() {
+fn builder_defaults_the_optional_fields() -> miette::Result<()> {
     amenable_core::init_tracing();
 
     let time = LocalTimeDescriptorBuilder::default()
@@ -31,42 +32,49 @@ fn builder_defaults_the_optional_fields() {
         .minute(59u8)
         .second(60u8)
         .build()
-        .expect("every required field is set");
+        .into_diagnostic()
+        .wrap_err("every required field is set")?;
 
     assert_eq!(time.hour(), 23);
     assert!(time.fractional_second().is_none());
+    Ok(())
 }
 
 #[test]
-fn duration_builder_is_all_optional() {
+fn duration_builder_is_all_optional() -> miette::Result<()> {
     amenable_core::init_tracing();
 
     let empty = DurationDescriptorBuilder::default()
         .build()
-        .expect("all fields default");
+        .into_diagnostic()
+        .wrap_err("all fields default")?;
     assert_eq!(empty, DurationDescriptor::default());
 
     let a_week = DurationDescriptorBuilder::default()
         .weeks(1u32)
         .build()
-        .expect("weeks is the only set field");
+        .into_diagnostic()
+        .wrap_err("weeks is the only set field")?;
     assert_eq!(a_week.weeks(), 1);
     assert_eq!(a_week.days(), 0);
+    Ok(())
 }
 
 #[test]
-fn precision_builder_carries_the_smallest_component() {
+fn precision_builder_carries_the_smallest_component() -> miette::Result<()> {
     amenable_core::init_tracing();
 
     let precision = PrecisionDescriptorBuilder::default()
         .smallest_component(TemporalComponent::Second)
         .fractional_digits(9u8)
         .build()
-        .expect("component set, rounding mode defaulted");
+        .into_diagnostic()
+        .wrap_err("component set, rounding mode defaulted")?;
 
     assert_eq!(precision.smallest_component(), TemporalComponent::Second);
     assert_eq!(precision.fractional_digits(), Some(9));
     assert!(precision.rounding_mode().is_none());
+    Ok(())
 }
 
 #[test]

@@ -14,6 +14,7 @@ use amenable_time::{
     ProvenOffsetDateTimeCarrier, ReflectedOffsetDateTime, TemporalError, TemporalErrorKind,
     TemporalInputToken, TemporalInstantNativeBridge, UtcOffsetDescriptorBuilder, UtcOffsetSign,
 };
+use miette::{IntoDiagnostic, WrapErr};
 
 // Fails to compile if `JiffTimeBackend` stops resolving as a real
 // `TemporalInstantNativeBridge<JiffVerifier>`.
@@ -33,7 +34,7 @@ fn offset_date_time_bundle_token() -> OffsetDateTimeSemanticBundleToken {
 }
 
 #[test]
-fn realize_offset_date_time_round_trips_a_calendar_date() {
+fn realize_offset_date_time_round_trips_a_calendar_date() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -45,27 +46,32 @@ fn realize_offset_date_time_round_trips_a_calendar_date() {
                 .minute(30u8)
                 .second(0u8)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
         .hours(5u8)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let descriptor = OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")?;
 
     let carrier: ProvenOffsetDateTimeCarrier<JiffOffsetDateTime> = backend
         .exchange(ReflectedOffsetDateTime::new(
             descriptor,
             offset_date_time_bundle_token(),
         ))
-        .expect("a complete calendar date realizes to a real jiff::civil::DateTime + Offset");
+        .into_diagnostic()
+        .wrap_err("a complete calendar date realizes to a real jiff::civil::DateTime + Offset")?;
     let jiff_offset_date_time = carrier.carrier();
 
     assert_eq!(jiff_offset_date_time.local.year(), 2024);
@@ -74,10 +80,11 @@ fn realize_offset_date_time_round_trips_a_calendar_date() {
     assert_eq!(jiff_offset_date_time.local.hour(), 13);
     assert_eq!(jiff_offset_date_time.local.minute(), 30);
     assert_eq!(jiff_offset_date_time.offset.seconds(), -5 * 3600);
+    Ok(())
 }
 
 #[test]
-fn realize_offset_date_time_resolves_an_ordinal_or_week_date() {
+fn realize_offset_date_time_resolves_an_ordinal_or_week_date() -> miette::Result<()> {
     // Phase 2 originally rejected these (calendar dates only); Phase 3's
     // TemporalCivilProps work widened the shared
     // local_date_time_descriptor_to_jiff_civil_datetime helper this
@@ -94,35 +101,41 @@ fn realize_offset_date_time_resolves_an_ordinal_or_week_date() {
                 .minute(0u8)
                 .second(0u8)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Positive)
         .hours(0u8)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let descriptor = OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")?;
 
     let carrier = backend
         .exchange(ReflectedOffsetDateTime::new(
             descriptor,
             offset_date_time_bundle_token(),
         ))
-        .expect("Phase 3 widened this to resolve ordinal dates too");
+        .into_diagnostic()
+        .wrap_err("Phase 3 widened this to resolve ordinal dates too")?;
     let jiff_offset_date_time = carrier.carrier();
     assert_eq!(jiff_offset_date_time.local.year(), 2024);
     assert_eq!(jiff_offset_date_time.local.month(), 3);
     assert_eq!(jiff_offset_date_time.local.day(), 10);
+    Ok(())
 }
 
 #[test]
-fn realize_offset_date_time_rejects_the_unknown_local_offset_case() {
+fn realize_offset_date_time_rejects_the_unknown_local_offset_case() -> miette::Result<()> {
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -134,21 +147,25 @@ fn realize_offset_date_time_rejects_the_unknown_local_offset_case() {
                 .minute(0u8)
                 .second(0u8)
                 .build()
-                .expect("valid local time"),
+                .into_diagnostic()
+                .wrap_err("valid local time")?,
         )
         .build()
-        .expect("valid local date-time");
+        .into_diagnostic()
+        .wrap_err("valid local date-time")?;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Positive)
         .hours(0u8)
         .relationship(amenable_time::UtcOffsetRelationship::UnknownLocalOffset)
         .build()
-        .expect("valid offset");
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let descriptor = OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .expect("valid offset date-time descriptor");
+        .into_diagnostic()
+        .wrap_err("valid offset date-time descriptor")?;
 
     let err: TemporalError = backend
         .exchange(ReflectedOffsetDateTime::new(
@@ -156,15 +173,23 @@ fn realize_offset_date_time_rejects_the_unknown_local_offset_case() {
             offset_date_time_bundle_token(),
         ))
         .map(|_| ())
-        .expect_err("jiff::tz::Offset has no unknown-local-offset representation");
+        .err()
+        .ok_or_else(|| {
+            miette::miette!("jiff::tz::Offset has no unknown-local-offset representation")
+        })?;
     assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
+    Ok(())
 }
 
 #[test]
-fn offset_date_time_round_trips_through_real_jiff_types() {
+fn offset_date_time_round_trips_through_real_jiff_types() -> miette::Result<()> {
     let backend = JiffTimeBackend;
-    let local = jiff::civil::DateTime::new(2023, 11, 5, 1, 30, 0, 0).expect("valid datetime");
-    let offset = jiff::tz::Offset::from_seconds(-4 * 3600).expect("valid offset");
+    let local = jiff::civil::DateTime::new(2023, 11, 5, 1, 30, 0, 0)
+        .into_diagnostic()
+        .wrap_err("valid datetime")?;
+    let offset = jiff::tz::Offset::from_seconds(-4 * 3600)
+        .into_diagnostic()
+        .wrap_err("valid offset")?;
     let carrier = ProvenOffsetDateTimeCarrier::<JiffOffsetDateTime>::new(
         JiffOffsetDateTime { local, offset },
         offset_date_time_bundle_token(),
@@ -172,12 +197,15 @@ fn offset_date_time_round_trips_through_real_jiff_types() {
 
     let reflected: ReflectedOffsetDateTime = backend
         .exchange(carrier)
-        .expect("a real jiff offset date-time reflects to a descriptor");
+        .into_diagnostic()
+        .wrap_err("a real jiff offset date-time reflects to a descriptor")?;
     let round_tripped: ProvenOffsetDateTimeCarrier<JiffOffsetDateTime> = backend
         .exchange(reflected)
-        .expect("the descriptor realizes back to an equivalent offset date-time");
+        .into_diagnostic()
+        .wrap_err("the descriptor realizes back to an equivalent offset date-time")?;
     let round_tripped = round_tripped.carrier();
 
     assert_eq!(round_tripped.local, local);
     assert_eq!(round_tripped.offset, offset);
+    Ok(())
 }
