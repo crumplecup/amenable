@@ -29,15 +29,17 @@
 //! `TemporalNativeZoneFactory`, the higher-order zone-resolution
 //! factory, including real ambiguity (fold) and gap disambiguation and
 //! a genuine offset/named-zone consistency check Phase 4's own native
-//! bridge never performed.** **Phase 5 (this file, so far, on top of
-//! the phases above): `TemporalConversionFactory` plus
-//! `TemporalNativeConversionFactory` — real UTC normalization, real
-//! named-zone stripping (reusing Phase 4b's own now-consistency-checked
-//! zoned conversion), and real, honest lossless-vs-lossy sub-second
-//! precision adjustment.** Every other `Temporal*Props`/`NativeBridge`/
-//! `Factory` family named in the plan doc's checklist lands in later
-//! commits, each widening this same `JiffTimeBackend` struct with its
-//! own real `Exchange` impls.
+//! bridge never performed.** **Phase 5: `TemporalConversionFactory`
+//! plus `TemporalNativeConversionFactory` — real UTC normalization,
+//! real named-zone stripping (reusing Phase 4b's own now-consistency-
+//! checked zoned conversion), and real, honest lossless-vs-lossy
+//! sub-second precision adjustment.** **Phase 6 (this file, so far, on
+//! top of the phases above): `TemporalReporter`'s real capability
+//! declaration, every flag checked against jiff's own real source or
+//! docs rather than assumed from the canary's own values.** Every other
+//! `Temporal*Props`/`NativeBridge`/`Factory` family named in the plan
+//! doc's checklist lands in later commits, each widening this same
+//! `JiffTimeBackend` struct with its own real `Exchange` impls.
 
 use amenable_core::{
     ClassifiedWitness, Establish, Exchange, Metadata, OwnedEntry, Provenance, Sidecar, Standard,
@@ -71,10 +73,10 @@ use amenable_time::{
     ResolveLocalDateTimeNativeEstablished, ResolveLocalDateTimeNativeInput,
     ResolveLocalDateTimeNativeOutput, ResolveLocalDateTimeOutput,
     ResolveLocalDateTimePreconditionsToken, ResolvedNamedTimeZone, RoundingModeDescriptor,
-    StripNamedZoneEstablished, StripNamedZoneInput, StripNamedZoneOutput,
+    SerializationProfile, StripNamedZoneEstablished, StripNamedZoneInput, StripNamedZoneOutput,
     StripNamedZonePreconditionsToken, TemporalCivilProps, TemporalComponent, TemporalDurationProps,
     TemporalError, TemporalErrorKind, TemporalInputToken, TemporalInstantProps, TemporalProvenance,
-    TemporalZoneProps, TruncateSubsecondsEstablished, TruncateSubsecondsInput,
+    TemporalReporter, TemporalZoneProps, TruncateSubsecondsEstablished, TruncateSubsecondsInput,
     TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
     TruncateSubsecondsNativeOutput, TruncateSubsecondsOutput, TruncateSubsecondsPreconditionsToken,
     UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign,
@@ -1956,5 +1958,74 @@ impl
         Ok(TruncateSubsecondsNativeOutput::<JiffTimeBackend>::new(
             native, token,
         ))
+    }
+}
+
+// ── Reporter (Phase 6) ───────────────────────────────────────────────
+//
+// `TemporalReporter`'s real capability declaration. Every flag below
+// is checked against jiff's own real source/docs, not assumed from the
+// canary's own values:
+//
+// - `max_fractional_second_digits`: `Some(9)` -- jiff's civil time and
+//   `Span` are both nanosecond-precision throughout (confirmed in
+//   Phases 1-5's own real conversions).
+// - `supports_leap_seconds`: `false` -- jiff's own docs state outright
+//   "Jiff does not support leap seconds. Jiff behaves as if they don't
+//   exist" (verbatim, `civil::DateTime`/`Timestamp`/`civil::Time`/
+//   `Zoned`'s own doc comments).
+// - `supports_unknown_local_offset`: `false` -- Phase 2's own
+//   `realize_offset_date_time_rejects_the_unknown_local_offset_case`
+//   test already confirmed `jiff::tz::Offset` has no representation
+//   for RFC 9557's `-00:00` convention at all.
+// - `supports_named_zone_round_trip`: `true` -- real IANA tzdb lookups
+//   via `TimeZone::get`, exercised for real since Phase 4.
+// - `supports_end_of_day_twenty_four`: `false` -- `jiff::civil::Time::MAX`
+//   is `23:59:59.999999999`; jiff has no `24:00:00` representation.
+// - `current_tzdb_revision`: `None` -- jiff exposes no public API to
+//   query the linked tzdb's own revision string (checked its real
+//   `tz::db` module directly in Phase 4); re-confirmed here, not
+//   reassumed.
+// - `supported_serialization_profiles`: empty, matching the canary --
+//   an honest declaration, not a pessimistic one: no `TemporalParser`/
+//   `TemporalFormatter` edge exists on this backend yet (Phases 9-10),
+//   so no serialization profile is actually reachable through this
+//   backend's own `Exchange` surface today, even though jiff's real
+//   `fmt::temporal` module could back several of them once those
+//   phases land.
+impl TemporalReporter for JiffTimeBackend {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn supported_serialization_profiles(&self) -> Vec<SerializationProfile> {
+        Vec::new()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn max_fractional_second_digits(&self) -> Option<u8> {
+        Some(9)
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn supports_leap_seconds(&self) -> bool {
+        false
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn supports_unknown_local_offset(&self) -> bool {
+        false
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn supports_named_zone_round_trip(&self) -> bool {
+        true
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn supports_end_of_day_twenty_four(&self) -> bool {
+        false
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn current_tzdb_revision(&self) -> Option<String> {
+        None
     }
 }
