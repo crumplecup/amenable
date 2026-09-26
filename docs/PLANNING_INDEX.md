@@ -69,7 +69,12 @@ rounding mode is a real `Unsupported`); the same missing-constructor
 gap recurred and was fixed identically on the Conversion factory's own
 `*Request` types; retrofitted Phase 4's `zoned_date_time_descriptor_
 to_jiff_zoned` to perform the offset/named-zone consistency check it
-had never actually done. Full-surface map of
+had never actually done. Phase 6 done (2026-09-26, commit `d741b716`):
+`TemporalReporter`'s real capability declaration, both flagged unknowns
+(leap seconds, end-of-day `24:00:00`) resolved to real `false` against
+jiff's own source/docs rather than assumed; `supported_serialization_
+profiles` left honestly empty since no `TemporalParser`/
+`TemporalFormatter` edge exists on this backend yet. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are

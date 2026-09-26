@@ -6,10 +6,25 @@
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 `8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
 done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
-`75bc0ee0`). This doc is the full-surface map and checklist; execution
-proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
-plan steps" convention — no check-in needed between phases once a
-phase's own real work is verified and committed.
+`75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). This doc is
+the full-surface map and checklist; execution proceeds phase by phase
+per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
+no check-in needed between phases once a phase's own real work is
+verified and committed.
+
+**Phase 6 real findings, worth carrying into later phases:** every one
+of the plan's two flagged unknowns resolved to real, checkable facts
+rather than guesses — jiff's own doc comments state outright, verbatim,
+that "Jiff does not support leap seconds. Jiff behaves as if they don't
+exist" (repeated across `DateTime`/`Timestamp`/`Time`/`Zoned`'s own
+doc comments), and `jiff::civil::Time::MAX` is a real constant
+(`23:59:59.999999999`) confirming no `24:00:00` representation exists
+at all. `supported_serialization_profiles` is left empty for now, not
+because jiff can't back any profile, but because no `TemporalParser`/
+`TemporalFormatter` edge exists on this backend yet — that's Phases
+9-10's own job, and this method should be revisited once those land
+(jiff's real `fmt::temporal` module can genuinely back RFC 3339, RFC
+9557 IXDTF, and ISO 8601 extended once wired).
 
 **Phase 5 real findings, worth carrying into later phases:** the same
 missing-constructor gap Phase 4b found recurred identically for the
@@ -337,8 +352,9 @@ surface is the actual checklist below.
       `ConversionFactory` (UTC normalize, zone-strip, precision adjust)
       over the same `(jiff::civil::DateTime, jiff::tz::Offset)` pair
       Phase 2's own helpers already established.
-- [ ] **Phase 6 — Reporter.** Real capability declaration; verify the two
-      flagged unknowns against jiff source before committing.
+- [x] **Phase 6 — Reporter.** Real capability declaration; the two
+      flagged unknowns (leap seconds, end-of-day 24:00:00) both resolved
+      to real `false` against jiff's own source/docs.
 - [ ] **Phase 7 — Interval factory.** `TemporalIntervalFactory` — real
       duration/order-endpoints edges; interval/recurring-interval
       text-parse via hand-rolled `/`-split over the Phase 1-2 carriers.
