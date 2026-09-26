@@ -2,17 +2,49 @@
 
 ## Status
 
-🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
+✅ Complete. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 `8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
 done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
 `75bc0ee0`). Phase 6 done (2026-09-26, commit `d741b716`). Phase 7 done
 (2026-09-26, commit `caa4f823`). Phase 8 done (2026-09-26, commit
-`f5c74b81`). Phase 9 done (2026-09-26, commit `ecccb7ff`). This doc is
-the full-surface map and checklist; execution proceeds phase by phase
-per `docs/PLANNING_INDEX.md`'s "commit between plan steps" convention —
-no check-in needed between phases once a phase's own real work is
-verified and committed.
+`f5c74b81`). Phase 9 done (2026-09-26, commit `ecccb7ff`). Phase 10
+done (2026-09-26, commit `0a152909`) — all 10 phases of this plan are
+now landed. `JiffTimeBackend` implements every real, jiff-representable
+edge across `amenable_time`'s whole trait surface (Props/NativeBridge/
+Factory/Parser/Formatter), with a real, honest `Unsupported` for the
+~34 edges the CalConnect/ISO 8601-2 extension family genuinely has no
+jiff representation for. 116 tests passing across 10 test files.
+
+**Phase 10 real findings:** `TemporalFormatter<V>` is, like
+`TemporalParser`, ONE blanket-impl'd trait over all 36 edges — every
+edge's input is one of Parser's own already-proven `ParsedX` sidecars,
+so formatting turned out to be pure text construction from already-
+trusted descriptor fields, no fresh jiff calls needed except where
+jiff's own `Span: Display` backs `Duration` directly. Two real,
+deliberate scope decisions surfaced only by building this phase: (1) a
+known zero UTC offset always formats as the explicit numeric form
+(`"+00:00"`), never `"Z"` — Phase 9's own parser already found `"Z"`
+and `"+00:00"` collapse to the identical descriptor, so there is no
+surviving information to choose `"Z"` back over the numeric form on
+the way out; (2) `Open`/`Unknown` interval boundaries are a real
+`Unsupported` for formatting, not a guessed textual convention —
+reading `contracts/extended/qualification.rs`'s own real ISO 8601-2
+§10.2 citations confirmed both boundary kinds are themselves an
+extension-family concept this backend has no independently sourced
+basic-ISO-8601 text for, so guessing one (e.g. `".."`) would have been
+exactly the kind of unsourced assumption this whole backend avoided
+everywhere else. `TimeInterval`/`RecurringInterval` formatting, unlike
+Parser's own blanket `Unsupported` for the same two edges, turned out
+real (for every jiff-representable endpoint form) — formatting
+consumes an already-STRUCTURED descriptor (the endpoint's concrete
+form is a known enum discriminant), unlike parsing raw text where the
+form is unknown until parsed, so Phase 8's own endpoint classification
+could be reused directly.
+
+This doc remains the full-surface map and checklist for any future
+session that needs to re-derive or extend this backend's own scope
+boundaries.
 
 **Phase 9 real findings, worth carrying into Phase 10:** `TemporalParser<V>`
 is a SINGLE blanket-impl'd trait over all 24 edges, unlike every prior
@@ -438,8 +470,12 @@ surface is the actual checklist below.
       forms, UTC offset, local/offset date-time, RFC 3339, IXDTF), 11
       honestly `Unsupported` (the CalConnect/ISO 8601-2 extension
       family, plus `TimeInterval` per Phase 7's own finding).
-- [ ] **Phase 10 — Formatter.** The matching ~9+ real `TemporalFormatter`
-      edges via jiff's `*Printer` types.
+- [x] **Phase 10 — Formatter.** All 36 `TemporalFormatter` edges (a
+      single blanket-impl'd trait, no feasibility split possible): 24
+      real (formatted directly from Parser's own already-validated
+      descriptor fields, plus jiff's real `Span: Display` for
+      `Duration`), 12 honestly `Unsupported` (the CalConnect/ISO 8601-2
+      extension family).
 
 Each phase: its own real implementation, its own test file (mirroring
 `amenable_std/tests/std_backend_test.rs`'s trait-bound-assertion +

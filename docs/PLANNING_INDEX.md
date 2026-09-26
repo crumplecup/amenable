@@ -34,7 +34,7 @@ becomes load-bearing once something large actively uses it.
 
 **Document:** [AMENABLE_TIME_JIFF_BACKEND_PLAN.md](AMENABLE_TIME_JIFF_BACKEND_PLAN.md)
 
-**Status:** 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`):
+**Status:** ✅ Complete (2026-09-26). Phase 1 done (2026-09-23, commit `3930418e`):
 a real `JiffTimeBackend`/`JiffVerifier`, `TemporalDurationProps` +
 `TemporalDurationNativeBridge` over `jiff::Span`, with the
 `jiff_backend_trusts!` 23-contract block every later phase will also
@@ -98,7 +98,18 @@ exists; hand-rolled digit-splitting for ordinal/week/reduced-precision/
 UTC-offset text jiff's own parser won't accept; jiff's real
 `fmt::temporal::Pieces` decomposition for offset/RFC 3339/IXDTF
 timestamps), 11 honestly `Unsupported` (the CalConnect/ISO 8601-2
-extension family, plus `TimeInterval`). Full-surface map of
+extension family, plus `TimeInterval`). Phase 10 done (2026-09-26,
+commit `0a152909`): `TemporalFormatter` — the matching single
+blanket-impl'd trait over all 36 edges: 24 real (pure text
+construction from Parser's own already-validated descriptor fields,
+plus jiff's real `Span: Display` for `Duration`; `TimeInterval`/
+`RecurringInterval` formatting turned out real, unlike Parser's own
+blanket `Unsupported` for those two, since formatting consumes an
+already-structured descriptor rather than unparsed text), 12 honestly
+`Unsupported` (the same extension family). **All 10 phases of this
+plan are now complete** — 116 tests passing across 10 test files;
+`JiffTimeBackend` implements every real, jiff-representable edge across
+`amenable_time`'s whole trait surface. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are
