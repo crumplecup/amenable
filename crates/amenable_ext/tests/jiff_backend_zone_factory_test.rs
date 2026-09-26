@@ -23,9 +23,9 @@ use amenable_time::{
     OffsetDateTimeDescriptorBuilder, ProvenZonedDateTimeCarrier, RawInput,
     ResolveLocalDateTimeInput, ResolveLocalDateTimeNativeInput, ResolveLocalDateTimeNativeRequest,
     ResolveLocalDateTimePreconditions, ResolveLocalDateTimePreconditionsToken,
-    ResolveLocalDateTimeRequest, TemporalError, TemporalErrorKind, TemporalInputToken,
-    TemporalNativeZoneFactory, TemporalZoneFactory, UtcOffsetDescriptorBuilder, UtcOffsetSign,
-    ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor,
+    ResolveLocalDateTimeRequest, ResolvedNamedTimeZone, TemporalError, TemporalErrorKind,
+    TemporalInputToken, TemporalNativeZoneFactory, TemporalZoneFactory, UtcOffsetDescriptorBuilder,
+    UtcOffsetSign, ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor,
     ZoneTransitionResolutionAuthorityBundle,
 };
 
@@ -96,7 +96,7 @@ fn confirm_named_zone_revision_preconditions_token() -> ConfirmNamedZoneRevision
 #[test]
 fn resolve_named_zone_accepts_a_real_iana_identifier() {
     let backend = JiffTimeBackend;
-    let resolved = backend
+    let resolved: ResolvedNamedTimeZone = backend
         .exchange(RawInput::received("America/New_York"))
         .expect("America/New_York is a real IANA zone");
     assert_eq!(resolved.descriptor().identifier(), "America/New_York");
@@ -105,8 +105,9 @@ fn resolve_named_zone_accepts_a_real_iana_identifier() {
 #[test]
 fn resolve_named_zone_rejects_a_fake_identifier() {
     let backend = JiffTimeBackend;
-    let err: TemporalError = backend
-        .exchange(RawInput::received("Nowhere/Fictional"))
+    let result: Result<ResolvedNamedTimeZone, TemporalError> =
+        backend.exchange(RawInput::received("Nowhere/Fictional"));
+    let err: TemporalError = result
         .map(|_| ())
         .expect_err("Nowhere/Fictional is not real");
     assert!(matches!(
