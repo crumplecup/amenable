@@ -5,11 +5,43 @@
 🟡 In progress. Phase 1 done (2026-09-23, commit `3930418e`). Phase 2
 done (2026-09-23, commit `2d29ec9f`). Phase 3 done (2026-09-23, commit
 `8277401e`). Phase 4 done (2026-09-23, commit `96137de6`). Phase 4b
-done (2026-09-23, commit `40086544`). This doc is the full-surface map
-and checklist; execution proceeds phase by phase per
-`docs/PLANNING_INDEX.md`'s "commit between plan steps" convention — no
-check-in needed between phases once a phase's own real work is
-verified and committed.
+done (2026-09-23, commit `40086544`). Phase 5 done (2026-09-26, commit
+`75bc0ee0`). This doc is the full-surface map and checklist; execution
+proceeds phase by phase per `docs/PLANNING_INDEX.md`'s "commit between
+plan steps" convention — no check-in needed between phases once a
+phase's own real work is verified and committed.
+
+**Phase 5 real findings, worth carrying into later phases:** the same
+missing-constructor gap Phase 4b found recurred identically for the
+Conversion factory's own `*Request` types (`NormalizeToUtcRequest`/
+`StripNamedZoneRequest`/`AdjustPrecisionLosslesslyRequest`/
+`TruncateSubsecondsRequest` at the descriptor level,
+`AdjustPrecisionLosslesslyNativeRequest<B>`/`TruncateSubsecondsNative-
+Request<B>` at the native level) — fixed identically, with a real
+`derive_new::new` added directly in `amenable_time`. `strip_named_zone`
+exposed a genuine correctness gap left over from Phase 4: `zoned_date_
+time_descriptor_to_jiff_zoned` had never validated offset/zone
+consistency at all before pinning, even though `attach_named_zone`
+(Phase 4b) already proves exactly that fact — retrofitted so every
+caller, not just `attach_named_zone`'s own, gets the real check.
+jiff's civil time is always second-plus-nanosecond in shape, with no
+concept of a "smallest component" coarser than a second for precision-
+*adjustment* (as opposed to the civil/ordinal round trip Phase 3 built,
+which is a different axis) — any `PrecisionDescriptor` naming a
+`smallest_component` other than `Second` is a real, honest
+`Unsupported` case, not a silent no-op. `RoundingModeDescriptor` has
+five real variants (`Truncate`/`HalfUp`/`HalfEven`/`Ceiling`/`Floor`/
+`Other`), but this backend only implements true `Truncate` arithmetic
+for now — `truncate_subseconds` accepts a declared `Truncate` (or
+absent) rounding mode and honestly rejects every other one as
+`Unsupported`, rather than silently truncating regardless or attempting
+half-up/-even/ceiling/floor arithmetic that was never asked for. No new
+composite carrier was needed here: both `normalize_to_utc` and
+`strip_named_zone` reuse the same `(jiff::civil::DateTime, jiff::tz::
+Offset)` pair Phase 2's own `offset_date_time_descriptor_to_jiff_parts`/
+`jiff_parts_to_offset_date_time_descriptor` helpers already established,
+confirming those two helpers' reuse value extends past the Instant/Zone
+phases that originally motivated them.
 
 **Phase 2 real findings, worth carrying into later phases:** jiff has no
 first-class "offset date-time" type of its own — `JiffOffsetDateTime`
@@ -301,8 +333,10 @@ surface is the actual checklist below.
 - [x] **Phase 4b — Zone factory.** `TemporalZoneFactory` (5 edges) +
       `TemporalNativeZoneFactory` (3 edges) — the higher-order zone-
       resolution factory built on top of Phase 4's own carriers.
-- [ ] **Phase 5 — Conversion.** `NativeConversionFactory`/
-      `ConversionFactory` (UTC normalize, zone-strip, precision adjust).
+- [x] **Phase 5 — Conversion.** `NativeConversionFactory`/
+      `ConversionFactory` (UTC normalize, zone-strip, precision adjust)
+      over the same `(jiff::civil::DateTime, jiff::tz::Offset)` pair
+      Phase 2's own helpers already established.
 - [ ] **Phase 6 — Reporter.** Real capability declaration; verify the two
       flagged unknowns against jiff source before committing.
 - [ ] **Phase 7 — Interval factory.** `TemporalIntervalFactory` — real

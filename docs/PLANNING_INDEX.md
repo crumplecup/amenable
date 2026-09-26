@@ -58,7 +58,18 @@ offset/named-zone consistency check Phase 4's own native bridge never
 performed; also fixed a real, significant pre-existing gap in
 `amenable_time`'s own API (no public constructor at all on the
 zone-factory `*Request` types) via a real `derive_new::new` addition.
-Full-surface map of
+Phase 5 done (2026-09-26, commit `75bc0ee0`):
+`TemporalConversionFactory`/`NativeConversionFactory` — real UTC
+normalization and named-zone stripping over the same `(jiff::civil::
+DateTime, jiff::tz::Offset)` pair Phase 2's own helpers already
+established, plus real, honest lossless-vs-lossy sub-second precision
+adjustment anchored at the second (jiff's own civil-time granularity;
+only true `Truncate` rounding is implemented, every other declared
+rounding mode is a real `Unsupported`); the same missing-constructor
+gap recurred and was fixed identically on the Conversion factory's own
+`*Request` types; retrofitted Phase 4's `zoned_date_time_descriptor_
+to_jiff_zoned` to perform the offset/named-zone consistency check it
+had never actually done. Full-surface map of
 `amenable_time`'s ~129-edge trait surface (`Temporal*Props`/
 `NativeBridge`/`Factory`/`Parser`/`Formatter`), every Props associated
 type and Exchange edge classified against jiff's real API: ~95 edges are
