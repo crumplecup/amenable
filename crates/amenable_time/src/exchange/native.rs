@@ -83,7 +83,7 @@ impl<B: TemporalInstantProps + TemporalZoneProps> NormalizeToUtcNativeOutput<B> 
 }
 
 /// Runtime values the `adjust_precision_losslessly_native` exchange consumes.
-#[derive(amenable_derive::Evidence, derive_getters::Getters)]
+#[derive(amenable_derive::Evidence, derive_getters::Getters, new)]
 #[evidence(basis = "crate::NativeCarrierRequest")]
 pub struct AdjustPrecisionLosslesslyNativeRequest<B: TemporalInstantProps + TemporalZoneProps> {
     /// The `timestamp` input.
@@ -162,7 +162,7 @@ impl<B: TemporalInstantProps + TemporalZoneProps> AdjustPrecisionLosslesslyNativ
 }
 
 /// Runtime values the `truncate_subseconds_native` exchange consumes.
-#[derive(amenable_derive::Evidence, derive_getters::Getters)]
+#[derive(amenable_derive::Evidence, derive_getters::Getters, new)]
 #[evidence(basis = "crate::NativeCarrierRequest")]
 pub struct TruncateSubsecondsNativeRequest<B: TemporalInstantProps + TemporalZoneProps> {
     /// The `timestamp` input.

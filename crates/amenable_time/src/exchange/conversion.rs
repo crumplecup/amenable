@@ -4,6 +4,13 @@
 //! and its return-tuple proofs into a `*Established` proposition (the
 //! `proof_composition` fold). The `Exchange` impls live in the backend
 //! crate (`#[capture_exchange_body]`); `amenable_time` ships the shape.
+//!
+//! Each `*Request` type gets a real `derive_new::new` constructor —
+//! the same real, pre-existing gap already fixed in `exchange/zone.rs`
+//! (private fields, `Getters`-only read access, no public constructor
+//! of any kind).
+
+use derive_new::new;
 
 use crate::{
     AdjustPrecisionLosslesslyEstablishedToken, AdjustPrecisionLosslesslyPreconditionsToken,
@@ -19,7 +26,15 @@ use crate::{
 
 /// Descriptors the `normalize_to_utc` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct NormalizeToUtcRequest {
@@ -112,7 +127,15 @@ impl NormalizeToUtcOutput {
 
 /// Descriptors the `strip_named_zone` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct StripNamedZoneRequest {
@@ -209,7 +232,15 @@ impl StripNamedZoneOutput {
 
 /// Descriptors the `adjust_precision_losslessly` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct AdjustPrecisionLosslesslyRequest {
@@ -305,7 +336,15 @@ impl AdjustPrecisionLosslesslyOutput {
 
 /// Descriptors the `truncate_subseconds` exchange consumes.
 #[derive(
-    Debug, Clone, Default, PartialEq, Eq, Hash, amenable_derive::Evidence, derive_getters::Getters,
+    Debug,
+    Clone,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    new,
 )]
 #[evidence(basis = "Self")]
 pub struct TruncateSubsecondsRequest {
