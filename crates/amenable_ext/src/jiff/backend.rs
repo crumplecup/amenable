@@ -40,13 +40,20 @@
 //! `TemporalIntervalFactory` — real duration parsing and real
 //! `order_offset_endpoints` arithmetic; the two full interval-text-parse
 //! edges are an honest `Unsupported` for now, since they need
-//! `TemporalParser` (Phase 9), not yet built.** **Phase 8 (this file,
-//! so far, on top of the phases above): `TemporalTimeIntervalProps` +
-//! `TemporalRecurringIntervalProps` plus their `NativeBridge`s, and
-//! `TemporalNativeIntervalFactory`'s own `order_offset_endpoints_native`
-//! edge — real for every jiff-representable endpoint form, honestly
-//! `Unsupported` for the CalConnect/ISO 8601-2 extension family.**
-//! Every other `Temporal*Props`/`NativeBridge`/`Factory` family named
+//! `TemporalParser` (Phase 9), not yet built.** **Phase 8:
+//! `TemporalTimeIntervalProps` + `TemporalRecurringIntervalProps` plus
+//! their `NativeBridge`s, and `TemporalNativeIntervalFactory`'s own
+//! `order_offset_endpoints_native` edge — real for every
+//! jiff-representable endpoint form, honestly `Unsupported` for the
+//! CalConnect/ISO 8601-2 extension family.** **Phase 9 (this file, so
+//! far, on top of the phases above): `TemporalParser` — 13 of its 24
+//! edges are real (jiff `FromStr` where it exists, hand-rolled digit
+//! splitting for the ordinal/week/reduced-precision/UTC-offset forms
+//! jiff's own parser doesn't accept as text, and jiff's real `Pieces`
+//! decomposition for offset/RFC 3339/IXDTF timestamps); the other 11
+//! (the CalConnect/ISO 8601-2 extension family, plus `TimeInterval` per
+//! Phase 7's own finding) are a real, honest `Unsupported`.** Every
+//! other `Temporal*Props`/`NativeBridge`/`Factory` family named
 //! in the plan doc's checklist lands in later commits, each widening
 //! this same `JiffTimeBackend` struct with its own real `Exchange`
 //! impls.
@@ -62,44 +69,55 @@ use amenable_time::{
     AdjustPrecisionLosslesslyPreconditionsToken, AttachNamedZoneEstablished,
     AttachNamedZoneEstablishedToken, AttachNamedZoneInput, AttachNamedZoneNativeInput,
     AttachNamedZoneOutput, AttachNamedZonePreconditions, AttachNamedZonePreconditionsToken,
-    CalendarDateDescriptor, CompleteDateDescriptor, ConfirmNamedZoneRevisionEstablished,
-    ConfirmNamedZoneRevisionEstablishedToken, ConfirmNamedZoneRevisionInput,
-    ConfirmNamedZoneRevisionNativeOutput, ConfirmNamedZoneRevisionOutput,
-    ConfirmNamedZoneRevisionPreconditions, ConfirmNamedZoneRevisionPreconditionsToken,
-    ConfirmZoneAuthorityEstablished, ConfirmZoneAuthorityInput, ConfirmZoneAuthorityOutput,
-    ConfirmZoneAuthorityPreconditionsToken, DurationDescriptor, DurationDescriptorBuilder,
-    DurationFormValid, DurationFractionDescriptor, FractionalSecondDescriptor,
-    IntervalEndpointOrderingBundle, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
-    LocalTimeDescriptorBuilder, LocalTimeZoneResolutionAuthorityDescriptor,
-    NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder, NamedTimeZoneIdentityValid,
-    NamedTimeZoneRevisionBundle, NormalizeToUtcEstablished, NormalizeToUtcInput,
-    NormalizeToUtcNativeEstablished, NormalizeToUtcNativeOutput, NormalizeToUtcOutput,
-    NormalizeToUtcPreconditionsToken, OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder,
-    OffsetDateTimeProof, OffsetDateTimeProofToken, OffsetDateTimeSemanticBundle,
-    OrderOffsetEndpointsEstablished, OrderOffsetEndpointsEstablishedToken,
-    OrderOffsetEndpointsInput, OrderOffsetEndpointsNativeInput, OrderOffsetEndpointsNativeOutput,
-    OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken, ParsedDuration,
-    ParsedRecurringInterval, ParsedTimeInterval, PrecisionDescriptor, ProvenDurationCarrier,
-    ProvenLocalDateTimeCarrier, ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier,
-    ProvenRecurringIntervalCarrier, ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier,
-    QualifiedOrBareTemporalValueDescriptor, RawInput, RecurringIntervalDescriptorBuilder,
-    ReflectedDuration, ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
+    CalendarDateDescriptor, CalendarDateValid, CompleteDateDescriptor,
+    ConfirmNamedZoneRevisionEstablished, ConfirmNamedZoneRevisionEstablishedToken,
+    ConfirmNamedZoneRevisionInput, ConfirmNamedZoneRevisionNativeOutput,
+    ConfirmNamedZoneRevisionOutput, ConfirmNamedZoneRevisionPreconditions,
+    ConfirmNamedZoneRevisionPreconditionsToken, ConfirmZoneAuthorityEstablished,
+    ConfirmZoneAuthorityInput, ConfirmZoneAuthorityOutput, ConfirmZoneAuthorityPreconditionsToken,
+    DurationDescriptor, DurationDescriptorBuilder, DurationFormValid, DurationFractionDescriptor,
+    FractionalSecondDescriptor, IntervalEndpointOrderingBundle, IxdtfTimeZoneAnnotationDescriptor,
+    IxdtfTimestampDescriptorBuilder, IxdtfTimestampProof, LocalDateTimeDescriptor,
+    LocalDateTimeDescriptorBuilder, LocalDateTimeProof, LocalTimeDescriptorBuilder, LocalTimeValid,
+    LocalTimeZoneResolutionAuthorityDescriptor, NamedTimeZoneDescriptor,
+    NamedTimeZoneDescriptorBuilder, NamedTimeZoneIdentityValid, NamedTimeZoneRevisionBundle,
+    NormalizeToUtcEstablished, NormalizeToUtcInput, NormalizeToUtcNativeEstablished,
+    NormalizeToUtcNativeOutput, NormalizeToUtcOutput, NormalizeToUtcPreconditionsToken,
+    OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder, OffsetDateTimeProof,
+    OffsetDateTimeProofToken, OffsetDateTimeSemanticBundle, OrderOffsetEndpointsEstablished,
+    OrderOffsetEndpointsEstablishedToken, OrderOffsetEndpointsInput,
+    OrderOffsetEndpointsNativeInput, OrderOffsetEndpointsNativeOutput, OrderOffsetEndpointsOutput,
+    OrderOffsetEndpointsPreconditionsToken, OrdinalDateDescriptor, OrdinalDateValid,
+    ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade,
+    ParsedDuration, ParsedExtendedYear, ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp,
+    ParsedLocalDateTime, ParsedLocalTime, ParsedOffsetDateTime, ParsedOrdinalDate,
+    ParsedQualifiedTemporalValue, ParsedRecurringInterval, ParsedReducedCalendarDate,
+    ParsedReducedLocalTime, ParsedRfc3339Timestamp, ParsedSeasonalTemporalExpression,
+    ParsedSubYearGroupingExpression, ParsedTemporalSet, ParsedTimeInterval,
+    ParsedTimeOfDayWithShift, ParsedUnspecifiedComponentExpression, ParsedUtcOffset,
+    ParsedWeekDate, PrecisionDescriptor, ProvenDurationCarrier, ProvenLocalDateTimeCarrier,
+    ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier, ProvenRecurringIntervalCarrier,
+    ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier, QualifiedOrBareTemporalValueDescriptor,
+    RawInput, RecurringIntervalDescriptorBuilder, ReducedCalendarDateDescriptor,
+    ReducedCalendarDateValid, ReducedLocalTimeDescriptor, ReducedLocalTimeValid, ReflectedDuration,
+    ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
     ReflectedRecurringInterval, ReflectedTimeInterval, ReflectedZonedDateTime,
     ResolveLocalDateTimeEstablished, ResolveLocalDateTimeInput,
     ResolveLocalDateTimeNativeEstablished, ResolveLocalDateTimeNativeInput,
     ResolveLocalDateTimeNativeOutput, ResolveLocalDateTimeOutput,
-    ResolveLocalDateTimePreconditionsToken, ResolvedNamedTimeZone, RoundingModeDescriptor,
-    SerializationProfile, StripNamedZoneEstablished, StripNamedZoneInput, StripNamedZoneOutput,
-    StripNamedZonePreconditionsToken, TemporalCivilProps, TemporalComponent, TemporalDurationProps,
-    TemporalError, TemporalErrorKind, TemporalInputToken, TemporalInstantProps, TemporalProvenance,
-    TemporalRecurringIntervalProps, TemporalReporter, TemporalTimeIntervalProps,
-    TemporalValueDescriptor, TemporalZoneProps, TimeIntervalDescriptor, TimeIntervalEndpoint,
-    TimeIntervalRepresentation, TruncateSubsecondsEstablished, TruncateSubsecondsInput,
-    TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
+    ResolveLocalDateTimePreconditionsToken, ResolvedNamedTimeZone, Rfc3339TimestampProof,
+    RoundingModeDescriptor, SerializationProfile, StripNamedZoneEstablished, StripNamedZoneInput,
+    StripNamedZoneOutput, StripNamedZonePreconditionsToken, TemporalCivilProps, TemporalComponent,
+    TemporalDurationProps, TemporalError, TemporalErrorKind, TemporalInputToken,
+    TemporalInstantProps, TemporalProvenance, TemporalRecurringIntervalProps, TemporalReporter,
+    TemporalTimeIntervalProps, TemporalValueDescriptor, TemporalZoneProps, TimeIntervalDescriptor,
+    TimeIntervalEndpoint, TimeIntervalRepresentation, TruncateSubsecondsEstablished,
+    TruncateSubsecondsInput, TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
     TruncateSubsecondsNativeOutput, TruncateSubsecondsOutput, TruncateSubsecondsPreconditionsToken,
     UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign,
-    ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor, ZonedDateTimeDescriptor,
-    ZonedDateTimeDescriptorBuilder, ZonedDateTimeSemanticBundle,
+    UtcOffsetValid, WeekDateDescriptor, WeekDateValid, ZoneAmbiguityResolutionDescriptor,
+    ZoneGapResolutionDescriptor, ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
+    ZonedDateTimeSemanticBundle,
 };
 
 // ── Phase 3: Civil ───────────────────────────────────────────────────
@@ -2629,5 +2647,759 @@ impl
             IntervalEndpointOrderingBundle::default(),
             bundle_token,
         ))
+    }
+}
+
+// ── Parser (Phase 9) ─────────────────────────────────────────────────
+//
+// `TemporalParser<JiffVerifier>` is ONE blanket-impl'd supertrait
+// bundle over all 24 `Exchange<RawInput, ParsedX, JiffVerifier>` edges
+// -- unlike every prior family, there is no way to claim a subset;
+// every edge needs a real `Exchange` impl before the trait holds at
+// all. 13 are real jiff-backed parses (calendar/ordinal/week dates,
+// local time, the two reduced-precision forms Phase 3's own carriers
+// anticipated wiring here, UTC offset, local/offset date-time, RFC
+// 3339, IXDTF). The other 11 are the CalConnect/ISO 8601-2 extension
+// family (plus `TimeInterval`, per Phase 7's own finding) -- a real,
+// honest `Unsupported`, not a stand-in, mirroring the std canary's own
+// `unsupported_parse` pattern for exactly this reason.
+//
+// Every parse proposition (`CalendarDateValid`, `OffsetDateTimeProof`,
+// ...) establishes in a SINGLE hop directly from `TemporalInputToken`
+// (confirmed by reading `exchange/establish.rs`'s own module doc
+// comment) -- so every real edge below shares the same two-line
+// Establish tail, no multi-hop chain-walking needed anywhere in this
+// section.
+
+/// Report that this backend cannot parse the named form -- the
+/// CalConnect/ISO 8601-2 extension family (plus `TimeInterval`, which
+/// needs the general endpoint parser this backend still lacks).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn unsupported_parse(edge: &'static str) -> TemporalError {
+    TemporalError::new(TemporalErrorKind::Unsupported(format!(
+        "jiff backend cannot parse {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
+    )))
+}
+
+/// Parse an ISO 8601 ordinal date string (`"YYYY-DDD"` or `"YYYYDDD"`)
+/// into its year/day-of-year components. jiff's own `Date::from_str`
+/// only accepts the calendar form (confirmed by reading its real
+/// grammar/doctests) -- this is genuine hand-rolled digit-splitting,
+/// not a jiff gap, exactly as the plan doc's own Phase 9 row predicted.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: "ISO 8601 ordinal date".to_owned(),
+            detail,
+        })
+    };
+    if !text.is_ascii() {
+        return Err(reject(format!("{text:?} is not ASCII")));
+    }
+    let (year_range, day_range) = match text.len() {
+        7 => (0..4, 4..7),
+        8 if text.as_bytes().get(4) == Some(&b'-') => (0..4, 5..8),
+        _ => {
+            return Err(reject(format!(
+                "{text:?} is not a 7-digit or 8-character (YYYY-DDD) ordinal date"
+            )));
+        }
+    };
+    let year_str = text.get(year_range).expect("length already checked above");
+    let day_str = text.get(day_range).expect("length already checked above");
+    let year = year_str
+        .parse::<i32>()
+        .map_err(|err| reject(format!("invalid year in {text:?}: {err}")))?;
+    let day_of_year = day_str
+        .parse::<u16>()
+        .map_err(|err| reject(format!("invalid day-of-year in {text:?}: {err}")))?;
+    Ok((year, day_of_year))
+}
+
+/// Parse an ISO 8601 week date string (`"YYYY-Www-D"` or `"YYYYWwwD"`)
+/// into its week-year/week/weekday components. Same real gap as
+/// [`parse_ordinal_date_text`]: no jiff `FromStr` accepts this text
+/// form at all.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: "ISO 8601 week date".to_owned(),
+            detail,
+        })
+    };
+    if !text.is_ascii() {
+        return Err(reject(format!("{text:?} is not ASCII")));
+    }
+    let bytes = text.as_bytes();
+    let (year_range, week_range, weekday_range) = match text.len() {
+        8 if bytes.get(4) == Some(&b'W') => (0..4, 5..7, 7..8),
+        10 if bytes.get(4) == Some(&b'-')
+            && bytes.get(5) == Some(&b'W')
+            && bytes.get(8) == Some(&b'-') =>
+        {
+            (0..4, 6..8, 9..10)
+        }
+        _ => {
+            return Err(reject(format!(
+                "{text:?} is not an 8-character (YYYYWwwD) or 10-character \
+                 (YYYY-Www-D) ISO week date"
+            )));
+        }
+    };
+    let year_str = text.get(year_range).expect("length already checked above");
+    let week_str = text.get(week_range).expect("length already checked above");
+    let weekday_str = text
+        .get(weekday_range)
+        .expect("length already checked above");
+    let week_year = year_str
+        .parse::<i32>()
+        .map_err(|err| reject(format!("invalid week-year in {text:?}: {err}")))?;
+    let week = week_str
+        .parse::<u8>()
+        .map_err(|err| reject(format!("invalid week number in {text:?}: {err}")))?;
+    let weekday = weekday_str
+        .parse::<u8>()
+        .map_err(|err| reject(format!("invalid weekday in {text:?}: {err}")))?;
+    Ok((week_year, week, weekday))
+}
+
+/// Parse a bare UTC offset string (`"Z"`, `"+HH:MM"`, `"-HHMM"`,
+/// `"+HH"`, ...) into a [`UtcOffsetDescriptor`]. `jiff::tz::Offset` has
+/// no `FromStr` of its own at all (confirmed by grepping jiff's real
+/// source for an `impl FromStr for Offset` and finding none) -- a real
+/// jiff gap, not an oversight, exactly as the plan doc's own Phase 9
+/// row predicted. `"-00:00"`/`"-0000"`/`"-00"` (negative zero) map to
+/// RFC 9557's unknown-local-offset relationship; `"Z"` maps to a known
+/// zero offset.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: "ISO 8601 / RFC 9557 UTC offset".to_owned(),
+            detail,
+        })
+    };
+    if text.eq_ignore_ascii_case("z") {
+        return UtcOffsetDescriptorBuilder::default()
+            .sign(UtcOffsetSign::Positive)
+            .hours(0u8)
+            .build()
+            .map_err(|err| reject(format!("could not build a Zulu offset descriptor: {err}")));
+    }
+    if !text.is_ascii() || text.len() < 3 {
+        return Err(reject(format!("{text:?} is too short to be a UTC offset")));
+    }
+    let sign = match text.as_bytes()[0] {
+        b'+' => UtcOffsetSign::Positive,
+        b'-' => UtcOffsetSign::Negative,
+        _ => return Err(reject(format!("{text:?} must start with '+', '-', or 'Z'"))),
+    };
+    let rest = text.get(1..).expect("ASCII text, at least 3 bytes long");
+    let (hours_str, minutes_str) = if let Some(idx) = rest.find(':') {
+        (
+            rest.get(..idx).expect("idx is a valid find() result"),
+            Some(rest.get(idx + 1..).expect("idx is a valid find() result")),
+        )
+    } else if rest.len() == 4 {
+        (
+            rest.get(..2).expect("length checked above"),
+            Some(rest.get(2..).expect("length checked above")),
+        )
+    } else {
+        (rest, None)
+    };
+    let hours: u8 = hours_str
+        .parse()
+        .map_err(|err| reject(format!("invalid offset hours in {text:?}: {err}")))?;
+    let minutes: Option<u8> = match minutes_str {
+        None => None,
+        Some(m) => Some(
+            m.parse()
+                .map_err(|err| reject(format!("invalid offset minutes in {text:?}: {err}")))?,
+        ),
+    };
+    let mut builder = UtcOffsetDescriptorBuilder::default()
+        .sign(sign)
+        .hours(hours);
+    if let Some(minutes) = minutes {
+        builder = builder.minutes(minutes);
+    }
+    if sign == UtcOffsetSign::Negative && hours == 0 && minutes.unwrap_or(0) == 0 {
+        builder = builder.relationship(UtcOffsetRelationship::UnknownLocalOffset);
+    }
+    let descriptor = builder
+        .build()
+        .map_err(|err| reject(format!("could not build a UTC offset descriptor: {err}")))?;
+    // Real validation: reuse Phase 2's own offset conversion as the
+    // range oracle (rejects e.g. hours = 99), rather than re-deriving
+    // jiff's own component bounds by hand. Skipped for the unknown-
+    // local-offset case: Phase 2 already established that jiff::tz::
+    // Offset has NO representation for it at all, so that oracle would
+    // always reject a descriptor this parse edge's own job is just to
+    // recognize as lawfully PARSED text -- "not realizable by this
+    // backend" is a distinct, later-stage limitation, not a parse
+    // failure.
+    if descriptor.relationship() != UtcOffsetRelationship::UnknownLocalOffset {
+        utc_offset_descriptor_to_jiff_offset(descriptor)?;
+    }
+    Ok(descriptor)
+}
+
+/// Parse a reduced-precision calendar date string (`"YYYY"` or
+/// `"YYYY-MM"`) into a [`ReducedCalendarDateDescriptor`]. The real
+/// carrier this feeds (`JiffReducedCalendarDate`) was built in Phase 3
+/// but deliberately left unwired until a real edge needed it -- this
+/// is that edge.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_reduced_calendar_date_text(
+    text: &str,
+) -> Result<ReducedCalendarDateDescriptor, TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: "ISO 8601 reduced-precision calendar date".to_owned(),
+            detail,
+        })
+    };
+    if !text.is_ascii() {
+        return Err(reject(format!("{text:?} is not ASCII")));
+    }
+    if let Some((year_str, month_str)) = text.split_once('-') {
+        let year: i32 = year_str
+            .parse()
+            .map_err(|err| reject(format!("invalid year in {text:?}: {err}")))?;
+        let month: u8 = month_str
+            .parse()
+            .map_err(|err| reject(format!("invalid month in {text:?}: {err}")))?;
+        i16::try_from(year).map_err(|err| {
+            reject(format!(
+                "year {year} in {text:?} is beyond jiff's representable range: {err}"
+            ))
+        })?;
+        if !(1..=12).contains(&month) {
+            return Err(reject(format!(
+                "month {month} in {text:?} is out of range 1..=12"
+            )));
+        }
+        return Ok(ReducedCalendarDateDescriptor::YearMonth { year, month });
+    }
+    let year: i32 = text.parse().map_err(|err| {
+        reject(format!(
+            "{text:?} is not a valid reduced calendar date: {err}"
+        ))
+    })?;
+    i16::try_from(year).map_err(|err| {
+        reject(format!(
+            "year {year} in {text:?} is beyond jiff's representable range: {err}"
+        ))
+    })?;
+    Ok(ReducedCalendarDateDescriptor::Year { year })
+}
+
+/// Parse a reduced-precision local time string (`"HH"`, `"HH:MM"`, or
+/// `"HHMM"`) into a [`ReducedLocalTimeDescriptor`]. A fractional suffix
+/// on the hour/minute component (e.g. `"12,5"`) is a real, honest
+/// `Unsupported` -- `jiff::civil::Time` has no representation for it at
+/// all, exactly as Phase 3's own doc comment on `JiffReducedLocalTime`
+/// anticipated.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_reduced_local_time_text(text: &str) -> Result<ReducedLocalTimeDescriptor, TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: "ISO 8601 reduced-precision local time".to_owned(),
+            detail,
+        })
+    };
+    if !text.is_ascii() {
+        return Err(reject(format!("{text:?} is not ASCII")));
+    }
+    if text.contains(['.', ',']) {
+        return Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
+            "jiff's civil time has no representation for a fractional hour/minute \
+             component, as in {text:?}"
+        ))));
+    }
+    let (hour_str, minute_str) = if let Some((h, m)) = text.split_once(':') {
+        (h, Some(m.to_owned()))
+    } else if text.len() == 4 && text.bytes().all(|b| b.is_ascii_digit()) {
+        (
+            text.get(0..2).expect("length checked above"),
+            Some(text.get(2..4).expect("length checked above").to_owned()),
+        )
+    } else {
+        (text, None)
+    };
+    let hour: u8 = hour_str
+        .parse()
+        .map_err(|err| reject(format!("invalid hour in {text:?}: {err}")))?;
+    match minute_str {
+        None => {
+            jiff::civil::Time::new(i8::try_from(hour).unwrap_or(i8::MAX), 0, 0, 0)
+                .map_err(|err| reject(format!("hour {hour} in {text:?} is out of range: {err}")))?;
+            Ok(ReducedLocalTimeDescriptor::Hour {
+                hour,
+                fractional_component: None,
+            })
+        }
+        Some(minute_str) => {
+            let minute: u8 = minute_str
+                .parse()
+                .map_err(|err| reject(format!("invalid minute in {text:?}: {err}")))?;
+            jiff::civil::Time::new(
+                i8::try_from(hour).unwrap_or(i8::MAX),
+                i8::try_from(minute).unwrap_or(i8::MAX),
+                0,
+                0,
+            )
+            .map_err(|err| {
+                reject(format!(
+                    "hour/minute {hour}:{minute} in {text:?} is out of range: {err}"
+                ))
+            })?;
+            Ok(ReducedLocalTimeDescriptor::HourMinute {
+                hour,
+                minute,
+                fractional_component: None,
+            })
+        }
+    }
+}
+
+/// Parse text into jiff's real `Pieces` decomposition, wrapping any
+/// parse failure under `profile`.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn parse_temporal_pieces<'i>(
+    text: &'i str,
+    profile: &'static str,
+) -> Result<jiff::fmt::temporal::Pieces<'i>, TemporalError> {
+    jiff::fmt::temporal::Pieces::parse(text).map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: profile.to_owned(),
+            detail: format!("{err}"),
+        })
+    })
+}
+
+/// Decompose real jiff `Pieces` into a local date-time + offset pair,
+/// requiring both a time-of-day and a UTC offset to be present (an
+/// offset with no time makes no sense under any of the profiles this
+/// helper backs).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn pieces_to_offset_date_time(
+    pieces: &jiff::fmt::temporal::Pieces<'_>,
+    text: &str,
+    profile: &'static str,
+) -> Result<(jiff::civil::DateTime, jiff::tz::Offset), TemporalError> {
+    let reject = |detail: String| {
+        TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: profile.to_owned(),
+            detail,
+        })
+    };
+    let time = pieces
+        .time()
+        .ok_or_else(|| reject(format!("{text:?} has no time-of-day component")))?;
+    let offset = pieces
+        .offset()
+        .ok_or_else(|| reject(format!("{text:?} has no UTC offset")))?;
+    Ok((
+        jiff::civil::DateTime::from_parts(pieces.date(), time),
+        offset.to_numeric_offset(),
+    ))
+}
+
+/// Reject a zone annotation on `pieces` -- neither plain ISO 8601
+/// offset date-times nor RFC 3339 timestamps have `[...]` zone-bracket
+/// syntax at all; only RFC 9557 IXDTF does.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn reject_zone_annotation(
+    pieces: &jiff::fmt::temporal::Pieces<'_>,
+    text: &str,
+    profile: &'static str,
+) -> Result<(), TemporalError> {
+    if pieces.time_zone_annotation().is_some() {
+        return Err(TemporalError::new(TemporalErrorKind::ParseRejected {
+            profile: profile.to_owned(),
+            detail: format!(
+                "{text:?} carries an RFC 9557 zone annotation, not valid under this profile"
+            ),
+        }));
+    }
+    Ok(())
+}
+
+/// Decompose a real jiff time-zone annotation into a neutral IXDTF
+/// zone-annotation descriptor. The annotation's own name is not
+/// validated against the real IANA tzdb here -- jiff's own IXDTF
+/// grammar treats the annotation as descriptive metadata, not a
+/// zone-identity claim the instant depends on (confirmed by its own
+/// doctest accepting `"Australia/Bluey"`, not a real zone).
+#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+fn jiff_time_zone_annotation_to_descriptor(
+    annotation: &jiff::fmt::temporal::TimeZoneAnnotation<'_>,
+) -> Result<IxdtfTimeZoneAnnotationDescriptor, TemporalError> {
+    match annotation.kind() {
+        jiff::fmt::temporal::TimeZoneAnnotationKind::Named(name) => {
+            let descriptor = NamedTimeZoneDescriptorBuilder::default()
+                .identifier(name.as_str())
+                .build()
+                .map_err(|err| {
+                    TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                        "could not build a named time zone descriptor: {err}"
+                    )))
+                })?;
+            Ok(IxdtfTimeZoneAnnotationDescriptor::Named(descriptor))
+        }
+        jiff::fmt::temporal::TimeZoneAnnotationKind::Offset(offset) => {
+            let descriptor = jiff_offset_to_utc_offset_descriptor(*offset)?;
+            Ok(IxdtfTimeZoneAnnotationDescriptor::Offset(descriptor))
+        }
+        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
+            "jiff backend does not recognize this time-zone annotation kind: {other:?}"
+        )))),
+    }
+}
+
+impl Exchange<RawInput, ParsedCalendarDate, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedCalendarDate, TemporalError> {
+        let date: jiff::civil::Date = input.as_str().parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseRejected {
+                profile: "ISO 8601 calendar date".to_owned(),
+                detail: format!("{err}"),
+            })
+        })?;
+        let descriptor = jiff_date_to_calendar_date_descriptor(date)?;
+        let token = <CalendarDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedCalendarDate::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedReducedCalendarDate, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedReducedCalendarDate, TemporalError> {
+        let descriptor = parse_reduced_calendar_date_text(input.as_str())?;
+        let token =
+            <ReducedCalendarDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+                <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+            );
+        Ok(ParsedReducedCalendarDate::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedExtendedYear, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedExtendedYear, TemporalError> {
+        Err(unsupported_parse("an ISO 8601-2 extended year"))
+    }
+}
+
+impl Exchange<RawInput, ParsedDecade, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedDecade, TemporalError> {
+        Err(unsupported_parse("a Gregorian decade"))
+    }
+}
+
+impl Exchange<RawInput, ParsedCentury, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedCentury, TemporalError> {
+        Err(unsupported_parse("a Gregorian century"))
+    }
+}
+
+impl Exchange<RawInput, ParsedQualifiedTemporalValue, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedQualifiedTemporalValue, TemporalError> {
+        Err(unsupported_parse(
+            "an ISO 8601-2 explicitly-qualified temporal value",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedOrdinalDate, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedOrdinalDate, TemporalError> {
+        let (year, day_of_year) = parse_ordinal_date_text(input.as_str())?;
+        // Real validation: build the equivalent jiff::civil::Date via
+        // the shared Phase 3 helper, discarding the value -- confirms
+        // the day-of-year is genuinely valid for the (possibly leap)
+        // year, not just well-formed digits.
+        complete_date_descriptor_to_jiff_date(CompleteDateDescriptor::Ordinal(
+            OrdinalDateDescriptor::new(year, day_of_year),
+        ))?;
+        let token = <OrdinalDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedOrdinalDate::new(
+            OrdinalDateDescriptor::new(year, day_of_year),
+            token,
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedWeekDate, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedWeekDate, TemporalError> {
+        let (week_year, week, weekday) = parse_week_date_text(input.as_str())?;
+        complete_date_descriptor_to_jiff_date(CompleteDateDescriptor::Week(
+            WeekDateDescriptor::new(week_year, week, weekday),
+        ))?;
+        let token = <WeekDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedWeekDate::new(
+            WeekDateDescriptor::new(week_year, week, weekday),
+            token,
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedLocalTime, TemporalError> {
+        let time: jiff::civil::Time = input.as_str().parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseRejected {
+                profile: "ISO 8601 local time".to_owned(),
+                detail: format!("{err}"),
+            })
+        })?;
+        let mut builder = LocalTimeDescriptorBuilder::default()
+            .hour(u8::try_from(time.hour()).unwrap_or_default())
+            .minute(u8::try_from(time.minute()).unwrap_or_default())
+            .second(u8::try_from(time.second()).unwrap_or_default());
+        let nanos = time.subsec_nanosecond();
+        if nanos != 0 {
+            builder = builder.fractional_second(FractionalSecondDescriptor::new(
+                nanos_to_fractional_seconds_digits(i64::from(nanos)),
+            ));
+        }
+        let descriptor = builder.build().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not build a local time descriptor: {err}"
+            )))
+        })?;
+        let token = <LocalTimeValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedLocalTime::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedReducedLocalTime, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedReducedLocalTime, TemporalError> {
+        let descriptor = parse_reduced_local_time_text(input.as_str())?;
+        let token =
+            <ReducedLocalTimeValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+                <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+            );
+        Ok(ParsedReducedLocalTime::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedUtcOffset, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedUtcOffset, TemporalError> {
+        let descriptor = parse_utc_offset_text(input.as_str())?;
+        let token = <UtcOffsetValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedUtcOffset::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedLocalDateTime, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedLocalDateTime, TemporalError> {
+        let datetime: jiff::civil::DateTime = input.as_str().parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseRejected {
+                profile: "ISO 8601 local date-time".to_owned(),
+                detail: format!("{err}"),
+            })
+        })?;
+        let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(datetime)?;
+        let token = <LocalDateTimeProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedLocalDateTime::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedOffsetDateTime, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedOffsetDateTime, TemporalError> {
+        let text = input.as_str();
+        let pieces = parse_temporal_pieces(text, "ISO 8601 offset date-time")?;
+        reject_zone_annotation(&pieces, text, "ISO 8601 offset date-time")?;
+        let (local, offset) =
+            pieces_to_offset_date_time(&pieces, text, "ISO 8601 offset date-time")?;
+        let descriptor = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
+        let token = <OffsetDateTimeProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedOffsetDateTime::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedDateWithShift, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedDateWithShift, TemporalError> {
+        Err(unsupported_parse(
+            "a CalConnect explicit date-with-shift value",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedTimeOfDayWithShift, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedTimeOfDayWithShift, TemporalError> {
+        Err(unsupported_parse(
+            "a CalConnect explicit time-of-day-with-shift value",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedRfc3339Timestamp, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedRfc3339Timestamp, TemporalError> {
+        let text = input.as_str();
+        let pieces = parse_temporal_pieces(text, "RFC 3339 timestamp")?;
+        reject_zone_annotation(&pieces, text, "RFC 3339 timestamp")?;
+        let (local, offset) = pieces_to_offset_date_time(&pieces, text, "RFC 3339 timestamp")?;
+        let descriptor = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
+        let token =
+            <Rfc3339TimestampProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
+                <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+            );
+        Ok(ParsedRfc3339Timestamp::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedIxdtfTimestamp, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
+    fn exchange(&self, input: RawInput) -> Result<ParsedIxdtfTimestamp, TemporalError> {
+        let text = input.as_str();
+        let pieces = parse_temporal_pieces(text, "RFC 9557 IXDTF timestamp")?;
+        let (local, offset) =
+            pieces_to_offset_date_time(&pieces, text, "RFC 9557 IXDTF timestamp")?;
+        let timestamp = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
+        let mut builder = IxdtfTimestampDescriptorBuilder::default().timestamp(timestamp);
+        if let Some(annotation) = pieces.time_zone_annotation() {
+            builder =
+                builder.time_zone_annotation(jiff_time_zone_annotation_to_descriptor(annotation)?);
+        }
+        let descriptor = builder.build().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
+                "could not build an IXDTF timestamp descriptor: {err}"
+            )))
+        })?;
+        let token = <IxdtfTimestampProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
+            <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
+        );
+        Ok(ParsedIxdtfTimestamp::new(descriptor, token))
+    }
+}
+
+impl Exchange<RawInput, ParsedSeasonalTemporalExpression, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(
+        &self,
+        _input: RawInput,
+    ) -> Result<ParsedSeasonalTemporalExpression, TemporalError> {
+        Err(unsupported_parse("an ISO 8601-2 seasonal expression"))
+    }
+}
+
+impl Exchange<RawInput, ParsedSubYearGroupingExpression, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedSubYearGroupingExpression, TemporalError> {
+        Err(unsupported_parse(
+            "an ISO 8601-2 sub-year grouping expression",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedUnspecifiedComponentExpression, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(
+        &self,
+        _input: RawInput,
+    ) -> Result<ParsedUnspecifiedComponentExpression, TemporalError> {
+        Err(unsupported_parse(
+            "an ISO 8601-2 unspecified-component expression",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedTemporalSet, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedTemporalSet, TemporalError> {
+        Err(unsupported_parse("an ISO 8601-2 temporal set"))
+    }
+}
+
+impl Exchange<RawInput, ParsedGroupedTimeScaleUnit, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedGroupedTimeScaleUnit, TemporalError> {
+        Err(unsupported_parse(
+            "an ISO 8601-2 grouped time-scale unit expression",
+        ))
+    }
+}
+
+impl Exchange<RawInput, ParsedDateTimeFormula, JiffVerifier> for JiffTimeBackend {
+    type Error = TemporalError;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
+    fn exchange(&self, _input: RawInput) -> Result<ParsedDateTimeFormula, TemporalError> {
+        Err(unsupported_parse("a CalConnect date-time formula"))
     }
 }
