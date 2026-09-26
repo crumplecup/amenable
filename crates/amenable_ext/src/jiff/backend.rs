@@ -96,11 +96,11 @@ use amenable_time::{
     FormattedTemporalText, FormattedTimeInterval, FormattedTimeOfDayWithShift,
     FormattedUnspecifiedComponentExpression, FormattedUtcOffsetBasic, FormattedUtcOffsetExtended,
     FormattedWeekDateBasic, FormattedWeekDateExtended, FractionalSecondDescriptor,
-    IntervalEndpointOrderingBundle, IxdtfTimeZoneAnnotationDescriptor, IxdtfTimestampDescriptor,
-    IxdtfTimestampDescriptorBuilder, IxdtfTimestampFormatted, IxdtfTimestampProof,
-    IxdtfZonedTimestampFormatted, LocalDateTimeBasicFormatted, LocalDateTimeDescriptor,
-    LocalDateTimeDescriptorBuilder, LocalDateTimeExtendedFormatted, LocalDateTimeProof,
-    LocalTimeBasicFormatted, LocalTimeDescriptor, LocalTimeDescriptorBuilder,
+    IntervalEndpointOrderingBundle, InvalidDescriptorSource, IxdtfTimeZoneAnnotationDescriptor,
+    IxdtfTimestampDescriptor, IxdtfTimestampDescriptorBuilder, IxdtfTimestampFormatted,
+    IxdtfTimestampProof, IxdtfZonedTimestampFormatted, LocalDateTimeBasicFormatted,
+    LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder, LocalDateTimeExtendedFormatted,
+    LocalDateTimeProof, LocalTimeBasicFormatted, LocalTimeDescriptor, LocalTimeDescriptorBuilder,
     LocalTimeExtendedFormatted, LocalTimeValid, LocalTimeZoneResolutionAuthorityDescriptor,
     NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder, NamedTimeZoneIdentityValid,
     NamedTimeZoneRevisionBundle, NormalizeToUtcEstablished, NormalizeToUtcInput,
@@ -111,19 +111,19 @@ use amenable_time::{
     OrderOffsetEndpointsEstablishedToken, OrderOffsetEndpointsInput,
     OrderOffsetEndpointsNativeInput, OrderOffsetEndpointsNativeOutput, OrderOffsetEndpointsOutput,
     OrderOffsetEndpointsPreconditionsToken, OrdinalDateBasicFormatted, OrdinalDateDescriptor,
-    OrdinalDateExtendedFormatted, OrdinalDateValid, ParsedCalendarDate, ParsedCentury,
-    ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade, ParsedDuration, ParsedExtendedYear,
-    ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp, ParsedIxdtfZonedTimestamp,
-    ParsedLocalDateTime, ParsedLocalTime, ParsedOffsetDateTime, ParsedOrdinalDate,
-    ParsedQualifiedTemporalValue, ParsedRecurringInterval, ParsedReducedCalendarDate,
-    ParsedReducedLocalTime, ParsedRfc3339Timestamp, ParsedSeasonalTemporalExpression,
-    ParsedSubYearGroupingExpression, ParsedTemporalSet, ParsedTimeInterval,
-    ParsedTimeOfDayWithShift, ParsedUnspecifiedComponentExpression, ParsedUtcOffset,
-    ParsedWeekDate, PrecisionDescriptor, ProvenDurationCarrier, ProvenLocalDateTimeCarrier,
-    ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier, ProvenRecurringIntervalCarrier,
-    ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier, QualifiedOrBareTemporalValueDescriptor,
-    RawInput, RecurringIntervalDescriptorBuilder, RecurringIntervalFormatted,
-    ReducedCalendarDateBasicFormatted, ReducedCalendarDateDescriptor,
+    OrdinalDateExtendedFormatted, OrdinalDateValid, ParseRejectedSource, ParsedCalendarDate,
+    ParsedCentury, ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade, ParsedDuration,
+    ParsedExtendedYear, ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp,
+    ParsedIxdtfZonedTimestamp, ParsedLocalDateTime, ParsedLocalTime, ParsedOffsetDateTime,
+    ParsedOrdinalDate, ParsedQualifiedTemporalValue, ParsedRecurringInterval,
+    ParsedReducedCalendarDate, ParsedReducedLocalTime, ParsedRfc3339Timestamp,
+    ParsedSeasonalTemporalExpression, ParsedSubYearGroupingExpression, ParsedTemporalSet,
+    ParsedTimeInterval, ParsedTimeOfDayWithShift, ParsedUnspecifiedComponentExpression,
+    ParsedUtcOffset, ParsedWeekDate, PrecisionDescriptor, ProvenDurationCarrier,
+    ProvenLocalDateTimeCarrier, ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier,
+    ProvenRecurringIntervalCarrier, ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier,
+    QualifiedOrBareTemporalValueDescriptor, RawInput, RecurringIntervalDescriptorBuilder,
+    RecurringIntervalFormatted, ReducedCalendarDateBasicFormatted, ReducedCalendarDateDescriptor,
     ReducedCalendarDateExtendedFormatted, ReducedCalendarDateValid, ReducedLocalTimeBasicFormatted,
     ReducedLocalTimeDescriptor, ReducedLocalTimeExtendedFormatted, ReducedLocalTimeValid,
     ReflectedDuration, ReflectedLocalDateTime, ReflectedNamedTimeZone, ReflectedOffsetDateTime,
@@ -141,7 +141,7 @@ use amenable_time::{
     TimeIntervalRepresentation, TruncateSubsecondsEstablished, TruncateSubsecondsInput,
     TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
     TruncateSubsecondsNativeOutput, TruncateSubsecondsOutput, TruncateSubsecondsPreconditionsToken,
-    UtcOffsetBasicFormatted, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
+    UnsupportedSource, UtcOffsetBasicFormatted, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
     UtcOffsetExtendedFormatted, UtcOffsetRelationship, UtcOffsetSign, UtcOffsetValid,
     WeekDateBasicFormatted, WeekDateDescriptor, WeekDateExtendedFormatted, WeekDateValid,
     ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor, ZonedDateTimeDescriptor,
@@ -487,9 +487,11 @@ fn fractional_seconds_digits_to_nanos(digits: &str) -> Result<i64, TemporalError
         }
     }
     padded.parse::<i64>().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "fractional-second digits {digits:?} are not a valid decimal: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "fractional-second digits {digits:?} are not a valid decimal: {err}"
+            )),
+        ))
     })
 }
 
@@ -529,9 +531,11 @@ fn duration_descriptor_to_jiff_span(
     descriptor: &DurationDescriptor,
 ) -> Result<jiff::Span, TemporalError> {
     let out_of_range = |err: jiff::Error| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "duration component out of jiff::Span's representable range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "duration component out of jiff::Span's representable range: {err}"
+            )),
+        ))
     };
 
     let span = jiff::Span::new()
@@ -550,10 +554,12 @@ fn duration_descriptor_to_jiff_span(
             let nanos = fractional_seconds_digits_to_nanos(fraction.digits())?;
             span.try_nanoseconds(nanos).map_err(out_of_range)
         }
-        Some(fraction) => Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff backend supports a fractional-second component only, not a fraction on {}",
-            fraction.component()
-        )))),
+        Some(fraction) => Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff backend supports a fractional-second component only, not a fraction on {}",
+                fraction.component()
+            )),
+        ))),
     }
 }
 
@@ -564,9 +570,11 @@ fn duration_descriptor_to_jiff_span(
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn jiff_span_to_duration_descriptor(span: jiff::Span) -> Result<DurationDescriptor, TemporalError> {
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "span's {field} does not fit the descriptor's u32 component: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "span's {field} does not fit the descriptor's u32 component: {err}"
+            )),
+        ))
     };
 
     let years = u32::try_from(span.get_years()).map_err(|e| out_of_range("years", e))?;
@@ -600,9 +608,9 @@ fn jiff_span_to_duration_descriptor(span: jiff::Span) -> Result<DurationDescript
         builder = builder.fractional_component(fraction);
     }
     builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "could not build a duration descriptor: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!("could not build a duration descriptor: {err}")),
+        ))
     })
 }
 
@@ -721,8 +729,10 @@ fn utc_offset_descriptor_to_jiff_offset(
 ) -> Result<jiff::tz::Offset, TemporalError> {
     if descriptor.relationship() == UtcOffsetRelationship::UnknownLocalOffset {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            "jiff::tz::Offset has no representation for the RFC 9557 unknown-local-offset case"
-                .to_owned(),
+            UnsupportedSource::new(
+                "jiff::tz::Offset has no representation for the RFC 9557 unknown-local-offset case"
+                    .to_owned(),
+            ),
         )));
     }
 
@@ -734,9 +744,11 @@ fn utc_offset_descriptor_to_jiff_offset(
     };
 
     jiff::tz::Offset::from_seconds(seconds).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "offset out of jiff::tz::Offset's representable range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "offset out of jiff::tz::Offset's representable range: {err}"
+            )),
+        ))
     })
 }
 
@@ -761,9 +773,11 @@ fn jiff_offset_to_utc_offset_descriptor(
     };
     let magnitude = seconds.unsigned_abs();
     let hours = u8::try_from(magnitude / 3600).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "offset's hour component does not fit the descriptor's u8 component: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "offset's hour component does not fit the descriptor's u8 component: {err}"
+            )),
+        ))
     })?;
     let remainder_minutes = (magnitude % 3600) / 60;
 
@@ -772,17 +786,19 @@ fn jiff_offset_to_utc_offset_descriptor(
         .hours(hours);
     if remainder_minutes != 0 {
         let minutes = u8::try_from(remainder_minutes).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "offset's minute component does not fit the descriptor's u8 component: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "offset's minute component does not fit the descriptor's u8 component: {err}"
+                )),
+            ))
         })?;
         builder = builder.minutes(minutes);
     }
 
     builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "could not build a UTC offset descriptor: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!("could not build a UTC offset descriptor: {err}")),
+        ))
     })
 }
 
@@ -803,14 +819,18 @@ fn complete_date_descriptor_to_jiff_date(
     date: CompleteDateDescriptor,
 ) -> Result<jiff::civil::Date, TemporalError> {
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "{field} does not fit jiff::civil::Date's component range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "{field} does not fit jiff::civil::Date's component range: {err}"
+            )),
+        ))
     };
     let range_err = |err: jiff::Error| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "date out of jiff::civil::Date's representable range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "date out of jiff::civil::Date's representable range: {err}"
+            )),
+        ))
     };
 
     match date {
@@ -858,9 +878,11 @@ fn local_date_time_descriptor_to_jiff_civil_datetime(
     let time = descriptor.time();
 
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "{field} does not fit jiff::civil::Time's component range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "{field} does not fit jiff::civil::Time's component range: {err}"
+            )),
+        ))
     };
     let hour = i8::try_from(time.hour()).map_err(|e| out_of_range("hour", e))?;
     let minute = i8::try_from(time.minute()).map_err(|e| out_of_range("minute", e))?;
@@ -871,9 +893,11 @@ fn local_date_time_descriptor_to_jiff_civil_datetime(
             .map_err(|e| out_of_range("fractional second", e))?,
     };
     let time = jiff::civil::Time::new(hour, minute, second, subsec_nanosecond).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "local time out of jiff::civil::Time's representable range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "local time out of jiff::civil::Time's representable range: {err}"
+            )),
+        ))
     })?;
 
     Ok(jiff::civil::DateTime::from_parts(date, time))
@@ -893,9 +917,11 @@ fn jiff_civil_datetime_to_local_date_time_descriptor(
     datetime: jiff::civil::DateTime,
 ) -> Result<LocalDateTimeDescriptor, TemporalError> {
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "datetime's {field} does not fit the descriptor's component range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "datetime's {field} does not fit the descriptor's component range: {err}"
+            )),
+        ))
     };
     let year = i32::from(datetime.year());
     let month = u8::try_from(datetime.month()).map_err(|e| out_of_range("month", e))?;
@@ -915,9 +941,9 @@ fn jiff_civil_datetime_to_local_date_time_descriptor(
         ));
     }
     let time = time_builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "could not build a local time descriptor: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!("could not build a local time descriptor: {err}")),
+        ))
     })?;
 
     LocalDateTimeDescriptorBuilder::default()
@@ -927,9 +953,11 @@ fn jiff_civil_datetime_to_local_date_time_descriptor(
         .time(time)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build a local date-time descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build a local date-time descriptor: {err}"
+                )),
+            ))
         })
 }
 
@@ -961,9 +989,11 @@ fn jiff_parts_to_offset_date_time_descriptor(
         .offset(offset)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build an offset date-time descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build an offset date-time descriptor: {err}"
+                )),
+            ))
         })
 }
 
@@ -1079,10 +1109,12 @@ fn named_time_zone_descriptor_to_jiff_time_zone(
     descriptor: &NamedTimeZoneDescriptor,
 ) -> Result<jiff::tz::TimeZone, TemporalError> {
     jiff::tz::TimeZone::get(descriptor.identifier()).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "could not resolve IANA time zone {:?}: {err}",
-            descriptor.identifier()
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "could not resolve IANA time zone {:?}: {err}",
+                descriptor.identifier()
+            )),
+        ))
     })
 }
 
@@ -1106,19 +1138,21 @@ fn jiff_time_zone_to_named_time_zone_descriptor(
     tz: &jiff::tz::TimeZone,
 ) -> Result<NamedTimeZoneDescriptor, TemporalError> {
     let identifier = tz.iana_name().ok_or_else(|| {
-        TemporalError::new(TemporalErrorKind::Unsupported(
+        TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
             "this jiff::tz::TimeZone has no IANA identifier to decompose into a named-zone \
              descriptor (it is unknown, or a fixed offset)"
                 .to_owned(),
-        ))
+        )))
     })?;
     NamedTimeZoneDescriptorBuilder::default()
         .identifier(identifier)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build a named time zone descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build a named time zone descriptor: {err}"
+                )),
+            ))
         })
 }
 
@@ -1146,19 +1180,21 @@ fn zoned_date_time_descriptor_to_jiff_zoned(
     let named_tz = named_time_zone_descriptor_to_jiff_time_zone(descriptor.zone())?;
     if !offset_is_consistent_with_named_zone(local, &named_tz, offset) {
         return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            format!(
+            InvalidDescriptorSource::new(format!(
                 "offset {offset:?} is not one of the real offsets {}'s own rules produce for local \
              time {local}",
                 named_tz.iana_name().unwrap_or("<unnamed>"),
-            ),
+            )),
         )));
     }
     let timestamp = jiff::tz::TimeZone::fixed(offset)
         .to_zoned(local)
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not pin the offset date-time to a fixed instant: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not pin the offset date-time to a fixed instant: {err}"
+                )),
+            ))
         })?
         .timestamp();
     Ok(timestamp.to_zoned(named_tz))
@@ -1177,9 +1213,11 @@ fn jiff_zoned_to_zoned_date_time_descriptor(
         .zone(zone)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build a zoned date-time descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build a zoned date-time descriptor: {err}"
+                )),
+            ))
         })
 }
 
@@ -1347,9 +1385,11 @@ fn resolve_local_date_time_to_jiff_zoned(
     let ambiguous = tz.to_ambiguous_zoned(local).offset();
     let offset = resolve_ambiguous_offset(ambiguous, authority);
     let timestamp = offset.to_timestamp(local).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "resolved local date-time out of jiff's representable instant range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "resolved local date-time out of jiff's representable instant range: {err}"
+            )),
+        ))
     })?;
     Ok(timestamp.to_zoned(tz))
 }
@@ -1365,17 +1405,19 @@ fn attach_named_zone_to_jiff_zoned(
 ) -> Result<jiff::Zoned, TemporalError> {
     if !offset_is_consistent_with_named_zone(local, &tz, offset) {
         return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            format!(
+            InvalidDescriptorSource::new(format!(
                 "offset {offset:?} is not one of the real offsets {}'s own rules produce for local \
              time {local}",
                 tz.iana_name().unwrap_or("<unnamed>"),
-            ),
+            )),
         )));
     }
     let timestamp = offset.to_timestamp(local).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "could not pin the offset date-time to a fixed instant: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "could not pin the offset date-time to a fixed instant: {err}"
+            )),
+        ))
     })?;
     Ok(timestamp.to_zoned(tz))
 }
@@ -1395,17 +1437,21 @@ impl Exchange<RawInput, ResolvedNamedTimeZone, JiffVerifier> for JiffTimeBackend
     fn exchange(&self, input: RawInput) -> Result<ResolvedNamedTimeZone, TemporalError> {
         let identifier = input.as_str();
         jiff::tz::TimeZone::get(identifier).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not resolve IANA time zone {identifier:?}: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not resolve IANA time zone {identifier:?}: {err}"
+                )),
+            ))
         })?;
         let descriptor = NamedTimeZoneDescriptorBuilder::default()
             .identifier(identifier)
             .build()
             .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                    "could not build a named time zone descriptor: {err}"
-                )))
+                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                    InvalidDescriptorSource::new(format!(
+                        "could not build a named time zone descriptor: {err}"
+                    )),
+                ))
             })?;
         let input_token = <RawInput as Sidecar<JiffVerifier>>::sidecar(&input);
         let token =
@@ -1513,11 +1559,11 @@ impl Exchange<ConfirmNamedZoneRevisionInput, ConfirmNamedZoneRevisionOutput, Jif
         let tz = named_time_zone_descriptor_to_jiff_time_zone(descriptor.zone())?;
         if !offset_is_consistent_with_named_zone(local, &tz, offset) {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!(
+                InvalidDescriptorSource::new(format!(
                     "offset {offset:?} is no longer consistent with {}'s real rules for local time \
                  {local}",
                     tz.iana_name().unwrap_or("<unnamed>"),
-                ),
+                )),
             )));
         }
         let input_token = <ConfirmNamedZoneRevisionInput as Sidecar<JiffVerifier>>::sidecar(&input);
@@ -1644,11 +1690,11 @@ impl
         let offset = zoned.offset();
         if !offset_is_consistent_with_named_zone(local, tz, offset) {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!(
+                InvalidDescriptorSource::new(format!(
                     "offset {offset:?} is no longer consistent with {}'s real rules for local time \
                  {local}",
                     tz.iana_name().unwrap_or("<unnamed>"),
-                ),
+                )),
             )));
         }
         // This edge's own input is an already-proven native carrier,
@@ -1699,18 +1745,22 @@ impl
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, TemporalError> {
     if target.smallest_component() != TemporalComponent::Second {
-        return Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff backend's precision-adjustment edges anchor at the second; \
+        return Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff backend's precision-adjustment edges anchor at the second; \
              smallest_component = {} is not supported",
-            target.smallest_component(),
-        ))));
+                target.smallest_component(),
+            )),
+        )));
     }
     let digits = target.fractional_digits().unwrap_or(0);
     if digits > 9 {
-        return Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff's civil time is nanosecond-precision (9 fractional digits); \
+        return Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff's civil time is nanosecond-precision (9 fractional digits); \
              {digits} fractional digits exceeds its representable range"
-        ))));
+            )),
+        )));
     }
     Ok(digits)
 }
@@ -1743,19 +1793,21 @@ fn adjust_jiff_local_precision(
     if truncated_nanos != original_nanos {
         if lossless {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!(
+                InvalidDescriptorSource::new(format!(
                     "adjusting to {digits} fractional digits would discard non-zero \
                  sub-second precision ({original_nanos} nanoseconds); not lossless"
-                ),
+                )),
             )));
         }
         match target_precision.rounding_mode() {
             None | Some(RoundingModeDescriptor::Truncate) => {}
             Some(other) => {
-                return Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-                    "jiff backend only implements truncation for sub-second \
+                return Err(TemporalError::new(TemporalErrorKind::Unsupported(
+                    UnsupportedSource::new(format!(
+                        "jiff backend only implements truncation for sub-second \
                      precision reduction, not rounding mode {other}"
-                ))));
+                    )),
+                )));
             }
         }
     }
@@ -1764,9 +1816,11 @@ fn adjust_jiff_local_precision(
         .subsec_nanosecond(truncated_nanos)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not rebuild the precision-adjusted local time: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not rebuild the precision-adjusted local time: {err}"
+                )),
+            ))
         })
 }
 
@@ -1790,9 +1844,11 @@ impl Exchange<NormalizeToUtcInput, NormalizeToUtcOutput, JiffVerifier> for JiffT
         let (local, offset) =
             offset_date_time_descriptor_to_jiff_parts(input.request().timestamp())?;
         let timestamp = offset.to_timestamp(local).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not pin the offset date-time to a fixed instant: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not pin the offset date-time to a fixed instant: {err}"
+                )),
+            ))
         })?;
         let utc = timestamp.to_zoned(jiff::tz::TimeZone::UTC);
         let descriptor = jiff_parts_to_offset_date_time_descriptor(utc.datetime(), utc.offset())?;
@@ -1897,9 +1953,11 @@ impl
     ) -> Result<NormalizeToUtcNativeOutput<JiffTimeBackend>, TemporalError> {
         let carrier = input.carrier();
         let timestamp = carrier.offset.to_timestamp(carrier.local).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not pin the offset date-time to a fixed instant: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not pin the offset date-time to a fixed instant: {err}"
+                )),
+            ))
         })?;
         let utc = timestamp.to_zoned(jiff::tz::TimeZone::UTC);
         let native = JiffOffsetDateTime {
@@ -2127,10 +2185,10 @@ impl Exchange<RawInput, ParsedDuration, JiffVerifier> for JiffTimeBackend {
     fn exchange(&self, input: RawInput) -> Result<ParsedDuration, TemporalError> {
         let text = input.as_str();
         let span: jiff::Span = text.parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected {
-                profile: "ISO 8601 duration".to_owned(),
-                detail: format!("{err}"),
-            })
+            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+                "ISO 8601 duration".to_owned(),
+                format!("{err}"),
+            )))
         })?;
         let descriptor = jiff_span_to_duration_descriptor(span)?;
         let input_token = <RawInput as Sidecar<JiffVerifier>>::sidecar(&input);
@@ -2145,9 +2203,11 @@ impl Exchange<RawInput, ParsedDuration, JiffVerifier> for JiffTimeBackend {
 /// implemented on this backend (see the module doc comment above).
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn unsupported_interval_endpoint_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(format!(
-        "this backend cannot yet parse an arbitrary temporal value as an interval \
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
+        format!(
+            "this backend cannot yet parse an arbitrary temporal value as an interval \
          endpoint for {edge}: that requires TemporalParser (Phase 9), not yet built here"
+        ),
     )))
 }
 
@@ -2185,9 +2245,11 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, JiffVerifie
         let (end_local, end_offset) = offset_date_time_descriptor_to_jiff_parts(request.end())?;
         let pin = |offset: jiff::tz::Offset, local: jiff::civil::DateTime| {
             offset.to_timestamp(local).map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                    "could not pin the offset date-time to a fixed instant: {err}"
-                )))
+                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                    InvalidDescriptorSource::new(format!(
+                        "could not pin the offset date-time to a fixed instant: {err}"
+                    )),
+                ))
             })
         };
         let start = pin(start_offset, start_local)?;
@@ -2195,7 +2257,9 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, JiffVerifie
 
         if start > end {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!("interval start ({start}) is after its end ({end})"),
+                InvalidDescriptorSource::new(format!(
+                    "interval start ({start}) is after its end ({end})"
+                )),
             )));
         }
 
@@ -2338,9 +2402,11 @@ fn jiff_date_to_calendar_date_descriptor(
     date: jiff::civil::Date,
 ) -> Result<CalendarDateDescriptor, TemporalError> {
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "date's {field} does not fit the descriptor's component range: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "date's {field} does not fit the descriptor's component range: {err}"
+            )),
+        ))
     };
     let year = i32::from(date.year());
     let month = u8::try_from(date.month()).map_err(|e| out_of_range("month", e))?;
@@ -2379,10 +2445,12 @@ fn temporal_value_descriptor_to_jiff_endpoint(
                 zoned_date_time_descriptor_to_jiff_zoned(datetime)?,
             ))
         }
-        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff backend has no representation for the {other:?} interval-endpoint \
+        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff backend has no representation for the {other:?} interval-endpoint \
              form (ISO 8601-2 / CalConnect extension family, out of scope)"
-        )))),
+            )),
+        ))),
     }
 }
 
@@ -2395,7 +2463,9 @@ fn jiff_endpoint_to_temporal_value_descriptor(
     match endpoint {
         JiffTimeIntervalEndpoint::Open | JiffTimeIntervalEndpoint::Unknown => {
             Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                "an Open/Unknown endpoint carries no temporal value to decompose".to_owned(),
+                InvalidDescriptorSource::new(
+                    "an Open/Unknown endpoint carries no temporal value to decompose".to_owned(),
+                ),
             )))
         }
         JiffTimeIntervalEndpoint::CalendarDate(date) => Ok(TemporalValueDescriptor::CalendarDate(
@@ -2431,13 +2501,13 @@ fn time_interval_endpoint_descriptor_to_jiff(
         TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Bare(value)) => {
             temporal_value_descriptor_to_jiff_endpoint(value)
         }
-        TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Qualified(_)) => {
-            Err(TemporalError::new(TemporalErrorKind::Unsupported(
+        TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Qualified(_)) => Err(
+            TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
                 "jiff backend has no representation for an explicitly qualified \
                  (ISO 8601-2) interval-endpoint value"
                     .to_owned(),
-            )))
-        }
+            ))),
+        ),
     }
 }
 
@@ -2609,9 +2679,11 @@ impl
             .interval(TimeIntervalDescriptor::new(representation))
             .build()
             .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                    "could not build a recurring interval descriptor: {err}"
-                )))
+                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                    InvalidDescriptorSource::new(format!(
+                        "could not build a recurring interval descriptor: {err}"
+                    )),
+                ))
             })?;
         let token = <ProvenRecurringIntervalCarrier<JiffRecurringInterval> as Sidecar<
             JiffVerifier,
@@ -2637,9 +2709,11 @@ impl
         let request = input.request();
         let pin = |odt: &JiffOffsetDateTime| {
             odt.offset.to_timestamp(odt.local).map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                    "could not pin the offset date-time to a fixed instant: {err}"
-                )))
+                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                    InvalidDescriptorSource::new(format!(
+                        "could not pin the offset date-time to a fixed instant: {err}"
+                    )),
+                ))
             })
         };
         let start = pin(request.start())?;
@@ -2647,7 +2721,9 @@ impl
 
         if start > end {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!("interval start ({start}) is after its end ({end})"),
+                InvalidDescriptorSource::new(format!(
+                    "interval start ({start}) is after its end ({end})"
+                )),
             )));
         }
 
@@ -2704,8 +2780,10 @@ impl
 /// needs the general endpoint parser this backend still lacks).
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn unsupported_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(format!(
-        "jiff backend cannot parse {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
+        format!(
+            "jiff backend cannot parse {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
+        ),
     )))
 }
 
@@ -2717,10 +2795,10 @@ fn unsupported_parse(edge: &'static str) -> TemporalError {
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: "ISO 8601 ordinal date".to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            "ISO 8601 ordinal date".to_owned(),
             detail,
-        })
+        )))
     };
     if !text.is_ascii() {
         return Err(reject(format!("{text:?} is not ASCII")));
@@ -2752,10 +2830,10 @@ fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), TemporalError> {
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: "ISO 8601 week date".to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            "ISO 8601 week date".to_owned(),
             detail,
-        })
+        )))
     };
     if !text.is_ascii() {
         return Err(reject(format!("{text:?} is not ASCII")));
@@ -2804,10 +2882,10 @@ fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), TemporalError> {
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: "ISO 8601 / RFC 9557 UTC offset".to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            "ISO 8601 / RFC 9557 UTC offset".to_owned(),
             detail,
-        })
+        )))
     };
     if text.eq_ignore_ascii_case("z") {
         return UtcOffsetDescriptorBuilder::default()
@@ -2885,10 +2963,10 @@ fn parse_reduced_calendar_date_text(
     text: &str,
 ) -> Result<ReducedCalendarDateDescriptor, TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: "ISO 8601 reduced-precision calendar date".to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            "ISO 8601 reduced-precision calendar date".to_owned(),
             detail,
-        })
+        )))
     };
     if !text.is_ascii() {
         return Err(reject(format!("{text:?} is not ASCII")));
@@ -2934,19 +3012,21 @@ fn parse_reduced_calendar_date_text(
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn parse_reduced_local_time_text(text: &str) -> Result<ReducedLocalTimeDescriptor, TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: "ISO 8601 reduced-precision local time".to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            "ISO 8601 reduced-precision local time".to_owned(),
             detail,
-        })
+        )))
     };
     if !text.is_ascii() {
         return Err(reject(format!("{text:?} is not ASCII")));
     }
     if text.contains(['.', ',']) {
-        return Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff's civil time has no representation for a fractional hour/minute \
+        return Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff's civil time has no representation for a fractional hour/minute \
              component, as in {text:?}"
-        ))));
+            )),
+        )));
     }
     let (hour_str, minute_str) = if let Some((h, m)) = text.split_once(':') {
         (h, Some(m.to_owned()))
@@ -3002,10 +3082,10 @@ fn parse_temporal_pieces<'i>(
     profile: &'static str,
 ) -> Result<jiff::fmt::temporal::Pieces<'i>, TemporalError> {
     jiff::fmt::temporal::Pieces::parse(text).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: profile.to_owned(),
-            detail: format!("{err}"),
-        })
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            profile.to_owned(),
+            format!("{err}"),
+        )))
     })
 }
 
@@ -3020,10 +3100,10 @@ fn pieces_to_offset_date_time(
     profile: &'static str,
 ) -> Result<(jiff::civil::DateTime, jiff::tz::Offset), TemporalError> {
     let reject = |detail: String| {
-        TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: profile.to_owned(),
+        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+            profile.to_owned(),
             detail,
-        })
+        )))
     };
     let time = pieces
         .time()
@@ -3047,12 +3127,14 @@ fn reject_zone_annotation(
     profile: &'static str,
 ) -> Result<(), TemporalError> {
     if pieces.time_zone_annotation().is_some() {
-        return Err(TemporalError::new(TemporalErrorKind::ParseRejected {
-            profile: profile.to_owned(),
-            detail: format!(
-                "{text:?} carries an RFC 9557 zone annotation, not valid under this profile"
+        return Err(TemporalError::new(TemporalErrorKind::ParseRejected(
+            ParseRejectedSource::new(
+                profile.to_owned(),
+                format!(
+                    "{text:?} carries an RFC 9557 zone annotation, not valid under this profile"
+                ),
             ),
-        }));
+        )));
     }
     Ok(())
 }
@@ -3073,9 +3155,11 @@ fn jiff_time_zone_annotation_to_descriptor(
                 .identifier(name.as_str())
                 .build()
                 .map_err(|err| {
-                    TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                        "could not build a named time zone descriptor: {err}"
-                    )))
+                    TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                        InvalidDescriptorSource::new(format!(
+                            "could not build a named time zone descriptor: {err}"
+                        )),
+                    ))
                 })?;
             Ok(IxdtfTimeZoneAnnotationDescriptor::Named(descriptor))
         }
@@ -3083,9 +3167,11 @@ fn jiff_time_zone_annotation_to_descriptor(
             let descriptor = jiff_offset_to_utc_offset_descriptor(*offset)?;
             Ok(IxdtfTimeZoneAnnotationDescriptor::Offset(descriptor))
         }
-        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff backend does not recognize this time-zone annotation kind: {other:?}"
-        )))),
+        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff backend does not recognize this time-zone annotation kind: {other:?}"
+            )),
+        ))),
     }
 }
 
@@ -3095,10 +3181,10 @@ impl Exchange<RawInput, ParsedCalendarDate, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedCalendarDate, TemporalError> {
         let date: jiff::civil::Date = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected {
-                profile: "ISO 8601 calendar date".to_owned(),
-                detail: format!("{err}"),
-            })
+            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+                "ISO 8601 calendar date".to_owned(),
+                format!("{err}"),
+            )))
         })?;
         let descriptor = jiff_date_to_calendar_date_descriptor(date)?;
         let token = <CalendarDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -3208,10 +3294,10 @@ impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalTime, TemporalError> {
         let time: jiff::civil::Time = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected {
-                profile: "ISO 8601 local time".to_owned(),
-                detail: format!("{err}"),
-            })
+            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+                "ISO 8601 local time".to_owned(),
+                format!("{err}"),
+            )))
         })?;
         let mut builder = LocalTimeDescriptorBuilder::default()
             .hour(u8::try_from(time.hour()).unwrap_or_default())
@@ -3224,9 +3310,11 @@ impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
             ));
         }
         let descriptor = builder.build().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build a local time descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build a local time descriptor: {err}"
+                )),
+            ))
         })?;
         let token = <LocalTimeValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
             <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
@@ -3268,10 +3356,10 @@ impl Exchange<RawInput, ParsedLocalDateTime, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalDateTime, TemporalError> {
         let datetime: jiff::civil::DateTime = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected {
-                profile: "ISO 8601 local date-time".to_owned(),
-                detail: format!("{err}"),
-            })
+            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
+                "ISO 8601 local date-time".to_owned(),
+                format!("{err}"),
+            )))
         })?;
         let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(datetime)?;
         let token = <LocalDateTimeProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -3355,9 +3443,11 @@ impl Exchange<RawInput, ParsedIxdtfTimestamp, JiffVerifier> for JiffTimeBackend 
                 builder.time_zone_annotation(jiff_time_zone_annotation_to_descriptor(annotation)?);
         }
         let descriptor = builder.build().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build an IXDTF timestamp descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build an IXDTF timestamp descriptor: {err}"
+                )),
+            ))
         })?;
         let token = <IxdtfTimestampProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
             <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
@@ -3465,8 +3555,10 @@ impl Exchange<RawInput, ParsedDateTimeFormula, JiffVerifier> for JiffTimeBackend
 /// Report that this backend cannot format the named form.
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn unsupported_format(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(format!(
-        "jiff backend cannot format {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
+        format!(
+            "jiff backend cannot format {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
+        ),
     )))
 }
 
@@ -3714,10 +3806,12 @@ fn format_temporal_value(value: &TemporalValueDescriptor) -> Result<String, Temp
         TemporalValueDescriptor::LocalDateTime(d) => Ok(format_local_date_time(d, false)),
         TemporalValueDescriptor::OffsetDateTime(d) => Ok(format_offset_date_time(d, false)),
         TemporalValueDescriptor::ZonedDateTime(d) => Ok(format_zoned_date_time(d)),
-        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(format!(
-            "jiff backend cannot format the {other:?} interval-endpoint form \
+        other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
+            UnsupportedSource::new(format!(
+                "jiff backend cannot format the {other:?} interval-endpoint form \
              (ISO 8601-2 / CalConnect extension family, out of scope)"
-        )))),
+            )),
+        ))),
     }
 }
 

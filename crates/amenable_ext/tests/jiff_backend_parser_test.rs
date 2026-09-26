@@ -45,10 +45,7 @@ fn parse_calendar_date_rejects_malformed_text() {
     let result: Result<ParsedCalendarDate, TemporalError> =
         backend.exchange(RawInput::received("not a date"));
     let err = result.expect_err("malformed text is not a real calendar date");
-    assert!(matches!(
-        err.kind(),
-        TemporalErrorKind::ParseRejected { .. }
-    ));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
 }
 
 #[test]
@@ -176,7 +173,7 @@ fn parse_reduced_local_time_rejects_a_fractional_component() {
     let result: Result<ParsedReducedLocalTime, TemporalError> =
         backend.exchange(RawInput::received("13,5"));
     let err = result.expect_err("jiff's civil time has no fractional hour representation");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -251,10 +248,7 @@ fn parse_offset_date_time_rejects_a_zone_annotation() {
     ));
     let err =
         result.expect_err("plain ISO 8601 offset date-times have no [...] zone-bracket syntax");
-    assert!(matches!(
-        err.kind(),
-        TemporalErrorKind::ParseRejected { .. }
-    ));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
 }
 
 #[test]
@@ -347,6 +341,6 @@ fn the_calconnect_extension_family_is_honestly_unsupported() {
         formula.map(|_| ()),
     ] {
         let err = result.expect_err("the CalConnect/ISO 8601-2 extension family is out of scope");
-        assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+        assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
     }
 }

@@ -99,7 +99,7 @@ fn realize_duration_rejects_a_fraction_on_a_coarser_unit() {
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
         .map(|_| ())
         .expect_err("jiff::Span has no fractional representation for a coarser-than-seconds unit");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn realize_duration_rejects_a_component_beyond_jiffs_representable_range() {
         .map(|_| ())
         .expect_err("20,000 years exceeds jiff::Span's own representable range");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }

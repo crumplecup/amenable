@@ -290,7 +290,11 @@ pub use contracts::{
     ZuluTimeZoneSuffixAvoidsOffsetInconsistency,
 };
 pub use coverage::{TemporalCoverage, TemporalCoverageRow};
-pub use error::{TemporalError, TemporalErrorKind, TemporalResult};
+pub use error::{
+    AmbiguousLocalTimestampSource, InvalidDescriptorSource, LossyConversionRequiresAuthoritySource,
+    NamedZoneInconsistencySource, ParseRejectedSource, TemporalError, TemporalErrorKind,
+    TemporalResult, UnsupportedSource,
+};
 pub use exchange::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyEstablishedToken,
     AdjustPrecisionLosslesslyInput, AdjustPrecisionLosslesslyOutput,

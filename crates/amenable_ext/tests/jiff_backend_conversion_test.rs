@@ -280,7 +280,7 @@ fn adjust_precision_losslessly_rejects_a_narrower_target() {
         .map(|_| ())
         .expect_err("truncating away real sub-second precision is not lossless");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
@@ -302,7 +302,7 @@ fn adjust_precision_losslessly_rejects_a_non_second_component() {
         ))
         .map(|_| ())
         .expect_err("jiff's precision edges anchor at the second, not the minute");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -382,7 +382,7 @@ fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() {
         ))
         .map(|_| ())
         .expect_err("this backend only implements Truncate rounding");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]

@@ -111,7 +111,7 @@ fn text_parse_edges_report_unsupported() {
     let out: Result<ParsedDuration, TemporalError> =
         backend.exchange(RawInput::received("P1Y2M3DT4H5M6S"));
     assert!(matches!(
-        out.unwrap_err().kind(),
+        &**out.unwrap_err().kind(),
         TemporalErrorKind::Unsupported(_)
     ));
 }
@@ -135,7 +135,7 @@ fn reversed_endpoints_are_rejected() {
         .map(|_| ())
         .expect_err("a later start than end has no ordering to establish");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
@@ -177,7 +177,7 @@ fn realize_duration_rejects_calendar_variable_components() {
         .map(|_| ())
         .expect_err("a year is not a fixed std::time::Duration");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }

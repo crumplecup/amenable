@@ -81,7 +81,7 @@ fn realize_named_time_zone_rejects_an_unknown_identifier() {
         .map(|_| ())
         .expect_err("Nowhere/Fictional is not a real IANA zone");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
@@ -116,7 +116,7 @@ fn reflect_named_time_zone_rejects_a_zone_with_no_iana_identifier() {
     let err: TemporalError = backend.exchange(carrier).map(|_| ()).expect_err(
         "a fixed-offset TimeZone has no IANA identifier to decompose into a descriptor",
     );
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]

@@ -83,10 +83,7 @@ fn rejects_malformed_duration_text() {
     let result: Result<ParsedDuration, TemporalError> =
         backend.exchange(RawInput::received("not a duration"));
     let err = result.expect_err("malformed text is not a real ISO 8601 duration");
-    assert!(matches!(
-        err.kind(),
-        TemporalErrorKind::ParseRejected { .. }
-    ));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
 }
 
 #[test]
@@ -95,7 +92,7 @@ fn recurring_interval_text_parse_is_honestly_unsupported() {
     let result: Result<ParsedRecurringInterval, TemporalError> =
         backend.exchange(RawInput::received("R5/2024-01-01/P1D"));
     let err = result.expect_err("no TemporalParser exists on this backend yet");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -104,7 +101,7 @@ fn time_interval_text_parse_is_honestly_unsupported() {
     let result: Result<ParsedTimeInterval, TemporalError> =
         backend.exchange(RawInput::received("2024-01-01/2024-01-02"));
     let err = result.expect_err("no TemporalParser exists on this backend yet");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -139,7 +136,7 @@ fn order_offset_endpoints_rejects_a_reversed_pair() {
         .map(|_| ())
         .expect_err("start is genuinely after end");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }

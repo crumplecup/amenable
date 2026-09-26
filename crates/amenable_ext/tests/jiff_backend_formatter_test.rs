@@ -229,7 +229,7 @@ fn rejects_formatting_a_fractional_reduced_local_time() {
         ParsedReducedLocalTime::new(descriptor, established_token!(ReducedLocalTimeValid)),
     );
     let err = result.expect_err("jiff's civil time has no fractional hour representation");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -470,7 +470,7 @@ fn rejects_formatting_an_open_boundary() {
         ParsedTimeInterval::new(descriptor, established_token!(TimeIntervalProof)),
     );
     let err = result.expect_err("no independently sourced textual convention for Open exists");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -579,6 +579,6 @@ fn the_calconnect_extension_family_is_honestly_unsupported_when_formatting() {
         formula.map(|_| ()),
     ] {
         let err = result.expect_err("the CalConnect/ISO 8601-2 extension family is out of scope");
-        assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+        assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
     }
 }

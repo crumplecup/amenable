@@ -190,7 +190,7 @@ fn rejects_an_out_of_scope_endpoint_form() {
             time_interval_bundle_token(),
         ));
     let err = result.expect_err("a decade endpoint is the CalConnect/ISO 8601-2 extension family");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]
@@ -292,7 +292,7 @@ fn order_offset_endpoints_native_rejects_a_reversed_pair() {
         ));
     let err = result.expect_err("start is genuinely after end");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }

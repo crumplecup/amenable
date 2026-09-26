@@ -157,7 +157,7 @@ fn realize_offset_date_time_rejects_the_unknown_local_offset_case() {
         ))
         .map(|_| ())
         .expect_err("jiff::tz::Offset has no unknown-local-offset representation");
-    assert!(matches!(err.kind(), TemporalErrorKind::Unsupported(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::Unsupported(_)));
 }
 
 #[test]

@@ -42,12 +42,13 @@ use amenable_core::{
     Verifier, Witness, WitnessSupportSummary,
 };
 use amenable_time::{
-    CompleteDateDescriptor, DurationDescriptor, DurationDescriptorBuilder,
+    CompleteDateDescriptor, DurationDescriptor, DurationDescriptorBuilder, InvalidDescriptorSource,
     OffsetDateTimeDescriptor, OrderOffsetEndpointsEstablished, OrderOffsetEndpointsInput,
     OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken, ParsedDuration,
     ParsedRecurringInterval, ParsedTimeInterval, ProvenDurationCarrier, RawInput,
     ReflectedDuration, SerializationProfile, TemporalDurationProps, TemporalError,
-    TemporalErrorKind, TemporalInstantProps, TemporalProvenance, TemporalReporter, UtcOffsetSign,
+    TemporalErrorKind, TemporalInstantProps, TemporalProvenance, TemporalReporter,
+    UnsupportedSource, UtcOffsetSign,
 };
 
 // ── CanaryVerifier ──────────────────────────────────────────────────
@@ -299,8 +300,10 @@ fn offset_datetime_to_epoch_seconds(
     let local = descriptor.local();
     let CompleteDateDescriptor::Calendar(date) = local.date() else {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            "std::time canary resolves complete calendar dates only, not ordinal or week dates"
-                .to_owned(),
+            UnsupportedSource::new(
+                "std::time canary resolves complete calendar dates only, not ordinal or week dates"
+                    .to_owned(),
+            ),
         )));
     };
 
@@ -335,12 +338,17 @@ fn offset_datetime_to_epoch_seconds(
 fn duration_descriptor_to_std(descriptor: &DurationDescriptor) -> Result<Duration, TemporalError> {
     if descriptor.years() != 0 || descriptor.months() != 0 {
         return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            "a duration with year or month components has no fixed std::time::Duration".to_owned(),
+            InvalidDescriptorSource::new(
+                "a duration with year or month components has no fixed std::time::Duration"
+                    .to_owned(),
+            ),
         )));
     }
     if descriptor.fractional_component().is_some() {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            "the std::time canary carries whole-second durations only".to_owned(),
+            UnsupportedSource::new(
+                "the std::time canary carries whole-second durations only".to_owned(),
+            ),
         )));
     }
 
@@ -365,9 +373,11 @@ fn std_to_duration_descriptor(span: Duration) -> Result<DurationDescriptor, Temp
     let seconds = remaining % 60;
 
     let days = u32::try_from(days).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-            "duration's {days}-day span exceeds the descriptor's u32 day component: {err}"
-        )))
+        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+            InvalidDescriptorSource::new(format!(
+                "duration's {days}-day span exceeds the descriptor's u32 day component: {err}"
+            )),
+        ))
     })?;
 
     DurationDescriptorBuilder::default()
@@ -377,9 +387,11 @@ fn std_to_duration_descriptor(span: Duration) -> Result<DurationDescriptor, Temp
         .seconds(u32::try_from(seconds).unwrap_or_default())
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(format!(
-                "could not build a duration descriptor: {err}"
-            )))
+            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
+                InvalidDescriptorSource::new(format!(
+                    "could not build a duration descriptor: {err}"
+                )),
+            ))
         })
 }
 
@@ -398,8 +410,10 @@ fn std_to_duration_descriptor(span: Duration) -> Result<DurationDescriptor, Temp
 /// Report the missing ISO 8601 parser for a text-parse edge.
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 fn unsupported_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(format!(
-        "std::time cannot parse {edge}: no ISO 8601 / RFC 3339 parser in the standard library"
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
+        format!(
+            "std::time cannot parse {edge}: no ISO 8601 / RFC 3339 parser in the standard library"
+        ),
     )))
 }
 
@@ -449,7 +463,9 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, CanaryVerif
         // re-issue.
         if start > end {
             return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                format!("interval start ({start}s) is after its end ({end}s)"),
+                InvalidDescriptorSource::new(format!(
+                    "interval start ({start}s) is after its end ({end}s)"
+                )),
             )));
         }
 

@@ -111,7 +111,7 @@ fn resolve_named_zone_rejects_a_fake_identifier() {
         .map(|_| ())
         .expect_err("Nowhere/Fictional is not real");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
@@ -294,7 +294,7 @@ fn attach_named_zone_rejects_an_inconsistent_offset() {
         .map(|_| ())
         .expect_err("-05:00 (EST) is not America/New_York's real offset in July (EDT, -04:00)");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
@@ -375,7 +375,7 @@ fn attach_named_zone_native_rejects_an_inconsistent_offset() {
         .map(|_| ())
         .expect_err("the native edge performs the same real consistency check");
     assert!(matches!(
-        err.kind(),
+        &**err.kind(),
         TemporalErrorKind::InvalidDescriptor(_)
     ));
 }
