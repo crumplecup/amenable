@@ -18,12 +18,26 @@ pub open spec fn leap_day_occurs_only_in_leap_year_holds(year: i32, month: u8, d
     !(month == 2 && day == 29) || gregorian_leap_year_holds(year)
 }
 
+/// The exec check's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn leap_day_result_matches(year: i32, month: u8, day: u8, result: bool) -> bool {
+    result == leap_day_occurs_only_in_leap_year_holds(year, month, day)
+}
+
+/// February 29's own validity as a calendar day matches the Gregorian
+/// leap-year rule exactly — a genuinely different, independently-named
+/// cross-check (a biconditional, strictly stronger than the one-way
+/// implication the primary predicate states).
+pub open spec fn leap_day_validity_matches_gregorian_rule(year: i32) -> bool {
+    valid_calendar_day(year, 2, 29) == gregorian_leap_year_holds(year)
+}
+
 /// The exec predicate matches the spec, and February 29 is a valid
 /// calendar date exactly when the year is a leap year.
 pub fn verify_leap_day_occurs_only_in_leap_year(year: i32, month: u8, day: u8) -> (result: bool)
     ensures
-        result == leap_day_occurs_only_in_leap_year_holds(year, month, day),
-        valid_calendar_day(year, 2, 29) == gregorian_leap_year_holds(year),
+        leap_day_result_matches(year, month, day, result),
+        leap_day_validity_matches_gregorian_rule(year),
 {
     !(month == 2 && day == 29) || (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
 }

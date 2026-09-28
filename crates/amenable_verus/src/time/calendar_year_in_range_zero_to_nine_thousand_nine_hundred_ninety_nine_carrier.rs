@@ -18,11 +18,17 @@ pub open spec fn calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninet
     year < 10000
 }
 
+/// The `year <= 9999` inclusive form's result matches the `year < 10000`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_result_matches(year: u16, result: bool) -> bool {
+    result == calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds(year)
+}
+
 /// The `year <= 9999` inclusive form (exec body) satisfies the `year < 10000`
 /// spec, for every `u16`.
 pub fn verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine(year: u16) -> (result: bool)
     ensures
-        result == calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds(year),
+        calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_result_matches(year, result),
 {
     year <= 9999
 }

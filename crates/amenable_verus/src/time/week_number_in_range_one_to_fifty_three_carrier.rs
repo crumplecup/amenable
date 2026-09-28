@@ -28,11 +28,17 @@ pub open spec fn week_number_in_range_one_to_fifty_three_holds(week: u8) -> bool
     week_number_in_range_one_to_fifty_three_at_least_1(week) && week_number_in_range_one_to_fifty_three_below_54(week)
 }
 
+/// The `1..=53` range form's result matches the bound-conjunction
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn week_number_in_range_one_to_fifty_three_result_matches(week: u8, result: bool) -> bool {
+    result == week_number_in_range_one_to_fifty_three_holds(week)
+}
+
 /// The `1..=53` range form (exec body) satisfies the
 /// bound-conjunction spec, for every `u8`.
 pub fn verify_week_number_in_range_one_to_fifty_three(week: u8) -> (result: bool)
     ensures
-        result == week_number_in_range_one_to_fifty_three_holds(week),
+        week_number_in_range_one_to_fifty_three_result_matches(week, result),
 {
     (1..=53u8).contains(&week)
 }

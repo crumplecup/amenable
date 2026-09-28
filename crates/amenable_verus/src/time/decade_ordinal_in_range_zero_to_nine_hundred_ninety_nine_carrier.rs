@@ -18,11 +18,17 @@ pub open spec fn decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds(
     ordinal < 1000
 }
 
+/// The `ordinal <= 999` inclusive form's result matches the `ordinal < 1000`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_result_matches(ordinal: u16, result: bool) -> bool {
+    result == decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds(ordinal)
+}
+
 /// The `ordinal <= 999` inclusive form (exec body) satisfies the `ordinal < 1000`
 /// spec, for every `u16`.
 pub fn verify_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine(ordinal: u16) -> (result: bool)
     ensures
-        result == decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds(ordinal),
+        decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_result_matches(ordinal, result),
 {
     ordinal <= 999
 }

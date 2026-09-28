@@ -17,10 +17,16 @@ pub open spec fn centennial_year_divisible_by_one_hundred_holds(year: i32) -> bo
     year % 100 == 0
 }
 
+/// The exec check's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn centennial_year_result_matches(year: i32, result: bool) -> bool {
+    result == centennial_year_divisible_by_one_hundred_holds(year)
+}
+
 /// The exec check matches the spec, and the dated anchors hold.
 pub fn verify_centennial_year_divisible_by_one_hundred(year: i32) -> (result: bool)
     ensures
-        result == centennial_year_divisible_by_one_hundred_holds(year),
+        centennial_year_result_matches(year, result),
         centennial_year_divisible_by_one_hundred_holds(0),
         centennial_year_divisible_by_one_hundred_holds(1900),
         centennial_year_divisible_by_one_hundred_holds(2000),

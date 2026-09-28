@@ -18,11 +18,17 @@ pub open spec fn minute_in_range_zero_to_fifty_nine_holds(minute: u8) -> bool {
     minute < 60
 }
 
+/// The `minute <= 59` inclusive form's result matches the `minute < 60`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn minute_in_range_zero_to_fifty_nine_result_matches(minute: u8, result: bool) -> bool {
+    result == minute_in_range_zero_to_fifty_nine_holds(minute)
+}
+
 /// The `minute <= 59` inclusive form (exec body) satisfies the `minute < 60`
 /// spec, for every `u8`.
 pub fn verify_minute_in_range_zero_to_fifty_nine(minute: u8) -> (result: bool)
     ensures
-        result == minute_in_range_zero_to_fifty_nine_holds(minute),
+        minute_in_range_zero_to_fifty_nine_result_matches(minute, result),
 {
     minute <= 59
 }

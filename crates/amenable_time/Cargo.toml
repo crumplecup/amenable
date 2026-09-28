@@ -33,7 +33,7 @@ miette = { workspace = true }
 # name `amenable_core::VerusVerifier` — itself `#[cfg(feature = "verus")]`.
 # Off by default (an experimental, still-partial verifier backend); the
 # real `verus! { .. }` proof content lives in `amenable_verus`.
-verus = ["amenable_core/verus"]
+verus = ["amenable_core/verus", "amenable_derive/verus"]
 
 [lints]
 workspace = true

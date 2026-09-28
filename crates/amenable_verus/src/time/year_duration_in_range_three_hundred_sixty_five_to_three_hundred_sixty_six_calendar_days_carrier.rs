@@ -24,13 +24,31 @@ pub open spec fn year_duration_in_range_three_hundred_sixty_five_to_three_hundre
     365 <= days_in_year(year) && days_in_year(year) <= 366
 }
 
+/// The exec check's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn year_duration_result_matches(year: i32, result: bool) -> bool {
+    result == year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds(year)
+}
+
+/// The year-length model is well-formed: every year has 365 or 366
+/// days — a standalone fact, named so it is citable.
+pub open spec fn days_in_year_is_365_or_366(year: i32) -> bool {
+    days_in_year(year) == 365 || days_in_year(year) == 366
+}
+
+/// The domain restriction every year-length check in this family
+/// shares: the model is only defined for non-negative years.
+pub open spec fn year_is_non_negative(year: i32) -> bool {
+    year >= 0
+}
+
 /// The exec year-length check matches the spec.
 pub fn verify_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days(year: i32) -> (result: bool)
     requires
-        year >= 0,
+        year_is_non_negative(year),
     ensures
-        result == year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds(year),
-        days_in_year(year) == 365 || days_in_year(year) == 366,
+        year_duration_result_matches(year, result),
+        days_in_year_is_365_or_366(year),
 {
     let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
     (365..=366).contains(&days)

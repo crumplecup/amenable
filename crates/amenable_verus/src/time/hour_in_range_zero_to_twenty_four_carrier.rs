@@ -18,11 +18,17 @@ pub open spec fn hour_in_range_zero_to_twenty_four_holds(hour: u8) -> bool {
     hour < 25
 }
 
+/// The `hour <= 24` inclusive form's result matches the `hour < 25`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn hour_in_range_zero_to_twenty_four_result_matches(hour: u8, result: bool) -> bool {
+    result == hour_in_range_zero_to_twenty_four_holds(hour)
+}
+
 /// The `hour <= 24` inclusive form (exec body) satisfies the `hour < 25`
 /// spec, for every `u8`.
 pub fn verify_hour_in_range_zero_to_twenty_four(hour: u8) -> (result: bool)
     ensures
-        result == hour_in_range_zero_to_twenty_four_holds(hour),
+        hour_in_range_zero_to_twenty_four_result_matches(hour, result),
 {
     hour <= 24
 }

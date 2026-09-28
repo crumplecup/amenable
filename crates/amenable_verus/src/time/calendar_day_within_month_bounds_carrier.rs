@@ -18,15 +18,40 @@ pub open spec fn calendar_day_within_month_bounds_holds(year: i32, month: u8, da
     valid_calendar_day(year, month, day)
 }
 
+/// The exec check's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn calendar_day_within_bounds_result_matches(year: i32, month: u8, day: u8, result: bool) -> bool {
+    result == calendar_day_within_month_bounds_holds(year, month, day)
+}
+
+/// A day the exec check accepts is in `1..=31` — a genuinely different,
+/// independently-named characterization of the same result.
+pub open spec fn calendar_day_within_bounds_result_implies_day_in_range(year: i32, month: u8, day: u8, result: bool) -> bool {
+    result ==> 1 <= day <= 31
+}
+
+/// A February 29 the exec check accepts forces a leap year — a
+/// genuinely different, independently-named characterization.
+pub open spec fn calendar_day_feb29_result_implies_leap_year(year: i32, month: u8, day: u8, result: bool) -> bool {
+    month == 2 && day == 29 && result ==> gregorian_leap_year_holds(year)
+}
+
+/// The domain restriction this check shares with
+/// `MonthDurationInRangeTwentyEightToThirtyOneCalendarDays`: a month
+/// number is one of the twelve calendar months.
+pub open spec fn month_in_range_one_to_twelve_for_requires(month: u8) -> bool {
+    1 <= month <= 12
+}
+
 /// The exec bounds check matches the spec; a valid day is in `1..=31`; and
 /// a valid February 29 forces a leap year.
 pub fn verify_calendar_day_within_month_bounds(year: i32, month: u8, day: u8) -> (result: bool)
     requires
-        1 <= month <= 12,
+        month_in_range_one_to_twelve_for_requires(month),
     ensures
-        result == calendar_day_within_month_bounds_holds(year, month, day),
-        result ==> 1 <= day <= 31,
-        month == 2 && day == 29 && result ==> gregorian_leap_year_holds(year),
+        calendar_day_within_bounds_result_matches(year, month, day, result),
+        calendar_day_within_bounds_result_implies_day_in_range(year, month, day, result),
+        calendar_day_feb29_result_implies_leap_year(year, month, day, result),
 {
     let dim: u8 = if month == 2 {
         if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 29 } else { 28 }

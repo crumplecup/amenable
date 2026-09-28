@@ -18,13 +18,31 @@ pub open spec fn interval_duration_is_non_negative_holds(start: i32, end: i32) -
     (end as int) - (start as int) >= 0
 }
 
+/// The exec body's result matches the predicate, named so the
+/// exec-to-spec link is a citable fact.
+pub open spec fn interval_duration_is_non_negative_result_matches(start: i32, end: i32, result: bool) -> bool {
+    result == interval_duration_is_non_negative_holds(start, end)
+}
+
+/// The predicate agrees with the panic-free `start <= end` witness form —
+/// a genuinely different, independently-named characterization.
+pub open spec fn interval_duration_is_non_negative_matches_start_le_end_form(start: i32, end: i32) -> bool {
+    interval_duration_is_non_negative_holds(start, end) == (start <= end)
+}
+
+/// The span is exactly zero precisely when the endpoints coincide — a
+/// standalone fact about the model, named so it is citable.
+pub open spec fn interval_zero_span_iff_endpoints_equal(start: i32, end: i32) -> bool {
+    ((end as int) - (start as int) == 0) == (start == end)
+}
+
 /// `start <= end` (exec body) is the panic-free witness that the span is
 /// non-negative; it also pins the zero-span case to endpoint equality.
 pub fn verify_interval_duration_is_non_negative(start: i32, end: i32) -> (result: bool)
     ensures
-        result == interval_duration_is_non_negative_holds(start, end),
-        interval_duration_is_non_negative_holds(start, end) == (start <= end),
-        ((end as int) - (start as int) == 0) == (start == end),
+        interval_duration_is_non_negative_result_matches(start, end, result),
+        interval_duration_is_non_negative_matches_start_le_end_form(start, end),
+        interval_zero_span_iff_endpoints_equal(start, end),
 {
     start <= end
 }

@@ -18,11 +18,17 @@ pub open spec fn second_in_range_zero_to_sixty_holds(second: u8) -> bool {
     second < 61
 }
 
+/// The `second <= 60` inclusive form's result matches the `second < 61`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn second_in_range_zero_to_sixty_result_matches(second: u8, result: bool) -> bool {
+    result == second_in_range_zero_to_sixty_holds(second)
+}
+
 /// The `second <= 60` inclusive form (exec body) satisfies the `second < 61`
 /// spec, for every `u8`.
 pub fn verify_second_in_range_zero_to_sixty(second: u8) -> (result: bool)
     ensures
-        result == second_in_range_zero_to_sixty_holds(second),
+        second_in_range_zero_to_sixty_result_matches(second, result),
 {
     second <= 60
 }

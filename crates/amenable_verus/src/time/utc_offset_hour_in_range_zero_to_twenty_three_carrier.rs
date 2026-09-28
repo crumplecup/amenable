@@ -18,11 +18,17 @@ pub open spec fn utc_offset_hour_in_range_zero_to_twenty_three_holds(hour: u8) -
     hour < 24
 }
 
+/// The `hour <= 23` inclusive form's result matches the `hour < 24`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn utc_offset_hour_in_range_zero_to_twenty_three_result_matches(hour: u8, result: bool) -> bool {
+    result == utc_offset_hour_in_range_zero_to_twenty_three_holds(hour)
+}
+
 /// The `hour <= 23` inclusive form (exec body) satisfies the `hour < 24`
 /// spec, for every `u8`.
 pub fn verify_utc_offset_hour_in_range_zero_to_twenty_three(hour: u8) -> (result: bool)
     ensures
-        result == utc_offset_hour_in_range_zero_to_twenty_three_holds(hour),
+        utc_offset_hour_in_range_zero_to_twenty_three_result_matches(hour, result),
 {
     hour <= 23
 }

@@ -37,6 +37,29 @@ pub open spec fn month_duration_in_range_twenty_eight_to_thirty_one_calendar_day
     28 <= days_in_month(year, month) && days_in_month(year, month) <= 31
 }
 
+/// The exec check's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn month_duration_result_matches(year: i32, month: u8, result: bool) -> bool {
+    result == month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds(year, month)
+}
+
+/// The twelve months of a year sum to that year's day count — a
+/// standalone fact, named so it is citable.
+pub open spec fn month_durations_sum_to_year_duration(year: i32) -> bool {
+    days_in_month(year, 1) + days_in_month(year, 2) + days_in_month(year, 3)
+        + days_in_month(year, 4) + days_in_month(year, 5) + days_in_month(year, 6)
+        + days_in_month(year, 7) + days_in_month(year, 8) + days_in_month(year, 9)
+        + days_in_month(year, 10) + days_in_month(year, 11) + days_in_month(year, 12)
+        == days_in_year(year)
+}
+
+/// The domain restriction this check shares with
+/// `CalendarDayWithinMonthBounds`: a month number is one of the twelve
+/// calendar months.
+pub open spec fn month_in_range_one_to_twelve_for_requires(month: u8) -> bool {
+    1 <= month <= 12
+}
+
 /// The exec duration check matches the spec, and the twelve months of a
 /// year sum to that year's day count.
 pub fn verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days(
@@ -44,14 +67,10 @@ pub fn verify_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days(
     month: u8,
 ) -> (result: bool)
     requires
-        1 <= month <= 12,
+        month_in_range_one_to_twelve_for_requires(month),
     ensures
-        result == month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds(year, month),
-        days_in_month(year, 1) + days_in_month(year, 2) + days_in_month(year, 3)
-            + days_in_month(year, 4) + days_in_month(year, 5) + days_in_month(year, 6)
-            + days_in_month(year, 7) + days_in_month(year, 8) + days_in_month(year, 9)
-            + days_in_month(year, 10) + days_in_month(year, 11) + days_in_month(year, 12)
-            == days_in_year(year),
+        month_duration_result_matches(year, month, result),
+        month_durations_sum_to_year_duration(year),
 {
     let dim: u8 = if month == 2 {
         if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 29 } else { 28 }

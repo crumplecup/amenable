@@ -19,12 +19,24 @@ pub open spec fn gregorian_leap_year_holds(year: i32) -> bool {
     year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 }
 
+/// The exec rule's result matches the spec, named so the exec-to-spec
+/// link is a citable fact.
+pub open spec fn gregorian_leap_year_result_matches(year: i32, result: bool) -> bool {
+    result == gregorian_leap_year_holds(year)
+}
+
+/// Every leap year is divisible by four — a genuinely different,
+/// independently-named characterization of the same rule.
+pub open spec fn gregorian_leap_year_implies_divisible_by_four(year: i32) -> bool {
+    gregorian_leap_year_holds(year) ==> year % 4 == 0
+}
+
 /// The exec rule matches the spec, every leap year is divisible by four,
 /// and the six dated anchors hold.
 pub fn verify_gregorian_leap_year(year: i32) -> (result: bool)
     ensures
-        result == gregorian_leap_year_holds(year),
-        gregorian_leap_year_holds(year) ==> year % 4 == 0,
+        gregorian_leap_year_result_matches(year, result),
+        gregorian_leap_year_implies_divisible_by_four(year),
         gregorian_leap_year_holds(2000),
         gregorian_leap_year_holds(1600),
         gregorian_leap_year_holds(2024),

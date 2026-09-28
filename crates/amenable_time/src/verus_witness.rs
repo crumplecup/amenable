@@ -90,6 +90,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    CalendarMonthInRangeOneToTwelve,
+    "amenable_time::CalendarMonthInRangeOneToTwelve",
+    "calendar_month_range_result_matches"
+);
+
 // ── HourInRangeZeroToTwentyFour ──────────────────────────────────
 
 const HOUR_IN_RANGE_ZERO_TO_TWENTY_FOUR_VERUS_SRC: &str =
@@ -124,6 +130,12 @@ inventory::submit! {
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    HourInRangeZeroToTwentyFour,
+    "amenable_time::HourInRangeZeroToTwentyFour",
+    "hour_in_range_zero_to_twenty_four_result_matches"
+);
 
 // ── MinuteInRangeZeroToFiftyNine ──────────────────────────────────
 
@@ -160,6 +172,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    MinuteInRangeZeroToFiftyNine,
+    "amenable_time::MinuteInRangeZeroToFiftyNine",
+    "minute_in_range_zero_to_fifty_nine_result_matches"
+);
+
 // ── SecondInRangeZeroToSixty ──────────────────────────────────
 
 const SECOND_IN_RANGE_ZERO_TO_SIXTY_VERUS_SRC: &str =
@@ -194,6 +212,12 @@ inventory::submit! {
         },
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    SecondInRangeZeroToSixty,
+    "amenable_time::SecondInRangeZeroToSixty",
+    "second_in_range_zero_to_sixty_result_matches"
+);
 
 // ── UtcOffsetHourInRangeZeroToTwentyThree ──────────────────────────────────
 
@@ -231,6 +255,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    UtcOffsetHourInRangeZeroToTwentyThree,
+    "amenable_time::UtcOffsetHourInRangeZeroToTwentyThree",
+    "utc_offset_hour_in_range_zero_to_twenty_three_result_matches"
+);
+
 // ── UtcOffsetMinuteInRangeZeroToFiftyNine ──────────────────────────────────
 
 const UTC_OFFSET_MINUTE_IN_RANGE_ZERO_TO_FIFTY_NINE_VERUS_SRC: &str = include_str!(
@@ -267,6 +297,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    UtcOffsetMinuteInRangeZeroToFiftyNine,
+    "amenable_time::UtcOffsetMinuteInRangeZeroToFiftyNine",
+    "utc_offset_minute_in_range_zero_to_fifty_nine_result_matches"
+);
+
 // ── WeekdayInRangeOneToSeven ──────────────────
 
 const WEEKDAY_IN_RANGE_ONE_TO_SEVEN_VERUS_SRC: &str =
@@ -299,6 +335,12 @@ inventory::submit! {
         || <WeekdayInRangeOneToSeven as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    WeekdayInRangeOneToSeven,
+    "amenable_time::WeekdayInRangeOneToSeven",
+    "weekday_in_range_one_to_seven_result_matches"
+);
 
 // ── WeekNumberInRangeOneToFiftyThree ──────────────────
 
@@ -333,6 +375,12 @@ inventory::submit! {
         || <WeekNumberInRangeOneToFiftyThree as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    WeekNumberInRangeOneToFiftyThree,
+    "amenable_time::WeekNumberInRangeOneToFiftyThree",
+    "week_number_in_range_one_to_fifty_three_result_matches"
+);
 
 // ── OrdinalDayInRangeOneToThreeHundredSixtySix ──────────────────
 
@@ -371,6 +419,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    OrdinalDayInRangeOneToThreeHundredSixtySix,
+    "amenable_time::OrdinalDayInRangeOneToThreeHundredSixtySix",
+    "ordinal_day_in_range_one_to_three_hundred_sixty_six_result_matches"
+);
+
 // ── CenturyOrdinalInRangeZeroToNinetyNine ──────────────────
 
 const CENTURY_ORDINAL_IN_RANGE_ZERO_TO_NINETY_NINE_VERUS_SRC: &str = include_str!(
@@ -404,6 +458,12 @@ inventory::submit! {
         || <CenturyOrdinalInRangeZeroToNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    CenturyOrdinalInRangeZeroToNinetyNine,
+    "amenable_time::CenturyOrdinalInRangeZeroToNinetyNine",
+    "century_ordinal_in_range_zero_to_ninety_nine_result_matches"
+);
 
 // ── DecadeOrdinalInRangeZeroToNineHundredNinetyNine ──────────────────
 
@@ -441,6 +501,12 @@ inventory::submit! {
         || <DecadeOrdinalInRangeZeroToNineHundredNinetyNine as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    DecadeOrdinalInRangeZeroToNineHundredNinetyNine,
+    "amenable_time::DecadeOrdinalInRangeZeroToNineHundredNinetyNine",
+    "decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_result_matches"
+);
 
 // ── CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine ──────────────────
 
@@ -481,6 +547,12 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine,
+    "amenable_time::CalendarYearInRangeZeroToNineThousandNineHundredNinetyNine",
+    "calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_result_matches"
+);
+
 // ── IntervalStartPrecedesEnd ──────────────────
 
 const INTERVAL_START_PRECEDES_END_VERUS_SRC: &str =
@@ -513,6 +585,16 @@ inventory::submit! {
         || <IntervalStartPrecedesEnd as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    IntervalStartPrecedesEnd,
+    "amenable_time::IntervalStartPrecedesEnd",
+    [
+        "interval_start_precedes_end_result_matches",
+        "interval_start_precedes_end_matches_negated_form",
+        "interval_start_precedes_end_matches_nonneg_span_form",
+    ]
+);
 
 // ── IntervalDurationIsNonNegative ──────────────────
 
@@ -547,6 +629,16 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    IntervalDurationIsNonNegative,
+    "amenable_time::IntervalDurationIsNonNegative",
+    [
+        "interval_duration_is_non_negative_result_matches",
+        "interval_duration_is_non_negative_matches_start_le_end_form",
+        "interval_zero_span_iff_endpoints_equal",
+    ]
+);
+
 // ── UtcTimelineOrderingAppliesToFixedInstants ──────────────────
 
 const UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_VERUS_SRC: &str = include_str!(
@@ -580,6 +672,18 @@ inventory::submit! {
         || <UtcTimelineOrderingAppliesToFixedInstants as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    UtcTimelineOrderingAppliesToFixedInstants,
+    "amenable_time::UtcTimelineOrderingAppliesToFixedInstants",
+    [
+        "utc_timeline_ordering_result_matches",
+        "utc_timeline_ordering_applies_to_fixed_instants_holds",
+        "utc_timeline_ordering_is_total",
+        "utc_timeline_ordering_is_antisymmetric",
+        "utc_timeline_ordering_is_transitive",
+    ]
+);
 
 // ── GregorianLeapYearUsesDivisibleByFourAndFourHundredException ──────────────────
 
@@ -616,6 +720,16 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    GregorianLeapYearUsesDivisibleByFourAndFourHundredException,
+    "amenable_time::GregorianLeapYearUsesDivisibleByFourAndFourHundredException",
+    [
+        "gregorian_leap_year_result_matches",
+        "gregorian_leap_year_implies_divisible_by_four",
+        "gregorian_leap_year_holds",
+    ]
+);
+
 // ── CentennialYearDivisibleByOneHundred ──────────────────
 
 const CENTENNIAL_YEAR_DIVISIBLE_BY_ONE_HUNDRED_VERUS_SRC: &str = include_str!(
@@ -649,6 +763,15 @@ inventory::submit! {
         || <CentennialYearDivisibleByOneHundred as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    CentennialYearDivisibleByOneHundred,
+    "amenable_time::CentennialYearDivisibleByOneHundred",
+    [
+        "centennial_year_result_matches",
+        "centennial_year_divisible_by_one_hundred_holds"
+    ]
+);
 
 // ── LeapYearHasThreeHundredSixtySixCalendarDays ──────────────────
 
@@ -687,6 +810,22 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    LeapYearHasThreeHundredSixtySixCalendarDays,
+    "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays",
+    [
+        "leap_year_has_366_days_result_matches",
+        "leap_year_day_count_matches_gregorian_rule",
+        "days_in_year_is_365_or_366",
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    LeapYearHasThreeHundredSixtySixCalendarDays,
+    "amenable_time::LeapYearHasThreeHundredSixtySixCalendarDays",
+    "year_is_non_negative"
+);
+
 // ── CommonYearHasThreeHundredSixtyFiveCalendarDays ──────────────────
 
 const COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_VERUS_SRC: &str = include_str!(
@@ -724,6 +863,22 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays",
+    [
+        "common_year_has_365_days_result_matches",
+        "common_year_day_count_matches_gregorian_rule",
+        "days_in_year_is_365_or_366",
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    CommonYearHasThreeHundredSixtyFiveCalendarDays,
+    "amenable_time::CommonYearHasThreeHundredSixtyFiveCalendarDays",
+    "year_is_non_negative"
+);
+
 // ── YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays ──────────────────
 
 const YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_VERUS_SRC: &str =
@@ -758,6 +913,18 @@ inventory::submit! {
         || <YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
+    "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays",
+    ["year_duration_result_matches", "days_in_year_is_365_or_366"]
+);
+
+amenable_derive::verus_requires_predicate!(
+    YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays,
+    "amenable_time::YearDurationInRangeThreeHundredSixtyFiveToThreeHundredSixtySixCalendarDays",
+    "year_is_non_negative"
+);
 
 // ── MonthDurationInRangeTwentyEightToThirtyOneCalendarDays ──────────────────
 
@@ -798,6 +965,21 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
+    "amenable_time::MonthDurationInRangeTwentyEightToThirtyOneCalendarDays",
+    [
+        "month_duration_result_matches",
+        "month_durations_sum_to_year_duration"
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    MonthDurationInRangeTwentyEightToThirtyOneCalendarDays,
+    "amenable_time::MonthDurationInRangeTwentyEightToThirtyOneCalendarDays",
+    "month_in_range_one_to_twelve_for_requires"
+);
+
 // ── CalendarDayWithinMonthBounds ──────────────────
 
 const CALENDAR_DAY_WITHIN_MONTH_BOUNDS_VERUS_SRC: &str =
@@ -831,6 +1013,22 @@ inventory::submit! {
     )
 }
 
+amenable_derive::verus_ensures_predicate!(
+    CalendarDayWithinMonthBounds,
+    "amenable_time::CalendarDayWithinMonthBounds",
+    [
+        "calendar_day_within_bounds_result_matches",
+        "calendar_day_within_bounds_result_implies_day_in_range",
+        "calendar_day_feb29_result_implies_leap_year",
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    CalendarDayWithinMonthBounds,
+    "amenable_time::CalendarDayWithinMonthBounds",
+    "month_in_range_one_to_twelve_for_requires"
+);
+
 // ── LeapDayOccursOnlyInLeapYear ──────────────────
 
 const LEAP_DAY_OCCURS_ONLY_IN_LEAP_YEAR_VERUS_SRC: &str =
@@ -863,3 +1061,12 @@ inventory::submit! {
         || <LeapDayOccursOnlyInLeapYear as amenable_core::Witness<VerusVerifier>>::proof().to_string(),
     )
 }
+
+amenable_derive::verus_ensures_predicate!(
+    LeapDayOccursOnlyInLeapYear,
+    "amenable_time::LeapDayOccursOnlyInLeapYear",
+    [
+        "leap_day_result_matches",
+        "leap_day_validity_matches_gregorian_rule"
+    ]
+);

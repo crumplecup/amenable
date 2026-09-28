@@ -21,12 +21,19 @@ pub open spec fn calendar_month_is_enumerated(month: u8) -> bool {
         || month == 7 || month == 8 || month == 9 || month == 10 || month == 11 || month == 12
 }
 
+/// The `1..=12` range check's result matches the twelve-way enumeration
+/// of the legal calendar months, named so the link between the exec
+/// body and the enumeration is a citable fact in its own right.
+pub open spec fn calendar_month_range_result_matches(month: u8, result: bool) -> bool {
+    result == calendar_month_is_enumerated(month)
+}
+
 /// The `1..=12` range check (the exec body) agrees with the twelve-way
 /// enumeration of the legal calendar months (the postcondition), for
 /// every `u8` — the same claim the Kani harness checks.
 pub fn verify_calendar_month_in_range(month: u8) -> (result: bool)
     ensures
-        result == calendar_month_is_enumerated(month),
+        calendar_month_range_result_matches(month, result),
 {
     (1..=12u8).contains(&month)
 }

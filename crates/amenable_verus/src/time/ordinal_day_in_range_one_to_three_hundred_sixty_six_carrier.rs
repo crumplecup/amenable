@@ -28,11 +28,17 @@ pub open spec fn ordinal_day_in_range_one_to_three_hundred_sixty_six_holds(day: 
     ordinal_day_in_range_one_to_three_hundred_sixty_six_at_least_1(day) && ordinal_day_in_range_one_to_three_hundred_sixty_six_below_367(day)
 }
 
+/// The `1..=366` range form's result matches the bound-conjunction
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn ordinal_day_in_range_one_to_three_hundred_sixty_six_result_matches(day: u16, result: bool) -> bool {
+    result == ordinal_day_in_range_one_to_three_hundred_sixty_six_holds(day)
+}
+
 /// The `1..=366` range form (exec body) satisfies the
 /// bound-conjunction spec, for every `u16`.
 pub fn verify_ordinal_day_in_range_one_to_three_hundred_sixty_six(day: u16) -> (result: bool)
     ensures
-        result == ordinal_day_in_range_one_to_three_hundred_sixty_six_holds(day),
+        ordinal_day_in_range_one_to_three_hundred_sixty_six_result_matches(day, result),
 {
     (1..=366u16).contains(&day)
 }

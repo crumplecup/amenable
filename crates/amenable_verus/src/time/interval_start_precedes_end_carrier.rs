@@ -18,13 +18,31 @@ pub open spec fn interval_start_precedes_end_holds(start: i32, end: i32) -> bool
     start <= end
 }
 
+/// The exec body's result matches the predicate, named so the
+/// exec-to-spec link is a citable fact.
+pub open spec fn interval_start_precedes_end_result_matches(start: i32, end: i32, result: bool) -> bool {
+    result == interval_start_precedes_end_holds(start, end)
+}
+
+/// The predicate agrees with its negation form — a genuinely different,
+/// independently-named characterization of the same rule.
+pub open spec fn interval_start_precedes_end_matches_negated_form(start: i32, end: i32) -> bool {
+    interval_start_precedes_end_holds(start, end) == !(end < start)
+}
+
+/// The predicate agrees with the non-negative-`int`-span form — a
+/// genuinely different, independently-named characterization.
+pub open spec fn interval_start_precedes_end_matches_nonneg_span_form(start: i32, end: i32) -> bool {
+    interval_start_precedes_end_holds(start, end) == ((end as int) - (start as int) >= 0)
+}
+
 /// `start <= end` (exec body) matches the predicate, its negation form, and
 /// the non-negative-span form, for every `i32` pair.
 pub fn verify_interval_start_precedes_end(start: i32, end: i32) -> (result: bool)
     ensures
-        result == interval_start_precedes_end_holds(start, end),
-        interval_start_precedes_end_holds(start, end) == !(end < start),
-        interval_start_precedes_end_holds(start, end) == ((end as int) - (start as int) >= 0),
+        interval_start_precedes_end_result_matches(start, end, result),
+        interval_start_precedes_end_matches_negated_form(start, end),
+        interval_start_precedes_end_matches_nonneg_span_form(start, end),
 {
     start <= end
 }

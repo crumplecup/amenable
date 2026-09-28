@@ -18,11 +18,17 @@ pub open spec fn weekday_in_range_one_to_seven_holds(weekday: u8) -> bool {
     weekday == 1 || weekday == 2 || weekday == 3 || weekday == 4 || weekday == 5 || weekday == 6 || weekday == 7
 }
 
+/// The `1..=7` range form's result matches the seven-way enumeration,
+/// named so the exec-to-spec link is a citable fact.
+pub open spec fn weekday_in_range_one_to_seven_result_matches(weekday: u8, result: bool) -> bool {
+    result == weekday_in_range_one_to_seven_holds(weekday)
+}
+
 /// The `1..=7` range form (exec body) satisfies the seven-way
 /// enumeration, for every `u8`.
 pub fn verify_weekday_in_range_one_to_seven(weekday: u8) -> (result: bool)
     ensures
-        result == weekday_in_range_one_to_seven_holds(weekday),
+        weekday_in_range_one_to_seven_result_matches(weekday, result),
 {
     (1..=7u8).contains(&weekday)
 }

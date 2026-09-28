@@ -18,11 +18,17 @@ pub open spec fn century_ordinal_in_range_zero_to_ninety_nine_holds(ordinal: u8)
     ordinal < 100
 }
 
+/// The `ordinal <= 99` inclusive form's result matches the `ordinal < 100`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn century_ordinal_in_range_zero_to_ninety_nine_result_matches(ordinal: u8, result: bool) -> bool {
+    result == century_ordinal_in_range_zero_to_ninety_nine_holds(ordinal)
+}
+
 /// The `ordinal <= 99` inclusive form (exec body) satisfies the `ordinal < 100`
 /// spec, for every `u8`.
 pub fn verify_century_ordinal_in_range_zero_to_ninety_nine(ordinal: u8) -> (result: bool)
     ensures
-        result == century_ordinal_in_range_zero_to_ninety_nine_holds(ordinal),
+        century_ordinal_in_range_zero_to_ninety_nine_result_matches(ordinal, result),
 {
     ordinal <= 99
 }

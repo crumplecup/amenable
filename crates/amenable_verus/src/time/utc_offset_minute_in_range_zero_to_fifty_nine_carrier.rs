@@ -18,11 +18,17 @@ pub open spec fn utc_offset_minute_in_range_zero_to_fifty_nine_holds(minute: u8)
     minute < 60
 }
 
+/// The `minute <= 59` inclusive form's result matches the `minute < 60`
+/// spec, named so the exec-to-spec link is a citable fact.
+pub open spec fn utc_offset_minute_in_range_zero_to_fifty_nine_result_matches(minute: u8, result: bool) -> bool {
+    result == utc_offset_minute_in_range_zero_to_fifty_nine_holds(minute)
+}
+
 /// The `minute <= 59` inclusive form (exec body) satisfies the `minute < 60`
 /// spec, for every `u8`.
 pub fn verify_utc_offset_minute_in_range_zero_to_fifty_nine(minute: u8) -> (result: bool)
     ensures
-        result == utc_offset_minute_in_range_zero_to_fifty_nine_holds(minute),
+        utc_offset_minute_in_range_zero_to_fifty_nine_result_matches(minute, result),
 {
     minute <= 59
 }
