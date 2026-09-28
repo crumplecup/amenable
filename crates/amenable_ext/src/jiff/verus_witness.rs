@@ -863,11 +863,48 @@ amenable_derive::verus_ensures_predicate!(
     "fractional_unit_model_conversion_holds"
 );
 
-impl_verus_witness_checked_ext!(
-    jiff::fmt::strtime::BrokenDownTime,
-    "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model",
-    "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time.rs"
-);
+// Hand-written, not `impl_verus_witness_checked_ext!`: the model's real
+// source now spans three files (`model.rs` + `predicates.rs` +
+// `setters.rs` -- `mod.rs` itself is just `mod`/`pub use`, split to
+// stay under the modularity line limit), so the `claim` concatenates
+// all three rather than the macro's single `include_str!`.
+impl Witness<VerusVerifier> for ExtStandard<jiff::fmt::strtime::BrokenDownTime> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ExtCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        ExtCheckedProof::new(
+            "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model".to_owned(),
+            concat!(
+                include_str!(
+                    "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time/model.rs"
+                ),
+                include_str!(
+                    "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time/predicates.rs"
+                ),
+                include_str!(
+                    "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time/setters.rs"
+                ),
+            )
+            .to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+
+    fn support() -> WitnessSupportSummary {
+        WitnessSupportSummary::checked_leaf()
+    }
+}
+
+impl ClassifiedWitness<VerusVerifier> for ExtStandard<jiff::fmt::strtime::BrokenDownTime> {}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        concat!("amenable_ext::ExtStandard<", stringify!(jiff::fmt::strtime::BrokenDownTime), ">"),
+        "verus",
+        || <ExtStandard<jiff::fmt::strtime::BrokenDownTime> as Witness<VerusVerifier>>::proof().to_string(),
+    )
+}
 
 amenable_derive::verus_ensures_predicate!(
     ExtStandard<jiff::fmt::strtime::BrokenDownTime>,
