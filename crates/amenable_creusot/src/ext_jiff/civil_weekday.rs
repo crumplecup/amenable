@@ -42,6 +42,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_weekday::civil_weekday_monday_one_offset_round_trips",
+        "creusot",
+        "ensures",
+        || CIVIL_WEEKDAY_MONDAY_ONE_OFFSET_ROUND_TRIPS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_WEEKDAY_MONDAY_ONE_OFFSET_ROUND_TRIPS_SRC, {
         /// `Weekday::from_monday_one_offset(offset)`, whenever it

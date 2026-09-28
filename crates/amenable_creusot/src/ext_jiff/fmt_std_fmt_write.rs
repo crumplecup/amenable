@@ -68,6 +68,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_std_fmt_write::fmt_std_fmt_write_write_str_never_fails_holds",
+        "creusot",
+        "ensures",
+        || FMT_STD_FMT_WRITE_WRITE_STR_NEVER_FAILS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_FMT_STD_FMT_WRITE_WRITE_STR_NEVER_FAILS_SRC, {
         /// `String`'s own `core::fmt::Write::write_str` always

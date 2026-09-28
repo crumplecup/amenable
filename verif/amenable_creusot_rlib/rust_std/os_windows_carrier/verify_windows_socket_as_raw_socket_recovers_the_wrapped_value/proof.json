@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_windows_socket_as_raw_socket_recovers_the_wrapped_value": {
         "prover": "alt-ergo",
-        "time": 0.012
+        "time": 0.027
       }
     }
   }

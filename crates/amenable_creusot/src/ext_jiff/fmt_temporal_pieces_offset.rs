@@ -68,6 +68,16 @@ amenable_derive::harness! { creusot, FMT_TEMPORAL_PIECES_OFFSET_ZULU_AND_FROM_OF
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_temporal_pieces_offset::fmt_temporal_pieces_offset_zulu_and_from_offset_round_trip_holds",
+        "creusot",
+        "ensures",
+        || FMT_TEMPORAL_PIECES_OFFSET_ZULU_AND_FROM_OFFSET_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_FMT_TEMPORAL_PIECES_OFFSET_ZULU_AND_FROM_OFFSET_ROUND_TRIP_SRC, {
     /// `PiecesOffset::Zulu.to_numeric_offset()` is always
     /// `Offset::UTC`, and `PiecesOffset::from(offset)

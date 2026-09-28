@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_assert_unwind_safe_derefs_transparently": {
         "prover": "alt-ergo",
-        "time": 0.013
+        "time": 0.032
       }
     }
   }

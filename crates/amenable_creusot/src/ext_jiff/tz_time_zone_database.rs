@@ -46,6 +46,16 @@ amenable_derive::harness! { creusot, TZ_TIME_ZONE_DATABASE_NONE_IS_DEFINITIVELY_
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_time_zone_database::tz_time_zone_database_none_is_definitively_empty_holds",
+        "creusot",
+        "ensures",
+        || TZ_TIME_ZONE_DATABASE_NONE_IS_DEFINITIVELY_EMPTY_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_TIME_ZONE_DATABASE_NONE_IS_DEFINITIVELY_EMPTY_SRC, {
     /// `TimeZoneDatabase::none().is_definitively_empty()` is always
     /// `true` — a real Creusot postcondition resting on the

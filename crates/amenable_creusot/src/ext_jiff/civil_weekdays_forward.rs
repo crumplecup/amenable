@@ -43,6 +43,39 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_weekdays_forward::civil_weekdays_forward_next_yields_start_then_its_successor_holds",
+        "creusot",
+        "ensures",
+        || CIVIL_WEEKDAYS_FORWARD_NEXT_YIELDS_START_THEN_ITS_SUCCESSOR_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, WEEKDAY_OFFSET_IN_MONDAY_ONE_RANGE_HOLDS_SRC, {
+        /// The Monday-one weekday offset's valid range (`1..=7`) --
+        /// `pub(crate)` (not nested in `mirror`) so `civil_weekdays_
+        /// reverse.rs` can reuse the identical bound rather than
+        /// restating it.
+        #[logic(open)]
+        pub(crate) fn weekday_offset_in_monday_one_range(offset: i8) -> bool {
+            pearlite! { offset > 0i8 && offset < 8i8 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_weekdays_forward::weekday_offset_in_monday_one_range",
+        "creusot",
+        "requires",
+        || WEEKDAY_OFFSET_IN_MONDAY_ONE_RANGE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_WEEKDAYS_FORWARD_NEXT_YIELDS_START_THEN_ITS_SUCCESSOR_SRC, {
         /// `weekday.cycle_forward()`'s first `next()` call yields
@@ -54,7 +87,7 @@ amenable_derive::harness! {
         /// checks by symbolic execution against jiff's real API,
         /// restated here as an accommodation model since Creusot has
         /// no real contract coverage for jiff's `Iterator` impl.
-        #[requires(start_offset > 0i8 && start_offset < 8i8)]
+        #[requires(weekday_offset_in_monday_one_range(start_offset))]
         #[ensures(civil_weekdays_forward_next_yields_start_then_its_successor_holds(start_offset, result))]
         fn verify_civil_weekdays_forward_next_yields_start_then_its_successor(
             start_offset: i8,

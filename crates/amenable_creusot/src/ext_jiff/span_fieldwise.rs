@@ -40,6 +40,13 @@ mod mirror {
     pub(super) use creusot_std::macros::{ensures, extern_spec, requires};
 }
 #[cfg(creusot)]
+use super::span::{
+    span_days_in_jiff_range, span_hours_in_jiff_range, span_microseconds_in_jiff_range,
+    span_milliseconds_in_jiff_range, span_minutes_in_jiff_range, span_months_in_jiff_range,
+    span_nanoseconds_in_jiff_range, span_seconds_in_jiff_range, span_weeks_in_jiff_range,
+    span_years_in_jiff_range,
+};
+#[cfg(creusot)]
 use mirror::{ensures, extern_spec, requires};
 
 #[cfg(creusot)]
@@ -98,22 +105,16 @@ amenable_derive::harness! {
         /// `span_i64_of` to the concrete argument actually passed (see
         /// `span.rs`'s own doc comment, and this file's own doc comment
         /// on the real debugging path that found this was missing).
-        #[requires(years > -19_998i16 - 1i16 && years < 19_998i16 + 1i16)]
-        #[requires(months > -239_976i32 - 1i32 && months < 239_976i32 + 1i32)]
-        #[requires(weeks > -1_043_497i32 - 1i32 && weeks < 1_043_497i32 + 1i32)]
-        #[requires(days > -7_304_484i32 - 1i32 && days < 7_304_484i32 + 1i32)]
-        #[requires(hours > -175_307_616i32 - 1i32 && hours < 175_307_616i32 + 1i32)]
-        #[requires(minutes > -10_518_456_960i64 - 1i64 && minutes < 10_518_456_960i64 + 1i64)]
-        #[requires(seconds > -631_107_417_600i64 - 1i64 && seconds < 631_107_417_600i64 + 1i64)]
-        #[requires(
-            milliseconds > -631_107_417_600_000i64 - 1i64
-                && milliseconds < 631_107_417_600_000i64 + 1i64
-        )]
-        #[requires(
-            microseconds > -631_107_417_600_000_000i64 - 1i64
-                && microseconds < 631_107_417_600_000_000i64 + 1i64
-        )]
-        #[requires(nanoseconds > -9_223_372_036_854_775_807i64 && nanoseconds < i64::MAX)]
+        #[requires(span_years_in_jiff_range(years))]
+        #[requires(span_months_in_jiff_range(months))]
+        #[requires(span_weeks_in_jiff_range(weeks))]
+        #[requires(span_days_in_jiff_range(days))]
+        #[requires(span_hours_in_jiff_range(hours))]
+        #[requires(span_minutes_in_jiff_range(minutes))]
+        #[requires(span_seconds_in_jiff_range(seconds))]
+        #[requires(span_milliseconds_in_jiff_range(milliseconds))]
+        #[requires(span_microseconds_in_jiff_range(microseconds))]
+        #[requires(span_nanoseconds_in_jiff_range(nanoseconds))]
         #[ensures(result)]
         fn verify_span_fieldwise_negation_negates_every_unit_getter(
             years: i16,

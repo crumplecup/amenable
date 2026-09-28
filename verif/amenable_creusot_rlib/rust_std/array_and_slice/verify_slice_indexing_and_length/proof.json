@@ -5,7 +5,7 @@
       "vc_len_i32": { "prover": "alt-ergo", "time": 0.021 },
       "vc_verify_slice_indexing_and_length": {
         "prover": "alt-ergo",
-        "time": 0.019
+        "time": 0.045
       }
     }
   }

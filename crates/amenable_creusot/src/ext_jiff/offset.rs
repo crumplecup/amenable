@@ -74,6 +74,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::offset::offset_from_seconds_round_trips",
+        "creusot",
+        "ensures",
+        || OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_OFFSET_FROM_SECONDS_ROUND_TRIPS_SRC, {
         /// `Offset::from_seconds(secs)`, whenever it succeeds, always

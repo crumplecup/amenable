@@ -307,6 +307,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_strtime_broken_down_time::fmt_strtime_broken_down_time_numeric_setters_round_trip_holds",
+        "creusot",
+        "ensures",
+        || FMT_STRTIME_BROKEN_DOWN_TIME_NUMERIC_SETTERS_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_FMT_STRTIME_BROKEN_DOWN_TIME_NUMERIC_SETTERS_ROUND_TRIP_SRC, {
         /// Each of `BrokenDownTime`'s 12 numeric setters, whenever it

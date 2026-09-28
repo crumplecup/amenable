@@ -106,6 +106,39 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_era::civil_era_year_classifies_bce_and_ce_correctly",
+        "creusot",
+        "ensures",
+        || CIVIL_ERA_YEAR_CLASSIFIES_BCE_AND_CE_CORRECTLY_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, CIVIL_ERA_YEAR_IN_DATE_NEW_RANGE_HOLDS_SRC, {
+        /// `jiff::civil::Date::new`'s own documented valid year range
+        /// (`-9999..=9999`) — named so this file's `#[requires(..)]`
+        /// points at a real predicate instead of restating the bound
+        /// inline.
+        #[logic(open)]
+        fn civil_era_year_in_date_new_range(year: i16) -> bool {
+            pearlite! { year > -9999i16 - 1i16 && year < 9999i16 + 1i16 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_era::civil_era_year_in_date_new_range",
+        "creusot",
+        "requires",
+        || CIVIL_ERA_YEAR_IN_DATE_NEW_RANGE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_ERA_YEAR_CLASSIFIES_BCE_AND_CE_CORRECTLY_SRC, {
         /// `Date::new(year, 1, 1).era_year()` classifies `year >= 1`
@@ -114,7 +147,7 @@ amenable_derive::harness! {
         /// verify_civil_era_year_classifies_bce_and_ce_correctly`
         /// checks by symbolic execution, restated as a real Creusot
         /// postcondition resting on the `extern_spec!` above.
-        #[requires(year > -9999i16 - 1i16 && year < 9999i16 + 1i16)]
+        #[requires(civil_era_year_in_date_new_range(year))]
         #[ensures(civil_era_year_classifies_bce_and_ce_correctly(year, result))]
         fn verify_civil_era_year_classifies_bce_and_ce_correctly(
             year: i16,

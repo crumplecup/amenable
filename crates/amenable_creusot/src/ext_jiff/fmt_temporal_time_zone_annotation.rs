@@ -114,6 +114,16 @@ amenable_derive::harness! { creusot, FMT_TEMPORAL_TIME_ZONE_ANNOTATION_FROM_NAME
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_temporal_time_zone_annotation::fmt_temporal_time_zone_annotation_from_name_and_from_offset_holds",
+        "creusot",
+        "ensures",
+        || FMT_TEMPORAL_TIME_ZONE_ANNOTATION_FROM_NAME_AND_FROM_OFFSET_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_FMT_TEMPORAL_TIME_ZONE_ANNOTATION_FROM_NAME_AND_FROM_OFFSET_SRC, {
     /// `TimeZoneAnnotation::from(name)` always builds the `Named`
     /// variant with `is_critical() == false`; `TimeZoneAnnotation::

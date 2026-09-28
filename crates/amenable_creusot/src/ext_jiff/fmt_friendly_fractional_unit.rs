@@ -91,6 +91,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_friendly_fractional_unit::fmt_friendly_fractional_unit_from_matches_documented_mapping_holds",
+        "creusot",
+        "ensures",
+        || FMT_FRIENDLY_FRACTIONAL_UNIT_FROM_MATCHES_DOCUMENTED_MAPPING_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_FMT_FRIENDLY_FRACTIONAL_UNIT_FROM_MATCHES_DOCUMENTED_MAPPING_SRC, {
         /// `FractionalUnit`'s `From`-conversion into `Unit` matches

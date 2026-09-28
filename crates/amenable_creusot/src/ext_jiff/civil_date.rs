@@ -113,6 +113,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_date::civil_date_new_year_month_day_round_trips",
+        "creusot",
+        "ensures",
+        || CIVIL_DATE_NEW_YEAR_MONTH_DAY_ROUND_TRIPS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_DATE_NEW_YEAR_MONTH_DAY_ROUND_TRIPS_SRC, {
         /// `Date::new(year, month, day)`, whenever it succeeds within

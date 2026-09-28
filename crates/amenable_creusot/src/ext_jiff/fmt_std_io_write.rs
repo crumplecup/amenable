@@ -55,6 +55,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_std_io_write::fmt_std_io_write_write_str_never_fails_holds",
+        "creusot",
+        "ensures",
+        || FMT_STD_IO_WRITE_WRITE_STR_NEVER_FAILS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_FMT_STD_IO_WRITE_WRITE_STR_NEVER_FAILS_SRC, {
         /// `Vec<u8>`'s own `std::io::Write::write_all` always

@@ -92,13 +92,47 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::signed_duration::signed_duration_new_normalizes_nanos_and_carries_into_secs_holds",
+        "creusot",
+        "ensures",
+        || SIGNED_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, SIGNED_DURATION_SECS_HAS_CARRY_HEADROOM_HOLDS_SRC, {
+        /// This model's own safe-range restriction on `secs`, leaving
+        /// three seconds of headroom on each end so the nanosecond
+        /// carry can never itself overflow `i64` -- named so this
+        /// file's own `#[requires(..)]` points at a real predicate
+        /// instead of restating the bound inline.
+        #[logic(open)]
+        fn signed_duration_secs_has_carry_headroom(secs: i64) -> bool {
+            pearlite! { secs > i64::MIN + 3i64 && secs < i64::MAX - 3i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::signed_duration::signed_duration_secs_has_carry_headroom",
+        "creusot",
+        "requires",
+        || SIGNED_DURATION_SECS_HAS_CARRY_HEADROOM_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_SIGNED_DURATION_NEW_NORMALIZES_NANOS_AND_CARRIES_INTO_SECS_SRC, {
         /// `SignedDuration::new` preserves the total nanosecond count
         /// while normalizing — the same claim `amenable_kani::ext::
         /// jiff::signed_duration`'s real Kani harness checks by
         /// symbolic execution, resting on the `extern_spec!` above.
-        #[requires(secs > i64::MIN + 3i64 && secs < i64::MAX - 3i64)]
+        #[requires(signed_duration_secs_has_carry_headroom(secs))]
         #[ensures(signed_duration_new_normalizes_nanos_and_carries_into_secs_holds(secs, nanos, result))]
         fn verify_signed_duration_new_normalizes_nanos_and_carries_into_secs(
             secs: i64,

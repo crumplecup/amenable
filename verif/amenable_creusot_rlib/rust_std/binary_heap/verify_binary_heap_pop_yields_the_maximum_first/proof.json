@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_binary_heap_pop_yields_the_maximum_first": {
         "prover": "alt-ergo",
-        "time": 0.022
+        "time": 0.055
       }
     }
   }

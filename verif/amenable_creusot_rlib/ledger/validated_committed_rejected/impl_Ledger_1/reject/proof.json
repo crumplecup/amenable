@@ -5,7 +5,7 @@
       "vc_clone_TransferPayload": { "prover": "alt-ergo", "time": 0.03 },
       "vc_establish_Rejected_Pending": {
         "prover": "alt-ergo",
-        "time": 0.013
+        "time": 0.034
       },
       "vc_new_Rejected_Pending": { "prover": "alt-ergo", "time": 0.023 },
       "vc_primary_Transfer_Pending_PendingToken": {

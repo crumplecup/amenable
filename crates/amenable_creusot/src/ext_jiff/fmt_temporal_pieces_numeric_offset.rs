@@ -99,6 +99,16 @@ amenable_derive::harness! { creusot, FMT_TEMPORAL_PIECES_NUMERIC_OFFSET_FROM_AND
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_temporal_pieces_numeric_offset::fmt_temporal_pieces_numeric_offset_from_and_with_negative_zero_holds",
+        "creusot",
+        "ensures",
+        || FMT_TEMPORAL_PIECES_NUMERIC_OFFSET_FROM_AND_WITH_NEGATIVE_ZERO_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_FMT_TEMPORAL_PIECES_NUMERIC_OFFSET_FROM_AND_WITH_NEGATIVE_ZERO_SRC, {
     /// `PiecesNumericOffset::from(offset)` always round-trips
     /// `offset`'s own seconds through `.offset().seconds()`, and sets

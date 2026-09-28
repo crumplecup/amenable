@@ -5,17 +5,17 @@
       "vc_clone_TransferPayload": { "prover": "alt-ergo", "time": 0.03 },
       "vc_establish_Rejected_Validated": {
         "prover": "alt-ergo",
-        "time": 0.013
+        "time": 0.034
       },
-      "vc_new_Rejected_Validated": { "prover": "alt-ergo", "time": 0.018 },
+      "vc_new_Rejected_Validated": { "prover": "alt-ergo", "time": 0.038 },
       "vc_primary_Transfer_Validated_ValidatedToken": {
         "prover": "alt-ergo",
         "time": 0.03
       },
-      "vc_rollback": { "prover": "alt-ergo", "time": 0.022 },
+      "vc_rollback": { "prover": "alt-ergo", "time": 0.046 },
       "vc_sidecar_Transfer_Validated_ValidatedToken": {
         "prover": "alt-ergo",
-        "time": 0.017
+        "time": 0.034
       }
     }
   }

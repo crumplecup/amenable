@@ -45,6 +45,40 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_time_series::civil_time_series_next_yields_start_then_advances_by_period_holds",
+        "creusot",
+        "ensures",
+        || CIVIL_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, CIVIL_TIME_SERIES_NANOS_IN_SAFE_RANGE_HOLDS_SRC, {
+        /// This model's own safe-range restriction for a signed
+        /// nanosecond count -- comfortably clear of wraparound, the
+        /// same bound this file's own doc comment describes -- named
+        /// so both `#[requires(..)]` clauses point at one real
+        /// predicate instead of restating the bound twice.
+        #[logic(open)]
+        fn civil_time_series_nanos_in_safe_range(nanos: i64) -> bool {
+            pearlite! { nanos > -1_000_000_000_000i64 - 1i64 && nanos < 1_000_000_000_000i64 + 1i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_time_series::civil_time_series_nanos_in_safe_range",
+        "creusot",
+        "requires",
+        || CIVIL_TIME_SERIES_NANOS_IN_SAFE_RANGE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC, {
         /// `Time::series(period).next()` returns the original time
@@ -60,8 +94,8 @@ amenable_derive::harness! {
         /// jiff's actual `Iterator` impl: matching this crate's own
         /// established precedent for iterator types lacking real
         /// contract coverage (see this module's own doc comment).
-        #[requires(start_nanos > -1_000_000_000_000i64 - 1i64 && start_nanos < 1_000_000_000_000i64 + 1i64)]
-        #[requires(period_nanos > -1_000_000_000_000i64 - 1i64 && period_nanos < 1_000_000_000_000i64 + 1i64)]
+        #[requires(civil_time_series_nanos_in_safe_range(start_nanos))]
+        #[requires(civil_time_series_nanos_in_safe_range(period_nanos))]
         #[ensures(civil_time_series_next_yields_start_then_advances_by_period_holds(start_nanos, period_nanos, result))]
         fn verify_civil_time_series_next_yields_start_then_advances_by_period(
             start_nanos: i64,

@@ -83,6 +83,16 @@ amenable_derive::harness! { creusot, TZ_TIME_ZONE_OFFSET_INFO_FROM_FIXED_TIME_ZO
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_time_zone_offset_info::tz_time_zone_offset_info_from_fixed_time_zone_holds",
+        "creusot",
+        "ensures",
+        || TZ_TIME_ZONE_OFFSET_INFO_FROM_FIXED_TIME_ZONE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_TIME_ZONE_OFFSET_INFO_FROM_FIXED_TIME_ZONE_SRC, {
     /// `TimeZone::fixed(offset).to_offset_info(ts)` always reports
     /// `offset`'s own seconds and `Dst::No`, for any `ts` — a real

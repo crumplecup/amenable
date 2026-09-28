@@ -3,7 +3,7 @@
   "proofs": {
     "Coma": {
       "vc_exchange_Ledger": { "prover": "alt-ergo", "time": 0.024 },
-      "vc_reject": { "prover": "alt-ergo", "time": 0.017 }
+      "vc_reject": { "prover": "alt-ergo", "time": 0.036 }
     }
   }
 }

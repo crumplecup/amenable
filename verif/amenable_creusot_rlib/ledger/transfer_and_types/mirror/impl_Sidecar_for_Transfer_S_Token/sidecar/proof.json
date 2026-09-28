@@ -3,7 +3,7 @@
   "proofs": {
     "Coma": {
       "vc_clone_Token": { "prover": "alt-ergo", "time": 0.023 },
-      "vc_sidecar_Transfer_S_Token": { "prover": "alt-ergo", "time": 0.018 }
+      "vc_sidecar_Transfer_S_Token": { "prover": "alt-ergo", "time": 0.038 }
     }
   }
 }

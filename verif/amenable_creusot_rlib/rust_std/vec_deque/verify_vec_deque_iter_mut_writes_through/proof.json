@@ -4,7 +4,7 @@
     "Coma": {
       "vc_verify_vec_deque_iter_mut_writes_through": {
         "prover": "alt-ergo",
-        "time": 0.018
+        "time": 0.036
       }
     }
   }

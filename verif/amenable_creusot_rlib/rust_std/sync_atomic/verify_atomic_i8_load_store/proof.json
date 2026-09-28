@@ -38,7 +38,7 @@
       "vc_shoot_store_AtomicI8": { "prover": "alt-ergo", "time": 0.018 },
       "vc_store_FnGhostWrapper_closure4": {
         "prover": "alt-ergo",
-        "time": 0.016
+        "time": 0.035
       },
       "vc_verify_atomic_i8_load_store": { "prover": "z3", "time": 0.017 }
     }

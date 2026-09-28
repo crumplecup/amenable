@@ -1,36 +1,40 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1486 8 1486 55 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1533 8 1533 55 *)
 
-let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 19 1487 20
-let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 12 1487 20
-let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 24 1487 25
-let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 37 1487 40
-let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 30 1487 40
-let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 44 1487 45
-let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 29 1487 65
-let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 56 1487 59
-let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 49 1487 59
-let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 63 1487 64
-let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 12 1487 65
-let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1483 19 1483 23
-let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1484 18 1484 57
-let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1485 18 1485 93
-let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1465 24 1465 93
+let%span stime = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 19 1534 20
+let%span stime'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 12 1534 20
+let%span stime'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 24 1534 25
+let%span stime'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 37 1534 40
+let%span stime'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 30 1534 40
+let%span stime'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 44 1534 45
+let%span stime'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 29 1534 65
+let%span stime'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 56 1534 59
+let%span stime'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 49 1534 59
+let%span stime'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 63 1534 64
+let%span stime'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1534 12 1534 65
+let%span stime'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1530 19 1530 23
+let%span stime'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1531 18 1531 57
+let%span stime'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1532 18 1532 74
+let%span stime'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1488 24 1488 93
+let%span stime'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1512 24 1512 50
 
 use creusot.int.Int32
 use creusot.prelude.Bool
 use creusot.prelude.Any
 use int.ComputerDivision
 
-predicate gregorian_leap_year_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1464 8 1464 74] (year: Int32.t) (outcome: bool) =
+predicate gregorian_leap_year_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1487 8 1487 74] (year: Int32.t) (outcome: bool) =
   [%#stime'13] outcome
   = (ComputerDivision.mod (Int32.to_int year) 4 = 0
   /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0))
+
+predicate every_leap_year_is_divisible_by_four_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1511 8 1511 91] (year: Int32.t) (is_leap: bool) =
+  [%#stime'14] is_leap -> ComputerDivision.mod (Int32.to_int year) 4 = 0
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1486 8 1486 55]
+let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time.rs" 1533 8 1533 55]
   (year: Int32.t) (return (x: bool)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_9 <- year ] s1
@@ -91,8 +95,5 @@ let check_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creus
   | & _26: bool = Any.any_l () ])
   [ return (result: bool) ->
   {[@stop_split] [@expl:check_gregorian_leap_year ensures] ([@stop_split] [@expl:check_gregorian_leap_year ensures #0] [%#stime'11] gregorian_leap_year_holds year result)
-    /\ ([@stop_split] [@expl:check_gregorian_leap_year ensures #1] [%#stime'12] ComputerDivision.mod (Int32.to_int year) 4
-        = 0
-      /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
-    -> ComputerDivision.mod (Int32.to_int year) 4 = 0)}
+    /\ ([@stop_split] [@expl:check_gregorian_leap_year ensures #1] [%#stime'12] every_leap_year_is_divisible_by_four_holds year result)}
     (! return {result}) ]

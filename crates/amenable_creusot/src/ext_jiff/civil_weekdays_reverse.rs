@@ -21,6 +21,8 @@ mod mirror {
     pub(super) use creusot_std::macros::{ensures, logic, requires};
 }
 #[cfg(creusot)]
+use super::civil_weekdays_forward::weekday_offset_in_monday_one_range;
+#[cfg(creusot)]
 use mirror::{ensures, logic, requires};
 
 amenable_derive::harness! {
@@ -41,6 +43,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::civil_weekdays_reverse::civil_weekdays_reverse_next_yields_start_then_its_predecessor_holds",
+        "creusot",
+        "ensures",
+        || CIVIL_WEEKDAYS_REVERSE_NEXT_YIELDS_START_THEN_ITS_PREDECESSOR_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_CIVIL_WEEKDAYS_REVERSE_NEXT_YIELDS_START_THEN_ITS_PREDECESSOR_SRC, {
         /// `weekday.cycle_reverse()`'s first `next()` call yields
@@ -52,7 +64,7 @@ amenable_derive::harness! {
         /// checks by symbolic execution against jiff's real API,
         /// restated here as an accommodation model since Creusot has
         /// no real contract coverage for jiff's `Iterator` impl.
-        #[requires(start_offset > 0i8 && start_offset < 8i8)]
+        #[requires(weekday_offset_in_monday_one_range(start_offset))]
         #[ensures(civil_weekdays_reverse_next_yields_start_then_its_predecessor_holds(start_offset, result))]
         fn verify_civil_weekdays_reverse_next_yields_start_then_its_predecessor(
             start_offset: i8,

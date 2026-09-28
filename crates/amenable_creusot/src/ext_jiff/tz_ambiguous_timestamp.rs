@@ -108,6 +108,16 @@ amenable_derive::harness! { creusot, TZ_AMBIGUOUS_TIMESTAMP_FROM_FIXED_TIME_ZONE
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_ambiguous_timestamp::tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_holds",
+        "creusot",
+        "ensures",
+        || TZ_AMBIGUOUS_TIMESTAMP_FROM_FIXED_TIME_ZONE_IS_ALWAYS_UNAMBIGUOUS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_AMBIGUOUS_TIMESTAMP_FROM_FIXED_TIME_ZONE_IS_ALWAYS_UNAMBIGUOUS_SRC, {
     /// `TimeZone::fixed(offset).to_ambiguous_timestamp(dt)` always
     /// reports `AmbiguousOffset::Unambiguous { offset }` through

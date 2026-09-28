@@ -42,6 +42,61 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::date_series::date_series_next_yields_start_then_advances_by_period_holds",
+        "creusot",
+        "ensures",
+        || DATE_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, DATE_SERIES_START_DAYS_IN_SAFE_RANGE_HOLDS_SRC, {
+        /// This model's own safe-range restriction for a signed
+        /// day-count start point -- `pub(crate)` (not nested in
+        /// `mirror`) so `date_time_series.rs` can reuse the identical
+        /// bound rather than restating it.
+        #[logic(open)]
+        pub(crate) fn date_series_start_days_in_safe_range(days: i64) -> bool {
+            pearlite! { days > -3_700_000i64 - 1i64 && days < 3_700_000i64 + 1i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::date_series::date_series_start_days_in_safe_range",
+        "creusot",
+        "requires",
+        || DATE_SERIES_START_DAYS_IN_SAFE_RANGE_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, DATE_SERIES_PERIOD_DAYS_IN_SAFE_RANGE_HOLDS_SRC, {
+        /// This model's own safe-range restriction for a signed
+        /// day-count period -- `pub(crate)` for the same cross-file
+        /// reuse reason as the start-days range above.
+        #[logic(open)]
+        pub(crate) fn date_series_period_days_in_safe_range(days: i64) -> bool {
+            pearlite! { days > -1_000_000_000i64 - 1i64 && days < 1_000_000_000i64 + 1i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::date_series::date_series_period_days_in_safe_range",
+        "creusot",
+        "requires",
+        || DATE_SERIES_PERIOD_DAYS_IN_SAFE_RANGE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_DATE_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC, {
         /// `Date::series(period).next()` returns the original date
@@ -59,8 +114,8 @@ amenable_derive::harness! {
         /// jiff's actual `Iterator` impl: matching this crate's own
         /// established precedent for iterator types lacking real
         /// contract coverage (see this module's own doc comment).
-        #[requires(start_days > -3_700_000i64 - 1i64 && start_days < 3_700_000i64 + 1i64)]
-        #[requires(period_days > -1_000_000_000i64 - 1i64 && period_days < 1_000_000_000i64 + 1i64)]
+        #[requires(date_series_start_days_in_safe_range(start_days))]
+        #[requires(date_series_period_days_in_safe_range(period_days))]
         #[ensures(date_series_next_yields_start_then_advances_by_period_holds(start_days, period_days, result))]
         fn verify_date_series_next_yields_start_then_advances_by_period(
             start_days: i64,

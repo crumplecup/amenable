@@ -7,11 +7,11 @@
         "prover": "alt-ergo",
         "time": 0.036
       },
-      "vc_check_amount_positive_V": { "prover": "alt-ergo", "time": 0.018 },
-      "vc_check_sufficient_funds_V": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_check_amount_positive_V": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_check_sufficient_funds_V": { "prover": "alt-ergo", "time": 0.043 },
       "vc_clone_TransferPayload": { "prover": "alt-ergo", "time": 0.03 },
-      "vc_elim_Break": { "prover": "alt-ergo", "time": 0.017 },
-      "vc_establish_Validated": { "prover": "alt-ergo", "time": 0.02 },
+      "vc_elim_Break": { "prover": "alt-ergo", "time": 0.039 },
+      "vc_establish_Validated": { "prover": "alt-ergo", "time": 0.041 },
       "vc_from'0": { "prover": "alt-ergo", "time": 0.023 },
       "vc_from_TransferError": { "prover": "alt-ergo", "time": 0.036 },
       "vc_from_residual_Result_Transfer_Validated_ValidatedToken_TransferError": {

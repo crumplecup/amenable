@@ -152,6 +152,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_temporal_pieces::fmt_temporal_pieces_with_date_with_time_round_trip_holds",
+        "creusot",
+        "ensures",
+        || FMT_TEMPORAL_PIECES_WITH_DATE_WITH_TIME_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_FMT_TEMPORAL_PIECES_WITH_DATE_WITH_TIME_ROUND_TRIP_SRC, {
         /// `Pieces::with_date`/`with_time`, whenever the given values

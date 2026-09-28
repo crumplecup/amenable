@@ -103,6 +103,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::error::error_classification_predicates_are_mutually_exclusive_holds",
+        "creusot",
+        "ensures",
+        || ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_SRC, {
         /// `is_range`/`is_invalid_parameter`/`is_crate_feature` never

@@ -53,6 +53,16 @@ amenable_derive::harness! { creusot, TZ_DST_FROM_BOOL_ROUND_TRIPS_HOLDS_SRC, {
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_dst::tz_dst_from_bool_round_trips_holds",
+        "creusot",
+        "ensures",
+        || TZ_DST_FROM_BOOL_ROUND_TRIPS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_DST_FROM_BOOL_ROUND_TRIPS_SRC, {
     /// `Dst::from(is_dst).is_dst()` always equals `is_dst`, and
     /// `.is_std()` is always its exact complement — a real Creusot

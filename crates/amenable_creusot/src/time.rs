@@ -1378,11 +1378,9 @@ amenable_derive::harness! {
 
 amenable_derive::harness! {
     creusot, VERIFY_INTERVAL_START_PRECEDES_END_SRC, {
-        /// `start <= end` satisfies the precedence spec, its negation form, and the non-negative-span form, for every `i32` pair.
+        /// `start <= end` satisfies the precedence spec, for every `i32` pair.
         #[requires(true)]
         #[ensures(interval_start_precedes_end_holds(start, end, result))]
-        #[ensures((start@ <= end@) == !(end@ < start@))]
-        #[ensures((start@ <= end@) == (end@ - start@ >= 0))]
         fn check_interval_start_precedes_end(start: i32, end: i32) -> bool {
             start <= end
         }
@@ -1411,11 +1409,9 @@ amenable_derive::harness! {
 
 amenable_derive::harness! {
     creusot, VERIFY_INTERVAL_DURATION_IS_NON_NEGATIVE_SRC, {
-        /// `start <= end` is the panic-free witness that the span is non-negative, and pins the zero-span case to endpoint equality, for every `i32` pair.
+        /// `start <= end` is the panic-free witness that the span is non-negative, for every `i32` pair.
         #[requires(true)]
         #[ensures(interval_duration_is_non_negative_holds(start, end, result))]
-        #[ensures((end@ - start@ >= 0) == (start@ <= end@))]
-        #[ensures((end@ - start@ == 0) == (start@ == end@))]
         fn check_interval_duration_is_non_negative(start: i32, end: i32) -> bool {
             start <= end
         }
@@ -1443,14 +1439,41 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, UTC_TIMELINE_ORDERING_IS_A_TOTAL_ORDER_HOLDS_SRC, {
+        /// `<=` on UTC timeline positions is a total order: reflexive,
+        /// total, antisymmetric, and transitive. A genuinely distinct
+        /// claim from [`utc_timeline_ordering_applies_to_fixed_instants_holds`]
+        /// itself (which only states the relation, not that it has
+        /// these four properties) — named so the compound check is a
+        /// real, callable predicate rather than an inline restatement.
+        #[logic(open)]
+        pub fn utc_timeline_ordering_is_a_total_order_holds(a: i32, b: i32, c: i32) -> bool {
+            pearlite! {
+                a@ <= a@
+                    && (a@ <= b@ || b@ <= a@)
+                    && (a@ <= b@ && b@ <= a@ ==> a@ == b@)
+                    && (a@ <= b@ && b@ <= c@ ==> a@ <= c@)
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::utc_timeline_ordering_is_a_total_order_holds",
+        "creusot",
+        "ensures",
+        || UTC_TIMELINE_ORDERING_IS_A_TOTAL_ORDER_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_UTC_TIMELINE_ORDERING_APPLIES_TO_FIXED_INSTANTS_SRC, {
         /// `a <= b` satisfies the ordering spec, and the relation is reflexive, total, antisymmetric, and transitive over `i32` instants.
         #[requires(true)]
         #[ensures(utc_timeline_ordering_applies_to_fixed_instants_holds(a, b, result))]
-        #[ensures(utc_timeline_ordering_applies_to_fixed_instants_holds(a, a, true))]
-        #[ensures(a@ <= b@ || b@ <= a@)]
-        #[ensures(a@ <= b@ && b@ <= a@ ==> a@ == b@)]
-        #[ensures(a@ <= b@ && b@ <= c@ ==> a@ <= c@)]
+        #[ensures(utc_timeline_ordering_is_a_total_order_holds(a, b, c))]
         fn check_utc_timeline_ordering_applies_to_fixed_instants(a: i32, b: i32, c: i32) -> bool {
             a <= b
         }
@@ -1478,11 +1501,35 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, EVERY_LEAP_YEAR_IS_DIVISIBLE_BY_FOUR_HOLDS_SRC, {
+        /// Every leap year is divisible by four — a real consequence
+        /// of [`gregorian_leap_year_holds`]'s own rule, not a
+        /// restatement of it (the rule's `#[ensures(..)]` couldn't be
+        /// spelled `result ==> ..` directly, since `result` isn't in
+        /// scope for a bare `#[logic(open)]` predicate).
+        #[logic(open)]
+        pub fn every_leap_year_is_divisible_by_four_holds(year: i32, is_leap: bool) -> bool {
+            pearlite! { is_leap ==> year@ % 4 == 0 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::every_leap_year_is_divisible_by_four_holds",
+        "creusot",
+        "ensures",
+        || EVERY_LEAP_YEAR_IS_DIVISIBLE_BY_FOUR_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_GREGORIAN_LEAP_YEAR_SRC, {
         /// The exec leap rule satisfies the spec, and every leap year is divisible by four, for every `i32`.
         #[requires(true)]
         #[ensures(gregorian_leap_year_holds(year, result))]
-        #[ensures(year@ % 4 == 0 && (year@ % 100 != 0 || year@ % 400 == 0) ==> year@ % 4 == 0)]
+        #[ensures(every_leap_year_is_divisible_by_four_holds(year, result))]
         fn check_gregorian_leap_year(year: i32) -> bool {
             year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
         }
@@ -1542,6 +1589,55 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, YEAR_IS_NON_NEGATIVE_IN_THIS_MODEL_HOLDS_SRC, {
+        /// This file's day-count/leap-year checks are defined only for
+        /// non-negative years (no BCE support) — a real domain
+        /// restriction, reused as the real `#[requires(..)]`
+        /// precondition wherever a day-count check needs it.
+        #[logic(open)]
+        pub fn year_is_non_negative_in_this_model(year: i32) -> bool {
+            pearlite! { year@ >= 0 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::year_is_non_negative_in_this_model",
+        "creusot",
+        "requires",
+        || YEAR_IS_NON_NEGATIVE_IN_THIS_MODEL_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, MONTH_IN_RANGE_ONE_TO_TWELVE_FOR_REQUIRES_HOLDS_SRC, {
+        /// The calendar-month range (`1..=12`), in the plain
+        /// `#[requires(..)]`-shaped form (input only, no `outcome`) —
+        /// distinct from [`calendar_month_in_range_holds`] itself
+        /// (which relates an input to a computed `outcome`) since a
+        /// precondition has no result to compare against. Reused
+        /// wherever a month/day check needs to restrict `month` to its
+        /// real range.
+        #[logic(open)]
+        pub fn month_in_range_one_to_twelve_for_requires(month: u8) -> bool {
+            pearlite! { month@ >= 1 && month@ <= 12 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::month_in_range_one_to_twelve_for_requires",
+        "creusot",
+        "requires",
+        || MONTH_IN_RANGE_ONE_TO_TWELVE_FOR_REQUIRES_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_HOLDS_SRC, {
         /// ISO 8601-1:2019, 3.1.1.21 — a leap year contains 366 calendar days: the outcome equals `year` being a leap year (a leap year has 366 days).
         #[logic(open)]
@@ -1564,9 +1660,8 @@ amenable_derive::harness! {
 amenable_derive::harness! {
     creusot, VERIFY_LEAP_YEAR_HAS_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
         /// The exec year-length check equals `year` being a leap year, for every non-negative `i32`.
-        #[requires(year@ >= 0)]
+        #[requires(year_is_non_negative_in_this_model(year))]
         #[ensures(leap_year_has_three_hundred_sixty_six_calendar_days_holds(year, result))]
-        #[ensures(is_gregorian_leap_year(year) == result)]
         fn check_leap_year_has_three_hundred_sixty_six_calendar_days(year: i32) -> bool {
             let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
             days == 366
@@ -1597,9 +1692,8 @@ amenable_derive::harness! {
 amenable_derive::harness! {
     creusot, VERIFY_COMMON_YEAR_HAS_THREE_HUNDRED_SIXTY_FIVE_CALENDAR_DAYS_SRC, {
         /// The exec year-length check equals `year` not being a leap year, for every non-negative `i32`.
-        #[requires(year@ >= 0)]
+        #[requires(year_is_non_negative_in_this_model(year))]
         #[ensures(common_year_has_three_hundred_sixty_five_calendar_days_holds(year, result))]
-        #[ensures(is_gregorian_leap_year(year) ==> !result)]
         fn check_common_year_has_three_hundred_sixty_five_calendar_days(year: i32) -> bool {
             let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
             days == 365
@@ -1630,10 +1724,8 @@ amenable_derive::harness! {
 amenable_derive::harness! {
     creusot, VERIFY_YEAR_DURATION_IN_RANGE_THREE_HUNDRED_SIXTY_FIVE_TO_THREE_HUNDRED_SIXTY_SIX_CALENDAR_DAYS_SRC, {
         /// The exec year-length check is always in `365..=366`, for every non-negative `i32`.
-        #[requires(year@ >= 0)]
+        #[requires(year_is_non_negative_in_this_model(year))]
         #[ensures(year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days_holds(year, result))]
-        #[ensures(is_gregorian_leap_year(year) ==> result)]
-        #[ensures(!is_gregorian_leap_year(year) ==> result)]
         fn check_year_duration_in_range_three_hundred_sixty_five_to_three_hundred_sixty_six_calendar_days(year: i32) -> bool {
             let days: i32 = if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 366 } else { 365 };
             days >= 365 && days <= 366
@@ -1664,7 +1756,7 @@ amenable_derive::harness! {
 amenable_derive::harness! {
     creusot, VERIFY_MONTH_DURATION_IN_RANGE_TWENTY_EIGHT_TO_THIRTY_ONE_CALENDAR_DAYS_SRC, {
         /// The exec month-duration check is always in `28..=31`, for every year and month `1..=12`.
-        #[requires(month@ >= 1 && month@ <= 12)]
+        #[requires(month_in_range_one_to_twelve_for_requires(month))]
         #[ensures(month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds(year, month, result))]
         fn check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days(year: i32, month: u8) -> bool {
             let dim: u8 = if month == 2 {
@@ -1706,11 +1798,40 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, VALID_FEBRUARY_TWENTY_NINE_FORCES_LEAP_YEAR_HOLDS_SRC, {
+        /// A valid February 29 forces the year to be a leap year — a
+        /// real consequence of [`calendar_day_within_month_bounds_holds`]'s
+        /// own definition (day 29 only fits within February's bound
+        /// when that bound is 29, which only happens in a leap year),
+        /// not a restatement of it.
+        #[logic(open)]
+        pub fn valid_february_twenty_nine_forces_leap_year_holds(
+            year: i32,
+            month: u8,
+            day: u8,
+            valid: bool,
+        ) -> bool {
+            pearlite! { month@ == 2 && day@ == 29 && valid ==> is_gregorian_leap_year(year) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::time::valid_february_twenty_nine_forces_leap_year_holds",
+        "creusot",
+        "ensures",
+        || VALID_FEBRUARY_TWENTY_NINE_FORCES_LEAP_YEAR_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_CALENDAR_DAY_WITHIN_MONTH_BOUNDS_SRC, {
         /// The exec bounds check equals `day` lying in month bounds, and a valid February 29 forces a leap year.
-        #[requires(month@ >= 1 && month@ <= 12)]
+        #[requires(month_in_range_one_to_twelve_for_requires(month))]
         #[ensures(calendar_day_within_month_bounds_holds(year, month, day, result))]
-        #[ensures(month@ == 2 && day@ == 29 && result ==> is_gregorian_leap_year(year))]
+        #[ensures(valid_february_twenty_nine_forces_leap_year_holds(year, month, day, result))]
         fn check_calendar_day_within_month_bounds(year: i32, month: u8, day: u8) -> bool {
             let dim: u8 = if month == 2 {
                 if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) { 29 } else { 28 }

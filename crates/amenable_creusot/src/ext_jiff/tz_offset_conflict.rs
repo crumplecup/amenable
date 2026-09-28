@@ -83,6 +83,16 @@ amenable_derive::harness! { creusot, TZ_OFFSET_CONFLICT_ALWAYS_OFFSET_AND_ALWAYS
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_offset_conflict::tz_offset_conflict_always_offset_and_always_time_zone_holds",
+        "creusot",
+        "ensures",
+        || TZ_OFFSET_CONFLICT_ALWAYS_OFFSET_AND_ALWAYS_TIME_ZONE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_OFFSET_CONFLICT_ALWAYS_OFFSET_AND_ALWAYS_TIME_ZONE_SRC, {
     /// `OffsetConflict::AlwaysOffset.resolve(dt, offset_claimed,
     /// tz)` always uses `offset_claimed` (ignoring `tz`'s own

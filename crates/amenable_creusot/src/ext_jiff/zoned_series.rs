@@ -34,6 +34,10 @@ mod mirror {
     pub(super) use creusot_std::macros::{ensures, logic, requires};
 }
 #[cfg(creusot)]
+use super::timestamp_series::{
+    timestamp_series_period_secs_in_safe_range, timestamp_series_secs_in_safe_range,
+};
+#[cfg(creusot)]
 use mirror::{ensures, logic, requires};
 
 amenable_derive::harness! {
@@ -50,6 +54,16 @@ amenable_derive::harness! {
             pearlite! { observed.0 == secs && observed.1 == secs + period_secs }
         }
     }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::zoned_series::zoned_series_next_yields_start_then_advances_by_period_under_utc_holds",
+        "creusot",
+        "ensures",
+        || ZONED_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_UNDER_UTC_HOLDS_SRC,
+    )
 }
 
 amenable_derive::harness! {
@@ -70,8 +84,8 @@ amenable_derive::harness! {
         /// jiff's actual `Iterator` impl: matching this crate's own
         /// established precedent for iterator types lacking real
         /// contract coverage (see this module's own doc comment).
-        #[requires(secs > -300_000_000_000i64 - 1i64 && secs < 200_000_000_000i64 + 1i64)]
-        #[requires(period_secs > -1_000_000_000i64 - 1i64 && period_secs < 1_000_000_000i64 + 1i64)]
+        #[requires(timestamp_series_secs_in_safe_range(secs))]
+        #[requires(timestamp_series_period_secs_in_safe_range(period_secs))]
         #[ensures(zoned_series_next_yields_start_then_advances_by_period_under_utc_holds(secs, period_secs, result))]
         fn verify_zoned_series_next_yields_start_then_advances_by_period_under_utc(
             secs: i64,

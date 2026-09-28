@@ -73,6 +73,16 @@ amenable_derive::harness! { creusot, TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP_H
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::tz_time_zone::tz_time_zone_unknown_and_fixed_round_trip_holds",
+        "creusot",
+        "ensures",
+        || TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP_SRC, {
     /// `TimeZone::unknown().is_unknown()` is always `true`;
     /// `TimeZone::fixed(offset)` is never unknown, and its own

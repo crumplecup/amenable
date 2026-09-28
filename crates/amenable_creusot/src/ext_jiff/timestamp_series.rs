@@ -45,6 +45,61 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::timestamp_series::timestamp_series_next_yields_start_then_advances_by_period_holds",
+        "creusot",
+        "ensures",
+        || TIMESTAMP_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, TIMESTAMP_SERIES_SECS_IN_SAFE_RANGE_HOLDS_SRC, {
+        /// This model's own safe-range restriction for a signed-second
+        /// timestamp -- `pub(crate)` (not nested in `mirror`) so
+        /// `zoned_series.rs` can reuse the identical bound rather than
+        /// restating it.
+        #[logic(open)]
+        pub(crate) fn timestamp_series_secs_in_safe_range(secs: i64) -> bool {
+            pearlite! { secs > -300_000_000_000i64 - 1i64 && secs < 200_000_000_000i64 + 1i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::timestamp_series::timestamp_series_secs_in_safe_range",
+        "creusot",
+        "requires",
+        || TIMESTAMP_SERIES_SECS_IN_SAFE_RANGE_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
+    creusot, TIMESTAMP_SERIES_PERIOD_SECS_IN_SAFE_RANGE_HOLDS_SRC, {
+        /// This model's own safe-range restriction for a signed-second
+        /// period -- `pub(crate)` for the same cross-file reuse reason
+        /// as the secs range above.
+        #[logic(open)]
+        pub(crate) fn timestamp_series_period_secs_in_safe_range(period_secs: i64) -> bool {
+            pearlite! { period_secs > -1_000_000_000i64 - 1i64 && period_secs < 1_000_000_000i64 + 1i64 }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::timestamp_series::timestamp_series_period_secs_in_safe_range",
+        "creusot",
+        "requires",
+        || TIMESTAMP_SERIES_PERIOD_SECS_IN_SAFE_RANGE_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, VERIFY_TIMESTAMP_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_SRC, {
         /// `Timestamp::series(period).next()` returns the original
@@ -60,8 +115,8 @@ amenable_derive::harness! {
         /// jiff's actual `Iterator` impl: matching this crate's own
         /// established precedent for iterator types lacking real
         /// contract coverage (see this module's own doc comment).
-        #[requires(secs > -300_000_000_000i64 - 1i64 && secs < 200_000_000_000i64 + 1i64)]
-        #[requires(period_secs > -1_000_000_000i64 - 1i64 && period_secs < 1_000_000_000i64 + 1i64)]
+        #[requires(timestamp_series_secs_in_safe_range(secs))]
+        #[requires(timestamp_series_period_secs_in_safe_range(period_secs))]
         #[ensures(timestamp_series_next_yields_start_then_advances_by_period_holds(secs, period_secs, result))]
         fn verify_timestamp_series_next_yields_start_then_advances_by_period(
             secs: i64,

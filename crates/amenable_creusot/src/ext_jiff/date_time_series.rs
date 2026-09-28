@@ -22,6 +22,10 @@ mod mirror {
     pub(super) use creusot_std::macros::{ensures, logic, requires};
 }
 #[cfg(creusot)]
+use super::date_series::{
+    date_series_period_days_in_safe_range, date_series_start_days_in_safe_range,
+};
+#[cfg(creusot)]
 use mirror::{ensures, logic, requires};
 
 amenable_derive::harness! {
@@ -38,6 +42,16 @@ amenable_derive::harness! {
             pearlite! { observed.0 == start_days && observed.1 == start_days + period_days }
         }
     }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::date_time_series::date_time_series_next_yields_start_then_advances_by_period_holds",
+        "creusot",
+        "ensures",
+        || DATE_TIME_SERIES_NEXT_YIELDS_START_THEN_ADVANCES_BY_PERIOD_HOLDS_SRC,
+    )
 }
 
 amenable_derive::harness! {
@@ -58,8 +72,8 @@ amenable_derive::harness! {
         /// jiff's actual `Iterator` impl: matching this crate's own
         /// established precedent for iterator types lacking real
         /// contract coverage (see this module's own doc comment).
-        #[requires(start_days > -3_700_000i64 - 1i64 && start_days < 3_700_000i64 + 1i64)]
-        #[requires(period_days > -1_000_000_000i64 - 1i64 && period_days < 1_000_000_000i64 + 1i64)]
+        #[requires(date_series_start_days_in_safe_range(start_days))]
+        #[requires(date_series_period_days_in_safe_range(period_days))]
         #[ensures(date_time_series_next_yields_start_then_advances_by_period_holds(start_days, period_days, result))]
         fn verify_date_time_series_next_yields_start_then_advances_by_period(
             start_days: i64,

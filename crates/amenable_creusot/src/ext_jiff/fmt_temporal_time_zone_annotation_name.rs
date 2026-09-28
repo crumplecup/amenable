@@ -61,6 +61,16 @@ amenable_derive::harness! { creusot, FMT_TEMPORAL_TIME_ZONE_ANNOTATION_NAME_FROM
     }
 }}
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_jiff::fmt_temporal_time_zone_annotation_name::fmt_temporal_time_zone_annotation_name_from_str_round_trips_holds",
+        "creusot",
+        "ensures",
+        || FMT_TEMPORAL_TIME_ZONE_ANNOTATION_NAME_FROM_STR_ROUND_TRIPS_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! { creusot, VERIFY_FMT_TEMPORAL_TIME_ZONE_ANNOTATION_NAME_FROM_STR_ROUND_TRIPS_SRC, {
     /// `TimeZoneAnnotationName::from(name).as_str()` always equals
     /// the exact `name` given — the same claim `amenable_kani::
