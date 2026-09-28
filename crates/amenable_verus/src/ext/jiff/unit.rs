@@ -80,10 +80,10 @@ pub open spec fn unit_model_discriminant(u: UnitModel) -> int {
 /// their real discriminant value reproduces the documented "bigger
 /// units compare greater" law exactly.
 pub open spec fn unit_model_ordering_holds(a: UnitModel, b: UnitModel, result: i8) -> bool {
-    let da = unit_model_discriminant(a);
-    let db = unit_model_discriminant(b);
-    (result == 1 ==> da > db) && (result == 0 ==> da == db) && (result == -1 ==> da < db) && (
-    result == 1 || result == 0 || result == -1)
+    (result == 1 ==> unit_model_discriminant(a) > unit_model_discriminant(b))
+        && (result == 0 ==> unit_model_discriminant(a) == unit_model_discriminant(b))
+        && (result == -1 ==> unit_model_discriminant(a) < unit_model_discriminant(b))
+        && (result == 1 || result == 0 || result == -1)
 }
 
 /// A model of `a.cmp(&b)` for two `Unit` values, collapsed to `1`
@@ -109,11 +109,17 @@ pub fn verify_unit_ordering_matches_discriminant_order_model(
     }
 }
 
+/// `unit_model_discriminant_exec`'s postcondition: its exec result
+/// matches the ghost discriminant exactly.
+pub open spec fn unit_model_discriminant_exec_matches(u: UnitModel, result: i8) -> bool {
+    result as int == unit_model_discriminant(u)
+}
+
 /// Executable mirror of `unit_model_discriminant`, needed because spec
 /// functions cannot be called from executable code directly.
 fn unit_model_discriminant_exec(u: UnitModel) -> (result: i8)
     ensures
-        result as int == unit_model_discriminant(u),
+        unit_model_discriminant_exec_matches(u, result),
 {
     match u {
         UnitModel::Year => 9,

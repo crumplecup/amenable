@@ -44,13 +44,19 @@ pub open spec fn meridiem_model_from_hour_holds(hour: i8, result: MeridiemModel)
     }
 }
 
+/// `civil::Time`'s own real valid hour range (`0..=23`), the domain
+/// this model's `Meridiem::from(time)` conversion is restricted to.
+pub open spec fn meridiem_hour_in_range(hour: i8) -> bool {
+    0 <= hour && hour <= 23
+}
+
 /// A model of `Meridiem::from(time)`, restricted to `civil::Time`'s
 /// own real valid hour range (`0..=23`).
 pub fn verify_fmt_strtime_meridiem_from_time_matches_hour_threshold_model(
     hour: i8,
 ) -> (result: MeridiemModel)
     requires
-        0 <= hour && hour <= 23,
+        meridiem_hour_in_range(hour),
     ensures
         meridiem_model_from_hour_holds(hour, result),
 {

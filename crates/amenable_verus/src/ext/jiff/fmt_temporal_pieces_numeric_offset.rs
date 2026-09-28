@@ -43,6 +43,21 @@ pub struct PiecesNumericOffsetModel {
     pub is_negative: bool,
 }
 
+/// `from_offset_seconds`'s postcondition: the wrapped offset
+/// round-trips exactly, and `is_negative` matches the sign of `secs`.
+pub open spec fn pno_from_offset_seconds_holds(secs: i32, result: PiecesNumericOffsetModel) -> bool {
+    result.offset_seconds == secs && result.is_negative == (secs < 0)
+}
+
+/// `with_negative_zero`'s postcondition: the wrapped offset is
+/// preserved from the receiver, `is_negative` is always forced `true`.
+pub open spec fn pno_with_negative_zero_holds(
+    before: PiecesNumericOffsetModel,
+    result: PiecesNumericOffsetModel,
+) -> bool {
+    result.offset_seconds == before.offset_seconds && result.is_negative == true
+}
+
 impl PiecesNumericOffsetModel {
     /// Models `PiecesNumericOffset::from(Offset::from_seconds(secs)
     /// .unwrap())`: within jiff's documented valid range, the wrapped
@@ -52,8 +67,7 @@ impl PiecesNumericOffsetModel {
         requires
             pno_offset_seconds_in_range(secs as int),
         ensures
-            result.offset_seconds == secs,
-            result.is_negative == (secs < 0),
+            pno_from_offset_seconds_holds(secs, result),
     {
         PiecesNumericOffsetModel { offset_seconds: secs, is_negative: secs < 0 }
     }
@@ -62,8 +76,7 @@ impl PiecesNumericOffsetModel {
     /// wrapped offset exactly, always forces `is_negative` to `true`.
     pub fn with_negative_zero(self) -> (result: PiecesNumericOffsetModel)
         ensures
-            result.offset_seconds == self.offset_seconds,
-            result.is_negative == true,
+            pno_with_negative_zero_holds(self, result),
     {
         PiecesNumericOffsetModel { offset_seconds: self.offset_seconds, is_negative: true }
     }

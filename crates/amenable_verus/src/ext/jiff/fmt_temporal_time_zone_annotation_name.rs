@@ -34,11 +34,27 @@ pub struct TimeZoneAnnotationNameModel<'a> {
     pub name: &'a str,
 }
 
+/// `from_name`'s postcondition: the wrapped name is stored verbatim.
+pub open spec fn tz_annotation_name_from_name_holds(
+    s: &str,
+    result: TimeZoneAnnotationNameModel,
+) -> bool {
+    result.name == s
+}
+
+/// `as_str`'s postcondition: returns the receiver's own name verbatim.
+pub open spec fn tz_annotation_name_as_str_holds(
+    before: TimeZoneAnnotationNameModel,
+    result: &str,
+) -> bool {
+    result == before.name
+}
+
 impl<'a> TimeZoneAnnotationNameModel<'a> {
     /// Models `TimeZoneAnnotationName::from(s)`.
     pub fn from_name(s: &'a str) -> (result: TimeZoneAnnotationNameModel<'a>)
         ensures
-            result.name == s,
+            tz_annotation_name_from_name_holds(s, result),
     {
         TimeZoneAnnotationNameModel { name: s }
     }
@@ -46,7 +62,7 @@ impl<'a> TimeZoneAnnotationNameModel<'a> {
     /// Models `TimeZoneAnnotationName::as_str`.
     pub fn as_str(&self) -> (result: &'a str)
         ensures
-            result == self.name,
+            tz_annotation_name_as_str_holds(*self, result),
     {
         self.name
     }

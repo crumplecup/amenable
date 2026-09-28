@@ -17,6 +17,17 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+// Private, not `pub use`: gives `crate::VerusVerifier` a real crate-root
+// binding to satisfy `amenable_derive`'s `verus_ensures_witness!`/
+// `verus_ensures_predicate!` family (their generated code names
+// `crate::VerusVerifier` so the same macro works whether the calling
+// crate supplies the real marker or, as `amenable_derive`'s own tests
+// do, a local stand-in) without re-exporting `amenable_core::VerusVerifier`
+// under a second public path — the type's one public path stays
+// `amenable_core::VerusVerifier`.
+#[cfg(feature = "verus")]
+use amenable_core::VerusVerifier;
+
 mod ext_type;
 #[cfg(feature = "jiff")]
 mod jiff;

@@ -28,6 +28,17 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The append postcondition `write_str` establishes: the buffer's
+/// final content is its prior content with `data` appended, named so
+/// the `@`-sequence claim is a citable fact.
+pub open spec fn fmt_std_io_write_appends_bytes(
+    before: Seq<u8>,
+    after: Seq<u8>,
+    data: Seq<u8>,
+) -> bool {
+    after == before + data
+}
+
 /// A model of `jiff::fmt::StdIoWrite<Vec<u8>>::write_str`: standing in
 /// for `self.0.write_all(string.as_bytes()).map_err(..)` with
 /// `self.0: Vec<u8>` modeled directly as the `&mut Vec<u8>` receiver,
@@ -39,9 +50,10 @@ verus! {
 pub fn verify_fmt_std_io_write_write_str_model(buf: &mut Vec<u8>, data: &[u8]) -> (result: bool)
     ensures
         result,
-        final(buf)@ == old(buf)@ + data@,
+        fmt_std_io_write_appends_bytes(old(buf)@, final(buf)@, data@),
 {
     buf.extend_from_slice(data);
+    assert(buf@ =~= old(buf)@ + data@);
     true
 }
 

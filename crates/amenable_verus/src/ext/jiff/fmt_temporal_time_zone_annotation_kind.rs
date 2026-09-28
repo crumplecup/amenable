@@ -40,12 +40,26 @@ pub struct TimeZoneAnnotationKindModel {
     pub offset_seconds: i32,
 }
 
+/// `from_name`'s postcondition: always the `Named` variant.
+pub open spec fn tz_annotation_kind_from_name_holds(result: TimeZoneAnnotationKindModel) -> bool {
+    result.is_named
+}
+
+/// `from_offset_seconds`'s postcondition: always the `Offset` variant,
+/// carrying `secs` as its own offset seconds.
+pub open spec fn tz_annotation_kind_from_offset_seconds_holds(
+    secs: i32,
+    result: TimeZoneAnnotationKindModel,
+) -> bool {
+    !result.is_named && result.offset_seconds == secs
+}
+
 impl TimeZoneAnnotationKindModel {
     /// Models `TimeZoneAnnotationKind::from(name)`: always the
     /// `Named` variant.
     pub fn from_name() -> (result: TimeZoneAnnotationKindModel)
         ensures
-            result.is_named,
+            tz_annotation_kind_from_name_holds(result),
     {
         TimeZoneAnnotationKindModel { is_named: true, offset_seconds: 0 }
     }
@@ -54,8 +68,7 @@ impl TimeZoneAnnotationKindModel {
     /// `Offset` variant, carrying `offset`'s own seconds.
     pub fn from_offset_seconds(secs: i32) -> (result: TimeZoneAnnotationKindModel)
         ensures
-            !result.is_named,
-            result.offset_seconds == secs,
+            tz_annotation_kind_from_offset_seconds_holds(secs, result),
     {
         TimeZoneAnnotationKindModel { is_named: false, offset_seconds: secs }
     }

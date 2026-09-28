@@ -32,11 +32,16 @@ pub struct TimeZoneDatabaseModel {
     pub is_definitively_empty: bool,
 }
 
+/// `none`'s postcondition: always definitively empty.
+pub open spec fn time_zone_database_none_holds(result: TimeZoneDatabaseModel) -> bool {
+    result.is_definitively_empty
+}
+
 impl TimeZoneDatabaseModel {
     /// Models `TimeZoneDatabase::none()`.
     pub fn none() -> (result: TimeZoneDatabaseModel)
         ensures
-            result.is_definitively_empty,
+            time_zone_database_none_holds(result),
     {
         TimeZoneDatabaseModel { is_definitively_empty: true }
     }

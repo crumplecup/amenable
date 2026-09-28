@@ -52,11 +52,38 @@ pub struct PiecesOffsetModel {
     pub numeric_seconds: i32,
 }
 
+/// `zulu`'s postcondition: the result is always the `Zulu` variant.
+pub open spec fn pieces_offset_zulu_holds(result: PiecesOffsetModel) -> bool {
+    result.is_zulu
+}
+
+/// `from_offset_seconds`'s postcondition: always the `Numeric`
+/// variant, carrying `secs` as its own numeric seconds.
+pub open spec fn pieces_offset_from_offset_seconds_holds(
+    secs: i32,
+    result: PiecesOffsetModel,
+) -> bool {
+    !result.is_zulu && result.numeric_seconds == secs
+}
+
+/// `to_numeric_offset_seconds`'s postcondition: `Zulu` maps to zero
+/// seconds, `Numeric` unwraps to its own seconds.
+pub open spec fn pieces_offset_to_numeric_seconds_holds(
+    before: PiecesOffsetModel,
+    result: i32,
+) -> bool {
+    if before.is_zulu {
+        result == 0
+    } else {
+        result == before.numeric_seconds
+    }
+}
+
 impl PiecesOffsetModel {
     /// Models `PiecesOffset::Zulu`.
     pub fn zulu() -> (result: PiecesOffsetModel)
         ensures
-            result.is_zulu,
+            pieces_offset_zulu_holds(result),
     {
         PiecesOffsetModel { is_zulu: true, numeric_seconds: 0 }
     }
@@ -65,8 +92,7 @@ impl PiecesOffsetModel {
     /// variant, carrying `offset`'s own seconds.
     pub fn from_offset_seconds(secs: i32) -> (result: PiecesOffsetModel)
         ensures
-            !result.is_zulu,
-            result.numeric_seconds == secs,
+            pieces_offset_from_offset_seconds_holds(secs, result),
     {
         PiecesOffsetModel { is_zulu: false, numeric_seconds: secs }
     }
@@ -75,7 +101,7 @@ impl PiecesOffsetModel {
     /// seconds (`Offset::UTC`), `Numeric` unwraps to its own seconds.
     pub fn to_numeric_offset_seconds(&self) -> (result: i32)
         ensures
-            if self.is_zulu { result == 0 } else { result == self.numeric_seconds },
+            pieces_offset_to_numeric_seconds_holds(*self, result),
     {
         if self.is_zulu { 0 } else { self.numeric_seconds }
     }

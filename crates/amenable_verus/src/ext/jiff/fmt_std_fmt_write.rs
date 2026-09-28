@@ -35,6 +35,17 @@ use vstd::prelude::*;
 
 verus! {
 
+/// The append postcondition `write_str` establishes: the string's
+/// final content is its prior content with `s` appended, named so the
+/// `@`-sequence claim is a citable fact.
+pub open spec fn fmt_std_fmt_write_appends_str(
+    before: Seq<char>,
+    after: Seq<char>,
+    s: Seq<char>,
+) -> bool {
+    after == before + s
+}
+
 /// A model of `jiff::fmt::StdFmtWrite<String>::write_str`: standing in
 /// for `self.0.write_str(string).map_err(..)` with `self.0: String`
 /// modeled directly as the `&mut String` receiver, since jiff's real
@@ -45,7 +56,7 @@ verus! {
 pub fn verify_fmt_std_fmt_write_write_str_model(string: &mut String, s: &str) -> (result: bool)
     ensures
         result,
-        final(string)@ == old(string)@ + s@,
+        fmt_std_fmt_write_appends_str(old(string)@, final(string)@, s@),
 {
     string.append(s);
     true

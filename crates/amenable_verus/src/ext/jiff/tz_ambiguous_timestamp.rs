@@ -41,11 +41,20 @@ pub struct AmbiguousTimestampModel {
     pub offset_seconds: i32,
 }
 
+/// `from_fixed_offset_seconds`'s postcondition: the wrapped offset
+/// round-trips exactly.
+pub open spec fn ambiguous_timestamp_from_fixed_offset_seconds_holds(
+    secs: i32,
+    result: AmbiguousTimestampModel,
+) -> bool {
+    result.offset_seconds == secs
+}
+
 impl AmbiguousTimestampModel {
     /// Models `TimeZone::fixed(offset).to_ambiguous_timestamp(dt)`.
     pub fn from_fixed_offset_seconds(secs: i32) -> (result: AmbiguousTimestampModel)
         ensures
-            result.offset_seconds == secs,
+            ambiguous_timestamp_from_fixed_offset_seconds_holds(secs, result),
     {
         AmbiguousTimestampModel { offset_seconds: secs }
     }

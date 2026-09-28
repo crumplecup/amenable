@@ -44,6 +44,13 @@ pub open spec fn signed_duration_new_model_normalizes(
         && (secs_out == 0 || subsec_out == 0 || (secs_out > 0) == (subsec_out > 0))
 }
 
+/// `SignedDuration::new`'s precondition: `secs` has enough headroom
+/// below `i64::MIN`/`i64::MAX` to absorb the sign-fix step's `±1`
+/// shift without overflowing.
+pub open spec fn signed_duration_new_secs_headroom_holds(secs: i64) -> bool {
+    secs > i64::MIN + 3 && secs < i64::MAX - 3
+}
+
 /// A model of `(SignedDuration::new(secs, nanos).as_secs(),
 /// SignedDuration::new(secs, nanos).subsec_nanos())`, reproducing
 /// jiff's real carry-then-sign-fix algorithm — the same claim
@@ -57,7 +64,7 @@ pub fn verify_signed_duration_new_model_normalizes_nanos_and_carries_into_secs(
     nanos: i32,
 ) -> (result: (i64, i32))
     requires
-        secs > i64::MIN + 3, secs < i64::MAX - 3,
+        signed_duration_new_secs_headroom_holds(secs),
     ensures
         signed_duration_new_model_normalizes(secs, nanos, result.0, result.1),
 {

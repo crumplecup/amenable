@@ -37,11 +37,22 @@ pub struct TimeZoneModel {
     pub fixed_offset_seconds: i32,
 }
 
+/// `unknown`'s postcondition: always the unknown variant.
+pub open spec fn time_zone_unknown_holds(result: TimeZoneModel) -> bool {
+    result.is_unknown
+}
+
+/// `fixed`'s postcondition: never unknown, and the fixed offset
+/// round-trips exactly.
+pub open spec fn time_zone_fixed_holds(offset_seconds: i32, result: TimeZoneModel) -> bool {
+    !result.is_unknown && result.fixed_offset_seconds == offset_seconds
+}
+
 impl TimeZoneModel {
     /// Models `TimeZone::unknown()`.
     pub fn unknown() -> (result: TimeZoneModel)
         ensures
-            result.is_unknown,
+            time_zone_unknown_holds(result),
     {
         TimeZoneModel { is_unknown: true, fixed_offset_seconds: 0 }
     }
@@ -49,8 +60,7 @@ impl TimeZoneModel {
     /// Models `TimeZone::fixed(offset)`.
     pub fn fixed(offset_seconds: i32) -> (result: TimeZoneModel)
         ensures
-            !result.is_unknown,
-            result.fixed_offset_seconds == offset_seconds,
+            time_zone_fixed_holds(offset_seconds, result),
     {
         TimeZoneModel { is_unknown: false, fixed_offset_seconds: offset_seconds }
     }

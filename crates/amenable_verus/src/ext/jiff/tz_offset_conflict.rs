@@ -32,12 +32,24 @@ use vstd::prelude::*;
 
 verus! {
 
+/// `resolve_always_offset_seconds`'s postcondition: always returns
+/// the claimed offset.
+pub open spec fn offset_conflict_always_offset_holds(claimed: i32, result: i32) -> bool {
+    result == claimed
+}
+
+/// `resolve_always_time_zone_seconds`'s postcondition: always returns
+/// the time zone's own (actual) offset.
+pub open spec fn offset_conflict_always_time_zone_holds(actual: i32, result: i32) -> bool {
+    result == actual
+}
+
 /// Models `OffsetConflict::AlwaysOffset.resolve(dt, claimed, tz)`'s
 /// resolved offset seconds: always the claimed offset, ignoring
 /// `tz`'s own.
 pub fn resolve_always_offset_seconds(claimed: i32, actual: i32) -> (result: i32)
     ensures
-        result == claimed,
+        offset_conflict_always_offset_holds(claimed, result),
 {
     let _ = actual;
     claimed
@@ -48,7 +60,7 @@ pub fn resolve_always_offset_seconds(claimed: i32, actual: i32) -> (result: i32)
 /// ignoring the claimed one.
 pub fn resolve_always_time_zone_seconds(claimed: i32, actual: i32) -> (result: i32)
     ensures
-        result == actual,
+        offset_conflict_always_time_zone_holds(actual, result),
 {
     let _ = claimed;
     actual

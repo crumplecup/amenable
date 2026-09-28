@@ -55,14 +55,18 @@ pub open spec fn civil_era_year_classifies_bce_and_ce_correctly(
     year: i16,
     result: (i16, EraModel),
 ) -> bool {
-    let is_ce = match result.1 {
-        EraModel::Ce => true,
-        EraModel::Bce => false,
-    };
     if year >= 1 {
-        result.0 == year && is_ce
+        result.0 == year
+            && (match result.1 {
+                EraModel::Ce => true,
+                EraModel::Bce => false,
+            })
     } else {
-        result.0 == -year + 1 && !is_ce
+        result.0 == -year + 1
+            && (match result.1 {
+                EraModel::Ce => false,
+                EraModel::Bce => true,
+            })
     }
 }
 

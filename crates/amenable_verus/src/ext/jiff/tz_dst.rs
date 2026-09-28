@@ -36,12 +36,26 @@ pub enum DstModel {
     Yes,
 }
 
+/// `from_bool`'s postcondition: the result variant matches `is_dst`.
+pub open spec fn dst_from_bool_holds(is_dst: bool, result: DstModel) -> bool {
+    (is_dst ==> result == DstModel::Yes) && (!is_dst ==> result == DstModel::No)
+}
+
+/// `is_dst`'s postcondition: `true` exactly for the `Yes` variant.
+pub open spec fn dst_is_dst_holds(before: DstModel, result: bool) -> bool {
+    result == (before == DstModel::Yes)
+}
+
+/// `is_std`'s postcondition: `true` exactly for the `No` variant.
+pub open spec fn dst_is_std_holds(before: DstModel, result: bool) -> bool {
+    result == (before == DstModel::No)
+}
+
 impl DstModel {
     /// Models `Dst::from(is_dst)`.
     pub fn from_bool(is_dst: bool) -> (result: DstModel)
         ensures
-            is_dst ==> result == DstModel::Yes,
-            !is_dst ==> result == DstModel::No,
+            dst_from_bool_holds(is_dst, result),
     {
         if is_dst { DstModel::Yes } else { DstModel::No }
     }
@@ -49,7 +63,7 @@ impl DstModel {
     /// Models `Dst::is_dst`.
     pub fn is_dst(&self) -> (result: bool)
         ensures
-            result == (*self == DstModel::Yes),
+            dst_is_dst_holds(*self, result),
     {
         matches!(self, DstModel::Yes)
     }
@@ -57,7 +71,7 @@ impl DstModel {
     /// Models `Dst::is_std`.
     pub fn is_std(&self) -> (result: bool)
         ensures
-            result == (*self == DstModel::No),
+            dst_is_std_holds(*self, result),
     {
         matches!(self, DstModel::No)
     }

@@ -50,13 +50,38 @@ pub struct PiecesModel {
     pub time: Option<(i8, i8, i8, i32)>,
 }
 
+/// `from_date`'s postcondition: the given date is stored, and no time
+/// is set.
+pub open spec fn pieces_from_date_holds(date: (i16, i8, i8), result: PiecesModel) -> bool {
+    result.date == date && result.time is None
+}
+
+/// `with_date`'s postcondition: `date` is overwritten, `time` is
+/// preserved exactly from the receiver.
+pub open spec fn pieces_with_date_holds(
+    before: PiecesModel,
+    date: (i16, i8, i8),
+    result: PiecesModel,
+) -> bool {
+    result.date == date && result.time == before.time
+}
+
+/// `with_time`'s postcondition: `time` is overwritten to `Some(time)`,
+/// `date` is preserved exactly from the receiver.
+pub open spec fn pieces_with_time_holds(
+    before: PiecesModel,
+    time: (i8, i8, i8, i32),
+    result: PiecesModel,
+) -> bool {
+    result.time == Some(time) && result.date == before.date
+}
+
 impl PiecesModel {
     /// Models `Pieces::from(date)`: a fresh instance with the given
     /// date and no time set.
     pub fn from_date(date: (i16, i8, i8)) -> (result: PiecesModel)
         ensures
-            result.date == date,
-            result.time is None,
+            pieces_from_date_holds(date, result),
     {
         PiecesModel { date, time: None }
     }
@@ -65,8 +90,7 @@ impl PiecesModel {
     /// `time` exactly.
     pub fn with_date(self, date: (i16, i8, i8)) -> (result: PiecesModel)
         ensures
-            result.date == date,
-            result.time == self.time,
+            pieces_with_date_holds(self, date, result),
     {
         PiecesModel { date, time: self.time }
     }
@@ -75,8 +99,7 @@ impl PiecesModel {
     /// preserves `date` exactly.
     pub fn with_time(self, time: (i8, i8, i8, i32)) -> (result: PiecesModel)
         ensures
-            result.time == Some(time),
-            result.date == self.date,
+            pieces_with_time_holds(self, time, result),
     {
         PiecesModel { date: self.date, time: Some(time) }
     }

@@ -42,11 +42,20 @@ pub struct AmbiguousZonedModel {
     pub offset_seconds: i32,
 }
 
+/// `from_fixed_offset_seconds`'s postcondition: the wrapped offset
+/// round-trips exactly.
+pub open spec fn ambiguous_zoned_from_fixed_offset_seconds_holds(
+    secs: i32,
+    result: AmbiguousZonedModel,
+) -> bool {
+    result.offset_seconds == secs
+}
+
 impl AmbiguousZonedModel {
     /// Models `TimeZone::fixed(offset).to_ambiguous_zoned(dt)`.
     pub fn from_fixed_offset_seconds(secs: i32) -> (result: AmbiguousZonedModel)
         ensures
-            result.offset_seconds == secs,
+            ambiguous_zoned_from_fixed_offset_seconds_holds(secs, result),
     {
         AmbiguousZonedModel { offset_seconds: secs }
     }

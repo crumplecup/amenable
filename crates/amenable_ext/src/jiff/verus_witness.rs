@@ -624,10 +624,40 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/civil_date.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::Date>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::Date),
+        ">"
+    ),
+    "civil_date_new_model_round_trip_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::civil::Era,
     "verify_civil_era_year_classifies_bce_and_ce_correctly_model",
     "../../../amenable_verus/src/ext/jiff/civil_era.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::Era>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::Era),
+        ">"
+    ),
+    "civil_era_year_in_range"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::Era>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::Era),
+        ">"
+    ),
+    "civil_era_year_classifies_bce_and_ce_correctly"
 );
 
 impl_verus_witness_checked_ext!(
@@ -636,10 +666,30 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/civil_iso_week_date.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::ISOWeekDate>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::ISOWeekDate),
+        ">"
+    ),
+    "civil_iso_week_date_new_model_round_trip_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::civil::Time,
     "verify_civil_time_new_hour_minute_second_subsec_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/civil_time.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::Time>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::Time),
+        ">"
+    ),
+    "civil_time_new_model_round_trip_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -648,10 +698,50 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/civil_weekdays_reverse.rs"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::WeekdaysReverse>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::WeekdaysReverse),
+        ">"
+    ),
+    "civil_weekdays_reverse_start_offset_in_range"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::WeekdaysReverse>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::WeekdaysReverse),
+        ">"
+    ),
+    "civil_weekdays_reverse_next_yields_start_then_its_predecessor_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::civil::WeekdaysForward,
     "verify_civil_weekdays_forward_next_yields_start_then_its_successor",
     "../../../amenable_verus/src/ext/jiff/civil_weekdays_forward.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::WeekdaysForward>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::WeekdaysForward),
+        ">"
+    ),
+    "civil_weekdays_forward_start_offset_in_range"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::WeekdaysForward>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::WeekdaysForward),
+        ">"
+    ),
+    "civil_weekdays_forward_next_yields_start_then_its_successor_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -660,10 +750,43 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/civil_weekday.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::Weekday>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::Weekday),
+        ">"
+    ),
+    "civil_weekday_monday_one_offset_model_round_trip_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::civil::TimeSeries,
     "verify_civil_time_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/civil_time_series.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::TimeSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::TimeSeries),
+        ">"
+    ),
+    [
+        "civil_time_series_start_nanos_in_range",
+        "civil_time_series_period_nanos_in_range"
+    ]
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::TimeSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::TimeSeries),
+        ">"
+    ),
+    "civil_time_series_next_yields_start_then_advances_by_period_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -672,10 +795,56 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/date_series.rs"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::DateSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::DateSeries),
+        ">"
+    ),
+    [
+        "date_series_start_days_in_range",
+        "date_series_period_days_in_range"
+    ]
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::DateSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::DateSeries),
+        ">"
+    ),
+    "date_series_next_yields_start_then_advances_by_period_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::civil::DateTimeSeries,
     "verify_date_time_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/date_time_series.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::civil::DateTimeSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::DateTimeSeries),
+        ">"
+    ),
+    [
+        "date_time_series_start_days_in_range",
+        "date_time_series_period_days_in_range"
+    ]
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::civil::DateTimeSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::civil::DateTimeSeries),
+        ">"
+    ),
+    "date_time_series_next_yields_start_then_advances_by_period_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -684,10 +853,53 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_friendly_fractional_unit.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::friendly::FractionalUnit>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::friendly::FractionalUnit),
+        ">"
+    ),
+    "fractional_unit_model_conversion_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::fmt::strtime::BrokenDownTime,
     "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_strtime_broken_down_time.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::strtime::BrokenDownTime>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::strtime::BrokenDownTime),
+        ">"
+    ),
+    [
+        "broken_down_time_new_matches_new_spec",
+        "broken_down_time_year_in_range",
+        "broken_down_time_month_in_range",
+        "broken_down_time_day_in_range",
+        "broken_down_time_day_of_year_in_range",
+        "broken_down_time_iso_week_in_range",
+        "broken_down_time_week_number_in_range",
+        "broken_down_time_hour_in_range",
+        "broken_down_time_minute_or_second_in_range",
+        "broken_down_time_subsec_nanosecond_in_range",
+        "broken_down_time_year_set_or_preserved",
+        "broken_down_time_month_set_or_preserved",
+        "broken_down_time_day_set_or_preserved",
+        "broken_down_time_day_of_year_set_or_preserved",
+        "broken_down_time_iso_week_year_set_or_preserved",
+        "broken_down_time_iso_week_set_or_preserved",
+        "broken_down_time_week_sun_set_or_preserved",
+        "broken_down_time_week_mon_set_or_preserved",
+        "broken_down_time_hour_set_or_preserved",
+        "broken_down_time_minute_set_or_preserved",
+        "broken_down_time_second_set_or_preserved",
+        "broken_down_time_subsec_nanosecond_set_or_preserved",
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -696,10 +908,44 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_strtime_meridiem.rs"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::fmt::strtime::Meridiem>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::strtime::Meridiem),
+        ">"
+    ),
+    "meridiem_hour_in_range"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::strtime::Meridiem>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::strtime::Meridiem),
+        ">"
+    ),
+    "meridiem_model_from_hour_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::Pieces<'static>,
     "verify_fmt_temporal_pieces_with_date_with_time_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::Pieces<'static>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::Pieces<'static>),
+        ">"
+    ),
+    [
+        "pieces_from_date_holds",
+        "pieces_with_date_holds",
+        "pieces_with_time_holds"
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -708,10 +954,47 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces_numeric_offset.rs"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::fmt::temporal::PiecesNumericOffset>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::PiecesNumericOffset),
+        ">"
+    ),
+    "pno_offset_seconds_in_range"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::PiecesNumericOffset>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::PiecesNumericOffset),
+        ">"
+    ),
+    [
+        "pno_from_offset_seconds_holds",
+        "pno_with_negative_zero_holds"
+    ]
+);
+
 impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::PiecesOffset,
     "verify_fmt_temporal_pieces_offset_zulu_and_from_offset_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_pieces_offset.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::PiecesOffset>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::PiecesOffset),
+        ">"
+    ),
+    [
+        "pieces_offset_zulu_holds",
+        "pieces_offset_from_offset_seconds_holds",
+        "pieces_offset_to_numeric_seconds_holds",
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -720,10 +1003,36 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::TimeZoneAnnotation<'static>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::TimeZoneAnnotation<'static>),
+        ">"
+    ),
+    [
+        "tz_annotation_from_name_holds",
+        "tz_annotation_from_offset_seconds_holds"
+    ]
+);
+
 impl_verus_witness_checked_ext!(
     jiff::fmt::temporal::TimeZoneAnnotationKind<'static>,
     "verify_fmt_temporal_time_zone_annotation_kind_from_name_and_from_offset_model",
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_kind.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::TimeZoneAnnotationKind<'static>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::TimeZoneAnnotationKind<'static>),
+        ">"
+    ),
+    [
+        "tz_annotation_kind_from_name_holds",
+        "tz_annotation_kind_from_offset_seconds_holds"
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -732,10 +1041,33 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_temporal_time_zone_annotation_name.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::temporal::TimeZoneAnnotationName<'static>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::temporal::TimeZoneAnnotationName<'static>),
+        ">"
+    ),
+    [
+        "tz_annotation_name_from_name_holds",
+        "tz_annotation_name_as_str_holds"
+    ]
+);
+
 impl_verus_witness_checked_ext!(
     jiff::tz::AmbiguousTimestamp,
     "verify_tz_ambiguous_timestamp_from_fixed_time_zone_is_always_unambiguous_model",
     "../../../amenable_verus/src/ext/jiff/tz_ambiguous_timestamp.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::AmbiguousTimestamp>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::AmbiguousTimestamp),
+        ">"
+    ),
+    "ambiguous_timestamp_from_fixed_offset_seconds_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -744,10 +1076,30 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/tz_ambiguous_zoned.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::AmbiguousZoned>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::AmbiguousZoned),
+        ">"
+    ),
+    "ambiguous_zoned_from_fixed_offset_seconds_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::tz::Dst,
     "verify_tz_dst_from_bool_round_trips_model",
     "../../../amenable_verus/src/ext/jiff/tz_dst.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::Dst>,
+    concat!("amenable_ext::ExtStandard<", stringify!(jiff::tz::Dst), ">"),
+    [
+        "dst_from_bool_holds",
+        "dst_is_dst_holds",
+        "dst_is_std_holds"
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -756,10 +1108,33 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/tz_offset_conflict.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::OffsetConflict>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::OffsetConflict),
+        ">"
+    ),
+    [
+        "offset_conflict_always_offset_holds",
+        "offset_conflict_always_time_zone_holds"
+    ]
+);
+
 impl_verus_witness_checked_ext!(
     jiff::tz::TimeZone,
     "verify_tz_time_zone_unknown_and_fixed_round_trip_model",
     "../../../amenable_verus/src/ext/jiff/tz_time_zone.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::TimeZone>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::TimeZone),
+        ">"
+    ),
+    ["time_zone_unknown_holds", "time_zone_fixed_holds"]
 );
 
 impl_verus_witness_checked_ext!(
@@ -768,10 +1143,30 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/tz_time_zone_database.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::TimeZoneDatabase>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::TimeZoneDatabase),
+        ">"
+    ),
+    "time_zone_database_none_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::tz::TimeZoneOffsetInfo<'static>,
     "verify_tz_time_zone_offset_info_from_fixed_time_zone_model",
     "../../../amenable_verus/src/ext/jiff/tz_time_zone_offset_info.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::TimeZoneOffsetInfo<'static>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::TimeZoneOffsetInfo<'static>),
+        ">"
+    ),
+    "time_zone_offset_info_from_fixed_offset_seconds_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -780,10 +1175,30 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/fmt_std_fmt_write.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::StdFmtWrite<String>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::StdFmtWrite<String>),
+        ">"
+    ),
+    "fmt_std_fmt_write_appends_str"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::fmt::StdIoWrite<Vec<u8>>,
     "verify_fmt_std_io_write_write_str_model",
     "../../../amenable_verus/src/ext/jiff/fmt_std_io_write.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::fmt::StdIoWrite<Vec<u8>>>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::fmt::StdIoWrite<Vec<u8>>),
+        ">"
+    ),
+    "fmt_std_io_write_appends_bytes"
 );
 
 impl_verus_witness_checked_ext!(
@@ -792,10 +1207,26 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/offset.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::tz::Offset>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::tz::Offset),
+        ">"
+    ),
+    "offset_from_seconds_model_round_trip_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::Error,
     "verify_error_classification_predicates_are_mutually_exclusive",
     "../../../amenable_verus/src/ext/jiff/error.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::Error>,
+    concat!("amenable_ext::ExtStandard<", stringify!(jiff::Error), ">"),
+    "error_classification_predicates_are_mutually_exclusive"
 );
 
 impl_verus_witness_checked_ext!(
@@ -804,10 +1235,36 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/signed_duration.rs"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::SignedDuration>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::SignedDuration),
+        ">"
+    ),
+    "signed_duration_new_secs_headroom_holds"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::SignedDuration>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::SignedDuration),
+        ">"
+    ),
+    "signed_duration_new_model_normalizes"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::Span,
     "verify_span_unit_setters_model_round_trips",
     "../../../amenable_verus/src/ext/jiff/span.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::Span>,
+    concat!("amenable_ext::ExtStandard<", stringify!(jiff::Span), ">"),
+    "span_unit_setters_model_round_trip_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -816,10 +1273,43 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/span_fieldwise.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::SpanFieldwise>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::SpanFieldwise),
+        ">"
+    ),
+    "span_fieldwise_negation_model_holds"
+);
+
 impl_verus_witness_checked_ext!(
     jiff::TimestampSeries,
     "verify_timestamp_series_next_yields_start_then_advances_by_period",
     "../../../amenable_verus/src/ext/jiff/timestamp_series.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::TimestampSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::TimestampSeries),
+        ">"
+    ),
+    [
+        "timestamp_series_start_seconds_in_range",
+        "timestamp_series_period_seconds_in_range"
+    ]
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::TimestampSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::TimestampSeries),
+        ">"
+    ),
+    "timestamp_series_next_yields_start_then_advances_by_period_holds"
 );
 
 impl_verus_witness_checked_ext!(
@@ -828,8 +1318,40 @@ impl_verus_witness_checked_ext!(
     "../../../amenable_verus/src/ext/jiff/unit.rs"
 );
 
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::Unit>,
+    concat!("amenable_ext::ExtStandard<", stringify!(jiff::Unit), ">"),
+    [
+        "unit_model_ordering_holds",
+        "unit_model_discriminant_exec_matches"
+    ]
+);
+
 impl_verus_witness_checked_ext!(
     jiff::ZonedSeries,
     "verify_zoned_series_next_yields_start_then_advances_by_period_under_utc",
     "../../../amenable_verus/src/ext/jiff/zoned_series.rs"
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<jiff::ZonedSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::ZonedSeries),
+        ">"
+    ),
+    [
+        "zoned_series_start_seconds_in_range",
+        "zoned_series_period_seconds_in_range"
+    ]
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<jiff::ZonedSeries>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(jiff::ZonedSeries),
+        ">"
+    ),
+    "zoned_series_next_yields_start_then_advances_by_period_under_utc_holds"
 );
