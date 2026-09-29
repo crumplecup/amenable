@@ -64,7 +64,7 @@ pub struct NormalizeToUtcNativeToken(());
 
 /// Output sidecar for the `normalize_to_utc_native` exchange: the emitted
 /// native `OffsetDateTime` carrier + a [`NormalizeToUtcNativeEstablished`](crate::NormalizeToUtcNativeEstablished) token.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::NormalizeToUtcNativeEstablished",
     constructor = "pub"
@@ -74,14 +74,6 @@ pub struct NormalizeToUtcNativeOutput<B: TemporalInstantProps + TemporalZoneProp
     carrier: B::OffsetDateTime,
     #[sidecar(token)]
     token: NormalizeToUtcNativeToken,
-}
-
-impl<B: TemporalInstantProps + TemporalZoneProps> NormalizeToUtcNativeOutput<B> {
-    /// Borrow the emitted native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &B::OffsetDateTime {
-        &self.carrier
-    }
 }
 
 /// Runtime values the `adjust_precision_losslessly_native` exchange consumes.
@@ -95,21 +87,13 @@ pub struct AdjustPrecisionLosslesslyNativeRequest<B: TemporalInstantProps + Temp
 }
 
 /// Input sidecar for the `adjust_precision_losslessly_native` exchange.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::TemporalInputReceived", constructor = "pub")]
 pub struct AdjustPrecisionLosslesslyNativeInput<B: TemporalInstantProps + TemporalZoneProps> {
     #[sidecar(primary)]
     request: AdjustPrecisionLosslesslyNativeRequest<B>,
     #[sidecar(token)]
     token: TemporalInputToken,
-}
-
-impl<B: TemporalInstantProps + TemporalZoneProps> AdjustPrecisionLosslesslyNativeInput<B> {
-    /// Borrow the request values.
-    #[must_use]
-    pub fn request(&self) -> &AdjustPrecisionLosslesslyNativeRequest<B> {
-        &self.request
-    }
 }
 
 /// Proofs the `adjust_precision_losslessly_native` exchange re-issues, folded into one proposition.
@@ -143,7 +127,7 @@ pub struct AdjustPrecisionLosslesslyNativeToken(());
 
 /// Output sidecar for the `adjust_precision_losslessly_native` exchange: the emitted
 /// native `OffsetDateTime` carrier + a [`AdjustPrecisionLosslesslyNativeEstablished`](crate::AdjustPrecisionLosslesslyNativeEstablished) token.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::AdjustPrecisionLosslesslyNativeEstablished",
     constructor = "pub"
@@ -153,14 +137,6 @@ pub struct AdjustPrecisionLosslesslyNativeOutput<B: TemporalInstantProps + Tempo
     carrier: B::OffsetDateTime,
     #[sidecar(token)]
     token: AdjustPrecisionLosslesslyNativeToken,
-}
-
-impl<B: TemporalInstantProps + TemporalZoneProps> AdjustPrecisionLosslesslyNativeOutput<B> {
-    /// Borrow the emitted native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &B::OffsetDateTime {
-        &self.carrier
-    }
 }
 
 /// Runtime values the `truncate_subseconds_native` exchange consumes.
@@ -176,21 +152,13 @@ pub struct TruncateSubsecondsNativeRequest<B: TemporalInstantProps + TemporalZon
 }
 
 /// Input sidecar for the `truncate_subseconds_native` exchange.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::TemporalInputReceived", constructor = "pub")]
 pub struct TruncateSubsecondsNativeInput<B: TemporalInstantProps + TemporalZoneProps> {
     #[sidecar(primary)]
     request: TruncateSubsecondsNativeRequest<B>,
     #[sidecar(token)]
     token: TemporalInputToken,
-}
-
-impl<B: TemporalInstantProps + TemporalZoneProps> TruncateSubsecondsNativeInput<B> {
-    /// Borrow the request values.
-    #[must_use]
-    pub fn request(&self) -> &TruncateSubsecondsNativeRequest<B> {
-        &self.request
-    }
 }
 
 /// Proofs the `truncate_subseconds_native` exchange re-issues, folded into one proposition.
@@ -224,7 +192,7 @@ pub struct TruncateSubsecondsNativeToken(());
 
 /// Output sidecar for the `truncate_subseconds_native` exchange: the emitted
 /// native `OffsetDateTime` carrier + a [`TruncateSubsecondsNativeEstablished`](crate::TruncateSubsecondsNativeEstablished) token.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::TruncateSubsecondsNativeEstablished",
     constructor = "pub"
@@ -234,14 +202,6 @@ pub struct TruncateSubsecondsNativeOutput<B: TemporalInstantProps + TemporalZone
     carrier: B::OffsetDateTime,
     #[sidecar(token)]
     token: TruncateSubsecondsNativeToken,
-}
-
-impl<B: TemporalInstantProps + TemporalZoneProps> TruncateSubsecondsNativeOutput<B> {
-    /// Borrow the emitted native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &B::OffsetDateTime {
-        &self.carrier
-    }
 }
 
 /// Runtime values the `resolve_local_date_time_native` exchange consumes.
@@ -261,7 +221,7 @@ pub struct ResolveLocalDateTimeNativeRequest<
 }
 
 /// Input sidecar for the `resolve_local_date_time_native` exchange.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::TemporalInputReceived", constructor = "pub")]
 pub struct ResolveLocalDateTimeNativeInput<
     B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps,
@@ -270,16 +230,6 @@ pub struct ResolveLocalDateTimeNativeInput<
     request: ResolveLocalDateTimeNativeRequest<B>,
     #[sidecar(token)]
     token: TemporalInputToken,
-}
-
-impl<B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps>
-    ResolveLocalDateTimeNativeInput<B>
-{
-    /// Borrow the request values.
-    #[must_use]
-    pub fn request(&self) -> &ResolveLocalDateTimeNativeRequest<B> {
-        &self.request
-    }
 }
 
 /// Proofs the `resolve_local_date_time_native` exchange re-issues, folded into one proposition.
@@ -315,7 +265,7 @@ pub struct ResolveLocalDateTimeNativeToken(());
 
 /// Output sidecar for the `resolve_local_date_time_native` exchange: the emitted
 /// native `ZonedDateTime` carrier + a [`ResolveLocalDateTimeNativeEstablished`](crate::ResolveLocalDateTimeNativeEstablished) token.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::ResolveLocalDateTimeNativeEstablished",
     constructor = "pub"
@@ -327,16 +277,6 @@ pub struct ResolveLocalDateTimeNativeOutput<
     carrier: B::ZonedDateTime,
     #[sidecar(token)]
     token: ResolveLocalDateTimeNativeToken,
-}
-
-impl<B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps>
-    ResolveLocalDateTimeNativeOutput<B>
-{
-    /// Borrow the emitted native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &B::ZonedDateTime {
-        &self.carrier
-    }
 }
 
 /// Runtime values the `attach_named_zone_native` exchange consumes.
@@ -352,7 +292,7 @@ pub struct AttachNamedZoneNativeRequest<
 }
 
 /// Input sidecar for the `attach_named_zone_native` exchange.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::TemporalInputReceived", constructor = "pub")]
 pub struct AttachNamedZoneNativeInput<
     B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps,
@@ -363,19 +303,9 @@ pub struct AttachNamedZoneNativeInput<
     token: TemporalInputToken,
 }
 
-impl<B: TemporalCivilProps + TemporalInstantProps + TemporalZoneProps>
-    AttachNamedZoneNativeInput<B>
-{
-    /// Borrow the request values.
-    #[must_use]
-    pub fn request(&self) -> &AttachNamedZoneNativeRequest<B> {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `confirm_named_zone_revision_native` exchange — pure proof,
 /// the [`NamedTimeZoneRevisionBundle`](crate::NamedTimeZoneRevisionBundle) it re-issues + its token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::NamedTimeZoneRevisionBundle",
     constructor = "pub"
@@ -385,14 +315,6 @@ pub struct ConfirmNamedZoneRevisionNativeOutput {
     bundle: NamedTimeZoneRevisionBundle,
     #[sidecar(token)]
     token: NamedTimeZoneRevisionBundleToken,
-}
-
-impl ConfirmNamedZoneRevisionNativeOutput {
-    /// Borrow the re-issued proof bundle.
-    #[must_use]
-    pub fn bundle(&self) -> &NamedTimeZoneRevisionBundle {
-        &self.bundle
-    }
 }
 
 /// Runtime values the `order_offset_endpoints_native` exchange consumes.
@@ -406,7 +328,7 @@ pub struct OrderOffsetEndpointsNativeRequest<B: TemporalInstantProps> {
 }
 
 /// Input sidecar for the `order_offset_endpoints_native` exchange.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::TemporalInputReceived", constructor = "pub")]
 pub struct OrderOffsetEndpointsNativeInput<B: TemporalInstantProps> {
     #[sidecar(primary)]
@@ -415,17 +337,9 @@ pub struct OrderOffsetEndpointsNativeInput<B: TemporalInstantProps> {
     token: TemporalInputToken,
 }
 
-impl<B: TemporalInstantProps> OrderOffsetEndpointsNativeInput<B> {
-    /// Borrow the request values.
-    #[must_use]
-    pub fn request(&self) -> &OrderOffsetEndpointsNativeRequest<B> {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `order_offset_endpoints_native` exchange — pure proof,
 /// the [`IntervalEndpointOrderingBundle`](crate::IntervalEndpointOrderingBundle) it re-issues + its token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::IntervalEndpointOrderingBundle",
     constructor = "pub"
@@ -435,14 +349,6 @@ pub struct OrderOffsetEndpointsNativeOutput {
     bundle: IntervalEndpointOrderingBundle,
     #[sidecar(token)]
     token: IntervalEndpointOrderingBundleToken,
-}
-
-impl OrderOffsetEndpointsNativeOutput {
-    /// Borrow the re-issued proof bundle.
-    #[must_use]
-    pub fn bundle(&self) -> &IntervalEndpointOrderingBundle {
-        &self.bundle
-    }
 }
 
 /// Proofs the `evaluate_date_time_formula_native` exchange re-issues, folded into one proposition.
@@ -476,7 +382,7 @@ pub struct EvaluateDateTimeFormulaNativeToken(());
 
 /// Output sidecar for the `evaluate_date_time_formula_native` exchange: the emitted
 /// native `ExplicitTemporalForm` carrier + a [`EvaluateDateTimeFormulaNativeEstablished`](crate::EvaluateDateTimeFormulaNativeEstablished) token.
-#[derive(amenable_derive::Sidecar)]
+#[derive(amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::EvaluateDateTimeFormulaNativeEstablished",
     constructor = "pub"
@@ -488,14 +394,4 @@ pub struct EvaluateDateTimeFormulaNativeOutput<
     carrier: B::ExplicitTemporalForm,
     #[sidecar(token)]
     token: EvaluateDateTimeFormulaNativeToken,
-}
-
-impl<B: TemporalDateTimeFormulaProps + TemporalExplicitTemporalFormProps>
-    EvaluateDateTimeFormulaNativeOutput<B>
-{
-    /// Borrow the emitted native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &B::ExplicitTemporalForm {
-        &self.carrier
-    }
 }

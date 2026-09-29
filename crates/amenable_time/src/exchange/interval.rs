@@ -71,7 +71,7 @@ pub struct OrderOffsetEndpointsEstablished {
 }
 
 /// Input sidecar for the `order_offset_endpoints` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::OrderOffsetEndpointsPreconditions",
     constructor = "pub"
@@ -83,30 +83,14 @@ pub struct OrderOffsetEndpointsInput {
     token: OrderOffsetEndpointsPreconditionsToken,
 }
 
-impl OrderOffsetEndpointsInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &OrderOffsetEndpointsRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `order_offset_endpoints` exchange — no descriptor,
 /// so the folded [`OrderOffsetEndpointsEstablished`](crate::OrderOffsetEndpointsEstablished) proposition
 /// is itself the primary payload.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(constructor = "pub")]
 pub struct OrderOffsetEndpointsOutput {
     #[sidecar(primary)]
     established: OrderOffsetEndpointsEstablished,
     #[sidecar(token)]
     token: OrderOffsetEndpointsEstablishedToken,
-}
-
-impl OrderOffsetEndpointsOutput {
-    /// Borrow the re-issued proof composite.
-    #[must_use]
-    pub fn established(&self) -> &OrderOffsetEndpointsEstablished {
-        &self.established
-    }
 }

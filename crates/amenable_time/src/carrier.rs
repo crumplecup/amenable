@@ -238,7 +238,7 @@ pub struct LossyConversionAuthorityBundleToken(());
 /// `<STok as ProofToken>::Proposition`. A `T` only ever exists
 /// because a native factory produced it under proof, so this pairing
 /// is lawful by construction.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition_from_token, constructor = "pub")]
 pub struct ProvenTemporalCarrier<T, STok>
 where
@@ -249,18 +249,6 @@ where
     carrier: T,
     #[sidecar(token)]
     semantics: STok,
-}
-
-impl<T, STok> ProvenTemporalCarrier<T, STok>
-where
-    T: ::amenable_core::Evidence,
-    STok: ::amenable_core::ProofToken,
-{
-    /// Borrow the backend-native carrier.
-    #[must_use]
-    pub fn carrier(&self) -> &T {
-        &self.carrier
-    }
 }
 
 /// User-facing proven localdatetime carrier: a backend-native

@@ -32,21 +32,13 @@ use crate::{
 
 /// Output sidecar for the `resolve_named_zone` exchange: [`NamedTimeZoneDescriptor`](crate::NamedTimeZoneDescriptor)
 /// plus a token for [`NamedTimeZoneIdentityValid`](crate::NamedTimeZoneIdentityValid).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::NamedTimeZoneIdentityValid", constructor = "pub")]
 pub struct ResolvedNamedTimeZone {
     #[sidecar(primary)]
     descriptor: NamedTimeZoneDescriptor,
     #[sidecar(token)]
     token: NamedTimeZoneIdentityValidToken,
-}
-
-impl ResolvedNamedTimeZone {
-    /// Borrow the resolved descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &NamedTimeZoneDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `confirm_local_time_zone_resolution_authority` exchange consumes.
@@ -108,7 +100,7 @@ pub struct ConfirmZoneAuthorityEstablished {
 }
 
 /// Input sidecar for the `confirm_local_time_zone_resolution_authority` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::ConfirmZoneAuthorityPreconditions",
     constructor = "pub"
@@ -120,32 +112,16 @@ pub struct ConfirmZoneAuthorityInput {
     token: ConfirmZoneAuthorityPreconditionsToken,
 }
 
-impl ConfirmZoneAuthorityInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &ConfirmZoneAuthorityRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `confirm_local_time_zone_resolution_authority` exchange — no descriptor,
 /// so the folded [`ConfirmZoneAuthorityEstablished`](crate::ConfirmZoneAuthorityEstablished) proposition
 /// is itself the primary payload.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(constructor = "pub")]
 pub struct ConfirmZoneAuthorityOutput {
     #[sidecar(primary)]
     established: ConfirmZoneAuthorityEstablished,
     #[sidecar(token)]
     token: ConfirmZoneAuthorityEstablishedToken,
-}
-
-impl ConfirmZoneAuthorityOutput {
-    /// Borrow the re-issued proof composite.
-    #[must_use]
-    pub fn established(&self) -> &ConfirmZoneAuthorityEstablished {
-        &self.established
-    }
 }
 
 /// Descriptors the `resolve_local_date_time` exchange consumes.
@@ -225,7 +201,7 @@ pub struct ResolveLocalDateTimeEstablished {
 }
 
 /// Input sidecar for the `resolve_local_date_time` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::ResolveLocalDateTimePreconditions",
     constructor = "pub"
@@ -237,18 +213,10 @@ pub struct ResolveLocalDateTimeInput {
     token: ResolveLocalDateTimePreconditionsToken,
 }
 
-impl ResolveLocalDateTimeInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &ResolveLocalDateTimeRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `resolve_local_date_time` exchange: the
 /// [`ZonedDateTimeDescriptor`](crate::ZonedDateTimeDescriptor) it emits plus a
 /// token for the folded [`ResolveLocalDateTimeEstablished`](crate::ResolveLocalDateTimeEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::ResolveLocalDateTimeEstablished",
     constructor = "pub"
@@ -258,14 +226,6 @@ pub struct ResolveLocalDateTimeOutput {
     descriptor: ZonedDateTimeDescriptor,
     #[sidecar(token)]
     token: ResolveLocalDateTimeEstablishedToken,
-}
-
-impl ResolveLocalDateTimeOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ZonedDateTimeDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `attach_named_zone` exchange consumes.
@@ -333,7 +293,7 @@ pub struct AttachNamedZoneEstablished {
 }
 
 /// Input sidecar for the `attach_named_zone` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::AttachNamedZonePreconditions",
     constructor = "pub"
@@ -345,32 +305,16 @@ pub struct AttachNamedZoneInput {
     token: AttachNamedZonePreconditionsToken,
 }
 
-impl AttachNamedZoneInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &AttachNamedZoneRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `attach_named_zone` exchange: the
 /// [`ZonedDateTimeDescriptor`](crate::ZonedDateTimeDescriptor) it emits plus a
 /// token for the folded [`AttachNamedZoneEstablished`](crate::AttachNamedZoneEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::AttachNamedZoneEstablished", constructor = "pub")]
 pub struct AttachNamedZoneOutput {
     #[sidecar(primary)]
     descriptor: ZonedDateTimeDescriptor,
     #[sidecar(token)]
     token: AttachNamedZoneEstablishedToken,
-}
-
-impl AttachNamedZoneOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ZonedDateTimeDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `confirm_named_zone_revision` exchange consumes.
@@ -431,7 +375,7 @@ pub struct ConfirmNamedZoneRevisionEstablished {
 }
 
 /// Input sidecar for the `confirm_named_zone_revision` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::ConfirmNamedZoneRevisionPreconditions",
     constructor = "pub"
@@ -443,30 +387,14 @@ pub struct ConfirmNamedZoneRevisionInput {
     token: ConfirmNamedZoneRevisionPreconditionsToken,
 }
 
-impl ConfirmNamedZoneRevisionInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &ConfirmNamedZoneRevisionRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `confirm_named_zone_revision` exchange — no descriptor,
 /// so the folded [`ConfirmNamedZoneRevisionEstablished`](crate::ConfirmNamedZoneRevisionEstablished) proposition
 /// is itself the primary payload.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(constructor = "pub")]
 pub struct ConfirmNamedZoneRevisionOutput {
     #[sidecar(primary)]
     established: ConfirmNamedZoneRevisionEstablished,
     #[sidecar(token)]
     token: ConfirmNamedZoneRevisionEstablishedToken,
-}
-
-impl ConfirmNamedZoneRevisionOutput {
-    /// Borrow the re-issued proof composite.
-    #[must_use]
-    pub fn established(&self) -> &ConfirmNamedZoneRevisionEstablished {
-        &self.established
-    }
 }

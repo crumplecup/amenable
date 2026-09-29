@@ -26,25 +26,22 @@ fn type_name(path: &str) -> &str {
 }
 
 /// One contract's proof coverage across the three formal backends.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, derive_getters::Getters)]
 pub struct TemporalCoverageRow {
     /// The contract's bare type name.
     contract: String,
     /// A Kani harness proves this contract.
+    #[getter(skip)]
     kani: bool,
     /// A Creusot contract function proves this contract.
+    #[getter(skip)]
     creusot: bool,
     /// A Verus spec function proves this contract.
+    #[getter(skip)]
     verus: bool,
 }
 
 impl TemporalCoverageRow {
-    /// The contract's bare type name.
-    #[must_use]
-    pub fn contract(&self) -> &str {
-        &self.contract
-    }
-
     /// Whether Kani proves this contract.
     #[must_use]
     pub const fn kani(&self) -> bool {
@@ -71,7 +68,7 @@ impl TemporalCoverageRow {
 }
 
 /// The whole temporal contract graph, one [`TemporalCoverageRow`] each.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters)]
 pub struct TemporalCoverage {
     rows: Vec<TemporalCoverageRow>,
 }
@@ -111,12 +108,6 @@ impl TemporalCoverage {
         rows.sort_by(|a, b| a.contract.cmp(&b.contract));
         rows.dedup_by(|a, b| a.contract == b.contract);
         Self { rows }
-    }
-
-    /// Every contract row, sorted by name.
-    #[must_use]
-    pub fn rows(&self) -> &[TemporalCoverageRow] {
-        &self.rows
     }
 
     /// Total contracts in the graph.

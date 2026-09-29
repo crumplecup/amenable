@@ -85,7 +85,7 @@ pub struct NormalizeToUtcEstablished {
 }
 
 /// Input sidecar for the `normalize_to_utc` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::NormalizeToUtcPreconditions",
     constructor = "pub"
@@ -97,32 +97,16 @@ pub struct NormalizeToUtcInput {
     token: NormalizeToUtcPreconditionsToken,
 }
 
-impl NormalizeToUtcInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &NormalizeToUtcRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `normalize_to_utc` exchange: the
 /// [`OffsetDateTimeDescriptor`](crate::OffsetDateTimeDescriptor) it emits plus a
 /// token for the folded [`NormalizeToUtcEstablished`](crate::NormalizeToUtcEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::NormalizeToUtcEstablished", constructor = "pub")]
 pub struct NormalizeToUtcOutput {
     #[sidecar(primary)]
     descriptor: OffsetDateTimeDescriptor,
     #[sidecar(token)]
     token: NormalizeToUtcEstablishedToken,
-}
-
-impl NormalizeToUtcOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &OffsetDateTimeDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `strip_named_zone` exchange consumes.
@@ -190,7 +174,7 @@ pub struct StripNamedZoneEstablished {
 }
 
 /// Input sidecar for the `strip_named_zone` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::StripNamedZonePreconditions",
     constructor = "pub"
@@ -202,32 +186,16 @@ pub struct StripNamedZoneInput {
     token: StripNamedZonePreconditionsToken,
 }
 
-impl StripNamedZoneInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &StripNamedZoneRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `strip_named_zone` exchange: the
 /// [`OffsetDateTimeDescriptor`](crate::OffsetDateTimeDescriptor) it emits plus a
 /// token for the folded [`StripNamedZoneEstablished`](crate::StripNamedZoneEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::StripNamedZoneEstablished", constructor = "pub")]
 pub struct StripNamedZoneOutput {
     #[sidecar(primary)]
     descriptor: OffsetDateTimeDescriptor,
     #[sidecar(token)]
     token: StripNamedZoneEstablishedToken,
-}
-
-impl StripNamedZoneOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &OffsetDateTimeDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `adjust_precision_losslessly` exchange consumes.
@@ -291,7 +259,7 @@ pub struct AdjustPrecisionLosslesslyEstablished {
 }
 
 /// Input sidecar for the `adjust_precision_losslessly` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::AdjustPrecisionLosslesslyPreconditions",
     constructor = "pub"
@@ -303,18 +271,10 @@ pub struct AdjustPrecisionLosslesslyInput {
     token: AdjustPrecisionLosslesslyPreconditionsToken,
 }
 
-impl AdjustPrecisionLosslesslyInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &AdjustPrecisionLosslesslyRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `adjust_precision_losslessly` exchange: the
 /// [`OffsetDateTimeDescriptor`](crate::OffsetDateTimeDescriptor) it emits plus a
 /// token for the folded [`AdjustPrecisionLosslesslyEstablished`](crate::AdjustPrecisionLosslesslyEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::AdjustPrecisionLosslesslyEstablished",
     constructor = "pub"
@@ -324,14 +284,6 @@ pub struct AdjustPrecisionLosslesslyOutput {
     descriptor: OffsetDateTimeDescriptor,
     #[sidecar(token)]
     token: AdjustPrecisionLosslesslyEstablishedToken,
-}
-
-impl AdjustPrecisionLosslesslyOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &OffsetDateTimeDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Descriptors the `truncate_subseconds` exchange consumes.
@@ -399,7 +351,7 @@ pub struct TruncateSubsecondsEstablished {
 }
 
 /// Input sidecar for the `truncate_subseconds` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::TruncateSubsecondsPreconditions",
     constructor = "pub"
@@ -411,18 +363,10 @@ pub struct TruncateSubsecondsInput {
     token: TruncateSubsecondsPreconditionsToken,
 }
 
-impl TruncateSubsecondsInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &TruncateSubsecondsRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `truncate_subseconds` exchange: the
 /// [`OffsetDateTimeDescriptor`](crate::OffsetDateTimeDescriptor) it emits plus a
 /// token for the folded [`TruncateSubsecondsEstablished`](crate::TruncateSubsecondsEstablished).
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::TruncateSubsecondsEstablished",
     constructor = "pub"
@@ -432,12 +376,4 @@ pub struct TruncateSubsecondsOutput {
     descriptor: OffsetDateTimeDescriptor,
     #[sidecar(token)]
     token: TruncateSubsecondsEstablishedToken,
-}
-
-impl TruncateSubsecondsOutput {
-    /// Borrow the emitted descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &OffsetDateTimeDescriptor {
-        &self.descriptor
-    }
 }

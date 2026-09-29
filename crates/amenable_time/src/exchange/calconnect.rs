@@ -73,21 +73,13 @@ pub struct ExplicitTemporalFormProof {
 pub struct ExplicitTemporalFormProofToken(());
 
 /// Output sidecar for the `parse_explicit_temporal_form` exchange: [`ExplicitTemporalFormDescriptor`](crate::ExplicitTemporalFormDescriptor) + a [`ExplicitTemporalFormProof`](crate::ExplicitTemporalFormProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::ExplicitTemporalFormProof", constructor = "pub")]
 pub struct ParsedExplicitTemporalForm {
     #[sidecar(primary)]
     descriptor: ExplicitTemporalFormDescriptor,
     #[sidecar(token)]
     token: ExplicitTemporalFormProofToken,
-}
-
-impl ParsedExplicitTemporalForm {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ExplicitTemporalFormDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Proof for [`ParsedExplicitDuration`](crate::ParsedExplicitDuration) — the 6 proof sidecars `parse_explicit_duration` returns, folded.
@@ -130,21 +122,13 @@ pub struct ExplicitDurationProof {
 pub struct ExplicitDurationProofToken(());
 
 /// Output sidecar for the `parse_explicit_duration` exchange: [`ExplicitDurationDescriptor`](crate::ExplicitDurationDescriptor) + a [`ExplicitDurationProof`](crate::ExplicitDurationProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::ExplicitDurationProof", constructor = "pub")]
 pub struct ParsedExplicitDuration {
     #[sidecar(primary)]
     descriptor: ExplicitDurationDescriptor,
     #[sidecar(token)]
     token: ExplicitDurationProofToken,
-}
-
-impl ParsedExplicitDuration {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ExplicitDurationDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Proof for [`ParsedExplicitTimeInterval`](crate::ParsedExplicitTimeInterval) — the 4 proof sidecars `parse_explicit_time_interval` returns, folded.
@@ -183,21 +167,13 @@ pub struct ExplicitTimeIntervalProof {
 pub struct ExplicitTimeIntervalProofToken(());
 
 /// Output sidecar for the `parse_explicit_time_interval` exchange: [`ExplicitTimeIntervalDescriptor`](crate::ExplicitTimeIntervalDescriptor) + a [`ExplicitTimeIntervalProof`](crate::ExplicitTimeIntervalProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::ExplicitTimeIntervalProof", constructor = "pub")]
 pub struct ParsedExplicitTimeInterval {
     #[sidecar(primary)]
     descriptor: ExplicitTimeIntervalDescriptor,
     #[sidecar(token)]
     token: ExplicitTimeIntervalProofToken,
-}
-
-impl ParsedExplicitTimeInterval {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ExplicitTimeIntervalDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Proof for [`ParsedSelectionExpression`](crate::ParsedSelectionExpression) — the 16 proof sidecars `parse_selection_expression` returns, folded.
@@ -262,21 +238,13 @@ pub struct SelectionExpressionProof {
 pub struct SelectionExpressionProofToken(());
 
 /// Output sidecar for the `parse_selection_expression` exchange: [`SelectionExpressionDescriptor`](crate::SelectionExpressionDescriptor) + a [`SelectionExpressionProof`](crate::SelectionExpressionProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::SelectionExpressionProof", constructor = "pub")]
 pub struct ParsedSelectionExpression {
     #[sidecar(primary)]
     descriptor: SelectionExpressionDescriptor,
     #[sidecar(token)]
     token: SelectionExpressionProofToken,
-}
-
-impl ParsedSelectionExpression {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &SelectionExpressionDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Proof for [`ParsedRepeatRule`](crate::ParsedRepeatRule) — the 5 proof sidecars `parse_repeat_rule` returns, folded.
@@ -317,21 +285,13 @@ pub struct RepeatRuleProof {
 pub struct RepeatRuleProofToken(());
 
 /// Output sidecar for the `parse_repeat_rule` exchange: [`RepeatRuleDescriptor`](crate::RepeatRuleDescriptor) + a [`RepeatRuleProof`](crate::RepeatRuleProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(proposition = "crate::RepeatRuleProof", constructor = "pub")]
 pub struct ParsedRepeatRule {
     #[sidecar(primary)]
     descriptor: RepeatRuleDescriptor,
     #[sidecar(token)]
     token: RepeatRuleProofToken,
-}
-
-impl ParsedRepeatRule {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &RepeatRuleDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Proof for [`ParsedRecurringIntervalWithRepeatRule`](crate::ParsedRecurringIntervalWithRepeatRule) — the 6 proof sidecars `parse_recurring_interval_with_repeat_rule` returns, folded.
@@ -375,7 +335,7 @@ pub struct RecurringIntervalWithRepeatRuleProof {
 pub struct RecurringIntervalWithRepeatRuleProofToken(());
 
 /// Output sidecar for the `parse_recurring_interval_with_repeat_rule` exchange: [`RecurringIntervalWithRepeatRuleDescriptor`](crate::RecurringIntervalWithRepeatRuleDescriptor) + a [`RecurringIntervalWithRepeatRuleProof`](crate::RecurringIntervalWithRepeatRuleProof) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::RecurringIntervalWithRepeatRuleProof",
     constructor = "pub"
@@ -385,14 +345,6 @@ pub struct ParsedRecurringIntervalWithRepeatRule {
     descriptor: RecurringIntervalWithRepeatRuleDescriptor,
     #[sidecar(token)]
     token: RecurringIntervalWithRepeatRuleProofToken,
-}
-
-impl ParsedRecurringIntervalWithRepeatRule {
-    /// Borrow the parsed descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &RecurringIntervalWithRepeatRuleDescriptor {
-        &self.descriptor
-    }
 }
 
 /// Emission proof for [`FormattedExplicitTemporalForm`](crate::FormattedExplicitTemporalForm) — the `format_explicit_temporal_form` output proof(s), folded.
@@ -834,7 +786,7 @@ pub struct EvaluateDateTimeFormulaPreconditionsToken(());
 pub struct EvaluateDateTimeFormulaEstablishedToken(());
 
 /// Input sidecar for the `evaluate_date_time_formula` exchange.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::EvaluateDateTimeFormulaPreconditions",
     constructor = "pub"
@@ -846,18 +798,10 @@ pub struct EvaluateDateTimeFormulaInput {
     token: EvaluateDateTimeFormulaPreconditionsToken,
 }
 
-impl EvaluateDateTimeFormulaInput {
-    /// Borrow the request descriptors.
-    #[must_use]
-    pub fn request(&self) -> &EvaluateDateTimeFormulaRequest {
-        &self.request
-    }
-}
-
 /// Output sidecar for the `evaluate_date_time_formula` exchange: the emitted
 /// [`ExplicitTemporalValueDescriptor`](crate::ExplicitTemporalValueDescriptor) + a
 /// [`EvaluateDateTimeFormulaEstablished`](crate::EvaluateDateTimeFormulaEstablished) token.
-#[derive(Debug, Clone, amenable_derive::Sidecar)]
+#[derive(Debug, Clone, amenable_derive::Sidecar, derive_getters::Getters)]
 #[sidecar(
     proposition = "crate::EvaluateDateTimeFormulaEstablished",
     constructor = "pub"
@@ -867,12 +811,4 @@ pub struct EvaluateDateTimeFormulaOutput {
     descriptor: ExplicitTemporalValueDescriptor,
     #[sidecar(token)]
     token: EvaluateDateTimeFormulaEstablishedToken,
-}
-
-impl EvaluateDateTimeFormulaOutput {
-    /// Borrow the evaluated descriptor.
-    #[must_use]
-    pub fn descriptor(&self) -> &ExplicitTemporalValueDescriptor {
-        &self.descriptor
-    }
 }
