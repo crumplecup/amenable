@@ -6,11 +6,6 @@
 //! breakdown. This test is the composition itself: it fails to compile if
 //! any leaf anywhere in any of these trees is unclassified.
 
-#![allow(
-    clippy::too_many_lines,
-    reason = "one assertion per composed aggregate — a flat manifest"
-)]
-
 use amenable_core::ClassifiedWitness;
 use amenable_kani::KaniVerifier;
 use amenable_time::{
@@ -84,7 +79,7 @@ use amenable_time::{
 fn assert_classified<T: ClassifiedWitness<KaniVerifier>>() {}
 
 #[test]
-fn every_temporal_composition_is_a_classified_witness() {
+fn every_temporal_composition_is_a_classified_witness_part_1() {
     assert_classified::<BackendConversionSemanticBundle>();
     assert_classified::<BackendConversionSemanticsValid>();
     assert_classified::<CalendarDateValid>();
@@ -123,6 +118,10 @@ fn every_temporal_composition_is_a_classified_witness() {
     assert_classified::<EnhancedIntervalLevelOneSemanticsValid>();
     assert_classified::<EnhancedIntervalLevelTwoSemanticsValid>();
     assert_classified::<ExplicitDateTimeValid>();
+}
+
+#[test]
+fn every_temporal_composition_is_a_classified_witness_part_2() {
     assert_classified::<ExplicitDateTimeWithShiftValid>();
     assert_classified::<ExplicitDurationRepresentationEvidence>();
     assert_classified::<ExplicitDurationSemanticBundle>();
@@ -161,6 +160,10 @@ fn every_temporal_composition_is_a_classified_witness() {
     assert_classified::<IxdtfSuffixKeyRegistryEntryValid>();
     assert_classified::<IxdtfSuffixKeyRegistryPolicySemanticsValid>();
     assert_classified::<IxdtfTimeZoneAnnotationProofBranch>();
+}
+
+#[test]
+fn every_temporal_composition_is_a_classified_witness_part_3() {
     assert_classified::<IxdtfTimestampHasPreferredPresentationCalendar>();
     assert_classified::<IxdtfTimestampValid>();
     assert_classified::<LocalDateTimeDoesNotIdentifyFixedInstant>();
@@ -199,6 +202,10 @@ fn every_temporal_composition_is_a_classified_witness() {
     assert_classified::<RecurringIntervalWithRepeatRuleValid>();
     assert_classified::<ReducedCalendarDatePrecisionEvidence>();
     assert_classified::<ReducedCalendarDateValid>();
+}
+
+#[test]
+fn every_temporal_composition_is_a_classified_witness_part_4() {
     assert_classified::<ReducedLocalTimePrecisionEvidence>();
     assert_classified::<ReducedLocalTimeValid>();
     assert_classified::<RepeatRuleValid>();
