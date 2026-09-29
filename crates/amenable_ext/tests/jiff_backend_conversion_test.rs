@@ -177,7 +177,7 @@ fn normalize_to_utc_native_matches_the_descriptor_level_result() -> miette::Resu
         .into_diagnostic()
         .wrap_err("valid offset")?;
     let carrier = ProvenOffsetDateTimeCarrier::<JiffOffsetDateTime>::new(
-        JiffOffsetDateTime { local, offset },
+        JiffOffsetDateTime::new(local, offset),
         offset_date_time_bundle_token(),
     );
 
@@ -187,9 +187,9 @@ fn normalize_to_utc_native_matches_the_descriptor_level_result() -> miette::Resu
         .wrap_err("a real jiff offset date-time normalizes to UTC natively")?;
     let native = native.carrier();
 
-    assert_eq!(native.offset, jiff::tz::Offset::UTC);
-    assert_eq!(native.local.hour(), 17);
-    assert_eq!(native.local.minute(), 30);
+    assert_eq!(*native.offset(), jiff::tz::Offset::UTC);
+    assert_eq!(native.local().hour(), 17);
+    assert_eq!(native.local().minute(), 30);
     Ok(())
 }
 
@@ -244,7 +244,7 @@ fn strip_named_zone_native_matches_the_descriptor_level_result() -> miette::Resu
         .into_diagnostic()
         .wrap_err("an unambiguous local time")?;
     let carrier = ProvenZonedDateTimeCarrier::<JiffZoned>::new(
-        JiffZoned(zoned),
+        JiffZoned::new(zoned),
         zoned_date_time_bundle_token(),
     );
 
@@ -254,9 +254,9 @@ fn strip_named_zone_native_matches_the_descriptor_level_result() -> miette::Resu
         .wrap_err("a real jiff::Zoned strips to an offset date-time natively")?;
     let stripped = stripped.carrier();
 
-    assert_eq!(stripped.local.hour(), 13);
-    assert_eq!(stripped.local.minute(), 30);
-    assert_eq!(stripped.offset.seconds(), -4 * 3600);
+    assert_eq!(stripped.local().hour(), 13);
+    assert_eq!(stripped.local().minute(), 30);
+    assert_eq!(stripped.offset().seconds(), -4 * 3600);
     Ok(())
 }
 
@@ -365,7 +365,7 @@ fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() -> m
     let native = backend
         .exchange(AdjustPrecisionLosslesslyNativeInput::new(
             AdjustPrecisionLosslesslyNativeRequest::new(
-                JiffOffsetDateTime { local, offset },
+                JiffOffsetDateTime::new(local, offset),
                 target,
             ),
             TemporalInputToken::new(),
@@ -374,8 +374,8 @@ fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() -> m
         .wrap_err("truncating to exactly the represented precision is lossless natively")?;
     let native = native.carrier();
 
-    assert_eq!(native.local.subsec_nanosecond(), 123_000_000);
-    assert_eq!(native.offset, offset);
+    assert_eq!(native.local().subsec_nanosecond(), 123_000_000);
+    assert_eq!(*native.offset(), offset);
     Ok(())
 }
 
@@ -455,7 +455,7 @@ fn truncate_subseconds_native_matches_the_descriptor_level_result() -> miette::R
     let native = backend
         .exchange(TruncateSubsecondsNativeInput::new(
             TruncateSubsecondsNativeRequest::new(
-                JiffOffsetDateTime { local, offset },
+                JiffOffsetDateTime::new(local, offset),
                 target,
                 LossyConversionAuthorityBundle::default(),
             ),
@@ -465,7 +465,7 @@ fn truncate_subseconds_native_matches_the_descriptor_level_result() -> miette::R
         .wrap_err("truncation always succeeds under the default Truncate rounding mode natively")?;
     let native = native.carrier();
 
-    assert_eq!(native.local.subsec_nanosecond(), 123_000_000);
-    assert_eq!(native.offset, offset);
+    assert_eq!(native.local().subsec_nanosecond(), 123_000_000);
+    assert_eq!(*native.offset(), offset);
     Ok(())
 }

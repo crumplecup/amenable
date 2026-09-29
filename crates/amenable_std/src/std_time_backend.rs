@@ -183,11 +183,22 @@ impl ClassifiedWitness<CanaryVerifier> for amenable_time::TemporalInputReceived 
 // ── Native carriers ─────────────────────────────────────────────────
 
 /// A [`std::time::Duration`] as a temporal duration carrier.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct StdDuration(
     /// The wrapped span.
-    pub Duration,
+    Duration,
 );
 
 /// A [`std::time::SystemTime`] as a fixed-instant carrier.
@@ -196,11 +207,21 @@ pub struct StdDuration(
 /// the Unix epoch — an absolute instant with no civil-calendar or
 /// time-zone structure of its own, which is exactly the slice of the
 /// interface this backend claims.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct StdSystemTime(
     /// The wrapped instant.
-    pub SystemTime,
+    SystemTime,
 );
 
 impl Default for StdSystemTime {

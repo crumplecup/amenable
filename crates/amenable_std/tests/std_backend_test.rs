@@ -174,7 +174,7 @@ fn realize_duration_converts_whole_second_spans() -> miette::Result<()> {
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
         .into_diagnostic()
         .wrap_err("PT1H30M is a fixed span")?;
-    assert_eq!(carrier.carrier().0, Duration::from_secs(5400));
+    assert_eq!(**carrier.carrier(), Duration::from_secs(5400));
     Ok(())
 }
 
@@ -203,7 +203,7 @@ fn duration_round_trips_through_std_time() -> miette::Result<()> {
     let backend = StdTimeBackend;
     let span = Duration::from_secs(86_400 + 3600 + 60 + 1);
     let carrier =
-        ProvenDurationCarrier::<StdDuration>::new(StdDuration(span), duration_bundle_token());
+        ProvenDurationCarrier::<StdDuration>::new(StdDuration::new(span), duration_bundle_token());
 
     let reflected: ReflectedDuration = backend
         .exchange(carrier)
@@ -214,6 +214,6 @@ fn duration_round_trips_through_std_time() -> miette::Result<()> {
         .into_diagnostic()
         .wrap_err("the descriptor realizes back to a span")?;
 
-    assert_eq!(round_tripped.carrier().0, span);
+    assert_eq!(**round_tripped.carrier(), span);
     Ok(())
 }

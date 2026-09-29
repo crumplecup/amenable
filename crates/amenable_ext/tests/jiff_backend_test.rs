@@ -53,7 +53,7 @@ fn realize_duration_round_trips_every_whole_unit() -> miette::Result<()> {
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
         .into_diagnostic()
         .wrap_err("all-whole-unit descriptor realizes to a real jiff::Span")?;
-    let span = carrier.carrier().0;
+    let span = **carrier.carrier();
 
     assert_eq!(span.get_years(), 1);
     assert_eq!(span.get_months(), 2);
@@ -83,7 +83,7 @@ fn realize_duration_converts_a_fractional_second() -> miette::Result<()> {
         .exchange(ReflectedDuration::new(descriptor, duration_bundle_token()))
         .into_diagnostic()
         .wrap_err("a fractional-second descriptor realizes to a real jiff::Span")?;
-    let span = carrier.carrier().0;
+    let span = **carrier.carrier();
 
     assert_eq!(span.get_seconds(), 4);
     assert_eq!(span.get_nanoseconds(), 500_000_000);
@@ -149,7 +149,8 @@ fn duration_round_trips_through_a_real_jiff_span() -> miette::Result<()> {
         .minutes(3)
         .seconds(4)
         .nanoseconds(250_000_000);
-    let carrier = ProvenDurationCarrier::<JiffSpan>::new(JiffSpan(span), duration_bundle_token());
+    let carrier =
+        ProvenDurationCarrier::<JiffSpan>::new(JiffSpan::new(span), duration_bundle_token());
 
     let reflected: ReflectedDuration = backend
         .exchange(carrier)
@@ -159,7 +160,7 @@ fn duration_round_trips_through_a_real_jiff_span() -> miette::Result<()> {
         .exchange(reflected)
         .into_diagnostic()
         .wrap_err("the descriptor realizes back to an equivalent span")?;
-    let round_tripped_span = round_tripped.carrier().0;
+    let round_tripped_span = **round_tripped.carrier();
 
     assert_eq!(round_tripped_span.get_days(), span.get_days());
     assert_eq!(round_tripped_span.get_hours(), span.get_hours());

@@ -157,35 +157,79 @@ use amenable_time::{
 /// concrete value, the same "one carrier, several associated-type
 /// slots" pattern `amenable_std::StdSystemTime` already uses for its
 /// own `Instant`/`OffsetDateTime`.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffDate(
     /// The wrapped date.
-    pub jiff::civil::Date,
+    jiff::civil::Date,
 );
 
 /// A [`jiff::civil::Time`] as a local time-of-day carrier.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffTime(
     /// The wrapped time.
-    pub jiff::civil::Time,
+    jiff::civil::Time,
 );
 
 /// A [`jiff::civil::DateTime`] as a local date-time carrier.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffDateTime(
     /// The wrapped date-time.
-    pub jiff::civil::DateTime,
+    jiff::civil::DateTime,
 );
 
 /// A [`jiff::civil::ISOWeekDate`] as a week-date carrier.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffISOWeekDate(
     /// The wrapped ISO week date.
-    pub jiff::civil::ISOWeekDate,
+    jiff::civil::ISOWeekDate,
 );
 
 /// A reduced-precision calendar date carrier.
@@ -277,11 +321,13 @@ impl TemporalCivilProps for JiffTimeBackend {
 /// same as `JiffOffset`'s own doc comment, needs an explicit
 /// `basis_ctor` (`TimeZone::UTC`, a real jiff constant) since there is
 /// no `Default` to fall back to.
-#[derive(Debug, Clone, PartialEq, Eq, amenable_derive::Evidence)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, amenable_derive::Evidence, derive_more::Deref, derive_new::new,
+)]
 #[evidence(basis = "Self", basis_ctor = "Self(jiff::tz::TimeZone::UTC)")]
 pub struct JiffTimeZone(
     /// The wrapped time zone.
-    pub jiff::tz::TimeZone,
+    jiff::tz::TimeZone,
 );
 
 /// A [`jiff::Zoned`] as a zoned-date-time carrier.
@@ -290,11 +336,11 @@ pub struct JiffTimeZone(
 /// source), but DOES have a manual `Default` impl — unlike `JiffTimeZone`
 /// above, a bare `#[evidence(basis = "Self")]` works here without a
 /// `basis_ctor` override.
-#[derive(Debug, Clone, Default, amenable_derive::Evidence)]
+#[derive(Debug, Clone, Default, amenable_derive::Evidence, derive_more::Deref, derive_new::new)]
 #[evidence(basis = "Self")]
 pub struct JiffZoned(
     /// The wrapped zoned date-time.
-    pub jiff::Zoned,
+    jiff::Zoned,
 );
 
 impl TemporalZoneProps for JiffTimeBackend {
@@ -449,11 +495,13 @@ impl ClassifiedWitness<JiffVerifier> for amenable_time::TemporalInputReceived {}
 /// compare unequal fieldwise). This wrapper mirrors that: no
 /// `PartialEq`/`Eq`/`Hash` derive here either, and comparisons in tests
 /// go through `jiff::Span`'s own getters, not `==` on the whole carrier.
-#[derive(Debug, Clone, Copy, Default, amenable_derive::Evidence)]
+#[derive(
+    Debug, Clone, Copy, Default, amenable_derive::Evidence, derive_more::Deref, derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffSpan(
     /// The wrapped span.
-    pub jiff::Span,
+    jiff::Span,
 );
 
 // ── The backend ──────────────────────────────────────────────────────
@@ -660,11 +708,22 @@ impl Exchange<ProvenDurationCarrier<JiffSpan>, ReflectedDuration, JiffVerifier>
 // ── Phase 2: Instant ─────────────────────────────────────────────────
 
 /// A [`jiff::Timestamp`] as a fixed-instant carrier.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self")]
 pub struct JiffTimestamp(
     /// The wrapped instant.
-    pub jiff::Timestamp,
+    jiff::Timestamp,
 );
 
 /// A [`jiff::tz::Offset`] as a UTC-offset carrier.
@@ -679,11 +738,21 @@ pub struct JiffTimestamp(
 /// `basis_ctor` is absent — so this wrapper supplies `Offset::UTC` (a
 /// real, concrete jiff constant) as its root basis instead of relying
 /// on a `Default` the wrapped type doesn't have.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_more::Deref,
+    derive_new::new,
+)]
 #[evidence(basis = "Self", basis_ctor = "Self(jiff::tz::Offset::UTC)")]
 pub struct JiffOffset(
     /// The wrapped offset.
-    pub jiff::tz::Offset,
+    jiff::tz::Offset,
 );
 
 /// A real jiff-backed offset-aware date-time carrier: a local civil
@@ -696,16 +765,26 @@ pub struct JiffOffset(
 /// directly. Same `basis_ctor` need as `JiffOffset`'s own doc comment
 /// documents (its `offset` field has no `Default`), supplied here as
 /// `DateTime::ZERO` + `Offset::UTC`, both real jiff constants.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, amenable_derive::Evidence)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    amenable_derive::Evidence,
+    derive_getters::Getters,
+    derive_new::new,
+)]
 #[evidence(
     basis = "Self",
     basis_ctor = "Self { local: jiff::civil::DateTime::ZERO, offset: jiff::tz::Offset::UTC }"
 )]
 pub struct JiffOffsetDateTime {
     /// The local (wall-clock) civil date-time.
-    pub local: jiff::civil::DateTime,
+    local: jiff::civil::DateTime,
     /// The UTC offset it was recorded at.
-    pub offset: jiff::tz::Offset,
+    offset: jiff::tz::Offset,
 }
 
 impl TemporalInstantProps for JiffTimeBackend {
@@ -2351,11 +2430,11 @@ impl Default for JiffTimeIntervalRepresentation {
 }
 
 /// A real jiff-backed time-interval carrier.
-#[derive(Debug, Clone, amenable_derive::Evidence)]
+#[derive(Debug, Clone, amenable_derive::Evidence, derive_more::Deref, derive_new::new)]
 #[evidence(basis = "Self")]
 pub struct JiffTimeInterval(
     /// The wrapped representation.
-    pub JiffTimeIntervalRepresentation,
+    JiffTimeIntervalRepresentation,
 );
 
 impl Default for JiffTimeInterval {
@@ -2366,13 +2445,13 @@ impl Default for JiffTimeInterval {
 }
 
 /// A real jiff-backed recurring-interval carrier.
-#[derive(Debug, Clone, amenable_derive::Evidence)]
+#[derive(Debug, Clone, amenable_derive::Evidence, derive_getters::Getters, derive_new::new)]
 #[evidence(basis = "Self")]
 pub struct JiffRecurringInterval {
     /// Bounded repetition count; `None` denotes unbounded recurrence.
-    pub repetitions: Option<u32>,
+    repetitions: Option<u32>,
     /// Repeated interval payload.
-    pub interval: JiffTimeInterval,
+    interval: JiffTimeInterval,
 }
 
 impl Default for JiffRecurringInterval {

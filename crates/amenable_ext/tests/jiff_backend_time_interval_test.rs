@@ -287,11 +287,8 @@ fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() -> mie
         .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let request = OrderOffsetEndpointsNativeRequest::new(
-        JiffOffsetDateTime {
-            local: start,
-            offset,
-        },
-        JiffOffsetDateTime { local: end, offset },
+        JiffOffsetDateTime::new(start, offset),
+        JiffOffsetDateTime::new(end, offset),
     );
 
     backend
@@ -315,11 +312,8 @@ fn order_offset_endpoints_native_rejects_a_reversed_pair() -> miette::Result<()>
         .wrap_err("valid datetime")?;
     let offset = jiff::tz::Offset::UTC;
     let request = OrderOffsetEndpointsNativeRequest::new(
-        JiffOffsetDateTime {
-            local: start,
-            offset,
-        },
-        JiffOffsetDateTime { local: end, offset },
+        JiffOffsetDateTime::new(start, offset),
+        JiffOffsetDateTime::new(end, offset),
     );
 
     let result: Result<amenable_time::OrderOffsetEndpointsNativeOutput, TemporalError> = backend

@@ -74,12 +74,12 @@ fn realize_offset_date_time_round_trips_a_calendar_date() -> miette::Result<()> 
         .wrap_err("a complete calendar date realizes to a real jiff::civil::DateTime + Offset")?;
     let jiff_offset_date_time = carrier.carrier();
 
-    assert_eq!(jiff_offset_date_time.local.year(), 2024);
-    assert_eq!(jiff_offset_date_time.local.month(), 3);
-    assert_eq!(jiff_offset_date_time.local.day(), 10);
-    assert_eq!(jiff_offset_date_time.local.hour(), 13);
-    assert_eq!(jiff_offset_date_time.local.minute(), 30);
-    assert_eq!(jiff_offset_date_time.offset.seconds(), -5 * 3600);
+    assert_eq!(jiff_offset_date_time.local().year(), 2024);
+    assert_eq!(jiff_offset_date_time.local().month(), 3);
+    assert_eq!(jiff_offset_date_time.local().day(), 10);
+    assert_eq!(jiff_offset_date_time.local().hour(), 13);
+    assert_eq!(jiff_offset_date_time.local().minute(), 30);
+    assert_eq!(jiff_offset_date_time.offset().seconds(), -5 * 3600);
     Ok(())
 }
 
@@ -128,9 +128,9 @@ fn realize_offset_date_time_resolves_an_ordinal_or_week_date() -> miette::Result
         .into_diagnostic()
         .wrap_err("Phase 3 widened this to resolve ordinal dates too")?;
     let jiff_offset_date_time = carrier.carrier();
-    assert_eq!(jiff_offset_date_time.local.year(), 2024);
-    assert_eq!(jiff_offset_date_time.local.month(), 3);
-    assert_eq!(jiff_offset_date_time.local.day(), 10);
+    assert_eq!(jiff_offset_date_time.local().year(), 2024);
+    assert_eq!(jiff_offset_date_time.local().month(), 3);
+    assert_eq!(jiff_offset_date_time.local().day(), 10);
     Ok(())
 }
 
@@ -191,7 +191,7 @@ fn offset_date_time_round_trips_through_real_jiff_types() -> miette::Result<()> 
         .into_diagnostic()
         .wrap_err("valid offset")?;
     let carrier = ProvenOffsetDateTimeCarrier::<JiffOffsetDateTime>::new(
-        JiffOffsetDateTime { local, offset },
+        JiffOffsetDateTime::new(local, offset),
         offset_date_time_bundle_token(),
     );
 
@@ -205,7 +205,7 @@ fn offset_date_time_round_trips_through_real_jiff_types() -> miette::Result<()> 
         .wrap_err("the descriptor realizes back to an equivalent offset date-time")?;
     let round_tripped = round_tripped.carrier();
 
-    assert_eq!(round_tripped.local, local);
-    assert_eq!(round_tripped.offset, offset);
+    assert_eq!(*round_tripped.local(), local);
+    assert_eq!(*round_tripped.offset(), offset);
     Ok(())
 }

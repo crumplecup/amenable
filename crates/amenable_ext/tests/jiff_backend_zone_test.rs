@@ -65,7 +65,7 @@ fn realize_named_time_zone_resolves_a_real_iana_zone() -> miette::Result<()> {
         ))
         .into_diagnostic()
         .wrap_err("America/New_York is a real IANA zone")?;
-    assert_eq!(carrier.carrier().0.iana_name(), Some("America/New_York"));
+    assert_eq!(carrier.carrier().iana_name(), Some("America/New_York"));
     Ok(())
 }
 
@@ -101,7 +101,7 @@ fn reflect_named_time_zone_accepts_utc_as_a_real_identifier() -> miette::Result<
     // resemblance.
     let backend = JiffTimeBackend;
     let carrier = ProvenNamedTimeZoneCarrier::<JiffTimeZone>::new(
-        JiffTimeZone(jiff::tz::TimeZone::UTC),
+        JiffTimeZone::new(jiff::tz::TimeZone::UTC),
         named_time_zone_bundle_token(),
     );
 
@@ -120,7 +120,7 @@ fn reflect_named_time_zone_rejects_a_zone_with_no_iana_identifier() -> miette::R
         .into_diagnostic()
         .wrap_err("valid offset")?;
     let carrier = ProvenNamedTimeZoneCarrier::<JiffTimeZone>::new(
-        JiffTimeZone(jiff::tz::TimeZone::fixed(offset)),
+        JiffTimeZone::new(jiff::tz::TimeZone::fixed(offset)),
         named_time_zone_bundle_token(),
     );
 
@@ -183,7 +183,7 @@ fn realize_zoned_date_time_resolves_a_real_named_zone() -> miette::Result<()> {
         ))
         .into_diagnostic()
         .wrap_err("a -04:00 offset in America/New_York on 2024-03-10 resolves to a real Zoned")?;
-    let zoned = &carrier.carrier().0;
+    let zoned = carrier.carrier();
 
     assert_eq!(zoned.time_zone().iana_name(), Some("America/New_York"));
     assert_eq!(zoned.datetime().hour(), 13);
@@ -203,7 +203,7 @@ fn zoned_date_time_round_trips_through_a_real_jiff_zoned() -> miette::Result<()>
         .wrap_err("valid timestamp")?
         .to_zoned(tz);
     let carrier = ProvenZonedDateTimeCarrier::<JiffZoned>::new(
-        JiffZoned(original.clone()),
+        JiffZoned::new(original.clone()),
         zoned_date_time_bundle_token(),
     );
 
@@ -215,7 +215,7 @@ fn zoned_date_time_round_trips_through_a_real_jiff_zoned() -> miette::Result<()>
         .exchange(reflected)
         .into_diagnostic()
         .wrap_err("the descriptor realizes back to an equivalent Zoned")?;
-    let round_tripped = &round_tripped.carrier().0;
+    let round_tripped = round_tripped.carrier();
 
     assert_eq!(round_tripped.timestamp(), original.timestamp());
     assert_eq!(

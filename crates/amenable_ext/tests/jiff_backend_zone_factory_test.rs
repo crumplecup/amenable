@@ -381,8 +381,8 @@ fn resolve_local_date_time_native_matches_the_descriptor_level_result() -> miett
         ZoneGapResolutionDescriptor::ShiftForward,
     );
     let request = ResolveLocalDateTimeNativeRequest::<JiffTimeBackend>::new(
-        JiffDateTime(local),
-        JiffTimeZone(tz),
+        JiffDateTime::new(local),
+        JiffTimeZone::new(tz),
         authority,
         ZoneTransitionResolutionAuthorityBundle::default(),
     );
@@ -392,7 +392,7 @@ fn resolve_local_date_time_native_matches_the_descriptor_level_result() -> miett
         .exchange(input)
         .into_diagnostic()
         .wrap_err("the native edge resolves the same real gap")?;
-    assert_eq!(output.carrier().0.offset().seconds(), -5 * 3600);
+    assert_eq!(output.carrier().offset().seconds(), -5 * 3600);
     Ok(())
 }
 
@@ -409,11 +409,8 @@ fn attach_named_zone_native_rejects_an_inconsistent_offset() -> miette::Result<(
         .into_diagnostic()
         .wrap_err("a real IANA zone")?;
     let request = AttachNamedZoneNativeRequest::<JiffTimeBackend>::new(
-        JiffOffsetDateTime {
-            local,
-            offset: wrong_offset,
-        },
-        JiffTimeZone(tz),
+        JiffOffsetDateTime::new(local, wrong_offset),
+        JiffTimeZone::new(tz),
     );
     let input =
         AttachNamedZoneNativeInput::<JiffTimeBackend>::new(request, TemporalInputToken::new());
@@ -438,7 +435,7 @@ fn confirm_named_zone_revision_native_accepts_a_real_proven_zoned() -> miette::R
         .wrap_err("valid timestamp")?
         .to_zoned(tz);
     let carrier = ProvenZonedDateTimeCarrier::<JiffZoned>::new(
-        JiffZoned(zoned),
+        JiffZoned::new(zoned),
         confirm_zone_authority_token_as_zoned_bundle(),
     );
     let _: amenable_time::ConfirmNamedZoneRevisionNativeOutput = backend

@@ -41,6 +41,7 @@ derive-new = "0.7"
 derive_builder = "0.20"
 derive_more = { version = "2", features = [
   "as_ref",
+  "deref",
   "display",
   "error",
   "from",

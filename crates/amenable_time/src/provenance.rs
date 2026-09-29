@@ -20,30 +20,40 @@ use crate::{
 /// paraphrase) is always present; [`NormativeQuotation`] carries their
 /// verbatim text only where the source licence permits it.
 ///
-/// Hand-written `new` + `with_*` setters rather than `derive_builder`:
-/// `url` and `cross_checks` are genuinely optional, so a builder here
-/// would only ever produce a `.build().expect(...)` that cannot fail —
-/// a panic surface for a call that can't panic. The setters chain by
-/// value, so `temporal_standard!` builds a
-/// record with plain `let` shadowing and no `mut`.
-#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters)]
+/// Hand-written `new` rather than `derive_builder`: `url` and
+/// `cross_checks` are genuinely optional, so a builder here would only
+/// ever produce a `.build().expect(...)` that cannot fail — a panic
+/// surface for a call that can't panic. `with_url` derives instead
+/// (a plain `Option`-stripping value replacement); `with_cross_check`
+/// stays hand-written since it appends rather than replaces. The
+/// setters chain by value, so `temporal_standard!` builds a record
+/// with plain `let` shadowing and no `mut`.
+#[derive(Debug, Clone, PartialEq, Eq, derive_getters::Getters, derive_setters::Setters)]
+#[setters(prefix = "with_", strip_option, into)]
 pub struct TemporalProvenance {
     /// The normative document cited.
+    #[setters(skip)]
     document: NormativeDocument,
     /// The section or clause within it.
+    #[setters(skip)]
     section: NormativeSection,
     /// Whether the primary citation is normative or informative.
+    #[setters(skip)]
     status: NormativeStatus,
     /// The publishing standards body — implies the redistributability tier.
+    #[setters(skip)]
     body: StandardsBody,
     /// Our own concise paraphrase of what the clause requires.
+    #[setters(skip)]
     summary: SemanticSummary,
     /// The verbatim clause text, where the source licence permits it.
+    #[setters(skip)]
     quotation: NormativeQuotation,
     /// A stable deep link to the clause, where one exists.
     url: Option<SourceUrl>,
     /// Secondary citations — informative cross-checks or open-text
     /// stand-ins for a paywalled clause.
+    #[setters(skip)]
     cross_checks: Vec<CrossCheck>,
 }
 
@@ -72,14 +82,6 @@ impl TemporalProvenance {
             url: None,
             cross_checks: Vec::new(),
         }
-    }
-
-    /// Attach a stable deep link to the cited clause.
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, url)))]
-    #[must_use]
-    pub fn with_url(mut self, url: impl Into<SourceUrl>) -> Self {
-        self.url = Some(url.into());
-        self
     }
 
     /// Add one secondary citation.

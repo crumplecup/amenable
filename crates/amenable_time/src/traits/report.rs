@@ -52,17 +52,9 @@ pub trait TemporalReporter: Send + Sync {
 
 /// A borrowed capability declaration, rendered as a readable block by its
 /// [`Display`] impl. Obtain one from [`TemporalReporter::capabilities`].
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, derive_new::new)]
 pub struct TemporalCapabilities<'a> {
     reporter: &'a dyn TemporalReporter,
-}
-
-impl<'a> TemporalCapabilities<'a> {
-    /// Wrap any `&dyn TemporalReporter` for display.
-    #[must_use]
-    pub fn new(reporter: &'a dyn TemporalReporter) -> Self {
-        Self { reporter }
-    }
 }
 
 impl Display for TemporalCapabilities<'_> {

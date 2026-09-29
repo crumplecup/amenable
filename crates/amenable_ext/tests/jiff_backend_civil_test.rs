@@ -64,7 +64,7 @@ fn realize_local_date_time_resolves_a_calendar_date() -> miette::Result<()> {
         ))
         .into_diagnostic()
         .wrap_err("a calendar date realizes to a real jiff::civil::DateTime")?;
-    let datetime = carrier.carrier().0;
+    let datetime = **carrier.carrier();
 
     assert_eq!(datetime.year(), 2024);
     assert_eq!(datetime.month(), 3);
@@ -92,7 +92,7 @@ fn realize_local_date_time_resolves_an_ordinal_date() -> miette::Result<()> {
         ))
         .into_diagnostic()
         .wrap_err("an ordinal date realizes to a real jiff::civil::DateTime")?;
-    let datetime = carrier.carrier().0;
+    let datetime = **carrier.carrier();
 
     assert_eq!(datetime.year(), 2024);
     assert_eq!(datetime.month(), 3);
@@ -120,7 +120,7 @@ fn realize_local_date_time_resolves_a_week_date() -> miette::Result<()> {
         ))
         .into_diagnostic()
         .wrap_err("a week date realizes to a real jiff::civil::DateTime")?;
-    let datetime = carrier.carrier().0;
+    let datetime = **carrier.carrier();
 
     assert_eq!(datetime.year(), 2024);
     assert_eq!(datetime.month(), 3);
@@ -136,7 +136,7 @@ fn local_date_time_round_trips_through_a_real_jiff_datetime_and_canonicalizes_to
         .into_diagnostic()
         .wrap_err("valid datetime")?;
     let carrier = ProvenLocalDateTimeCarrier::<JiffDateTime>::new(
-        JiffDateTime(original),
+        JiffDateTime::new(original),
         local_date_time_bundle_token(),
     );
 
@@ -154,6 +154,6 @@ fn local_date_time_round_trips_through_a_real_jiff_datetime_and_canonicalizes_to
         .into_diagnostic()
         .wrap_err("the descriptor realizes back to an equivalent date-time")?;
 
-    assert_eq!(round_tripped.carrier().0, original);
+    assert_eq!(**round_tripped.carrier(), original);
     Ok(())
 }
