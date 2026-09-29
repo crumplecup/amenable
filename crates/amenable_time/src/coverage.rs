@@ -21,6 +21,7 @@ use amenable_core::{EvidenceLink, ProofRecord};
 /// which is unique across the temporal graph even though its
 /// `EvidenceLink` carries the full module path and its `ProofRecord`
 /// carries the crate-root path.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(path)))]
 fn type_name(path: &str) -> &str {
     path.rsplit("::").next().unwrap_or(path)
 }
@@ -111,18 +112,21 @@ impl TemporalCoverage {
     }
 
     /// Total contracts in the graph.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn total(&self) -> usize {
         self.rows.len()
     }
 
     /// Contracts with at least one machine-checked proof.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn checked(&self) -> usize {
         self.rows.iter().filter(|row| row.is_checked()).count()
     }
 
     /// Contracts backed only by their normative citation.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn citation_only(&self) -> usize {
         self.total() - self.checked()
@@ -130,6 +134,7 @@ impl TemporalCoverage {
 }
 
 impl Display for TemporalCoverage {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         writeln!(f, "temporal proof coverage")?;
         writeln!(f, "{:-<72}", "")?;

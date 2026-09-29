@@ -29,6 +29,7 @@ impl RawInput {
     }
 
     /// Borrow the raw input string.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn as_str(&self) -> &str {
         self.text.value()

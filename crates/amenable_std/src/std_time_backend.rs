@@ -314,7 +314,7 @@ fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
 /// Resolve an offset date-time descriptor to whole seconds from the Unix
 /// epoch. Only complete *calendar* dates are supported — ordinal and week
 /// dates need date-library machinery the canary does not carry.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn offset_datetime_to_epoch_seconds(
     descriptor: &OffsetDateTimeDescriptor,
 ) -> Result<i64, TemporalError> {
@@ -355,7 +355,7 @@ fn offset_datetime_to_epoch_seconds(
 /// Rejects the calendar-variable components (years, months) and fractional
 /// suffixes: a `std::time::Duration` is a fixed span of whole nanoseconds,
 /// so those simply do not convert.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn duration_descriptor_to_std(descriptor: &DurationDescriptor) -> Result<Duration, TemporalError> {
     if descriptor.years() != 0 || descriptor.months() != 0 {
         return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(

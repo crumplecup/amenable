@@ -62,7 +62,10 @@ impl TemporalProvenance {
     /// cross-checks yet.
     #[cfg_attr(
         not(kani),
-        tracing::instrument(level = "trace", skip(document, section, summary, quotation))
+        tracing::instrument(
+            level = "debug",
+            skip(document, section, status, body, summary, quotation)
+        )
     )]
     pub fn new(
         document: impl Into<NormativeDocument>,
@@ -123,6 +126,7 @@ impl Metadata for TemporalProvenance {
 impl Provenance for TemporalProvenance {}
 
 impl Display for TemporalProvenance {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", OwnedMetadataReport::new(self.clone()))
     }

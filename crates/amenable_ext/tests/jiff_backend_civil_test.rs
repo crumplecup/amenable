@@ -47,6 +47,7 @@ fn local_time() -> miette::Result<amenable_time::LocalTimeDescriptor> {
 
 #[test]
 fn realize_local_date_time_resolves_a_calendar_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -74,6 +75,7 @@ fn realize_local_date_time_resolves_a_calendar_date() -> miette::Result<()> {
 
 #[test]
 fn realize_local_date_time_resolves_an_ordinal_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // Day 70 of 2024 (a leap year) is 2024-03-10.
     let descriptor = LocalDateTimeDescriptorBuilder::default()
@@ -102,6 +104,7 @@ fn realize_local_date_time_resolves_an_ordinal_date() -> miette::Result<()> {
 
 #[test]
 fn realize_local_date_time_resolves_a_week_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // ISO week date 2024-W10-7 (Sunday) is 2024-03-10.
     let descriptor = LocalDateTimeDescriptorBuilder::default()
@@ -131,6 +134,7 @@ fn realize_local_date_time_resolves_a_week_date() -> miette::Result<()> {
 #[test]
 fn local_date_time_round_trips_through_a_real_jiff_datetime_and_canonicalizes_to_calendar()
 -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let original = jiff::civil::DateTime::new(2023, 11, 5, 1, 30, 0, 250_000_000)
         .into_diagnostic()

@@ -100,6 +100,7 @@ pub enum NormativeQuotation {
 
 impl NormativeQuotation {
     /// A tier A/B verbatim clause excerpt.
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(text)))]
     pub fn verbatim(text: impl Into<String>) -> Self {
         Self::Verbatim(text.into())
     }
@@ -163,6 +164,7 @@ pub struct CrossCheck {
 }
 
 impl std::fmt::Display for CrossCheck {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {} ({})", self.document, self.section, self.status)
     }

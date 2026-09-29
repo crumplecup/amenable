@@ -78,6 +78,7 @@ fn assert_classified<T: ClassifiedWitness<VerusVerifier>>() {}
 
 #[test]
 fn every_temporal_composition_is_a_classified_witness_part_1() {
+    amenable_core::init_tracing();
     assert_classified::<BackendConversionSemanticBundle>();
     assert_classified::<BackendConversionSemanticsValid>();
     assert_classified::<CalendarDateValid>();
@@ -120,6 +121,7 @@ fn every_temporal_composition_is_a_classified_witness_part_1() {
 
 #[test]
 fn every_temporal_composition_is_a_classified_witness_part_2() {
+    amenable_core::init_tracing();
     assert_classified::<ExplicitDateTimeWithShiftValid>();
     assert_classified::<ExplicitDurationRepresentationEvidence>();
     assert_classified::<ExplicitDurationSemanticBundle>();
@@ -162,6 +164,7 @@ fn every_temporal_composition_is_a_classified_witness_part_2() {
 
 #[test]
 fn every_temporal_composition_is_a_classified_witness_part_3() {
+    amenable_core::init_tracing();
     assert_classified::<IxdtfTimestampHasPreferredPresentationCalendar>();
     assert_classified::<IxdtfTimestampValid>();
     assert_classified::<LocalDateTimeDoesNotIdentifyFixedInstant>();
@@ -204,6 +207,7 @@ fn every_temporal_composition_is_a_classified_witness_part_3() {
 
 #[test]
 fn every_temporal_composition_is_a_classified_witness_part_4() {
+    amenable_core::init_tracing();
     assert_classified::<ReducedLocalTimePrecisionEvidence>();
     assert_classified::<ReducedLocalTimeValid>();
     assert_classified::<RepeatRuleValid>();

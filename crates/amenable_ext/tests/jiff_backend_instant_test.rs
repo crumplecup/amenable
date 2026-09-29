@@ -35,6 +35,7 @@ fn offset_date_time_bundle_token() -> OffsetDateTimeSemanticBundleToken {
 
 #[test]
 fn realize_offset_date_time_round_trips_a_calendar_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -85,6 +86,7 @@ fn realize_offset_date_time_round_trips_a_calendar_date() -> miette::Result<()> 
 
 #[test]
 fn realize_offset_date_time_resolves_an_ordinal_or_week_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // Phase 2 originally rejected these (calendar dates only); Phase 3's
     // TemporalCivilProps work widened the shared
     // local_date_time_descriptor_to_jiff_civil_datetime helper this
@@ -136,6 +138,7 @@ fn realize_offset_date_time_resolves_an_ordinal_or_week_date() -> miette::Result
 
 #[test]
 fn realize_offset_date_time_rejects_the_unknown_local_offset_case() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -183,6 +186,7 @@ fn realize_offset_date_time_rejects_the_unknown_local_offset_case() -> miette::R
 
 #[test]
 fn offset_date_time_round_trips_through_real_jiff_types() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = jiff::civil::DateTime::new(2023, 11, 5, 1, 30, 0, 0)
         .into_diagnostic()

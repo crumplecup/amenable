@@ -667,13 +667,13 @@ amenable_kani::stoplight::verify_green_transitions_only_to_yellow,1788637946,pas
 amenable_kani::stoplight::verify_red_transitions_only_to_green,1788637957,passed
 amenable_kani::stoplight::verify_yellow_transitions_only_to_red,1788637967,passed
 amenable_kani::time::verify_calendar_day_within_month_bounds,1790540135,passed
-amenable_kani::time::verify_calendar_month_in_range,1790540147,passed
+amenable_kani::time::verify_calendar_month_in_range,1790713151,passed
 amenable_kani::time::verify_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine,1790540159,passed
 amenable_kani::time::verify_centennial_year_divisible_by_one_hundred,1790540174,passed
 amenable_kani::time::verify_century_ordinal_in_range_zero_to_ninety_nine,1790540185,passed
 amenable_kani::time::verify_common_year_has_three_hundred_sixty_five_calendar_days,1790540238,passed
 amenable_kani::time::verify_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine,1790540250,passed
-amenable_kani::time::verify_gregorian_leap_year,1790540272,passed
+amenable_kani::time::verify_gregorian_leap_year,1790713176,passed
 amenable_kani::time::verify_hour_in_range_zero_to_twenty_four,1790540284,passed
 amenable_kani::time::verify_interval_duration_is_non_negative,1790540296,passed
 amenable_kani::time::verify_interval_start_precedes_end,1790540308,passed

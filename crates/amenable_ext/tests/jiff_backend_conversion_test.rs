@@ -143,6 +143,7 @@ fn fractional_digits_of(descriptor: &OffsetDateTimeDescriptor) -> Option<String>
 
 #[test]
 fn normalize_to_utc_shifts_a_negative_offset_forward() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 3, 10),
@@ -169,6 +170,7 @@ fn normalize_to_utc_shifts_a_negative_offset_forward() -> miette::Result<()> {
 
 #[test]
 fn normalize_to_utc_native_matches_the_descriptor_level_result() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = jiff::civil::DateTime::new(2024, 3, 10, 13, 30, 0, 0)
         .into_diagnostic()
@@ -195,6 +197,7 @@ fn normalize_to_utc_native_matches_the_descriptor_level_result() -> miette::Resu
 
 #[test]
 fn strip_named_zone_preserves_the_local_representation_and_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let timestamp = offset_date_time_descriptor(
         (2024, 3, 10),
@@ -232,6 +235,7 @@ fn strip_named_zone_preserves_the_local_representation_and_offset() -> miette::R
 
 #[test]
 fn strip_named_zone_native_matches_the_descriptor_level_result() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let tz = jiff::tz::TimeZone::get("America/New_York")
         .into_diagnostic()
@@ -262,6 +266,7 @@ fn strip_named_zone_native_matches_the_descriptor_level_result() -> miette::Resu
 
 #[test]
 fn adjust_precision_losslessly_accepts_an_exact_target() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
@@ -292,6 +297,7 @@ fn adjust_precision_losslessly_accepts_an_exact_target() -> miette::Result<()> {
 
 #[test]
 fn adjust_precision_losslessly_rejects_a_narrower_target() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
@@ -325,6 +331,7 @@ fn adjust_precision_losslessly_rejects_a_narrower_target() -> miette::Result<()>
 
 #[test]
 fn adjust_precision_losslessly_rejects_a_non_second_component() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor =
         offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), None, (UtcOffsetSign::Positive, 0))?;
@@ -350,6 +357,7 @@ fn adjust_precision_losslessly_rejects_a_non_second_component() -> miette::Resul
 
 #[test]
 fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_000_000)
         .into_diagnostic()
@@ -381,6 +389,7 @@ fn adjust_precision_losslessly_native_matches_the_descriptor_level_result() -> m
 
 #[test]
 fn truncate_subseconds_truncates_finer_digits() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
@@ -411,6 +420,7 @@ fn truncate_subseconds_truncates_finer_digits() -> miette::Result<()> {
 
 #[test]
 fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = offset_date_time_descriptor(
         (2024, 1, 1),
@@ -440,6 +450,7 @@ fn truncate_subseconds_rejects_a_non_truncate_rounding_mode() -> miette::Result<
 
 #[test]
 fn truncate_subseconds_native_matches_the_descriptor_level_result() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 123_456_789)
         .into_diagnostic()

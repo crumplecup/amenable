@@ -51,6 +51,7 @@ fn zoned_date_time_bundle_token() -> ZonedDateTimeSemanticBundleToken {
 
 #[test]
 fn realize_named_time_zone_resolves_a_real_iana_zone() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = NamedTimeZoneDescriptorBuilder::default()
         .identifier("America/New_York")
@@ -71,6 +72,7 @@ fn realize_named_time_zone_resolves_a_real_iana_zone() -> miette::Result<()> {
 
 #[test]
 fn realize_named_time_zone_rejects_an_unknown_identifier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = NamedTimeZoneDescriptorBuilder::default()
         .identifier("Nowhere/Fictional")
@@ -95,6 +97,7 @@ fn realize_named_time_zone_rejects_an_unknown_identifier() -> miette::Result<()>
 
 #[test]
 fn reflect_named_time_zone_accepts_utc_as_a_real_identifier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // Real jiff source confirms TimeZone::UTC.iana_name() == Some("UTC")
     // -- UTC is genuinely a valid identifier, unlike Offset's own
     // unrelated "no identifier" shape a first attempt here assumed by
@@ -115,6 +118,7 @@ fn reflect_named_time_zone_accepts_utc_as_a_real_identifier() -> miette::Result<
 
 #[test]
 fn reflect_named_time_zone_rejects_a_zone_with_no_iana_identifier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let offset = jiff::tz::Offset::from_seconds(3600)
         .into_diagnostic()
@@ -135,6 +139,7 @@ fn reflect_named_time_zone_rejects_a_zone_with_no_iana_identifier() -> miette::R
 
 #[test]
 fn realize_zoned_date_time_resolves_a_real_named_zone() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -194,6 +199,7 @@ fn realize_zoned_date_time_resolves_a_real_named_zone() -> miette::Result<()> {
 
 #[test]
 fn zoned_date_time_round_trips_through_a_real_jiff_zoned() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let tz = jiff::tz::TimeZone::get("Europe/London")
         .into_diagnostic()

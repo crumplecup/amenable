@@ -574,7 +574,7 @@ fn nanos_to_fractional_seconds_digits(nanos: i64) -> String {
 /// outright once a component exceeds jiff's own representable range
 /// (e.g. years beyond ±19,998), and `DurationDescriptor`'s `u32` fields
 /// can exceed that range trivially.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn duration_descriptor_to_jiff_span(
     descriptor: &DurationDescriptor,
 ) -> Result<jiff::Span, TemporalError> {
@@ -615,7 +615,7 @@ fn duration_descriptor_to_jiff_span(
 /// descriptor — the exact inverse of
 /// [`duration_descriptor_to_jiff_span`] for any span it could have
 /// produced.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(span)))]
 fn jiff_span_to_duration_descriptor(span: jiff::Span) -> Result<DurationDescriptor, TemporalError> {
     let out_of_range = |field: &str, err: std::num::TryFromIntError| {
         TemporalError::new(TemporalErrorKind::InvalidDescriptor(
@@ -802,7 +802,7 @@ impl TemporalInstantProps for JiffTimeBackend {
 /// `jiff::tz::Offset` is always a concrete, known value — so that case
 /// is a real `Unsupported` error, never silently coerced to `Offset::UTC`
 /// or any other default.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn utc_offset_descriptor_to_jiff_offset(
     descriptor: UtcOffsetDescriptor,
 ) -> Result<jiff::tz::Offset, TemporalError> {
@@ -840,7 +840,7 @@ fn utc_offset_descriptor_to_jiff_offset(
 /// minutes explicitly as `0` or omitted them, so this is the one
 /// faithful choice, matching `UtcOffsetDescriptor`'s own documented
 /// convention ("`None` denotes the integral-hour form").
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(offset)))]
 fn jiff_offset_to_utc_offset_descriptor(
     offset: jiff::tz::Offset,
 ) -> Result<UtcOffsetDescriptor, TemporalError> {
@@ -893,7 +893,7 @@ fn jiff_offset_to_utc_offset_descriptor(
 /// from_monday_one_offset` (the same ISO weekday-number convention
 /// already checked as a real witness for `civil::Weekday`) +
 /// `ISOWeekDate::new(..).date()` for the week form.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(date)))]
 fn complete_date_descriptor_to_jiff_date(
     date: CompleteDateDescriptor,
 ) -> Result<jiff::civil::Date, TemporalError> {
@@ -949,7 +949,7 @@ fn complete_date_descriptor_to_jiff_date(
 ///
 /// Any of the three complete-date forms (calendar, ordinal, week) —
 /// see [`complete_date_descriptor_to_jiff_date`].
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn local_date_time_descriptor_to_jiff_civil_datetime(
     descriptor: &LocalDateTimeDescriptor,
 ) -> Result<jiff::civil::DateTime, TemporalError> {
@@ -991,7 +991,7 @@ fn local_date_time_descriptor_to_jiff_civil_datetime(
 /// available choice (the same precision-is-not-preserved reasoning
 /// `jiff_offset_to_utc_offset_descriptor`'s own doc comment documents
 /// for offset minutes).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(datetime)))]
 fn jiff_civil_datetime_to_local_date_time_descriptor(
     datetime: jiff::civil::DateTime,
 ) -> Result<LocalDateTimeDescriptor, TemporalError> {
@@ -1045,7 +1045,7 @@ fn jiff_civil_datetime_to_local_date_time_descriptor(
 /// Phase 4's own `ZonedDateTime` realize (which needs the identical
 /// local + offset pair, pinned to a concrete instant before re-attaching
 /// a real named zone) can reuse it rather than duplicating it.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn offset_date_time_descriptor_to_jiff_parts(
     descriptor: &OffsetDateTimeDescriptor,
 ) -> Result<(jiff::civil::DateTime, jiff::tz::Offset), TemporalError> {
@@ -1056,7 +1056,7 @@ fn offset_date_time_descriptor_to_jiff_parts(
 
 /// The inverse of [`offset_date_time_descriptor_to_jiff_parts`] —
 /// factored out for the same reuse reason.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(local, offset)))]
 fn jiff_parts_to_offset_date_time_descriptor(
     local: jiff::civil::DateTime,
     offset: jiff::tz::Offset,
@@ -1183,7 +1183,7 @@ impl Exchange<ProvenLocalDateTimeCarrier<JiffDateTime>, ReflectedLocalDateTime, 
 /// query the linked tzdb's own revision string either (confirmed by
 /// checking its real `tz::db` module for a `version`/`revision`
 /// function — none exists).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn named_time_zone_descriptor_to_jiff_time_zone(
     descriptor: &NamedTimeZoneDescriptor,
 ) -> Result<jiff::tz::TimeZone, TemporalError> {
@@ -1212,7 +1212,7 @@ fn named_time_zone_descriptor_to_jiff_time_zone(
 /// than checking `TimeZone::iana_name()`'s real match arms directly.
 /// `tzdb_revision` is always `None` here for the same reason it's
 /// ignored on the realize direction above.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(tz)))]
 fn jiff_time_zone_to_named_time_zone_descriptor(
     tz: &jiff::tz::TimeZone,
 ) -> Result<NamedTimeZoneDescriptor, TemporalError> {
@@ -1251,7 +1251,7 @@ fn jiff_time_zone_to_named_time_zone_descriptor(
 /// caller of this function (Phase 4's own `TemporalZoneNativeBridge`
 /// realize body included) now gets the check for real, not just
 /// `attach_named_zone`'s own callers.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn zoned_date_time_descriptor_to_jiff_zoned(
     descriptor: &ZonedDateTimeDescriptor,
 ) -> Result<jiff::Zoned, TemporalError> {
@@ -1281,7 +1281,7 @@ fn zoned_date_time_descriptor_to_jiff_zoned(
 
 /// Decompose a real `jiff::Zoned` back into a zoned date-time
 /// descriptor.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(zoned)))]
 fn jiff_zoned_to_zoned_date_time_descriptor(
     zoned: &jiff::Zoned,
 ) -> Result<ZonedDateTimeDescriptor, TemporalError> {
@@ -1405,7 +1405,10 @@ impl Exchange<ProvenZonedDateTimeCarrier<JiffZoned>, ReflectedZonedDateTime, Jif
 
 /// Resolve a real `jiff::tz::AmbiguousOffset` against amenable_time's
 /// own two-axis resolution authority.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(ambiguous, authority))
+)]
 fn resolve_ambiguous_offset(
     ambiguous: jiff::tz::AmbiguousOffset,
     authority: &LocalTimeZoneResolutionAuthorityDescriptor,
@@ -1439,7 +1442,10 @@ fn resolve_ambiguous_offset(
 /// native` below are the edges that are actually supposed to prove
 /// `OffsetConsistentWithNamedZone`, so this check belongs here, for
 /// real, rather than staying silently absent.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(local, tz, offset))
+)]
 fn offset_is_consistent_with_named_zone(
     local: jiff::civil::DateTime,
     tz: &jiff::tz::TimeZone,
@@ -1455,7 +1461,10 @@ fn offset_is_consistent_with_named_zone(
 /// Resolve a local wall-clock date-time against a real named zone,
 /// applying amenable_time's own resolution authority to any genuine
 /// gap/fold ambiguity.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(local, tz, authority))
+)]
 fn resolve_local_date_time_to_jiff_zoned(
     local: jiff::civil::DateTime,
     tz: jiff::tz::TimeZone,
@@ -1476,7 +1485,10 @@ fn resolve_local_date_time_to_jiff_zoned(
 /// Attach a real named zone to an explicit offset date-time, after
 /// genuinely checking the given offset is consistent with what the
 /// zone's own real rules say for that local time.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(local, offset, tz))
+)]
 fn attach_named_zone_to_jiff_zoned(
     local: jiff::civil::DateTime,
     offset: jiff::tz::Offset,
@@ -1821,7 +1833,7 @@ impl
 /// round trip built in Phase 3), so any `smallest_component` other
 /// than `Second` is a real, honest `Unsupported` case here, not a
 /// silent no-op.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(target)))]
 fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, TemporalError> {
     if target.smallest_component() != TemporalComponent::Second {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
@@ -1860,7 +1872,10 @@ fn truncate_nanos_to_digits(nanos: i32, digits: u8) -> i32 {
 /// the only rounding arithmetic this backend implements -- a non-
 /// `Truncate` rounding mode is a real, honest `Unsupported` case, not
 /// silently ignored or approximated).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(local, target_precision))
+)]
 fn adjust_jiff_local_precision(
     local: jiff::civil::DateTime,
     target_precision: &PrecisionDescriptor,
@@ -1904,7 +1919,10 @@ fn adjust_jiff_local_precision(
 }
 
 /// Descriptor-level wrapper over [`adjust_jiff_local_precision`].
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(descriptor, target_precision))
+)]
 fn adjust_offset_date_time_precision(
     descriptor: &OffsetDateTimeDescriptor,
     target_precision: &PrecisionDescriptor,
@@ -2476,7 +2494,7 @@ impl TemporalRecurringIntervalProps for JiffTimeBackend {
 /// descriptor. No existing helper covers this direction alone: every
 /// prior phase only ever needed it as part of a larger local-date-time
 /// decomposition.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(date)))]
 fn jiff_date_to_calendar_date_descriptor(
     date: jiff::civil::Date,
 ) -> Result<CalendarDateDescriptor, TemporalError> {
@@ -2494,7 +2512,7 @@ fn jiff_date_to_calendar_date_descriptor(
 }
 
 /// Resolve a bare temporal value to a real jiff time-interval endpoint.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(value)))]
 fn temporal_value_descriptor_to_jiff_endpoint(
     value: &TemporalValueDescriptor,
 ) -> Result<JiffTimeIntervalEndpoint, TemporalError> {
@@ -2535,7 +2553,7 @@ fn temporal_value_descriptor_to_jiff_endpoint(
 
 /// Decompose a real jiff time-interval endpoint back into a bare
 /// temporal value.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(endpoint)))]
 fn jiff_endpoint_to_temporal_value_descriptor(
     endpoint: &JiffTimeIntervalEndpoint,
 ) -> Result<TemporalValueDescriptor, TemporalError> {
@@ -2570,7 +2588,7 @@ fn jiff_endpoint_to_temporal_value_descriptor(
 
 /// Resolve a neutral time-interval endpoint descriptor to a real jiff
 /// endpoint.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(endpoint)))]
 fn time_interval_endpoint_descriptor_to_jiff(
     endpoint: &TimeIntervalEndpoint,
 ) -> Result<JiffTimeIntervalEndpoint, TemporalError> {
@@ -2591,7 +2609,7 @@ fn time_interval_endpoint_descriptor_to_jiff(
 }
 
 /// Decompose a real jiff endpoint back into a neutral descriptor.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(endpoint)))]
 fn jiff_endpoint_to_time_interval_endpoint_descriptor(
     endpoint: &JiffTimeIntervalEndpoint,
 ) -> Result<TimeIntervalEndpoint, TemporalError> {
@@ -2608,7 +2626,7 @@ fn jiff_endpoint_to_time_interval_endpoint_descriptor(
 
 /// Resolve a neutral time-interval representation to its real jiff
 /// counterpart.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(representation)))]
 fn time_interval_representation_to_jiff(
     representation: &TimeIntervalRepresentation,
 ) -> Result<JiffTimeIntervalRepresentation, TemporalError> {
@@ -2636,7 +2654,7 @@ fn time_interval_representation_to_jiff(
 
 /// Decompose a real jiff time-interval representation back into a
 /// neutral descriptor.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(representation)))]
 fn jiff_representation_to_time_interval_representation(
     representation: &JiffTimeIntervalRepresentation,
 ) -> Result<TimeIntervalRepresentation, TemporalError> {
@@ -3194,7 +3212,7 @@ fn parse_temporal_pieces<'i>(
 /// requiring both a time-of-day and a UTC offset to be present (an
 /// offset with no time makes no sense under any of the profiles this
 /// helper backs).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces)))]
 fn pieces_to_offset_date_time(
     pieces: &jiff::fmt::temporal::Pieces<'_>,
     text: &str,
@@ -3221,7 +3239,7 @@ fn pieces_to_offset_date_time(
 /// Reject a zone annotation on `pieces` -- neither plain ISO 8601
 /// offset date-times nor RFC 3339 timestamps have `[...]` zone-bracket
 /// syntax at all; only RFC 9557 IXDTF does.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces)))]
 fn reject_zone_annotation(
     pieces: &jiff::fmt::temporal::Pieces<'_>,
     text: &str,
@@ -3246,7 +3264,7 @@ fn reject_zone_annotation(
 /// grammar treats the annotation as descriptive metadata, not a
 /// zone-identity claim the instant depends on (confirmed by its own
 /// doctest accepting `"Australia/Bluey"`, not a real zone).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(annotation)))]
 fn jiff_time_zone_annotation_to_descriptor(
     annotation: &jiff::fmt::temporal::TimeZoneAnnotation<'_>,
 ) -> Result<IxdtfTimeZoneAnnotationDescriptor, TemporalError> {
@@ -3678,7 +3696,7 @@ fn format_signed_year(year: i32) -> String {
 
 /// Format a calendar date as ISO 8601 extended (`YYYY-MM-DD`) or basic
 /// (`YYYYMMDD`) text.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_calendar_date(descriptor: &CalendarDateDescriptor, basic: bool) -> String {
     let year = format_signed_year(descriptor.year());
     if basic {
@@ -3690,7 +3708,7 @@ fn format_calendar_date(descriptor: &CalendarDateDescriptor, basic: bool) -> Str
 
 /// Format an ordinal date as ISO 8601 extended (`YYYY-DDD`) or basic
 /// (`YYYYDDD`) text.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_ordinal_date(descriptor: &OrdinalDateDescriptor, basic: bool) -> String {
     let year = format_signed_year(descriptor.year());
     if basic {
@@ -3702,7 +3720,7 @@ fn format_ordinal_date(descriptor: &OrdinalDateDescriptor, basic: bool) -> Strin
 
 /// Format a week date as ISO 8601 extended (`YYYY-Www-D`) or basic
 /// (`YYYYWwwD`) text.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_week_date(descriptor: &WeekDateDescriptor, basic: bool) -> String {
     let year = format_signed_year(descriptor.week_year());
     if basic {
@@ -3713,7 +3731,7 @@ fn format_week_date(descriptor: &WeekDateDescriptor, basic: bool) -> String {
 }
 
 /// Dispatch a complete date to its own real formatter.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_complete_date(descriptor: CompleteDateDescriptor, basic: bool) -> String {
     match descriptor {
         CompleteDateDescriptor::Calendar(d) => format_calendar_date(&d, basic),
@@ -3724,7 +3742,7 @@ fn format_complete_date(descriptor: CompleteDateDescriptor, basic: bool) -> Stri
 
 /// Format a local time as ISO 8601 extended (`HH:MM:SS[.fff]`) or
 /// basic (`HHMMSS[.fff]`) text.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_local_time(descriptor: &LocalTimeDescriptor, basic: bool) -> String {
     let mut text = if basic {
         format!(
@@ -3750,7 +3768,7 @@ fn format_local_time(descriptor: &LocalTimeDescriptor, basic: bool) -> String {
 
 /// Format a reduced-precision calendar date as ISO 8601 extended
 /// (`YYYY` / `YYYY-MM`) or basic (`YYYY` / `YYYYMM`) text.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_reduced_calendar_date(descriptor: &ReducedCalendarDateDescriptor, basic: bool) -> String {
     match descriptor {
         ReducedCalendarDateDescriptor::Year { year } => format_signed_year(*year),
@@ -3770,7 +3788,7 @@ fn format_reduced_calendar_date(descriptor: &ReducedCalendarDateDescriptor, basi
 /// hour/minute component is a real, honest `Unsupported`: jiff's
 /// civil time has no representation for it at all, the same real gap
 /// Phase 9's own parser already found and rejected on the way in.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_reduced_local_time(
     descriptor: &ReducedLocalTimeDescriptor,
     basic: bool,
@@ -3805,7 +3823,7 @@ fn format_reduced_local_time(
 /// `"+00:00"` collapse to the identical descriptor, so there is no
 /// surviving information to choose `"Z"` back over the numeric form; a
 /// real, honest round-trip-is-not-exact finding, not a bug.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_utc_offset(descriptor: &UtcOffsetDescriptor, basic: bool) -> String {
     if descriptor.relationship() == UtcOffsetRelationship::UnknownLocalOffset {
         return if basic {
@@ -3827,7 +3845,7 @@ fn format_utc_offset(descriptor: &UtcOffsetDescriptor, basic: bool) -> String {
 
 /// Format a local date-time as `<date>T<time>`, both in the same
 /// extended-or-basic form.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_local_date_time(descriptor: &LocalDateTimeDescriptor, basic: bool) -> String {
     format!(
         "{}T{}",
@@ -3837,7 +3855,7 @@ fn format_local_date_time(descriptor: &LocalDateTimeDescriptor, basic: bool) -> 
 }
 
 /// Format an offset date-time as `<local-date-time><offset>`.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_offset_date_time(descriptor: &OffsetDateTimeDescriptor, basic: bool) -> String {
     let offset = descriptor.offset();
     format!(
@@ -3850,7 +3868,7 @@ fn format_offset_date_time(descriptor: &OffsetDateTimeDescriptor, basic: bool) -
 /// Format a zoned date-time as `<offset-date-time>[<zone>]` -- always
 /// extended form, matching RFC 9557's own IXDTF grammar (no basic
 /// form defined for zone-annotated timestamps).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_zoned_date_time(descriptor: &ZonedDateTimeDescriptor) -> String {
     format!(
         "{}[{}]",
@@ -3860,7 +3878,7 @@ fn format_zoned_date_time(descriptor: &ZonedDateTimeDescriptor) -> String {
 }
 
 /// Format one additional IXDTF suffix annotation as `[!key=v1-v2]`.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(annotation)))]
 fn format_ixdtf_annotation(annotation: &amenable_time::IxdtfAnnotationDescriptor) -> String {
     let critical = if annotation.critical() { "!" } else { "" };
     format!(
@@ -3873,7 +3891,7 @@ fn format_ixdtf_annotation(annotation: &amenable_time::IxdtfAnnotationDescriptor
 /// Format a real IXDTF timestamp: the base offset date-time, an
 /// optional zone annotation, then any additional suffix annotations in
 /// source order.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_ixdtf_timestamp(descriptor: &IxdtfTimestampDescriptor) -> String {
     let mut text = format_offset_date_time(descriptor.timestamp(), false);
     if let Some(zone) = descriptor.time_zone_annotation() {
@@ -3898,7 +3916,7 @@ fn format_ixdtf_timestamp(descriptor: &IxdtfTimestampDescriptor) -> String {
 /// through their own real formatters; local/offset/zoned date-times
 /// keep their own). Every other form is the CalConnect/ISO 8601-2
 /// extension family, a real, honest `Unsupported`.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(value)))]
 fn format_temporal_value(value: &TemporalValueDescriptor) -> Result<String, TemporalError> {
     match value {
         TemporalValueDescriptor::CalendarDate(d) => Ok(format_calendar_date(d, false)),
@@ -3924,7 +3942,7 @@ fn format_temporal_value(value: &TemporalValueDescriptor) -> Result<String, Temp
 /// -- guessing one (e.g. `".."`) would be exactly the kind of
 /// unsourced assumption this whole backend has avoided everywhere
 /// else.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(endpoint)))]
 fn format_time_interval_endpoint(endpoint: &TimeIntervalEndpoint) -> Result<String, TemporalError> {
     match endpoint {
         TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Bare(value)) => {
@@ -3941,7 +3959,7 @@ fn format_time_interval_endpoint(endpoint: &TimeIntervalEndpoint) -> Result<Stri
 
 /// Format a time-interval representation as `<start>/<end>`,
 /// `<start>/<duration>`, or `<duration>/<end>`.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(representation)))]
 fn format_time_interval_representation(
     representation: &TimeIntervalRepresentation,
 ) -> Result<String, TemporalError> {
@@ -3966,7 +3984,7 @@ fn format_time_interval_representation(
 
 /// Format a recurring interval as `R[n]/<interval>` (an absent
 /// repetition count denotes ISO 8601's unbounded `R/` form).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn format_recurring_interval(
     descriptor: &amenable_time::RecurringIntervalDescriptor,
 ) -> Result<String, TemporalError> {

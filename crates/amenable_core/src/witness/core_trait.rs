@@ -84,10 +84,12 @@ impl<V: Verifier, T: Witness<V>> Witness<V> for Option<T> {
     type SupportingEvidence = T::SupportingEvidence;
     type ProofArtifact = Option<T::ProofArtifact>;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         Some(T::proof())
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         T::support()
     }

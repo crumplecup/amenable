@@ -58,6 +58,7 @@ pub struct TemporalCapabilities<'a> {
 }
 
 impl Display for TemporalCapabilities<'_> {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let yes_no = |flag: bool| if flag { "yes" } else { "no" };
 

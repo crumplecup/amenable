@@ -31,6 +31,7 @@ const _: () = {
 
 #[test]
 fn parse_calendar_date_parses_a_real_iso8601_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedCalendarDate = backend
         .exchange(RawInput::received("2024-03-10"))
@@ -44,6 +45,7 @@ fn parse_calendar_date_parses_a_real_iso8601_date() -> miette::Result<()> {
 
 #[test]
 fn parse_calendar_date_rejects_malformed_text() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedCalendarDate, TemporalError> =
         backend.exchange(RawInput::received("not a date"));
@@ -56,6 +58,7 @@ fn parse_calendar_date_rejects_malformed_text() -> miette::Result<()> {
 
 #[test]
 fn parse_reduced_calendar_date_parses_year_only() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedCalendarDate = backend
         .exchange(RawInput::received("2024"))
@@ -70,6 +73,7 @@ fn parse_reduced_calendar_date_parses_year_only() -> miette::Result<()> {
 
 #[test]
 fn parse_reduced_calendar_date_parses_year_month() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedCalendarDate = backend
         .exchange(RawInput::received("2024-03"))
@@ -87,6 +91,7 @@ fn parse_reduced_calendar_date_parses_year_month() -> miette::Result<()> {
 
 #[test]
 fn parse_ordinal_date_parses_the_extended_form() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedOrdinalDate = backend
         .exchange(RawInput::received("2024-070"))
@@ -99,6 +104,7 @@ fn parse_ordinal_date_parses_the_extended_form() -> miette::Result<()> {
 
 #[test]
 fn parse_ordinal_date_parses_the_basic_form() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedOrdinalDate = backend
         .exchange(RawInput::received("2024070"))
@@ -111,6 +117,7 @@ fn parse_ordinal_date_parses_the_basic_form() -> miette::Result<()> {
 
 #[test]
 fn parse_ordinal_date_rejects_a_real_out_of_range_day() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // 2023 is not a leap year -- day 366 does not exist.
     let result: Result<ParsedOrdinalDate, TemporalError> =
@@ -123,6 +130,7 @@ fn parse_ordinal_date_rejects_a_real_out_of_range_day() -> miette::Result<()> {
 
 #[test]
 fn parse_week_date_parses_the_extended_form() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedWeekDate = backend
         .exchange(RawInput::received("2024-W10-3"))
@@ -136,6 +144,7 @@ fn parse_week_date_parses_the_extended_form() -> miette::Result<()> {
 
 #[test]
 fn parse_week_date_parses_the_basic_form() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedWeekDate = backend
         .exchange(RawInput::received("2024W103"))
@@ -149,6 +158,7 @@ fn parse_week_date_parses_the_basic_form() -> miette::Result<()> {
 
 #[test]
 fn parse_local_time_parses_a_real_iso8601_time() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedLocalTime = backend
         .exchange(RawInput::received("13:30:00"))
@@ -161,6 +171,7 @@ fn parse_local_time_parses_a_real_iso8601_time() -> miette::Result<()> {
 
 #[test]
 fn parse_reduced_local_time_parses_hour_only() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedLocalTime = backend
         .exchange(RawInput::received("13"))
@@ -178,6 +189,7 @@ fn parse_reduced_local_time_parses_hour_only() -> miette::Result<()> {
 
 #[test]
 fn parse_reduced_local_time_parses_hour_minute() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedReducedLocalTime = backend
         .exchange(RawInput::received("13:30"))
@@ -196,6 +208,7 @@ fn parse_reduced_local_time_parses_hour_minute() -> miette::Result<()> {
 
 #[test]
 fn parse_reduced_local_time_rejects_a_fractional_component() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedReducedLocalTime, TemporalError> =
         backend.exchange(RawInput::received("13,5"));
@@ -208,6 +221,7 @@ fn parse_reduced_local_time_rejects_a_fractional_component() -> miette::Result<(
 
 #[test]
 fn parse_utc_offset_parses_zulu() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("Z"))
@@ -224,6 +238,7 @@ fn parse_utc_offset_parses_zulu() -> miette::Result<()> {
 
 #[test]
 fn parse_utc_offset_parses_a_negative_zero_as_unknown_local_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("-00:00"))
@@ -238,6 +253,7 @@ fn parse_utc_offset_parses_a_negative_zero_as_unknown_local_offset() -> miette::
 
 #[test]
 fn parse_utc_offset_parses_a_positive_offset_with_minutes() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedUtcOffset = backend
         .exchange(RawInput::received("+05:30"))
@@ -251,6 +267,7 @@ fn parse_utc_offset_parses_a_positive_offset_with_minutes() -> miette::Result<()
 
 #[test]
 fn parse_utc_offset_rejects_an_out_of_range_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedUtcOffset, TemporalError> =
         backend.exchange(RawInput::received("+99:00"));
@@ -262,6 +279,7 @@ fn parse_utc_offset_rejects_an_out_of_range_offset() -> miette::Result<()> {
 
 #[test]
 fn parse_local_date_time_parses_a_real_iso8601_datetime() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedLocalDateTime = backend
         .exchange(RawInput::received("2024-03-10T13:30:00"))
@@ -273,6 +291,7 @@ fn parse_local_date_time_parses_a_real_iso8601_datetime() -> miette::Result<()> 
 
 #[test]
 fn parse_offset_date_time_parses_a_real_offset_date_time() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedOffsetDateTime = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00"))
@@ -285,6 +304,7 @@ fn parse_offset_date_time_parses_a_real_offset_date_time() -> miette::Result<()>
 
 #[test]
 fn parse_offset_date_time_rejects_a_zone_annotation() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedOffsetDateTime, TemporalError> = backend.exchange(RawInput::received(
         "2024-03-10T13:30:00-04:00[America/New_York]",
@@ -298,6 +318,7 @@ fn parse_offset_date_time_rejects_a_zone_annotation() -> miette::Result<()> {
 
 #[test]
 fn parse_rfc3339_timestamp_parses_a_real_timestamp() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedRfc3339Timestamp = backend
         .exchange(RawInput::received("2024-03-10T17:30:00Z"))
@@ -309,6 +330,7 @@ fn parse_rfc3339_timestamp_parses_a_real_timestamp() -> miette::Result<()> {
 
 #[test]
 fn parse_ixdtf_timestamp_parses_a_named_zone_annotation() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received(
@@ -331,6 +353,7 @@ fn parse_ixdtf_timestamp_parses_a_named_zone_annotation() -> miette::Result<()> 
 
 #[test]
 fn parse_ixdtf_timestamp_parses_an_offset_annotation() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00[-04:00]"))
@@ -351,6 +374,7 @@ fn parse_ixdtf_timestamp_parses_an_offset_annotation() -> miette::Result<()> {
 
 #[test]
 fn parse_ixdtf_timestamp_without_an_annotation_still_parses() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedIxdtfTimestamp = backend
         .exchange(RawInput::received("2024-03-10T13:30:00-04:00"))
@@ -362,6 +386,7 @@ fn parse_ixdtf_timestamp_without_an_annotation_still_parses() -> miette::Result<
 
 #[test]
 fn the_calconnect_extension_family_is_honestly_unsupported() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
 
     let extended_year: Result<ParsedExtendedYear, TemporalError> =

@@ -111,6 +111,7 @@ fn one_day_duration() -> miette::Result<DurationDescriptor> {
 
 #[test]
 fn realizes_and_reflects_a_start_end_interval_of_offset_date_times() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -138,6 +139,7 @@ fn realizes_and_reflects_a_start_end_interval_of_offset_date_times() -> miette::
 
 #[test]
 fn realizes_and_reflects_open_and_unknown_boundaries() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartEnd {
         start: TimeIntervalEndpoint::Open,
@@ -162,6 +164,7 @@ fn realizes_and_reflects_open_and_unknown_boundaries() -> miette::Result<()> {
 
 #[test]
 fn realizes_and_reflects_a_start_duration_interval() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let descriptor = TimeIntervalDescriptor::new(TimeIntervalRepresentation::StartDuration {
@@ -187,6 +190,7 @@ fn realizes_and_reflects_a_start_duration_interval() -> miette::Result<()> {
 
 #[test]
 fn rejects_an_out_of_scope_endpoint_form() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let decade = DecadeDescriptorBuilder::default()
         .ordinal(202u16)
@@ -214,6 +218,7 @@ fn rejects_an_out_of_scope_endpoint_form() -> miette::Result<()> {
 
 #[test]
 fn realizes_and_reflects_a_bounded_recurring_interval() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -246,6 +251,7 @@ fn realizes_and_reflects_a_bounded_recurring_interval() -> miette::Result<()> {
 
 #[test]
 fn realizes_and_reflects_an_unbounded_recurring_interval() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -278,6 +284,7 @@ fn realizes_and_reflects_an_unbounded_recurring_interval() -> miette::Result<()>
 
 #[test]
 fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = jiff::civil::DateTime::new(2024, 1, 1, 0, 0, 0, 0)
         .into_diagnostic()
@@ -303,6 +310,7 @@ fn order_offset_endpoints_native_accepts_a_chronologically_ordered_pair() -> mie
 
 #[test]
 fn order_offset_endpoints_native_rejects_a_reversed_pair() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = jiff::civil::DateTime::new(2024, 1, 2, 0, 0, 0, 0)
         .into_diagnostic()

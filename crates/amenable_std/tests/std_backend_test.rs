@@ -94,6 +94,7 @@ fn duration_bundle_token() -> DurationSemanticBundleToken {
 
 #[test]
 fn reporter_declares_the_std_time_capability_slice() {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     assert!(backend.supported_serialization_profiles().is_empty());
     assert_eq!(backend.max_fractional_second_digits(), Some(9));
@@ -112,6 +113,7 @@ fn reporter_declares_the_std_time_capability_slice() {
 
 #[test]
 fn text_parse_edges_report_unsupported() {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let out: Result<ParsedDuration, TemporalError> =
         backend.exchange(RawInput::received("P1Y2M3DT4H5M6S"));
@@ -123,6 +125,7 @@ fn text_parse_edges_report_unsupported() {
 
 #[test]
 fn ordered_endpoints_establish_the_ordering_proposition() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let input = order_input(timestamp(2020, 1, 1, 0, 0)?, timestamp(2021, 6, 15, 12, 0)?);
     let output = backend
@@ -135,6 +138,7 @@ fn ordered_endpoints_establish_the_ordering_proposition() -> miette::Result<()> 
 
 #[test]
 fn reversed_endpoints_are_rejected() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let input = order_input(timestamp(2021, 6, 15, 12, 0)?, timestamp(2020, 1, 1, 0, 0)?);
     let err =
@@ -150,6 +154,7 @@ fn reversed_endpoints_are_rejected() -> miette::Result<()> {
 
 #[test]
 fn offsets_are_normalised_before_comparison() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     // 2020-01-01T00:00+05:00 is the same instant as 2019-12-31T19:00Z,
     // which precedes 2020-01-01T00:00Z.
@@ -163,6 +168,7 @@ fn offsets_are_normalised_before_comparison() -> miette::Result<()> {
 
 #[test]
 fn realize_duration_converts_whole_second_spans() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .hours(1u32)
@@ -180,6 +186,7 @@ fn realize_duration_converts_whole_second_spans() -> miette::Result<()> {
 
 #[test]
 fn realize_duration_rejects_calendar_variable_components() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
@@ -200,6 +207,7 @@ fn realize_duration_rejects_calendar_variable_components() -> miette::Result<()>
 
 #[test]
 fn duration_round_trips_through_std_time() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = StdTimeBackend;
     let span = Duration::from_secs(86_400 + 3600 + 60 + 1);
     let carrier =

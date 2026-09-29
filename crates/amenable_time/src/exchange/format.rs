@@ -39,6 +39,7 @@ pub struct FormattedCalendarDateExtended {
 
 impl FormattedCalendarDateExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -58,6 +59,7 @@ pub struct FormattedCalendarDateBasic {
 
 impl FormattedCalendarDateBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -80,6 +82,7 @@ pub struct FormattedReducedCalendarDateExtended {
 
 impl FormattedReducedCalendarDateExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -102,6 +105,7 @@ pub struct FormattedReducedCalendarDateBasic {
 
 impl FormattedReducedCalendarDateBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -124,6 +128,7 @@ pub struct FormattedOrdinalDateExtended {
 
 impl FormattedOrdinalDateExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -143,6 +148,7 @@ pub struct FormattedOrdinalDateBasic {
 
 impl FormattedOrdinalDateBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -162,6 +168,7 @@ pub struct FormattedWeekDateExtended {
 
 impl FormattedWeekDateExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -181,6 +188,7 @@ pub struct FormattedWeekDateBasic {
 
 impl FormattedWeekDateBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -200,6 +208,7 @@ pub struct FormattedLocalTimeExtended {
 
 impl FormattedLocalTimeExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -219,6 +228,7 @@ pub struct FormattedLocalTimeBasic {
 
 impl FormattedLocalTimeBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -241,6 +251,7 @@ pub struct FormattedReducedLocalTimeExtended {
 
 impl FormattedReducedLocalTimeExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -263,6 +274,7 @@ pub struct FormattedReducedLocalTimeBasic {
 
 impl FormattedReducedLocalTimeBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -282,6 +294,7 @@ pub struct FormattedUtcOffsetExtended {
 
 impl FormattedUtcOffsetExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -301,6 +314,7 @@ pub struct FormattedUtcOffsetBasic {
 
 impl FormattedUtcOffsetBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -323,6 +337,7 @@ pub struct FormattedLocalDateTimeExtended {
 
 impl FormattedLocalDateTimeExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -345,6 +360,7 @@ pub struct FormattedLocalDateTimeBasic {
 
 impl FormattedLocalDateTimeBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -367,6 +383,7 @@ pub struct FormattedOffsetDateTimeExtended {
 
 impl FormattedOffsetDateTimeExtended {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -389,6 +406,7 @@ pub struct FormattedOffsetDateTimeBasic {
 
 impl FormattedOffsetDateTimeBasic {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -408,6 +426,7 @@ pub struct FormattedDateWithShift {
 
 impl FormattedDateWithShift {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -430,6 +449,7 @@ pub struct FormattedTimeOfDayWithShift {
 
 impl FormattedTimeOfDayWithShift {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -449,6 +469,7 @@ pub struct FormattedExtendedYear {
 
 impl FormattedExtendedYear {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -468,6 +489,7 @@ pub struct FormattedDecade {
 
 impl FormattedDecade {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -487,6 +509,7 @@ pub struct FormattedCentury {
 
 impl FormattedCentury {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -509,6 +532,7 @@ pub struct FormattedQualifiedTemporalValue {
 
 impl FormattedQualifiedTemporalValue {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -528,6 +552,7 @@ pub struct FormattedRfc3339Timestamp {
 
 impl FormattedRfc3339Timestamp {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -550,6 +575,7 @@ pub struct FormattedIxdtfZonedTimestamp {
 
 impl FormattedIxdtfZonedTimestamp {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -569,6 +595,7 @@ pub struct FormattedIxdtfTimestamp {
 
 impl FormattedIxdtfTimestamp {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -591,6 +618,7 @@ pub struct FormattedSeasonalTemporalExpression {
 
 impl FormattedSeasonalTemporalExpression {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -613,6 +641,7 @@ pub struct FormattedSubYearGroupingExpression {
 
 impl FormattedSubYearGroupingExpression {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -635,6 +664,7 @@ pub struct FormattedUnspecifiedComponentExpression {
 
 impl FormattedUnspecifiedComponentExpression {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -654,6 +684,7 @@ pub struct FormattedTemporalSet {
 
 impl FormattedTemporalSet {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -676,6 +707,7 @@ pub struct FormattedGroupedTimeScaleUnit {
 
 impl FormattedGroupedTimeScaleUnit {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -695,6 +727,7 @@ pub struct FormattedDateTimeFormula {
 
 impl FormattedDateTimeFormula {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -714,6 +747,7 @@ pub struct FormattedDuration {
 
 impl FormattedDuration {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -733,6 +767,7 @@ pub struct FormattedRecurringInterval {
 
 impl FormattedRecurringInterval {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -752,6 +787,7 @@ pub struct FormattedTimeInterval {
 
 impl FormattedTimeInterval {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()

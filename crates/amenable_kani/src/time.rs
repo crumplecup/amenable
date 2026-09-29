@@ -30,11 +30,13 @@ use crate::{CalculationProof, KaniVerifier};
 
 /// The Gregorian leap-year rule (ISO 8601-1:2019, 3.1.1.21 note 1),
 /// shared by the year-length and month/day-bound harnesses.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
 fn is_gregorian_leap_year(year: i32) -> bool {
     year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 }
 
 /// A Gregorian calendar year is 366 days when a leap year, else 365.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn days_in_year(year: i32) -> i32 {
     if is_gregorian_leap_year(year) {
         366
@@ -45,6 +47,7 @@ fn days_in_year(year: i32) -> i32 {
 
 /// The number of calendar days in month `m` of year `y` (m in 1..=12;
 /// months outside that range yield 0).
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn days_in_month(year: i32, month: u8) -> u8 {
     if month == 2 {
         if is_gregorian_leap_year(year) { 29 } else { 28 }
@@ -58,6 +61,7 @@ fn days_in_month(year: i32, month: u8) -> u8 {
 }
 
 /// Whether `day` is a valid day-of-month for month `m` of year `y`.
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
 fn is_valid_calendar_day(year: i32, month: u8, day: u8) -> bool {
     (1..=days_in_month(year, month)).contains(&day)
 }

@@ -129,6 +129,7 @@ impl LossyConversionRequiresAuthoritySource {
 
 impl Default for LossyConversionRequiresAuthoritySource {
     #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     fn default() -> Self {
         Self::new()
     }

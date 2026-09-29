@@ -68,6 +68,7 @@ fn offset_date_time_descriptor(
 
 #[test]
 fn parses_a_real_iso8601_duration() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let parsed: ParsedDuration = backend
         .exchange(RawInput::received("P1Y2M3DT4H5M6.789S"))
@@ -86,6 +87,7 @@ fn parses_a_real_iso8601_duration() -> miette::Result<()> {
 
 #[test]
 fn rejects_malformed_duration_text() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedDuration, TemporalError> =
         backend.exchange(RawInput::received("not a duration"));
@@ -98,6 +100,7 @@ fn rejects_malformed_duration_text() -> miette::Result<()> {
 
 #[test]
 fn recurring_interval_text_parse_is_honestly_unsupported() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedRecurringInterval, TemporalError> =
         backend.exchange(RawInput::received("R5/2024-01-01/P1D"));
@@ -110,6 +113,7 @@ fn recurring_interval_text_parse_is_honestly_unsupported() -> miette::Result<()>
 
 #[test]
 fn time_interval_text_parse_is_honestly_unsupported() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ParsedTimeInterval, TemporalError> =
         backend.exchange(RawInput::received("2024-01-01/2024-01-02"));
@@ -122,6 +126,7 @@ fn time_interval_text_parse_is_honestly_unsupported() -> miette::Result<()> {
 
 #[test]
 fn order_offset_endpoints_accepts_a_chronologically_ordered_pair() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -139,6 +144,7 @@ fn order_offset_endpoints_accepts_a_chronologically_ordered_pair() -> miette::Re
 
 #[test]
 fn order_offset_endpoints_rejects_a_reversed_pair() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // Same real instant expressed in two different offsets, reversed
     // start/end: 13:00-04:00 == 17:00+00:00, and the request below
@@ -163,6 +169,7 @@ fn order_offset_endpoints_rejects_a_reversed_pair() -> miette::Result<()> {
 
 #[test]
 fn order_offset_endpoints_compares_real_instants_not_local_clock_faces() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // 23:00-05:00 on 2024-01-01 is the same real instant as 04:00+00:00
     // on 2024-01-02 -- equal instants order as start <= end, so this

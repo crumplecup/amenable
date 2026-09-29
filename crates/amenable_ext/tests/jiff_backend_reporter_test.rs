@@ -10,48 +10,56 @@ use amenable_time::TemporalReporter;
 
 #[test]
 fn reports_nanosecond_fractional_second_precision() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert_eq!(backend.max_fractional_second_digits(), Some(9));
 }
 
 #[test]
 fn does_not_support_leap_seconds() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert!(!backend.supports_leap_seconds());
 }
 
 #[test]
 fn does_not_support_the_unknown_local_offset_convention() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert!(!backend.supports_unknown_local_offset());
 }
 
 #[test]
 fn supports_named_zone_round_trip_via_the_real_iana_tzdb() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert!(backend.supports_named_zone_round_trip());
 }
 
 #[test]
 fn does_not_support_the_end_of_day_twenty_four_form() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert!(!backend.supports_end_of_day_twenty_four());
 }
 
 #[test]
 fn reports_no_queryable_tzdb_revision() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert_eq!(backend.current_tzdb_revision(), None);
 }
 
 #[test]
 fn declares_no_serialization_profile_until_a_parser_formatter_exists() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     assert!(backend.supported_serialization_profiles().is_empty());
 }
 
 #[test]
 fn capabilities_render_as_a_readable_block() {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let rendered = backend.capabilities().to_string();
     assert!(rendered.contains("9"));

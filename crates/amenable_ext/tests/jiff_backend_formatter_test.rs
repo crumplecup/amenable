@@ -95,6 +95,7 @@ fn offset_date_time_descriptor(
 
 #[test]
 fn formats_a_calendar_date_extended_and_basic() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = CalendarDateDescriptor::new(2024, 3, 10);
     let extended: FormattedCalendarDateExtended = backend
@@ -118,6 +119,7 @@ fn formats_a_calendar_date_extended_and_basic() -> miette::Result<()> {
 
 #[test]
 fn formats_a_reduced_calendar_date() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let year_only = ReducedCalendarDateDescriptor::Year { year: 2024 };
     let extended: FormattedReducedCalendarDateExtended = backend
@@ -154,6 +156,7 @@ fn formats_a_reduced_calendar_date() -> miette::Result<()> {
 
 #[test]
 fn formats_an_ordinal_date_extended_and_basic() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = OrdinalDateDescriptor::new(2024, 70);
     let extended: FormattedOrdinalDateExtended = backend
@@ -177,6 +180,7 @@ fn formats_an_ordinal_date_extended_and_basic() -> miette::Result<()> {
 
 #[test]
 fn formats_a_week_date_extended_and_basic() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = WeekDateDescriptor::new(2024, 10, 3);
     let extended: FormattedWeekDateExtended = backend
@@ -200,6 +204,7 @@ fn formats_a_week_date_extended_and_basic() -> miette::Result<()> {
 
 #[test]
 fn formats_a_local_time_with_a_fractional_second() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = LocalTimeDescriptorBuilder::default()
         .hour(13u8)
@@ -222,6 +227,7 @@ fn formats_a_local_time_with_a_fractional_second() -> miette::Result<()> {
 
 #[test]
 fn formats_a_reduced_local_time() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let hour_only = ReducedLocalTimeDescriptor::Hour {
         hour: 13,
@@ -240,6 +246,7 @@ fn formats_a_reduced_local_time() -> miette::Result<()> {
 
 #[test]
 fn rejects_formatting_a_fractional_reduced_local_time() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = ReducedLocalTimeDescriptor::Hour {
         hour: 13,
@@ -260,6 +267,7 @@ fn rejects_formatting_a_fractional_reduced_local_time() -> miette::Result<()> {
 
 #[test]
 fn formats_a_utc_offset_extended_and_basic() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
@@ -289,6 +297,7 @@ fn formats_a_utc_offset_extended_and_basic() -> miette::Result<()> {
 
 #[test]
 fn formats_a_known_zero_offset_as_the_numeric_form_not_z() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Positive)
@@ -309,6 +318,7 @@ fn formats_a_known_zero_offset_as_the_numeric_form_not_z() -> miette::Result<()>
 
 #[test]
 fn formats_an_unknown_local_offset_as_negative_zero() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
@@ -330,6 +340,7 @@ fn formats_an_unknown_local_offset_as_negative_zero() -> miette::Result<()> {
 
 #[test]
 fn formats_a_local_date_time_extended() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(
@@ -360,6 +371,7 @@ fn formats_a_local_date_time_extended() -> miette::Result<()> {
 
 #[test]
 fn formats_an_offset_date_time_extended_and_basic() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor =
         offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
@@ -384,6 +396,7 @@ fn formats_an_offset_date_time_extended_and_basic() -> miette::Result<()> {
 
 #[test]
 fn formats_an_rfc3339_timestamp() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor =
         offset_date_time_descriptor((2024, 3, 10), (17, 30, 0), (UtcOffsetSign::Positive, 0))?;
@@ -400,6 +413,7 @@ fn formats_an_rfc3339_timestamp() -> miette::Result<()> {
 
 #[test]
 fn formats_an_ixdtf_timestamp_with_a_named_zone_annotation() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let timestamp =
         offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
@@ -430,6 +444,7 @@ fn formats_an_ixdtf_timestamp_with_a_named_zone_annotation() -> miette::Result<(
 
 #[test]
 fn formats_an_ixdtf_zoned_timestamp() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let timestamp =
         offset_date_time_descriptor((2024, 3, 10), (13, 30, 0), (UtcOffsetSign::Negative, 4))?;
@@ -460,6 +475,7 @@ fn formats_an_ixdtf_zoned_timestamp() -> miette::Result<()> {
 
 #[test]
 fn formats_a_duration() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
@@ -481,6 +497,7 @@ fn formats_a_duration() -> miette::Result<()> {
 
 #[test]
 fn formats_a_time_interval_of_offset_date_times() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -513,6 +530,7 @@ fn formats_a_time_interval_of_offset_date_times() -> miette::Result<()> {
 
 #[test]
 fn rejects_formatting_an_open_boundary() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let representation = TimeIntervalRepresentation::StartEnd {
@@ -536,6 +554,7 @@ fn rejects_formatting_an_open_boundary() -> miette::Result<()> {
 
 #[test]
 fn formats_a_bounded_recurring_interval() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let start = offset_date_time_descriptor((2024, 1, 1), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
     let end = offset_date_time_descriptor((2024, 1, 2), (0, 0, 0), (UtcOffsetSign::Positive, 0))?;
@@ -573,6 +592,7 @@ fn formats_a_bounded_recurring_interval() -> miette::Result<()> {
 
 #[test]
 fn the_calconnect_extension_family_is_honestly_unsupported_when_formatting() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
 
     let extended_year: Result<FormattedExtendedYear, TemporalError> = backend.exchange(

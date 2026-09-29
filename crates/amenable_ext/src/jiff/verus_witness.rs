@@ -575,6 +575,7 @@ pub struct ExtCheckedProof {
 }
 
 impl std::fmt::Display for ExtCheckedProof {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, f)))]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "harness: {}", self.harness)?;
         writeln!(f, "claim: {}", self.claim)?;
@@ -872,6 +873,7 @@ impl Witness<VerusVerifier> for ExtStandard<jiff::fmt::strtime::BrokenDownTime> 
     type SupportingEvidence = Self;
     type ProofArtifact = ExtCheckedProof;
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn proof() -> Self::ProofArtifact {
         ExtCheckedProof::new(
             "verify_fmt_strtime_broken_down_time_numeric_setters_round_trip_model".to_owned(),
@@ -891,6 +893,7 @@ impl Witness<VerusVerifier> for ExtStandard<jiff::fmt::strtime::BrokenDownTime> 
         )
     }
 
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
     fn support() -> WitnessSupportSummary {
         WitnessSupportSummary::checked_leaf()
     }

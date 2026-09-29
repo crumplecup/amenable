@@ -10,6 +10,7 @@ fn assert_classified<T: ClassifiedWitness<VerusVerifier>>() {}
 
 #[test]
 fn timestamp_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_classified::<ExtStandard<jiff::Timestamp>>();
     assert_eq!(
         <ExtStandard<jiff::Timestamp> as Witness<VerusVerifier>>::proof(),
@@ -23,6 +24,7 @@ fn timestamp_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn zoned_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_classified::<ExtStandard<jiff::Zoned>>();
     assert_eq!(
         <ExtStandard<jiff::Zoned> as Witness<VerusVerifier>>::proof(),
@@ -36,6 +38,7 @@ fn zoned_witness_is_trusted_and_carries_chain_derived_provenance() {
 
 #[test]
 fn civil_datetime_witness_is_trusted_and_carries_chain_derived_provenance() {
+    amenable_core::init_tracing();
     assert_classified::<ExtStandard<jiff::civil::DateTime>>();
     assert_eq!(
         <ExtStandard<jiff::civil::DateTime> as Witness<VerusVerifier>>::proof(),

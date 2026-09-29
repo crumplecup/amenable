@@ -400,6 +400,7 @@ pub struct FormattedExplicitTemporalForm {
 
 impl FormattedExplicitTemporalForm {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -457,6 +458,7 @@ pub struct FormattedExplicitDuration {
 
 impl FormattedExplicitDuration {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -513,6 +515,7 @@ pub struct FormattedExplicitTimeInterval {
 
 impl FormattedExplicitTimeInterval {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -595,6 +598,7 @@ pub struct FormattedSelectionExpression {
 
 impl FormattedSelectionExpression {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -650,6 +654,7 @@ pub struct FormattedRepeatRule {
 
 impl FormattedRepeatRule {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()
@@ -711,6 +716,7 @@ pub struct FormattedRecurringIntervalWithRepeatRule {
 
 impl FormattedRecurringIntervalWithRepeatRule {
     /// Borrow the emitted text.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
     #[must_use]
     pub fn text(&self) -> &str {
         self.text.value()

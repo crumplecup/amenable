@@ -99,6 +99,7 @@ fn confirm_named_zone_revision_preconditions_token() -> ConfirmNamedZoneRevision
 
 #[test]
 fn resolve_named_zone_accepts_a_real_iana_identifier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let resolved: ResolvedNamedTimeZone = backend
         .exchange(RawInput::received("America/New_York"))
@@ -110,6 +111,7 @@ fn resolve_named_zone_accepts_a_real_iana_identifier() -> miette::Result<()> {
 
 #[test]
 fn resolve_named_zone_rejects_a_fake_identifier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let result: Result<ResolvedNamedTimeZone, TemporalError> =
         backend.exchange(RawInput::received("Nowhere/Fictional"));
@@ -126,6 +128,7 @@ fn resolve_named_zone_rejects_a_fake_identifier() -> miette::Result<()> {
 
 #[test]
 fn confirm_zone_authority_accepts_a_real_zone() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let request = ConfirmZoneAuthorityRequest::new(
         new_york_zone()?,
@@ -147,6 +150,7 @@ fn confirm_zone_authority_accepts_a_real_zone() -> miette::Result<()> {
 
 #[test]
 fn resolve_local_date_time_resolves_a_gap_by_shifting_forward() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // Real jiff cross-check: America/New_York springs forward on
     // 2024-03-10 at 02:00 local -> 03:00 EDT. 02:30 local falls inside
     // the gap. ShiftForward resolves via jiff's real `Gap::after`
@@ -186,6 +190,7 @@ fn resolve_local_date_time_resolves_a_gap_by_shifting_forward() -> miette::Resul
 
 #[test]
 fn resolve_local_date_time_resolves_a_gap_by_shifting_backward() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // The inverse of the ShiftForward case above: `Gap::before` (EST,
     // -05:00) computes UTC 07:30, which falls AFTER the real 07:00Z
     // transition, so the real zone reports EDT (-04:00) at that
@@ -218,6 +223,7 @@ fn resolve_local_date_time_resolves_a_gap_by_shifting_backward() -> miette::Resu
 
 #[test]
 fn resolve_local_date_time_resolves_a_fold_by_preferring_earlier() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // Real jiff cross-check: America/New_York falls back on 2024-11-03
     // at 02:00 EDT -> 01:00 EST, repeating the 01:00-01:59 hour. 01:30
     // local is genuinely ambiguous. PreferEarlier selects the first
@@ -244,6 +250,7 @@ fn resolve_local_date_time_resolves_a_fold_by_preferring_earlier() -> miette::Re
 
 #[test]
 fn resolve_local_date_time_resolves_a_fold_by_preferring_later() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let request = ResolveLocalDateTimeRequest::new(
         local_date_time(2024, 11, 3, 1, 30)?,
@@ -266,6 +273,7 @@ fn resolve_local_date_time_resolves_a_fold_by_preferring_later() -> miette::Resu
 
 #[test]
 fn attach_named_zone_accepts_a_consistent_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // 2024-07-15 is squarely inside EDT (-04:00) -- no ambiguity.
     let offset = UtcOffsetDescriptorBuilder::default()
@@ -294,6 +302,7 @@ fn attach_named_zone_accepts_a_consistent_offset() -> miette::Result<()> {
 
 #[test]
 fn attach_named_zone_rejects_an_inconsistent_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // Same local time as above, but the WRONG offset (EST, -05:00,
     // which does not apply in July).
@@ -332,6 +341,7 @@ fn attach_named_zone_rejects_an_inconsistent_offset() -> miette::Result<()> {
 #[test]
 fn confirm_named_zone_revision_accepts_a_currently_consistent_zoned_date_time() -> miette::Result<()>
 {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let offset = UtcOffsetDescriptorBuilder::default()
         .sign(UtcOffsetSign::Negative)
@@ -364,6 +374,7 @@ fn confirm_named_zone_revision_accepts_a_currently_consistent_zoned_date_time() 
 
 #[test]
 fn resolve_local_date_time_native_matches_the_descriptor_level_result() -> miette::Result<()> {
+    amenable_core::init_tracing();
     // Same real gap as `resolve_local_date_time_resolves_a_gap_by_
     // shifting_forward` above, exercised through the native edge
     // directly -- the real zone's own redisplayed offset at the
@@ -398,6 +409,7 @@ fn resolve_local_date_time_native_matches_the_descriptor_level_result() -> miett
 
 #[test]
 fn attach_named_zone_native_rejects_an_inconsistent_offset() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let local = jiff::civil::DateTime::new(2024, 7, 15, 17, 30, 0, 0)
         .into_diagnostic()
@@ -426,6 +438,7 @@ fn attach_named_zone_native_rejects_an_inconsistent_offset() -> miette::Result<(
 
 #[test]
 fn confirm_named_zone_revision_native_accepts_a_real_proven_zoned() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let tz = jiff::tz::TimeZone::get("America/New_York")
         .into_diagnostic()

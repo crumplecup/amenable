@@ -36,6 +36,7 @@ fn duration_bundle_token() -> DurationSemanticBundleToken {
 
 #[test]
 fn realize_duration_round_trips_every_whole_unit() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
@@ -68,6 +69,7 @@ fn realize_duration_round_trips_every_whole_unit() -> miette::Result<()> {
 
 #[test]
 fn realize_duration_converts_a_fractional_second() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .seconds(4u32)
@@ -92,6 +94,7 @@ fn realize_duration_converts_a_fractional_second() -> miette::Result<()> {
 
 #[test]
 fn realize_duration_rejects_a_fraction_on_a_coarser_unit() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let descriptor = DurationDescriptorBuilder::default()
         .years(1u32)
@@ -118,6 +121,7 @@ fn realize_duration_rejects_a_fraction_on_a_coarser_unit() -> miette::Result<()>
 
 #[test]
 fn realize_duration_rejects_a_component_beyond_jiffs_representable_range() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     // jiff::Span::try_years's own documented max is 19,998.
     let descriptor = DurationDescriptorBuilder::default()
@@ -142,6 +146,7 @@ fn realize_duration_rejects_a_component_beyond_jiffs_representable_range() -> mi
 
 #[test]
 fn duration_round_trips_through_a_real_jiff_span() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let backend = JiffTimeBackend;
     let span = jiff::Span::new()
         .days(1)
