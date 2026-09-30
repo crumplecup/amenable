@@ -21,10 +21,11 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
-#[cfg(not(creusot))]
-mod ext;
 #[cfg(feature = "jiff")]
 mod ext_jiff;
+#[cfg(not(creusot))]
+#[cfg(feature = "jiff")]
+mod jiff;
 mod ledger;
 mod rust_std;
 #[cfg(not(creusot))]

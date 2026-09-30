@@ -1,7 +1,7 @@
 //! Real Creusot proof content for `jiff::civil::DateTimeSeries`'s
 //! periodicity property (`ext::jiff::date_time_series` holds the
 //! `CreusotWitness` bridge) — the same claim
-//! `amenable_verus::ext::jiff::date_time_series`'s hand-verified model
+//! `amenable_verus::jiff::date_time_series`'s hand-verified model
 //! checks, and the same claim `amenable_kani::ext::jiff`'s own doc
 //! comment documents as UNCHECKABLE on Kani specifically (the same
 //! `jiff::Error` recursive-Arc Drop-glue wall `DateSeries`/
@@ -59,7 +59,7 @@ amenable_derive::harness! {
         /// `DateTime::series(period).next()` returns the original
         /// datetime exactly on the first call, and advances it by
         /// exactly `period` on the second — the same claim
-        /// `amenable_verus::ext::jiff::date_time_series`'s
+        /// `amenable_verus::jiff::date_time_series`'s
         /// hand-verified model checks, and the same claim confirmed
         /// too costly for Kani to check directly against jiff's real
         /// API (see `amenable_kani::gallery::jiff_error_drop_cost`'s

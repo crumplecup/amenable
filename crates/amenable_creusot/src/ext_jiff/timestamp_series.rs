@@ -1,7 +1,7 @@
 //! Real Creusot proof content for `jiff::TimestampSeries`'s
 //! periodicity property (`ext::jiff::timestamp_series` holds the
 //! `CreusotWitness` bridge) — the same claim
-//! `amenable_verus::ext::jiff::timestamp_series`'s hand-verified model
+//! `amenable_verus::jiff::timestamp_series`'s hand-verified model
 //! checks, and the same claim
 //! `amenable_kani::gallery::jiff_error_drop_cost`'s own doc comment
 //! documents as UNCHECKABLE on Kani specifically (a real,
@@ -105,7 +105,7 @@ amenable_derive::harness! {
         /// `Timestamp::series(period).next()` returns the original
         /// timestamp exactly on the first call, and advances it by
         /// exactly `period` on the second — the same claim
-        /// `amenable_verus::ext::jiff::timestamp_series`'s
+        /// `amenable_verus::jiff::timestamp_series`'s
         /// hand-verified model checks, and the same claim confirmed
         /// too costly for Kani to check directly against jiff's real
         /// API (see `amenable_kani::gallery::jiff_error_drop_cost`'s

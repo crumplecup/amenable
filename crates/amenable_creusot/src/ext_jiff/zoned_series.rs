@@ -1,6 +1,6 @@
 //! Real Creusot proof content for `jiff::ZonedSeries`'s periodicity
 //! property (`ext::jiff::zoned_series` holds the `CreusotWitness`
-//! bridge) — the same claim `amenable_verus::ext::jiff::zoned_series`'s
+//! bridge) — the same claim `amenable_verus::jiff::zoned_series`'s
 //! hand-verified model checks, and the same claim
 //! `amenable_kani::gallery::jiff_error_drop_cost`'s own doc comment
 //! documents as UNCHECKABLE on Kani specifically, for a reason
@@ -74,7 +74,7 @@ amenable_derive::harness! {
         /// UTC` specifically, where `ZonedSeries::next()`'s real
         /// DST-repeat retry loop is structurally unreachable (see this
         /// module's own doc comment). The same claim
-        /// `amenable_verus::ext::jiff::zoned_series`'s hand-verified
+        /// `amenable_verus::jiff::zoned_series`'s hand-verified
         /// model checks, and the same claim confirmed too costly for
         /// Kani to check directly against jiff's real API (see
         /// `amenable_kani::gallery::jiff_error_drop_cost`'s own doc

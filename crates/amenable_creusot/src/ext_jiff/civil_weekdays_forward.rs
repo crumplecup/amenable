@@ -1,7 +1,7 @@
 //! Real Creusot proof content for `jiff::civil::WeekdaysForward`'s
 //! periodicity property (`ext::jiff::civil_weekdays_forward` holds
 //! the `CreusotWitness` bridge) — the same claim
-//! `amenable_verus::ext::jiff::civil_weekdays_forward`'s
+//! `amenable_verus::jiff::civil_weekdays_forward`'s
 //! hand-verified model checks, and the same claim
 //! `amenable_kani::ext::jiff::civil_weekdays_forward`'s own harness
 //! checks directly against jiff's real API by symbolic execution
