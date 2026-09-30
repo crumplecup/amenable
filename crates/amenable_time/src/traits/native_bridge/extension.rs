@@ -1,6 +1,7 @@
-//! Native descriptor/carrier bridge traits — ported from
-//! `elicit_temporal::traits::native_bridge` / `native_span` /
-//! `native_extension`. Each per-family bridge's supertrait bundle *is*
+//! The 7 CalConnect/ISO 8601-2 extension-family native bridges plus their aggregate `TemporalNativeExtensionBridge`.
+//!
+//! Ported from `elicit_temporal::traits::native_bridge` / `native_span`
+//! / `native_extension`. Each per-family bridge's supertrait bundle *is*
 //! its `realize_x` / `reflect_x` exchange pair:
 //!
 //! - `realize_x` = `Exchange<Reflected<X>, Proven<X>Carrier<Self::X>, V>`
@@ -8,290 +9,24 @@
 //!
 //! (`Reflected<X>` is `<X>Descriptor` + the semantic-bundle token; the
 //! carrier holds the same token, so reflect is a genuine inverse.) The
-//! aggregate bridges and their blanket impls mirror `elicit_temporal`.
+//! aggregate bridge and its blanket impl mirror `elicit_temporal`.
 
 use amenable_core::{Exchange, Verifier, Witness};
 
 use crate::{
-    DateTimeFormulaSemanticBundle, DurationSemanticBundle, ExplicitDurationSemanticBundle,
+    DateTimeFormulaSemanticBundle, ExplicitDurationSemanticBundle,
     ExplicitTemporalFormSemanticBundle, ExplicitTimeIntervalSemanticBundle,
-    GroupedTimeScaleUnitSemanticBundle, LocalDateTimeSemanticBundle, NamedTimeZoneSemanticBundle,
-    OffsetDateTimeSemanticBundle, ProvenDateTimeFormulaCarrier, ProvenDurationCarrier,
+    GroupedTimeScaleUnitSemanticBundle, ProvenDateTimeFormulaCarrier,
     ProvenExplicitDurationCarrier, ProvenExplicitTemporalFormCarrier,
     ProvenExplicitTimeIntervalCarrier, ProvenGroupedTimeScaleUnitCarrier,
-    ProvenLocalDateTimeCarrier, ProvenNamedTimeZoneCarrier, ProvenOffsetDateTimeCarrier,
-    ProvenQualifiedTemporalValueCarrier, ProvenRecurringIntervalCarrier, ProvenTemporalSetCarrier,
-    ProvenTimeIntervalCarrier, ProvenZonedDateTimeCarrier, QualifiedTemporalValueSemanticBundle,
-    RecurringIntervalSemanticBundle, ReflectedDateTimeFormula, ReflectedDuration,
-    ReflectedExplicitDuration, ReflectedExplicitTemporalForm, ReflectedExplicitTimeInterval,
-    ReflectedGroupedTimeScaleUnit, ReflectedLocalDateTime, ReflectedNamedTimeZone,
-    ReflectedOffsetDateTime, ReflectedQualifiedTemporalValue, ReflectedRecurringInterval,
-    ReflectedTemporalSet, ReflectedTimeInterval, ReflectedZonedDateTime, TemporalCivilProps,
-    TemporalDateTimeFormulaProps, TemporalDurationProps, TemporalError,
-    TemporalExplicitDurationProps, TemporalExplicitTemporalFormProps,
-    TemporalExplicitTimeIntervalProps, TemporalGroupedTimeScaleUnitProps, TemporalInstantProps,
-    TemporalQualifiedTemporalValueProps, TemporalRecurringIntervalProps, TemporalSetProps,
-    TemporalSetSemanticBundle, TemporalTimeIntervalProps, TemporalZoneProps,
-    TimeIntervalSemanticBundle, ZonedDateTimeSemanticBundle,
+    ProvenQualifiedTemporalValueCarrier, ProvenTemporalSetCarrier,
+    QualifiedTemporalValueSemanticBundle, ReflectedDateTimeFormula, ReflectedExplicitDuration,
+    ReflectedExplicitTemporalForm, ReflectedExplicitTimeInterval, ReflectedGroupedTimeScaleUnit,
+    ReflectedQualifiedTemporalValue, ReflectedTemporalSet, TemporalDateTimeFormulaProps,
+    TemporalError, TemporalExplicitDurationProps, TemporalExplicitTemporalFormProps,
+    TemporalExplicitTimeIntervalProps, TemporalGroupedTimeScaleUnitProps,
+    TemporalQualifiedTemporalValueProps, TemporalSetProps, TemporalSetSemanticBundle,
 };
-
-/// Realize and reflect native `local_date_time` carriers.
-pub trait TemporalCivilNativeBridge<V: Verifier>:
-    TemporalCivilProps
-    + Send
-    + Sync
-    + Exchange<
-        ReflectedLocalDateTime,
-        ProvenLocalDateTimeCarrier<Self::LocalDateTime>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenLocalDateTimeCarrier<Self::LocalDateTime>,
-        ReflectedLocalDateTime,
-        V,
-        Error = TemporalError,
-    >
-where
-    LocalDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalCivilNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalCivilProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedLocalDateTime,
-            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
-            ReflectedLocalDateTime,
-            V,
-            Error = TemporalError,
-        >,
-    LocalDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-/// Realize and reflect native `offset_date_time` carriers.
-pub trait TemporalInstantNativeBridge<V: Verifier>:
-    TemporalInstantProps
-    + Send
-    + Sync
-    + Exchange<
-        ReflectedOffsetDateTime,
-        ProvenOffsetDateTimeCarrier<Self::OffsetDateTime>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenOffsetDateTimeCarrier<Self::OffsetDateTime>,
-        ReflectedOffsetDateTime,
-        V,
-        Error = TemporalError,
-    >
-where
-    OffsetDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalInstantNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalInstantProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedOffsetDateTime,
-            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
-            ReflectedOffsetDateTime,
-            V,
-            Error = TemporalError,
-        >,
-    OffsetDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-/// Realize and reflect native `named_time_zone`, `zoned_date_time` carriers.
-pub trait TemporalZoneNativeBridge<V: Verifier>:
-    TemporalInstantProps
-    + TemporalZoneProps
-    + Send
-    + Sync
-    + Exchange<
-        ReflectedNamedTimeZone,
-        ProvenNamedTimeZoneCarrier<Self::NamedTimeZone>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenNamedTimeZoneCarrier<Self::NamedTimeZone>,
-        ReflectedNamedTimeZone,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ReflectedZonedDateTime,
-        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
-        ReflectedZonedDateTime,
-        V,
-        Error = TemporalError,
-    >
-where
-    NamedTimeZoneSemanticBundle: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalZoneNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalInstantProps
-        + TemporalZoneProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedNamedTimeZone,
-            ProvenNamedTimeZoneCarrier<B::NamedTimeZone>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenNamedTimeZoneCarrier<B::NamedTimeZone>,
-            ReflectedNamedTimeZone,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ReflectedZonedDateTime,
-            ProvenZonedDateTimeCarrier<B::ZonedDateTime>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenZonedDateTimeCarrier<B::ZonedDateTime>,
-            ReflectedZonedDateTime,
-            V,
-            Error = TemporalError,
-        >,
-    NamedTimeZoneSemanticBundle: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-/// Realize and reflect native `duration` carriers.
-pub trait TemporalDurationNativeBridge<V: Verifier>:
-    TemporalDurationProps
-    + Send
-    + Sync
-    + Exchange<ReflectedDuration, ProvenDurationCarrier<Self::Duration>, V, Error = TemporalError>
-    + Exchange<ProvenDurationCarrier<Self::Duration>, ReflectedDuration, V, Error = TemporalError>
-where
-    DurationSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalDurationNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalDurationProps
-        + Send
-        + Sync
-        + Exchange<ReflectedDuration, ProvenDurationCarrier<B::Duration>, V, Error = TemporalError>
-        + Exchange<ProvenDurationCarrier<B::Duration>, ReflectedDuration, V, Error = TemporalError>,
-    DurationSemanticBundle: Witness<V>,
-{
-}
-
-/// Realize and reflect native `time_interval` carriers.
-pub trait TemporalTimeIntervalNativeBridge<V: Verifier>:
-    TemporalTimeIntervalProps
-    + Send
-    + Sync
-    + Exchange<
-        ReflectedTimeInterval,
-        ProvenTimeIntervalCarrier<Self::TimeInterval>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenTimeIntervalCarrier<Self::TimeInterval>,
-        ReflectedTimeInterval,
-        V,
-        Error = TemporalError,
-    >
-where
-    TimeIntervalSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalTimeIntervalNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalTimeIntervalProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedTimeInterval,
-            ProvenTimeIntervalCarrier<B::TimeInterval>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenTimeIntervalCarrier<B::TimeInterval>,
-            ReflectedTimeInterval,
-            V,
-            Error = TemporalError,
-        >,
-    TimeIntervalSemanticBundle: Witness<V>,
-{
-}
-
-/// Realize and reflect native `recurring_interval` carriers.
-pub trait TemporalRecurringIntervalNativeBridge<V: Verifier>:
-    TemporalRecurringIntervalProps
-    + Send
-    + Sync
-    + Exchange<
-        ReflectedRecurringInterval,
-        ProvenRecurringIntervalCarrier<Self::RecurringInterval>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenRecurringIntervalCarrier<Self::RecurringInterval>,
-        ReflectedRecurringInterval,
-        V,
-        Error = TemporalError,
-    >
-where
-    RecurringIntervalSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalRecurringIntervalNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalRecurringIntervalProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedRecurringInterval,
-            ProvenRecurringIntervalCarrier<B::RecurringInterval>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenRecurringIntervalCarrier<B::RecurringInterval>,
-            ReflectedRecurringInterval,
-            V,
-            Error = TemporalError,
-        >,
-    RecurringIntervalSemanticBundle: Witness<V>,
-{
-}
 
 /// Realize and reflect native `qualified_temporal_value` carriers.
 pub trait TemporalQualifiedTemporalValueNativeBridge<V: Verifier>:
@@ -586,53 +321,6 @@ where
     DateTimeFormulaSemanticBundle: Witness<V>,
 {
 }
-
-/// Aggregate native bridge: TemporalCivilNativeBridge, TemporalInstantNativeBridge, TemporalZoneNativeBridge.
-pub trait TemporalNativeBridge<V: Verifier>:
-    TemporalCivilNativeBridge<V> + TemporalInstantNativeBridge<V> + TemporalZoneNativeBridge<V>
-where
-    LocalDateTimeSemanticBundle: Witness<V>,
-    OffsetDateTimeSemanticBundle: Witness<V>,
-    NamedTimeZoneSemanticBundle: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalCivilNativeBridge<V> + TemporalInstantNativeBridge<V> + TemporalZoneNativeBridge<V>,
-    LocalDateTimeSemanticBundle: Witness<V>,
-    OffsetDateTimeSemanticBundle: Witness<V>,
-    NamedTimeZoneSemanticBundle: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-/// Aggregate native bridge: TemporalDurationNativeBridge, TemporalTimeIntervalNativeBridge, TemporalRecurringIntervalNativeBridge.
-pub trait TemporalNativeSpanBridge<V: Verifier>:
-    TemporalDurationNativeBridge<V>
-    + TemporalTimeIntervalNativeBridge<V>
-    + TemporalRecurringIntervalNativeBridge<V>
-where
-    DurationSemanticBundle: Witness<V>,
-    TimeIntervalSemanticBundle: Witness<V>,
-    RecurringIntervalSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalNativeSpanBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalDurationNativeBridge<V>
-        + TemporalTimeIntervalNativeBridge<V>
-        + TemporalRecurringIntervalNativeBridge<V>,
-    DurationSemanticBundle: Witness<V>,
-    TimeIntervalSemanticBundle: Witness<V>,
-    RecurringIntervalSemanticBundle: Witness<V>,
-{
-}
-
 /// Aggregate native bridge: TemporalQualifiedTemporalValueNativeBridge, TemporalExplicitTemporalFormNativeBridge, TemporalExplicitDurationNativeBridge, TemporalExplicitTimeIntervalNativeBridge, TemporalGroupedTimeScaleUnitNativeBridge, TemporalSetNativeBridge, TemporalDateTimeFormulaNativeBridge.
 pub trait TemporalNativeExtensionBridge<V: Verifier>:
     TemporalQualifiedTemporalValueNativeBridge<V>
