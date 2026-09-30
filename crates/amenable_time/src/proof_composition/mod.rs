@@ -13,10 +13,7 @@
 
 mod branches_a;
 mod branches_b;
-mod composites_a;
-mod composites_b;
-mod composites_c;
-mod composites_d;
+mod composites;
 mod proof_branches;
 mod semantic_bundles;
 
@@ -38,7 +35,7 @@ pub use branches_b::{
     ReducedLocalTimePrecisionEvidence, SubYearGroupingKindEvidence, UtcOffsetPrecisionEvidence,
     ZonedTimestampEvidence,
 };
-pub use composites_a::{
+pub use composites::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid,
     CompleteIntervalSubstitutionSemanticsValid,
     CompleteRecurringIntervalRepresentationSemanticsValid, ConversionLossless,
@@ -50,8 +47,6 @@ pub use composites_a::{
     ExplicitDateTimeValid, ExplicitDateTimeWithShiftValid, ExplicitDurationValid,
     ExplicitIntervalDurationSubstitutionSemanticsValid,
     ExplicitIntervalEndComponentInheritanceSemanticsValid,
-};
-pub use composites_b::{
     ExplicitIntervalShiftPropagationSemanticsValid, ExplicitTemporalFormValid,
     ExplicitTimeIntervalValid, ExplicitTimeOfDayValid, ExplicitTimeShiftValid,
     ExtendedIntervalBoundarySemanticsValid, ExtendedYearValid, GroupedTimeScaleUnitValid,
@@ -61,10 +56,8 @@ pub use composites_b::{
     IxdtfProvisionalSuffixKeyRegistrationSemanticsValid, IxdtfSuffixKeyRegistryEntryValid,
     IxdtfSuffixKeyRegistryPolicySemanticsValid, IxdtfTimestampHasPreferredPresentationCalendar,
     IxdtfTimestampValid, LocalDateTimeDoesNotIdentifyFixedInstant, LocalDateTimeValid,
-    LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid,
-};
-pub use composites_c::{
-    LossyConversionAuthorityValid, MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
+    LocalTimeScaleValid, LocalTimeSemanticsValid, LocalTimeValid, LossyConversionAuthorityValid,
+    MutualAgreementAuthorityValid, NamedTimeZoneIdentityValid,
     NamedTimeZoneInterpretationTracksTzdbRevision, OffsetConsistentWithNamedZone,
     OffsetDateTimeValid, OffsetOnlyZoneSemanticsLimited,
     OffsetTimeZoneAnnotationConsistentWithTimestamp, OrdinalDateValid,
@@ -73,8 +66,6 @@ pub use composites_c::{
     RecurringIntervalWithRepeatRuleValid, ReducedCalendarDateValid, ReducedLocalTimeValid,
     RepeatRuleValid, Rfc3339DisplayGuidanceValid, Rfc3339GenerationGuidanceValid,
     Rfc3339LexicalOrderingSemanticsValid, Rfc3339TimestampValid, SeasonalTemporalExpressionValid,
-};
-pub use composites_d::{
     SelectionExpressionValid, StandardTimeOfDayValid, StandardTimeValid,
     SubYearGroupingExpressionValid, TemporalOrderingPreserved, TemporalSetExpressionValid,
     TemporalSetRangeSemanticsValid, TimeIntervalValid, TimeOfDayWithShiftValid, TimeValid,
