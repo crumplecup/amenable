@@ -26,7 +26,7 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::super::macros::{ExtCheckedProof, kani_ensures_ext};
+use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use super::span::{
     SPAN_DAYS_MAX, SPAN_DAYS_MIN, SPAN_HOURS_MAX, SPAN_HOURS_MIN, SPAN_MICROSECONDS_MAX,
     SPAN_MICROSECONDS_MIN, SPAN_MILLISECONDS_MAX, SPAN_MILLISECONDS_MIN, SPAN_MINUTES_MAX,

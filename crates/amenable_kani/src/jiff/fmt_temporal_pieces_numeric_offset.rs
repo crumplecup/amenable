@@ -8,11 +8,11 @@
 //! printer engine — checked directly rather than assumed trusted, per
 //! this checklist's own "small types are not automatically trusted"
 //! discipline. It's a thin wrapper around `jiff::tz::Offset` (already
-//! a checked type in this crate — see `super::super::offset`) plus one
+//! a checked type in this crate — see `super::offset`) plus one
 //! extra `is_negative` bit that only matters for rendering `-00:00`.
 //!
 //! Reuses the same bounds-check-before-construct pattern
-//! `super::super::offset` established for `Offset::from_seconds`: the
+//! `super::offset` established for `Offset::from_seconds`: the
 //! `Result<Offset, jiff::Error>` Drop-glue wall documented there
 //! applies equally here, since this harness constructs an `Offset` the
 //! same way. Never lets the `Err` arm exist for any symbolic input the
@@ -23,7 +23,7 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::super::macros::{ExtCheckedProof, kani_ensures_ext};
+use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use crate::rust_std::bridge_kani_witness;
 
 impl crate::KaniWitness for ExtStandard<jiff::fmt::temporal::PiecesNumericOffset> {
@@ -52,7 +52,7 @@ bridge_kani_witness!(ExtStandard<jiff::fmt::temporal::PiecesNumericOffset>);
 }
 
 /// jiff's own documented valid range for `Offset::from_seconds` — the
-/// same constant `super::super::offset` independently confirms,
+/// same constant `super::offset` independently confirms,
 /// restated here so this harness never constructs the drop-heavy `Err`
 /// arm of `Offset::from_seconds`'s `Result` in the first place.
 const OFFSET_SECONDS_MIN: i32 = -93_599;

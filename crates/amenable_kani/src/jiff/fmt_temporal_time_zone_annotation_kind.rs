@@ -17,7 +17,7 @@
 //! str` can't be constructed symbolically under Kani without the
 //! real, documented UTF-8-validation cost wall, so this reuses
 //! `char`'s own built-in `Arbitrary` via `c.to_string()`. Reuses
-//! `super::super::offset`'s bounds-check-before-construct pattern
+//! `super::offset`'s bounds-check-before-construct pattern
 //! for the `Offset` variant.
 
 #[cfg(kani)]
@@ -25,7 +25,7 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::super::macros::{ExtCheckedProof, kani_ensures_ext};
+use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use crate::rust_std::bridge_kani_witness;
 
 impl crate::KaniWitness for ExtStandard<jiff::fmt::temporal::TimeZoneAnnotationKind<'static>> {
@@ -54,7 +54,7 @@ bridge_kani_witness!(ExtStandard<jiff::fmt::temporal::TimeZoneAnnotationKind<'st
 }
 
 /// jiff's own documented valid range for `Offset::from_seconds` — the
-/// same constant `super::super::offset` independently confirms.
+/// same constant `super::offset` independently confirms.
 const OFFSET_SECONDS_MIN: i32 = -93_599;
 const OFFSET_SECONDS_MAX: i32 = 93_599;
 

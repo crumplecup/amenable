@@ -34,7 +34,7 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::super::macros::{ExtCheckedProof, kani_ensures_ext};
+use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use crate::rust_std::bridge_kani_witness;
 
 impl crate::KaniWitness for ExtStandard<jiff::fmt::temporal::Pieces<'static>> {

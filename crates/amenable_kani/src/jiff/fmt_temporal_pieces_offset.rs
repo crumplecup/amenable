@@ -10,7 +10,7 @@
 //! wrapped offset; `From<Offset>` always builds the `Numeric` variant
 //! via `PiecesNumericOffset::from`.
 //!
-//! Reuses `super::super::offset`'s bounds-check-before-construct
+//! Reuses `super::offset`'s bounds-check-before-construct
 //! pattern for the same `Result<Offset, jiff::Error>` Drop-glue wall
 //! documented there.
 
@@ -19,7 +19,7 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::super::macros::{ExtCheckedProof, kani_ensures_ext};
+use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use crate::rust_std::bridge_kani_witness;
 
 impl crate::KaniWitness for ExtStandard<jiff::fmt::temporal::PiecesOffset> {
@@ -48,7 +48,7 @@ bridge_kani_witness!(ExtStandard<jiff::fmt::temporal::PiecesOffset>);
 }
 
 /// jiff's own documented valid range for `Offset::from_seconds` — the
-/// same constant `super::super::offset` independently confirms.
+/// same constant `super::offset` independently confirms.
 const OFFSET_SECONDS_MIN: i32 = -93_599;
 const OFFSET_SECONDS_MAX: i32 = 93_599;
 
