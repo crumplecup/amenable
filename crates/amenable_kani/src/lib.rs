@@ -32,6 +32,7 @@ mod gallery;
 mod hash_collections_model;
 mod hash_model;
 mod io_model;
+#[cfg(feature = "jiff")]
 mod jiff;
 mod ledger;
 mod linked_list_extract_model;
