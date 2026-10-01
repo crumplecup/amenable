@@ -11,30 +11,11 @@
 //! member `Standard`s land in the backend crates (orphan rules); genuine
 //! *transitions* become `Establish` / `Exchange` edges in Phase 4.
 
-mod branches_a;
-mod branches_b;
 mod composites;
+mod evidence;
 mod proof_branches;
 mod semantic_bundles;
 
-pub use branches_a::{
-    CombinedDateTimeDateEvidence, CompleteDateEvidence,
-    CompleteDurationEndIntervalSubstitutionEvidence,
-    CompleteIntervalDurationRepresentationEvidence,
-    CompleteStartDurationIntervalSubstitutionEvidence,
-    CompleteStartEndIntervalSubstitutionEvidence, CompleteTimePointDateRepresentationEvidence,
-    CompleteTimePointRepresentationEvidence, CompleteTimePointTimeRepresentationEvidence,
-    DurationAlternativeFormEvidence, DurationDesignatorRepresentationEvidence,
-    DurationWeekFormEvidence,
-};
-pub use branches_b::{
-    ExplicitDurationRepresentationEvidence, ExplicitDurationSemanticEvidence,
-    ExtendedYearBaseEvidence, ExtendedYearSignificantDigitsEvidence,
-    MutualAgreementAuthorityScopeEvidence, NamedZoneAttachmentEvidence,
-    QualificationPlacementEvidence, ReducedCalendarDatePrecisionEvidence,
-    ReducedLocalTimePrecisionEvidence, SubYearGroupingKindEvidence, UtcOffsetPrecisionEvidence,
-    ZonedTimestampEvidence,
-};
 pub use composites::{
     BackendConversionSemanticsValid, CalendarDateValid, CenturyValid,
     CompleteIntervalSubstitutionSemanticsValid,
@@ -74,6 +55,21 @@ pub use composites::{
     ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
     ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone,
     ZuluTimeZoneInconsistencyAvoidanceValid,
+};
+pub use evidence::{
+    CombinedDateTimeDateEvidence, CompleteDateEvidence,
+    CompleteDurationEndIntervalSubstitutionEvidence,
+    CompleteIntervalDurationRepresentationEvidence,
+    CompleteStartDurationIntervalSubstitutionEvidence,
+    CompleteStartEndIntervalSubstitutionEvidence, CompleteTimePointDateRepresentationEvidence,
+    CompleteTimePointRepresentationEvidence, CompleteTimePointTimeRepresentationEvidence,
+    DurationAlternativeFormEvidence, DurationDesignatorRepresentationEvidence,
+    DurationWeekFormEvidence, ExplicitDurationRepresentationEvidence,
+    ExplicitDurationSemanticEvidence, ExtendedYearBaseEvidence,
+    ExtendedYearSignificantDigitsEvidence, MutualAgreementAuthorityScopeEvidence,
+    NamedZoneAttachmentEvidence, QualificationPlacementEvidence,
+    ReducedCalendarDatePrecisionEvidence, ReducedLocalTimePrecisionEvidence,
+    SubYearGroupingKindEvidence, UtcOffsetPrecisionEvidence, ZonedTimestampEvidence,
 };
 pub use proof_branches::{
     CompleteIntervalSubstitutionProofBranch, DurationRepresentationProofBranch,
