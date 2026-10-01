@@ -1,0 +1,7 @@
+[
+  {
+    "file": "src/lib.rs",
+    "rule_id": "MODULARITY-FILE",
+    "reason": "lib.rs is already pure `mod`/`pub use` statements per CLAUDE.md's own lib.rs rule; its size comes entirely from re-exporting this crate's ~500+ public types at crate root, which CLAUDE.md also mandates ('Crate-level exports: Re-export all public types at crate root'). There is no logic, predicate, or constructor to peel into helpers -- the file has zero bodies, only declarations -- so a split here would only chop one already-alphabetized re-export list into arbitrary pieces with no genuine concern separation, unlike every other MODULARITY-FILE finding resolved this session."
+  }
+]
