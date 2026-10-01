@@ -1,12 +1,15 @@
-//! Proof-branch discriminants — the 13 `*ProofBranch` enums from
+//! Duration/interval/recurring-interval proof-branch discriminants.
+//!
+//!
+//! Proof-branch discriminants -- the 13 `*ProofBranch` enums from
 //! `elicit_temporal::types`, deferred from Phase 2 because they carry
 //! `Established<T>` / `*Evidence` payloads. Folded the same way as the
-//! [`super::composites_a`] family: `Established<X>` → `X`, and the
-//! elicit_temporal `evidence:` sidecar field is dropped where it is
+//! `proof_composition::composites` family: `Established<X>` -> `X`, and
+//! the elicit_temporal `evidence:` sidecar field is dropped where it is
 //! type-identical to the aggregate it accompanies (the folded composite
 //! already carries its own decomposition). Each is `#[derive(Evidence,
-//! Witness)]` — a proof-branch discriminant for the semantic bundles /
-//! exchange outputs of Phases 4–5.
+//! Witness)]` -- a proof-branch discriminant for the semantic bundles /
+//! exchange outputs of Phases 4-5.
 
 use crate::{
     CompleteDurationEndIntervalSubstitutionEvidence, CompleteIntervalSubstitutionSemanticsValid,
@@ -18,93 +21,8 @@ use crate::{
     ExplicitIntervalEndComponentInheritanceSemanticsValid,
     ExplicitIntervalShiftPropagationSemanticsValid, ExplicitTimeIntervalValid,
     InheritedIntervalEndComponentsSemanticsValid, InheritedIntervalZoneSemanticsValid,
-    IxdtfAdditionalInformationSemanticsValid, IxdtfTimestampHasPreferredPresentationCalendar,
-    LocalDateTimeMayBeAmbiguousAtZoneTransition, LocalDateTimeMayFallInZoneTransitionGap,
-    OffsetTimeZoneAnnotationConsistentWithTimestamp,
     OtherThanCompleteRecurringIntervalRepresentationSemanticsValid, TimeIntervalValid,
-    ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
-    ZonedDateTimeHasNamedZone, ZonedTimestampEvidence,
 };
-
-/// Explicit RFC 9557 time-zone annotation proof branch carried by IXDTF exchanges.
-#[derive(
-    Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
-)]
-#[evidence(basis = "Self")]
-pub enum IxdtfTimeZoneAnnotationProofBranch {
-    /// No RFC 9557 time-zone annotation is present.
-    #[default]
-    None,
-    /// A named-zone annotation is present and carries civil-rule identity.
-    Named {
-        /// Aggregate proof that the timestamp carries named-zone identity.
-        zoned: ZonedDateTimeHasNamedZone,
-        /// Evidence bundle for the named-zone branch.
-        evidence: ZonedTimestampEvidence,
-    },
-    /// An offset time-zone annotation is present and follows compatibility semantics.
-    Offset {
-        /// Aggregate proof that the offset annotation is consistent with the timestamp.
-        semantics: OffsetTimeZoneAnnotationConsistentWithTimestamp,
-    },
-}
-
-/// Explicit proof branch for local-to-zone resolution across transition edge cases.
-#[derive(
-    Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
-)]
-#[evidence(basis = "Self")]
-pub enum LocalTimeZoneResolutionProofBranch {
-    /// The local wall-clock time mapped to a single instant without transition special handling.
-    #[default]
-    Unambiguous,
-    /// The local wall-clock time was ambiguous and required explicit disambiguation authority.
-    Ambiguous {
-        /// The local timestamp can be ambiguous at a zone transition.
-        possibility: LocalDateTimeMayBeAmbiguousAtZoneTransition,
-        /// Aggregate proof that ambiguity semantics were handled explicitly and lawfully.
-        semantics: ZoneTransitionAmbiguitySemanticsValid,
-    },
-    /// The local wall-clock time fell inside a skipped transition gap.
-    Gap {
-        /// The local timestamp can fall inside a skipped zone-transition gap.
-        possibility: LocalDateTimeMayFallInZoneTransitionGap,
-        /// Aggregate proof that gap semantics were handled explicitly and lawfully.
-        semantics: ZoneTransitionGapSemanticsValid,
-    },
-}
-
-/// Explicit RFC 9557 preferred-calendar proof branch carried by IXDTF exchanges.
-#[derive(
-    Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
-)]
-#[evidence(basis = "Self")]
-pub enum IxdtfCalendarAnnotationProofBranch {
-    /// No preferred-presentation calendar annotation is present.
-    #[default]
-    None,
-    /// A preferred-presentation calendar annotation is present.
-    Present {
-        /// Aggregate proof that the timestamp declares a preferred presentation calendar.
-        preferred_calendar: IxdtfTimestampHasPreferredPresentationCalendar,
-    },
-}
-
-/// Explicit RFC 9557 additional-information proof branch carried by IXDTF exchanges.
-#[derive(
-    Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
-)]
-#[evidence(basis = "Self")]
-pub enum IxdtfAdditionalInformationProofBranch {
-    /// No additional-information annotations are present.
-    #[default]
-    None,
-    /// Additional-information annotations are present and semantically validated.
-    Present {
-        /// Aggregate proof that the additional-information semantics are valid.
-        semantics: IxdtfAdditionalInformationSemanticsValid,
-    },
-}
 
 /// Explicit proof branch for inherited end-component interval semantics.
 #[derive(
@@ -121,7 +39,6 @@ pub enum IntervalEndComponentInheritanceProofBranch {
         semantics: InheritedIntervalEndComponentsSemanticsValid,
     },
 }
-
 /// Explicit proof branch for inherited trailing-zone interval semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
@@ -137,7 +54,6 @@ pub enum IntervalZoneInheritanceProofBranch {
         semantics: InheritedIntervalZoneSemanticsValid,
     },
 }
-
 /// Explicit proof branch for CalConnect explicit-interval duration substitution semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
@@ -158,7 +74,6 @@ pub enum ExplicitIntervalDurationSubstitutionProofBranch {
         semantics: ExplicitIntervalDurationSubstitutionSemanticsValid,
     },
 }
-
 /// Explicit proof branch for CalConnect explicit-interval trailing-end inheritance semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
@@ -174,7 +89,6 @@ pub enum ExplicitIntervalEndComponentInheritanceProofBranch {
         semantics: ExplicitIntervalEndComponentInheritanceSemanticsValid,
     },
 }
-
 /// Explicit proof branch for CalConnect explicit-interval leading-shift propagation semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
@@ -190,7 +104,6 @@ pub enum ExplicitIntervalShiftPropagationProofBranch {
         semantics: ExplicitIntervalShiftPropagationSemanticsValid,
     },
 }
-
 /// Explicit proof branch for duration representation family semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, amenable_derive::Evidence, amenable_derive::Witness,
@@ -222,7 +135,6 @@ impl core::default::Default for DurationRepresentationProofBranch {
         }
     }
 }
-
 /// Explicit proof branch for complete-interval substitution semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, Default, amenable_derive::Evidence, amenable_derive::Witness,
@@ -254,7 +166,6 @@ pub enum CompleteIntervalSubstitutionProofBranch {
         evidence: CompleteDurationEndIntervalSubstitutionEvidence,
     },
 }
-
 /// Explicit proof branch for recurring-interval representation family semantics.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, amenable_derive::Evidence, amenable_derive::Witness,
@@ -281,7 +192,6 @@ impl core::default::Default for RecurringIntervalRepresentationProofBranch {
         }
     }
 }
-
 /// Explicit proof branch for the embedded interval family of a recurring interval with repeat rule.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, amenable_derive::Evidence, amenable_derive::Witness,
