@@ -5,7 +5,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DataStruct, Fields};
 
-use super::ProofTypeContext;
+use super::expand::ProofTypeContext;
 use super::helpers::{expand_generics_marker, expand_proof_fields};
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(ctx, data)))]

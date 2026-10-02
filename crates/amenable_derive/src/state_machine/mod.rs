@@ -121,90 +121,9 @@
 //! reachable this way at all — see this file's own module for that
 //! finding) isn't blocked by a hardcoded name.
 
-use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{DeriveInput, Error, LitStr, Type};
-
+mod decl;
 mod emit;
+mod expand;
 mod parse;
 
-use emit::{expand_block_assertions, expand_block_state_machine_impl};
-use parse::parse_state_machine_block;
-
-pub(super) struct StateDecl {
-    name: LitStr,
-    carrier: Type,
-    root: Option<RootDecl>,
-}
-
-/// A declared root constructor: the real, compile-time-checked path
-/// (for the `const _: fn(..) -> Carrier = #path;` assertion), its
-/// original literal text (for `root_entries()`'s `constructor` string
-/// -- kept alongside the parsed `syn::Path` rather than re-stringifying
-/// it via `quote!`, which normalizes token spacing, e.g. `Established::
-/// <Green, GreenToken>::root` becomes `Established :: < Green,
-/// GreenToken > :: root`, a technically-equivalent but uglier string
-/// than the one actually written in the declaration), and an optional
-/// seed: the real argument type a data-needing root's constructor
-/// requires, parsed and stringified the same paired way.
-pub(super) struct RootDecl {
-    path: syn::Path,
-    path_lit: LitStr,
-    seed: Option<(Type, LitStr)>,
-}
-
-pub(super) struct EdgeDecl {
-    from: LitStr,
-    to: LitStr,
-}
-
-pub(super) enum VerifierMode {
-    Concrete(Box<Type>),
-    Generic,
-}
-
-pub(super) struct StateMachineBlock {
-    verifier: VerifierMode,
-    states: Vec<StateDecl>,
-    edges: Vec<EdgeDecl>,
-    translator_cfg: Option<LitStr>,
-}
-
-/// Expand `#[derive(StateMachine)]` for a type carrying one or more
-/// `#[state_machine(..)]` attributes.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(input)))]
-pub fn expand_state_machine(input: &DeriveInput) -> syn::Result<TokenStream> {
-    let self_ty = &input.ident;
-
-    let blocks = input
-        .attrs
-        .iter()
-        .filter(|attr| attr.path().is_ident("state_machine"))
-        .map(parse_state_machine_block)
-        .collect::<syn::Result<Vec<_>>>()?;
-
-    if blocks.is_empty() {
-        return Err(Error::new_spanned(
-            self_ty,
-            "derive(StateMachine) requires at least one #[state_machine(..)] attribute",
-        ));
-    }
-
-    let expansions = blocks
-        .iter()
-        .map(|block| expand_block(self_ty, block))
-        .collect::<syn::Result<Vec<_>>>()?;
-
-    Ok(quote! { #(#expansions)* })
-}
-
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(self_ty, block)))]
-fn expand_block(self_ty: &syn::Ident, block: &StateMachineBlock) -> syn::Result<TokenStream> {
-    let assertions = expand_block_assertions(self_ty, block)?;
-    let state_machine_impl = expand_block_state_machine_impl(self_ty, block);
-
-    Ok(quote! {
-        #assertions
-        #state_machine_impl
-    })
-}
+pub use expand::expand_state_machine;

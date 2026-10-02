@@ -3,7 +3,7 @@
 
 use syn::{Attribute, Error, LitStr, Type};
 
-use super::{EdgeDecl, RootDecl, StateDecl, StateMachineBlock, VerifierMode};
+use super::decl::{EdgeDecl, RootDecl, StateDecl, StateMachineBlock, VerifierMode};
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(attr)))]
 pub(super) fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMachineBlock> {
@@ -60,12 +60,12 @@ pub(super) fn parse_state_machine_block(attr: &Attribute) -> syn::Result<StateMa
         }
     };
 
-    Ok(StateMachineBlock {
+    Ok(StateMachineBlock::new(
         verifier,
         states,
         edges,
         translator_cfg,
-    })
+    ))
 }
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(meta)))]
@@ -101,20 +101,12 @@ fn parse_state_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<StateDecl>
             None
         };
 
-        Some(RootDecl {
-            path: root_path,
-            path_lit: root_lit,
-            seed,
-        })
+        Some(RootDecl::new(root_path, root_lit, seed))
     } else {
         None
     };
 
-    Ok(StateDecl {
-        name,
-        carrier: carrier_lit.parse()?,
-        root,
-    })
+    Ok(StateDecl::new(name, carrier_lit.parse()?, root))
 }
 
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(meta)))]
@@ -126,5 +118,5 @@ fn parse_edge_decl(meta: &syn::meta::ParseNestedMeta) -> syn::Result<EdgeDecl> {
     content.parse::<syn::Token![,]>()?;
     let to: LitStr = content.parse()?;
 
-    Ok(EdgeDecl { from, to })
+    Ok(EdgeDecl::new(from, to))
 }

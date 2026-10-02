@@ -5,7 +5,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{DataEnum, Fields, Generics, Variant};
 
-use super::ProofTypeContext;
+use super::expand::ProofTypeContext;
 use super::helpers::{expand_generics_marker, expand_proof_fields};
 use crate::attr_options::parse_member_options;
 

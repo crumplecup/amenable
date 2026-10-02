@@ -7,7 +7,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{Error, LitStr, Type};
 
-use super::{RootDecl, StateDecl, StateMachineBlock, VerifierMode};
+use super::decl::{RootDecl, StateDecl, StateMachineBlock, VerifierMode};
 
 /// One shared, top-level generic checker function per block, referenced
 /// (never called) once per edge via a plain `const _: fn() = ..;` item —
@@ -46,13 +46,13 @@ pub(super) fn expand_block_assertions(
     // exactly the declared carrier, this fails to compile with a real,
     // precise error, not a silent gap.
     let root_checks: TokenStream = block
-        .states
+        .states()
         .iter()
         .filter_map(|state| {
-            let root_decl = state.root.as_ref()?;
-            let path = &root_decl.path;
-            let carrier = &state.carrier;
-            Some(match &root_decl.seed {
+            let root_decl = state.root().as_ref()?;
+            let path = root_decl.path();
+            let carrier = state.carrier();
+            Some(match root_decl.seed() {
                 Some((seed_ty, _)) => quote! {
                     const _: fn(#seed_ty) -> #carrier = #path;
                 },
@@ -63,7 +63,7 @@ pub(super) fn expand_block_assertions(
         })
         .collect();
 
-    let VerifierMode::Concrete(verifier) = &block.verifier else {
+    let VerifierMode::Concrete(verifier) = block.verifier() else {
         // No edge static assertion here -- see this module's own doc
         // comment for why a "for every V: Verifier" check is provably
         // too strong (real edges are only generic over V conditionally,
@@ -79,11 +79,11 @@ pub(super) fn expand_block_assertions(
         self_ty.to_string().to_lowercase()
     );
     let references = block
-        .edges
+        .edges()
         .iter()
         .map(|edge| {
-            let from_carrier = find_state_carrier(&block.states, &edge.from)?;
-            let to_carrier = find_state_carrier(&block.states, &edge.to)?;
+            let from_carrier = find_state_carrier(block.states(), edge.from())?;
+            let to_carrier = find_state_carrier(block.states(), edge.to())?;
 
             Ok(quote! {
                 const _: fn() = #checker_fn::<#from_carrier, #to_carrier, #self_ty>;
@@ -113,14 +113,14 @@ pub(super) fn expand_block_state_machine_impl(
 ) -> TokenStream {
     let self_ty_str = self_ty.to_string();
 
-    let state_names = block.states.iter().map(|state| &state.name);
-    let transitions = block.edges.iter().map(|edge| {
-        let from = &edge.from;
-        let to = &edge.to;
+    let state_names = block.states().iter().map(|state| state.name());
+    let transitions = block.edges().iter().map(|edge| {
+        let from = edge.from();
+        let to = edge.to();
         quote! { ::amenable_core::Transition::new(#from, #to) }
     });
 
-    let (impl_generics, verifier) = match &block.verifier {
+    let (impl_generics, verifier) = match block.verifier() {
         VerifierMode::Concrete(verifier) => (quote! {}, quote! { #verifier }),
         VerifierMode::Generic => (quote! { <V: ::amenable_core::Verifier> }, quote! { V }),
     };
@@ -159,7 +159,7 @@ pub(super) fn expand_block_state_machine_impl(
     // awareness belongs only in the one crate that's actually
     // translated, matching this whole codebase's "verifier backends
     // never depend on each other, not even a cfg name" discipline.
-    let audit_surface = match &block.translator_cfg {
+    let audit_surface = match block.translator_cfg() {
         None => quote! {
             fn audit_surface() -> ::std::vec::Vec<::amenable_core::TransitionAudit> {
                 #audit_surface_body
@@ -195,17 +195,17 @@ pub(super) fn expand_block_state_machine_impl(
     // state actually declared a root -- most blocks have none, and the
     // default already says exactly that honestly.
     let root_entries_states: Vec<(&StateDecl, &RootDecl)> = block
-        .states
+        .states()
         .iter()
-        .filter_map(|state| state.root.as_ref().map(|root| (state, root)))
+        .filter_map(|state| state.root().as_ref().map(|root| (state, root)))
         .collect();
     let root_entries = if root_entries_states.is_empty() {
         quote! {}
     } else {
         let entries = root_entries_states.iter().map(|(state, root_decl)| {
-            let name = &state.name;
-            let root_str = &root_decl.path_lit;
-            let seed_str = match &root_decl.seed {
+            let name = state.name();
+            let root_str = root_decl.path_lit();
+            let seed_str = match root_decl.seed() {
                 Some((_, seed_lit)) => quote! { #seed_lit },
                 None => quote! { "()" },
             };
@@ -251,7 +251,7 @@ pub(super) fn expand_block_state_machine_impl(
     // ungated ones, all inside one impl" shape in an isolated scratch
     // crate before landing here; see `docs/CFG_HYGIENE_PLAN.md`'s
     // Step 1).
-    if block.translator_cfg.is_some() {
+    if block.translator_cfg().is_some() {
         quote! {
             #[allow(unexpected_cfgs)]
             const _: () = {
@@ -267,8 +267,8 @@ pub(super) fn expand_block_state_machine_impl(
 fn find_state_carrier<'a>(states: &'a [StateDecl], name: &LitStr) -> syn::Result<&'a Type> {
     states
         .iter()
-        .find(|state| state.name.value() == name.value())
-        .map(|state| &state.carrier)
+        .find(|state| state.name().value() == name.value())
+        .map(|state| state.carrier())
         .ok_or_else(|| {
             Error::new(
                 name.span(),
