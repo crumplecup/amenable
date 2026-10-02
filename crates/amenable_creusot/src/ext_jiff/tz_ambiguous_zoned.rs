@@ -35,65 +35,9 @@
 //! contracted anywhere) for the same reason — `OffsetConflict::
 //! resolve_with`'s real `AlwaysTimeZone` branch calls it directly.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use crate::ext_jiff::tz_ambiguous_timestamp::tz_fixed_seconds_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn amb_zoned_offset_is_unambiguous_value(_z: &jiff::tz::AmbiguousZoned) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn amb_zoned_offset_seconds_value(_z: &jiff::tz::AmbiguousZoned) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::TimeZone {
-        #[check(ghost)]
-        #[ensures(
-            amb_zoned_offset_is_unambiguous_value(&result) == true
-            && amb_zoned_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
-        )]
-        fn to_ambiguous_zoned(&self, dt: jiff::civil::DateTime) -> jiff::tz::AmbiguousZoned;
-
-        #[check(ghost)]
-        #[ensures(
-            amb_zoned_offset_is_unambiguous_value(&result) == true
-            && amb_zoned_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
-        )]
-        fn into_ambiguous_zoned(self, dt: jiff::civil::DateTime) -> jiff::tz::AmbiguousZoned;
-    }
-
-    impl jiff::tz::AmbiguousZoned {
-        #[check(ghost)]
-        #[ensures(match result {
-            jiff::tz::AmbiguousOffset::Unambiguous { offset } => {
-                amb_zoned_offset_is_unambiguous_value(&self) == true
-                    && offset_seconds_value(&offset) == amb_zoned_offset_seconds_value(&self)
-            }
-            _ => amb_zoned_offset_is_unambiguous_value(&self) == false,
-        })]
-        fn offset(&self) -> jiff::tz::AmbiguousOffset;
-
-        #[check(ghost)]
-        #[ensures(result == (amb_zoned_offset_is_unambiguous_value(&self) == false))]
-        fn is_ambiguous(&self) -> bool;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, TZ_AMBIGUOUS_ZONED_FROM_FIXED_TIME_ZONE_IS_ALWAYS_UNAMBIGUOUS_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::tz::AmbiguousZoned>`

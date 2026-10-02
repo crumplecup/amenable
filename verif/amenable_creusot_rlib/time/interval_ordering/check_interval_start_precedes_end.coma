@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 162 8 162 74 *)
+
+let%span sinterval_ordering = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 160 19 160 23
+let%span sinterval_ordering'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 161 18 161 71
+let%span sinterval_ordering'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 142 24 142 51
+
+use creusot.int.Int32
+use creusot.prelude.Any
+use int.Int
+
+predicate interval_start_precedes_end_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 141 8 141 93] (start: Int32.t) (end': Int32.t) (outcome: bool) =
+  [%#sinterval_ordering'1] outcome = (Int32.to_int start <= Int32.to_int end')
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_interval_start_precedes_end [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/interval_ordering.rs" 162 8 162 74]
+  (start: Int32.t) (end': Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- Int32.le start end' ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & start: Int32.t = start | & end': Int32.t = end' ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_interval_start_precedes_end ensures] [%#sinterval_ordering'0] interval_start_precedes_end_holds start end' result}
+    (! return {result}) ]

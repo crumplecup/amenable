@@ -20,71 +20,23 @@
 //! needing to model days-in-month for a symbolic year/month
 //! combination while still checking the full year/month range.
 //!
-//! `date_year_value`/`date_month_value`/`date_day_value` are
-//! `pub(crate)` at this module's own top level, not nested in a
-//! private `mirror` module: `civil_era.rs` needs to reuse them (its
-//! own `Date::era_year` extern_spec needs `date_year_value` to state
-//! anything about `self`), and Creusot only allows one `extern_spec!`
-//! per real function crate-wide — confirmed via a genuine "duplicate
-//! extern specification for jiff::civil::Date::new" compiler error
-//! from a first attempt that (wrongly) redeclared `Date::new`'s own
-//! contract in `civil_era.rs` instead of reusing this one. The
-//! `pub(crate)`-at-top-level shape (not a two-hop re-export through a
-//! private nested `mod mirror`) is `span.rs`'s own already-established
-//! fix for the identical class of problem (`span_fieldwise.rs` reusing
-//! `span.rs`'s accessors) — see that file's own doc comment.
+//! `date_year_value`/`date_month_value`/`date_day_value` live in the
+//! `logic` submodule (self-gated via its own `#![cfg(creusot)]`,
+//! collapsing what was four separately `#[cfg(creusot)]`-gated items
+//! here into the single macro-import `use` below — cordial's
+//! CFG-SCATTER finding), `pub(crate)` there and reached by
+//! `civil_era.rs` via the full `super::civil_date::logic::
+//! date_year_value` path: its own `Date::era_year` extern_spec needs
+//! `date_year_value` to state anything about `self`, and Creusot only
+//! allows one `extern_spec!` per real function crate-wide — confirmed
+//! via a genuine "duplicate extern specification for
+//! jiff::civil::Date::new" compiler error from a first attempt that
+//! (wrongly) redeclared `Date::new`'s own contract in `civil_era.rs`
+//! instead of reusing this one.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_year_value(_d: &jiff::civil::Date) -> i16 {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_month_value(_d: &jiff::civil::Date) -> i8 {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_day_value(_d: &jiff::civil::Date) -> i8 {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::civil::Date {
-        #[check(ghost)]
-        #[ensures(match result {
-            Ok(ref d) => date_year_value(d) == year
-                && date_month_value(d) == month
-                && date_day_value(d) == day,
-            Err(_) => year < -9999i16 || year > 9999i16
-                || month < 1i8 || month > 12i8
-                || day < 1i8 || day > 28i8,
-        })]
-        fn new(year: i16, month: i8, day: i8) -> Result<jiff::civil::Date, jiff::Error>;
-
-        #[check(ghost)]
-        #[ensures(result == date_year_value(&self))]
-        fn year(self) -> i16;
-
-        #[check(ghost)]
-        #[ensures(result == date_month_value(&self))]
-        fn month(self) -> i8;
-
-        #[check(ghost)]
-        #[ensures(result == date_day_value(&self))]
-        fn day(self) -> i8;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! {
     creusot, CIVIL_DATE_NEW_YEAR_MONTH_DAY_ROUND_TRIPS_HOLDS_SRC, {

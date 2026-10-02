@@ -22,22 +22,9 @@
 //! site. Three lemmas cover all ten fields, since the generic-over-`I`
 //! opaqueness is shared.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{ensures, logic, trusted};
-
-    #[trusted]
-    #[logic(opaque)]
-    pub(super) fn span_i64_of<I>(_x: I) -> i64 {
-        dead
-    }
-}
-#[cfg(creusot)]
-use creusot_std::macros::{logic, trusted};
-#[cfg(creusot)]
-use mirror::ensures;
-#[cfg(creusot)]
-pub(crate) use mirror::span_i64_of;
+use creusot_std::macros::logic;
 
 amenable_derive::harness! {
     creusot, SPAN_I64_OF_I16_MATCHES_CAST_HOLDS_SRC, {
@@ -47,7 +34,7 @@ amenable_derive::harness! {
         /// instead of restating the comparison inline.
         #[logic(open)]
         fn span_i64_of_i16_matches_cast(x: i16) -> bool {
-            pearlite! { span_i64_of::<i16>(x) == x as i64 }
+            pearlite! { logic::span_i64_of::<i16>(x) == x as i64 }
         }
     }
 }
@@ -68,7 +55,7 @@ amenable_derive::harness! {
         /// real `as i64` cast it stands in for.
         #[logic(open)]
         fn span_i64_of_i32_matches_cast(x: i32) -> bool {
-            pearlite! { span_i64_of::<i32>(x) == x as i64 }
+            pearlite! { logic::span_i64_of::<i32>(x) == x as i64 }
         }
     }
 }
@@ -90,7 +77,7 @@ amenable_derive::harness! {
         /// checked the same way as the narrower widths for uniformity).
         #[logic(open)]
         fn span_i64_of_i64_matches_cast(x: i64) -> bool {
-            pearlite! { span_i64_of::<i64>(x) == x as i64 }
+            pearlite! { logic::span_i64_of::<i64>(x) == x as i64 }
         }
     }
 }
@@ -104,24 +91,3 @@ amenable_derive::harness! {
         || SPAN_I64_OF_I64_MATCHES_CAST_HOLDS_SRC,
     )
 }
-
-// `pub(crate)`, declared directly here (not nested in `mirror`, for the
-// same real reason the getter accessors in `accessors.rs` are:
-// `span_fieldwise.rs` needs to call these too, and a two-hop re-export
-// through a private nested module is real toolchain territory
-// Creusot's own visibility check rejects even though plain rustc
-// accepts it.
-#[cfg(creusot)]
-#[trusted]
-#[ensures(span_i64_of_i16_matches_cast(x))]
-pub(crate) fn span_i64_of_i16_lemma(x: i16) {}
-
-#[cfg(creusot)]
-#[trusted]
-#[ensures(span_i64_of_i32_matches_cast(x))]
-pub(crate) fn span_i64_of_i32_lemma(x: i32) {}
-
-#[cfg(creusot)]
-#[trusted]
-#[ensures(span_i64_of_i64_matches_cast(x))]
-pub(crate) fn span_i64_of_i64_lemma(x: i64) {}

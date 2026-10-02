@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 215 8 215 86 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span scalendar_ordinal_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 216 19 216 23
+let%span scalendar_ordinal_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 216 34 216 40
+let%span scalendar_ordinal_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 216 12 216 40
+let%span scalendar_ordinal_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 213 19 213 23
+let%span scalendar_ordinal_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 214 18 214 88
+let%span scalendar_ordinal_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 195 24 195 64
+
+use creusot.int.UInt16
+use creusot.prelude.Any
+
+predicate ge_log_u16 [@inline:trivial] (self: UInt16.t) (other: UInt16.t) = [%#sord] UInt16.le other self
+
+meta "rewrite_def" predicate ge_log_u16
+
+predicate ordinal_day_in_range_one_to_three_hundred_sixty_six_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 194 8 194 105] (day: UInt16.t) (outcome: bool) =
+  [%#scalendar_ordinal_bounds'4] outcome = (ge_log_u16 day (1: UInt16.t) /\ UInt16.lt day (367: UInt16.t))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_ordinal_day_in_range_one_to_three_hundred_sixty_six [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 215 8 215 86]
+  (day: UInt16.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- UInt16.ge day ([%#scalendar_ordinal_bounds] (1: UInt16.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = [ &_ret <- UInt16.le day ([%#scalendar_ordinal_bounds'0] (366: UInt16.t)) ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- [%#scalendar_ordinal_bounds'1] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & day: UInt16.t = day | & _5: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_ordinal_day_in_range_one_to_three_hundred_sixty_six ensures] [%#scalendar_ordinal_bounds'3] ordinal_day_in_range_one_to_three_hundred_sixty_six_holds day result}
+    (! return {result}) ]

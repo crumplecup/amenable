@@ -21,34 +21,9 @@
 //! `#[ensures(..)]` clause is expected to work here — confirmed by
 //! this file's own real `cargo creusot` run succeeding.
 
+mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn tzan_str_value<'a, 'n>(_t: &'a jiff::fmt::temporal::TimeZoneAnnotationName<'n>) -> &'a str {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl<'n> jiff::fmt::temporal::TimeZoneAnnotationName<'n> {
-        #[check(ghost)]
-        #[ensures(result == tzan_str_value(&self))]
-        fn as_str<'a>(&'a self) -> &'a str;
-    }
-
-    impl<'n> core::convert::From<&'n str> for jiff::fmt::temporal::TimeZoneAnnotationName<'n> {
-        #[check(ghost)]
-        #[ensures(tzan_str_value(&result) == string)]
-        fn from(string: &'n str) -> jiff::fmt::temporal::TimeZoneAnnotationName<'n>;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, FMT_TEMPORAL_TIME_ZONE_ANNOTATION_NAME_FROM_STR_ROUND_TRIPS_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::fmt::temporal::

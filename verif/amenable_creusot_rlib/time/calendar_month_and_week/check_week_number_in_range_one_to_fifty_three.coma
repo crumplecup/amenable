@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 243 8 243 74 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span scalendar_month_and_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 244 20 244 23
+let%span scalendar_month_and_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 244 35 244 39
+let%span scalendar_month_and_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 244 12 244 39
+let%span scalendar_month_and_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 241 19 241 23
+let%span scalendar_month_and_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 242 18 242 77
+let%span scalendar_month_and_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 223 24 223 63
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate ge_log_u8 [@inline:trivial] (self: UInt8.t) (other: UInt8.t) = [%#sord] UInt8.le other self
+
+meta "rewrite_def" predicate ge_log_u8
+
+predicate week_number_in_range_one_to_fifty_three_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 222 8 222 93] (week: UInt8.t) (outcome: bool) =
+  [%#scalendar_month_and_week'4] outcome = (ge_log_u8 week (1: UInt8.t) /\ UInt8.lt week (54: UInt8.t))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_week_number_in_range_one_to_fifty_three [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 243 8 243 74]
+  (week: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- UInt8.ge week ([%#scalendar_month_and_week] (1: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0 [ s0 = [ &_ret <- UInt8.le week ([%#scalendar_month_and_week'0] (53: UInt8.t)) ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- [%#scalendar_month_and_week'1] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & week: UInt8.t = week | & _5: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_week_number_in_range_one_to_fifty_three ensures] [%#scalendar_month_and_week'3] week_number_in_range_one_to_fifty_three_holds week result}
+    (! return {result}) ]

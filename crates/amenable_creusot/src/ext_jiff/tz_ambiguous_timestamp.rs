@@ -31,72 +31,9 @@
 //! `fixed` itself — only one `extern_spec!` per real function
 //! crate-wide.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use crate::ext_jiff::tz_time_zone::tz_is_unknown_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_fixed_seconds_value(_tz: &jiff::tz::TimeZone) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn amb_ts_offset_is_unambiguous_value(_t: &jiff::tz::AmbiguousTimestamp) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn amb_ts_offset_seconds_value(_t: &jiff::tz::AmbiguousTimestamp) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::TimeZone {
-        #[check(ghost)]
-        #[ensures(
-            tz_fixed_seconds_value(&result) == offset_seconds_value(&offset)
-            && tz_is_unknown_value(&result) == false
-        )]
-        fn fixed(offset: jiff::tz::Offset) -> jiff::tz::TimeZone;
-
-        #[check(ghost)]
-        #[ensures(
-            amb_ts_offset_is_unambiguous_value(&result) == true
-            && amb_ts_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
-        )]
-        fn to_ambiguous_timestamp(&self, dt: jiff::civil::DateTime) -> jiff::tz::AmbiguousTimestamp;
-    }
-
-    impl jiff::tz::AmbiguousTimestamp {
-        #[check(ghost)]
-        #[ensures(match result {
-            jiff::tz::AmbiguousOffset::Unambiguous { offset } => {
-                amb_ts_offset_is_unambiguous_value(&self) == true
-                    && offset_seconds_value(&offset) == amb_ts_offset_seconds_value(&self)
-            }
-            _ => amb_ts_offset_is_unambiguous_value(&self) == false,
-        })]
-        fn offset(&self) -> jiff::tz::AmbiguousOffset;
-
-        #[check(ghost)]
-        #[ensures(result == (amb_ts_offset_is_unambiguous_value(&self) == false))]
-        fn is_ambiguous(&self) -> bool;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, TZ_AMBIGUOUS_TIMESTAMP_FROM_FIXED_TIME_ZONE_IS_ALWAYS_UNAMBIGUOUS_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::tz::AmbiguousTimestamp>`

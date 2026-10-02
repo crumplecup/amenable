@@ -1,0 +1,35 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 212 8 212 67 *)
+
+let%span scalendar_month_and_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 213 23 213 26
+let%span scalendar_month_and_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 213 41 213 44
+let%span scalendar_month_and_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 213 12 213 44
+let%span scalendar_month_and_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 210 19 210 23
+let%span scalendar_month_and_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 211 18 211 70
+let%span scalendar_month_and_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 192 24 192 159
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate weekday_in_range_one_to_seven_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 191 8 191 86] (weekday: UInt8.t) (outcome: bool) =
+  [%#scalendar_month_and_week'4] outcome
+  = (weekday = (1: UInt8.t)
+  \/ weekday = (2: UInt8.t)
+  \/ weekday = (3: UInt8.t)
+  \/ weekday = (4: UInt8.t) \/ weekday = (5: UInt8.t) \/ weekday = (6: UInt8.t) \/ weekday = (7: UInt8.t))
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_weekday_in_range_one_to_seven [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_month_and_week.rs" 212 8 212 67]
+  (weekday: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_5 <- UInt8.ge weekday ([%#scalendar_month_and_week] (1: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_5 = false} (! bb2) | br1 -> {_5} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = [ &_ret <- UInt8.le weekday ([%#scalendar_month_and_week'0] (7: UInt8.t)) ] s1 | s1 = return {_ret} ]
+  | bb2 = s0 [ s0 = [ &_ret <- [%#scalendar_month_and_week'1] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & weekday: UInt8.t = weekday | & _5: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_weekday_in_range_one_to_seven ensures] [%#scalendar_month_and_week'3] weekday_in_range_one_to_seven_holds weekday result}
+    (! return {result}) ]

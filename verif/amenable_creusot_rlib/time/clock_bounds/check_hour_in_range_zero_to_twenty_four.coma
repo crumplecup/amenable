@@ -1,0 +1,24 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 236 8 236 68 *)
+
+let%span sclock_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 237 20 237 24
+let%span sclock_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 234 19 234 23
+let%span sclock_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 235 18 235 71
+let%span sclock_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 215 24 215 48
+
+use creusot.int.UInt8
+use creusot.prelude.Any
+
+predicate hour_in_range_zero_to_twenty_four_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 214 8 214 87] (hour: UInt8.t) (outcome: bool) =
+  [%#sclock_bounds'2] outcome = UInt8.lt hour (25: UInt8.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_hour_in_range_zero_to_twenty_four [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/clock_bounds.rs" 236 8 236 68]
+  (hour: UInt8.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0 [ s0 = [ &_ret <- UInt8.le hour ([%#sclock_bounds] (24: UInt8.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & hour: UInt8.t = hour ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_hour_in_range_zero_to_twenty_four ensures] [%#sclock_bounds'1] hour_in_range_zero_to_twenty_four_holds hour result}
+    (! return {result}) ]

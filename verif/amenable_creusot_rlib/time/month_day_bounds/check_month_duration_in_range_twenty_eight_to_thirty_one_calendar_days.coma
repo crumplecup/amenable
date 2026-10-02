@@ -1,0 +1,147 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 196 8 196 111 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span smonth_day_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 197 38 197 39
+let%span smonth_day_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 26 198 27
+let%span smonth_day_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 19 198 27
+let%span smonth_day_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 31 198 32
+let%span smonth_day_bounds'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 44 198 47
+let%span smonth_day_bounds'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 37 198 47
+let%span smonth_day_bounds'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 51 198 52
+let%span smonth_day_bounds'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 63 198 66
+let%span smonth_day_bounds'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 56 198 66
+let%span smonth_day_bounds'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 70 198 71
+let%span smonth_day_bounds'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 75 198 77
+let%span smonth_day_bounds'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 198 87 198 89
+let%span smonth_day_bounds'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 199 31 199 32
+let%span smonth_day_bounds'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 199 45 199 46
+let%span smonth_day_bounds'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 199 59 199 60
+let%span smonth_day_bounds'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 199 73 199 75
+let%span smonth_day_bounds'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 200 16 200 18
+let%span smonth_day_bounds'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 202 16 202 18
+let%span smonth_day_bounds'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 204 19 204 21
+let%span smonth_day_bounds'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 204 32 204 34
+let%span smonth_day_bounds'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 204 12 204 34
+let%span smonth_day_bounds'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 194 19 194 67
+let%span smonth_day_bounds'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 195 18 195 109
+let%span smonth_day_bounds'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 156 24 156 51
+let%span smonth_day_bounds'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 176 24 176 31
+
+use creusot.int.UInt8
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.Int
+
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate month_in_range_one_to_twelve_for_requires [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 155 8 155 75] (month: UInt8.t) =
+  [%#smonth_day_bounds'22] ge_log_Int (UInt8.t'int month) 1 /\ UInt8.t'int month <= 12
+
+predicate month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 175 8 175 132] (_year: Int32.t) (_month: UInt8.t) (outcome: bool) =
+  [%#smonth_day_bounds'23] outcome
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/month_day_bounds.rs" 196 8 196 111]
+  (year: Int32.t) (month: UInt8.t) (return (x: bool)) =
+{[@stop_split] [@expl:check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days requires] [%#smonth_day_bounds'20] month_in_range_one_to_twelve_for_requires month}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_9 <- month = ([%#smonth_day_bounds] (2: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_9 = false} (! bb17) | br1 -> {_9} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = [ &_13 <- year ] s1
+    | s1 = [ &_14 <- ([%#smonth_day_bounds'0] (4: Int32.t)) = ([%#smonth_day_bounds'1] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#smonth_day_bounds'1] not _14} s3
+    | s3 = [ &_15 <- ([%#smonth_day_bounds'0] (4: Int32.t)) = ([%#smonth_day_bounds'1] (-1: Int32.t)) ] s4
+    | s4 = [ &_16 <- _13 = ([%#smonth_day_bounds'1] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_17 <- Bool.bw_and _15 _16 ] s6
+    | s6 = {[@expl:Rem overflow] [%#smonth_day_bounds'1] not _17} s7
+    | s7 = Int32.rem [%#smonth_day_bounds'1] {_13} {[%#smonth_day_bounds'0] (4: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_12 <- _x ] s8)
+    | s8 = [ &_11 <- _12 = ([%#smonth_day_bounds'2] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_11 = false} (! bb15) | br1 -> {_11} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = [ &_20 <- year ] s1
+    | s1 = [ &_21 <- ([%#smonth_day_bounds'3] (100: Int32.t)) = ([%#smonth_day_bounds'4] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#smonth_day_bounds'4] not _21} s3
+    | s3 = [ &_22 <- ([%#smonth_day_bounds'3] (100: Int32.t)) = ([%#smonth_day_bounds'4] (-1: Int32.t)) ] s4
+    | s4 = [ &_23 <- _20 = ([%#smonth_day_bounds'4] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_24 <- Bool.bw_and _22 _23 ] s6
+    | s6 = {[@expl:Rem overflow] [%#smonth_day_bounds'4] not _24} s7
+    | s7 = Int32.rem [%#smonth_day_bounds'4] {_20} {[%#smonth_day_bounds'3] (100: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_19 <- _x ] s8)
+    | s8 = [ &_18 <- _19 <> ([%#smonth_day_bounds'5] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_18 = false} (! bb8) | br1 -> {_18} (! bb12) ] ]
+  | bb8 = s0
+    [ s0 = [ &_27 <- year ] s1
+    | s1 = [ &_28 <- ([%#smonth_day_bounds'6] (400: Int32.t)) = ([%#smonth_day_bounds'7] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#smonth_day_bounds'7] not _28} s3
+    | s3 = [ &_29 <- ([%#smonth_day_bounds'6] (400: Int32.t)) = ([%#smonth_day_bounds'7] (-1: Int32.t)) ] s4
+    | s4 = [ &_30 <- _27 = ([%#smonth_day_bounds'7] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_31 <- Bool.bw_and _29 _30 ] s6
+    | s6 = {[@expl:Rem overflow] [%#smonth_day_bounds'7] not _31} s7
+    | s7 = Int32.rem [%#smonth_day_bounds'7] {_27} {[%#smonth_day_bounds'6] (400: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_26 <- _x ] s8)
+    | s8 = [ &_25 <- _26 = ([%#smonth_day_bounds'8] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_25 = false} (! bb15) | br1 -> {_25} (! bb12) ] ]
+  | bb12 = s0 [ s0 = [ &dim <- [%#smonth_day_bounds'9] (29: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb15 = s0 [ s0 = [ &dim <- [%#smonth_day_bounds'10] (28: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb17 = s0
+    [ s0 = [ &_32 <- month = ([%#smonth_day_bounds'11] (4: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_32 = false} (! bb19) | br1 -> {_32} (! bb25) ] ]
+  | bb19 = s0
+    [ s0 = [ &_34 <- month = ([%#smonth_day_bounds'12] (6: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_34 = false} (! bb21) | br1 -> {_34} (! bb25) ] ]
+  | bb21 = s0
+    [ s0 = [ &_36 <- month = ([%#smonth_day_bounds'13] (9: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_36 = false} (! bb23) | br1 -> {_36} (! bb25) ] ]
+  | bb23 = s0
+    [ s0 = [ &_38 <- month = ([%#smonth_day_bounds'14] (11: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_38 = false} (! bb26) | br1 -> {_38} (! bb25) ] ]
+  | bb25 = s0 [ s0 = [ &dim <- [%#smonth_day_bounds'15] (30: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb26 = s0 [ s0 = [ &dim <- [%#smonth_day_bounds'16] (31: UInt8.t) ] s1 | s1 = bb28 ]
+  | bb28 = s0
+    [ s0 = [ &_40 <- UInt8.ge dim ([%#smonth_day_bounds'17] (28: UInt8.t)) ] s1
+    | s1 = any [ br0 -> {_40 = false} (! bb30) | br1 -> {_40} (! bb29) ] ]
+  | bb29 = s0 [ s0 = [ &_ret <- UInt8.le dim ([%#smonth_day_bounds'18] (31: UInt8.t)) ] s1 | s1 = return {_ret} ]
+  | bb30 = s0 [ s0 = [ &_ret <- [%#smonth_day_bounds'19] false ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & month: UInt8.t = month
+  | & dim: UInt8.t = Any.any_l ()
+  | & _9: bool = Any.any_l ()
+  | & _11: bool = Any.any_l ()
+  | & _12: Int32.t = Any.any_l ()
+  | & _13: Int32.t = Any.any_l ()
+  | & _14: bool = Any.any_l ()
+  | & _15: bool = Any.any_l ()
+  | & _16: bool = Any.any_l ()
+  | & _17: bool = Any.any_l ()
+  | & _18: bool = Any.any_l ()
+  | & _19: Int32.t = Any.any_l ()
+  | & _20: Int32.t = Any.any_l ()
+  | & _21: bool = Any.any_l ()
+  | & _22: bool = Any.any_l ()
+  | & _23: bool = Any.any_l ()
+  | & _24: bool = Any.any_l ()
+  | & _25: bool = Any.any_l ()
+  | & _26: Int32.t = Any.any_l ()
+  | & _27: Int32.t = Any.any_l ()
+  | & _28: bool = Any.any_l ()
+  | & _29: bool = Any.any_l ()
+  | & _30: bool = Any.any_l ()
+  | & _31: bool = Any.any_l ()
+  | & _32: bool = Any.any_l ()
+  | & _34: bool = Any.any_l ()
+  | & _36: bool = Any.any_l ()
+  | & _38: bool = Any.any_l ()
+  | & _40: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_month_duration_in_range_twenty_eight_to_thirty_one_calendar_days ensures] [%#smonth_day_bounds'21] month_duration_in_range_twenty_eight_to_thirty_one_calendar_days_holds year month result}
+    (! return {result}) ]

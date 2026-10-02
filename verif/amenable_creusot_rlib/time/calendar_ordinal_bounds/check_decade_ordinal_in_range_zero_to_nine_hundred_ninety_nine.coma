@@ -1,0 +1,25 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 277 8 277 95 *)
+
+let%span scalendar_ordinal_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 278 23 278 29
+let%span scalendar_ordinal_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 275 19 275 23
+let%span scalendar_ordinal_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 276 18 276 97
+let%span scalendar_ordinal_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 257 24 257 54
+
+use creusot.int.UInt16
+use creusot.prelude.Any
+
+predicate decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 256 8 256 114] (ordinal: UInt16.t) (outcome: bool) =
+  [%#scalendar_ordinal_bounds'2] outcome = UInt16.lt ordinal (1000: UInt16.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 277 8 277 95]
+  (ordinal: UInt16.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- UInt16.le ordinal ([%#scalendar_ordinal_bounds] (999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & ordinal: UInt16.t = ordinal ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine ensures] [%#scalendar_ordinal_bounds'1] decade_ordinal_in_range_zero_to_nine_hundred_ninety_nine_holds ordinal result}
+    (! return {result}) ]

@@ -25,43 +25,9 @@
 //! `TimeZone::fixed`-constructed case is exercised, reusing
 //! `tz_ambiguous_timestamp.rs`'s own `tz_fixed_seconds_value`.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use crate::ext_jiff::tz_ambiguous_timestamp::tz_fixed_seconds_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_is_unknown_value(_tz: &jiff::tz::TimeZone) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::TimeZone {
-        #[check(ghost)]
-        #[ensures(tz_is_unknown_value(&result) == true)]
-        fn unknown() -> jiff::tz::TimeZone;
-
-        #[check(ghost)]
-        #[ensures(result == tz_is_unknown_value(&self))]
-        fn is_unknown(&self) -> bool;
-
-        #[check(ghost)]
-        #[ensures(match result {
-            Ok(ref o) => offset_seconds_value(o) == tz_fixed_seconds_value(&self),
-            Err(_) => false,
-        })]
-        fn to_fixed_offset(&self) -> Result<jiff::tz::Offset, jiff::Error>;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, TZ_TIME_ZONE_UNKNOWN_AND_FIXED_ROUND_TRIP_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::tz::TimeZone>`

@@ -37,34 +37,9 @@ mod verus_exchange_export;
 #[cfg(feature = "verus")]
 mod verus_export;
 #[cfg(feature = "verus")]
+mod verus_facade;
+#[cfg(feature = "verus")]
 mod verus_gaap_tokens_export;
-
-pub use assessment::{AssessArgs, load};
-pub use cli::Cli;
-#[cfg(feature = "cli")]
-pub use cli::install_hook;
-pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
-#[cfg(feature = "creusot")]
-pub use creusot_export::write_creusot_exchange_companions;
-pub use error::{
-    AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
-    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
-};
-pub use gallery::GalleryArgs;
-pub use kani::{
-    Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
-    verify,
-};
-pub use paths::{
-    artifacts_directory, creusot_generated_directory, verus_exchange_generated_directory,
-    verus_gaap_ledger_tokens_path, verus_source_directory,
-};
-#[cfg(feature = "verus")]
-pub use verus_exchange_export::write_verus_exchange_companions;
-#[cfg(feature = "verus")]
-pub use verus_export::write_verus_witness_modules;
-#[cfg(feature = "verus")]
-pub use verus_gaap_tokens_export::write_verus_gaap_token_companion;
 
 pub use amenable_core::{
     AsStandard, Calculation, CarriesToken, Certificate, ChainError, ChainErrorKind, ChainGap,
@@ -78,8 +53,6 @@ pub use amenable_core::{
     WitnessExportSnapshot, WitnessModulePath, WitnessSupportKind, WitnessSupportSummary, Yellow,
     init_tracing, proof_chain, proof_chain_for_verifiers, witness_exports,
 };
-#[cfg(feature = "verus")]
-pub use amenable_core::{VerusVerifier, VerusVerifierMetadata};
 #[cfg(feature = "creusot")]
 pub use amenable_creusot::{
     CheckedProof as CreusotCheckedProof, CreusotVerifier, CreusotVerifierMetadata, CreusotWitness,
@@ -103,8 +76,6 @@ pub use amenable_std::{
     RustStdProvenance, RustStdStandard, RustStdType, SourceCrate, SourceModule, StdTimeBackend,
     TypeName, ValidUnicodeScalar, VerifierFamily, write_rust_std_certificate_artifacts,
 };
-#[cfg(feature = "verus")]
-pub use amenable_std::{VerusCheckedProof, VerusWitness};
 /// The temporal contract interface. The facade re-exports the whole crate
 /// rather than a curated list — its public surface is ~500 contract,
 /// descriptor, and trait names, and callers reach for them by full path.
@@ -112,4 +83,29 @@ pub use amenable_time;
 pub use amenable_time::{
     TemporalCapabilities, TemporalCoverage, TemporalCoverageRow, TemporalError, TemporalErrorKind,
     TemporalReporter,
+};
+pub use assessment::{AssessArgs, load};
+pub use cli::Cli;
+#[cfg(feature = "cli")]
+pub use cli::install_hook;
+pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
+#[cfg(feature = "creusot")]
+pub use creusot_export::write_creusot_exchange_companions;
+pub use error::{
+    AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
+    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
+};
+pub use gallery::GalleryArgs;
+pub use kani::{
+    Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
+    verify,
+};
+pub use paths::{
+    artifacts_directory, creusot_generated_directory, verus_exchange_generated_directory,
+    verus_gaap_ledger_tokens_path, verus_source_directory,
+};
+#[cfg(feature = "verus")]
+pub use verus_facade::{
+    VerusCheckedProof, VerusVerifier, VerusVerifierMetadata, VerusWitness,
+    write_verus_exchange_companions, write_verus_gaap_token_companion, write_verus_witness_modules,
 };

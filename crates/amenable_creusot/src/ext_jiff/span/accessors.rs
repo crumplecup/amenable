@@ -1,3 +1,4 @@
+#![cfg(creusot)]
 //! `jiff::Span`'s real API contract: an opaque logic accessor per unit
 //! getter, and the `extern_spec!` tying all ten setters/getters to
 //! jiff's real methods.
@@ -10,85 +11,73 @@
 //! (`get_years() -> i16`, `get_months`/`get_weeks`/`get_days`/
 //! `get_hours() -> i32`), since the postcondition just widens the real
 //! result via `as i64` to compare.
+//!
+//! Self-gated via this file's own `#![cfg(creusot)]` rather than a
+//! `#[cfg(creusot)]` on every item here — collapses thirteen separately
+//! gated items (ten `fn`s, three `use`s) into zero, since the whole
+//! file's inclusion is already conditional on its own first line
+//! (cordial's CFG-SCATTER finding).
+//!
+//! `span_get_*_value` are `pub(crate)`, declared directly at this
+//! module's own top level: reused by `span_fieldwise.rs`'s own
+//! extern_spec, which needs the SAME opaque accessors the extern_spec
+//! below already ties them to — Creusot only allows one extern_spec
+//! per real function crate-wide, so redeclaring a second one for the
+//! same method isn't an option, and a two-hop re-export through a
+//! private nested module is real toolchain territory Creusot's own
+//! visibility check rejects even though plain rustc accepts it —
+//! confirmed by a real "function import ... is private" error from
+//! `cargo creusot` (not from `cargo check`, which never compiles this
+//! creusot-only code at all) when these lived behind that indirection.
 
-#[cfg(creusot)]
-use super::lemmas::span_i64_of;
+use super::lemmas::logic::span_i64_of;
+use creusot_std::macros::{extern_spec, logic, trusted};
 
-#[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::extern_spec;
-}
-#[cfg(creusot)]
-use creusot_std::macros::{logic, trusted};
-#[cfg(creusot)]
-use mirror::extern_spec;
-
-// `pub(crate)`, declared directly here (not nested in `mirror`):
-// reused by `span_fieldwise.rs`'s own extern_spec, which needs the SAME
-// opaque accessors the extern_spec below already ties them to --
-// Creusot only allows one extern_spec per real function crate-wide, so
-// redeclaring a second one for the same method isn't an option, and a
-// two-hop re-export through a private nested module (`mirror::foo` ->
-// `pub(crate) use mirror::foo`) is real toolchain territory Creusot's
-// own visibility check rejects even though plain rustc accepts it --
-// confirmed by a real "function import ... is private" error from
-// `cargo creusot` (not from `cargo check`, which never compiles this
-// `#[cfg(creusot)]`-gated code at all) when these lived inside `mirror`.
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_years_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_months_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_weeks_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_days_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_hours_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_minutes_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_seconds_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_milliseconds_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_microseconds_value(_s: &jiff::Span) -> i64 {
     dead
 }
-#[cfg(creusot)]
 #[trusted]
 #[logic(opaque)]
 pub(crate) fn span_get_nanoseconds_value(_s: &jiff::Span) -> i64 {
@@ -98,7 +87,6 @@ pub(crate) fn span_get_nanoseconds_value(_s: &jiff::Span) -> i64 {
 // jiff's own documented valid ranges for each `Span` unit setter (the
 // same constants `amenable_kani::ext::jiff::span`'s Kani harness
 // independently confirms).
-#[cfg(creusot)]
 extern_spec! {
     impl jiff::Span {
         #[ensures(true)]

@@ -23,55 +23,9 @@
 //! `DeepModel` needed for a plain, non-generic enum), not compared via
 //! `==`.
 
+mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use crate::ext_jiff::tz_ambiguous_timestamp::tz_fixed_seconds_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_offset_info_offset_seconds_value(_info: &jiff::tz::TimeZoneOffsetInfo<'_>) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_offset_info_is_dst_value(_info: &jiff::tz::TimeZoneOffsetInfo<'_>) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::TimeZone {
-        #[check(ghost)]
-        #[ensures(
-            tz_offset_info_offset_seconds_value(&result) == tz_fixed_seconds_value(&self)
-            && tz_offset_info_is_dst_value(&result) == false
-        )]
-        fn to_offset_info<'t>(&'t self, timestamp: jiff::Timestamp) -> jiff::tz::TimeZoneOffsetInfo<'t>;
-    }
-
-    impl<'t> jiff::tz::TimeZoneOffsetInfo<'t> {
-        #[check(ghost)]
-        #[ensures(offset_seconds_value(&result) == tz_offset_info_offset_seconds_value(&self))]
-        fn offset(&self) -> jiff::tz::Offset;
-
-        #[check(ghost)]
-        #[ensures(match result {
-            jiff::tz::Dst::No => tz_offset_info_is_dst_value(&self) == false,
-            jiff::tz::Dst::Yes => tz_offset_info_is_dst_value(&self) == true,
-        })]
-        fn dst(&self) -> jiff::tz::Dst;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, TZ_TIME_ZONE_OFFSET_INFO_FROM_FIXED_TIME_ZONE_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::tz::TimeZoneOffsetInfo<

@@ -1,0 +1,115 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 422 8 422 90 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sleap_year_core = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 38 423 39
+let%span sleap_year_core'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 31 423 39
+let%span sleap_year_core'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 43 423 44
+let%span sleap_year_core'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 56 423 59
+let%span sleap_year_core'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 49 423 59
+let%span sleap_year_core'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 63 423 64
+let%span sleap_year_core'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 75 423 78
+let%span sleap_year_core'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 68 423 78
+let%span sleap_year_core'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 82 423 83
+let%span sleap_year_core'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 87 423 90
+let%span sleap_year_core'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 423 100 423 103
+let%span sleap_year_core'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 424 20 424 23
+let%span sleap_year_core'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 420 19 420 59
+let%span sleap_year_core'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 421 18 421 92
+let%span sleap_year_core'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 350 24 350 34
+let%span sleap_year_core'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 402 24 402 66
+let%span sleap_year_core'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 327 24 327 80
+
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.ComputerDivision
+use int.Int
+
+predicate ge_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other <= self
+
+meta "rewrite_def" predicate ge_log_Int
+
+predicate year_is_non_negative_in_this_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 349 8 349 68] (year: Int32.t) =
+  [%#sleap_year_core'13] ge_log_Int (Int32.to_int year) 0
+
+predicate is_gregorian_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 326 8 326 56] (year: Int32.t) =
+  [%#sleap_year_core'15] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+
+predicate common_year_has_three_hundred_sixty_five_calendar_days_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 401 8 401 109] (year: Int32.t) (outcome: bool) =
+  [%#sleap_year_core'14] outcome = (not is_gregorian_leap_year year)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_common_year_has_three_hundred_sixty_five_calendar_days [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 422 8 422 90]
+  (year: Int32.t) (return (x: bool)) =
+{[@stop_split] [@expl:check_common_year_has_three_hundred_sixty_five_calendar_days requires] [%#sleap_year_core'11] year_is_non_negative_in_this_model year}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_9 <- year ] s1
+    | s1 = [ &_10 <- ([%#sleap_year_core] (4: Int32.t)) = ([%#sleap_year_core'0] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#sleap_year_core'0] not _10} s3
+    | s3 = [ &_11 <- ([%#sleap_year_core] (4: Int32.t)) = ([%#sleap_year_core'0] (-1: Int32.t)) ] s4
+    | s4 = [ &_12 <- _9 = ([%#sleap_year_core'0] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_13 <- Bool.bw_and _11 _12 ] s6
+    | s6 = {[@expl:Rem overflow] [%#sleap_year_core'0] not _13} s7
+    | s7 = Int32.rem [%#sleap_year_core'0] {_9} {[%#sleap_year_core] (4: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_8 <- _x ] s8)
+    | s8 = [ &_7 <- _8 = ([%#sleap_year_core'1] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_7 = false} (! bb14) | br1 -> {_7} (! bb3) ] ]
+  | bb3 = s0
+    [ s0 = [ &_16 <- year ] s1
+    | s1 = [ &_17 <- ([%#sleap_year_core'2] (100: Int32.t)) = ([%#sleap_year_core'3] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#sleap_year_core'3] not _17} s3
+    | s3 = [ &_18 <- ([%#sleap_year_core'2] (100: Int32.t)) = ([%#sleap_year_core'3] (-1: Int32.t)) ] s4
+    | s4 = [ &_19 <- _16 = ([%#sleap_year_core'3] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_20 <- Bool.bw_and _18 _19 ] s6
+    | s6 = {[@expl:Rem overflow] [%#sleap_year_core'3] not _20} s7
+    | s7 = Int32.rem [%#sleap_year_core'3] {_16} {[%#sleap_year_core'2] (100: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_15 <- _x ] s8)
+    | s8 = [ &_14 <- _15 <> ([%#sleap_year_core'4] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_14 = false} (! bb7) | br1 -> {_14} (! bb11) ] ]
+  | bb7 = s0
+    [ s0 = [ &_23 <- year ] s1
+    | s1 = [ &_24 <- ([%#sleap_year_core'5] (400: Int32.t)) = ([%#sleap_year_core'6] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#sleap_year_core'6] not _24} s3
+    | s3 = [ &_25 <- ([%#sleap_year_core'5] (400: Int32.t)) = ([%#sleap_year_core'6] (-1: Int32.t)) ] s4
+    | s4 = [ &_26 <- _23 = ([%#sleap_year_core'6] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_27 <- Bool.bw_and _25 _26 ] s6
+    | s6 = {[@expl:Rem overflow] [%#sleap_year_core'6] not _27} s7
+    | s7 = Int32.rem [%#sleap_year_core'6] {_23} {[%#sleap_year_core'5] (400: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_22 <- _x ] s8)
+    | s8 = [ &_21 <- _22 = ([%#sleap_year_core'7] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_21 = false} (! bb14) | br1 -> {_21} (! bb11) ] ]
+  | bb11 = s0 [ s0 = [ &days <- [%#sleap_year_core'8] (366: Int32.t) ] s1 | s1 = bb15 ]
+  | bb14 = s0 [ s0 = [ &days <- [%#sleap_year_core'9] (365: Int32.t) ] s1 | s1 = bb15 ]
+  | bb15 = s0 [ s0 = [ &_ret <- days = ([%#sleap_year_core'10] (365: Int32.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & days: Int32.t = Any.any_l ()
+  | & _7: bool = Any.any_l ()
+  | & _8: Int32.t = Any.any_l ()
+  | & _9: Int32.t = Any.any_l ()
+  | & _10: bool = Any.any_l ()
+  | & _11: bool = Any.any_l ()
+  | & _12: bool = Any.any_l ()
+  | & _13: bool = Any.any_l ()
+  | & _14: bool = Any.any_l ()
+  | & _15: Int32.t = Any.any_l ()
+  | & _16: Int32.t = Any.any_l ()
+  | & _17: bool = Any.any_l ()
+  | & _18: bool = Any.any_l ()
+  | & _19: bool = Any.any_l ()
+  | & _20: bool = Any.any_l ()
+  | & _21: bool = Any.any_l ()
+  | & _22: Int32.t = Any.any_l ()
+  | & _23: Int32.t = Any.any_l ()
+  | & _24: bool = Any.any_l ()
+  | & _25: bool = Any.any_l ()
+  | & _26: bool = Any.any_l ()
+  | & _27: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_common_year_has_three_hundred_sixty_five_calendar_days ensures] [%#sleap_year_core'12] common_year_has_three_hundred_sixty_five_calendar_days_holds year result}
+    (! return {result}) ]

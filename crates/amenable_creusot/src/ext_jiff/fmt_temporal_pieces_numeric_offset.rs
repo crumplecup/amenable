@@ -31,63 +31,9 @@
 //! same cross-file-reuse shape `offset.rs`'s own `offset_seconds_value`
 //! now has.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn pno_offset_seconds_value(_p: &jiff::fmt::temporal::PiecesNumericOffset) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn pno_is_negative_value(_p: &jiff::fmt::temporal::PiecesNumericOffset) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::Offset {
-        #[check(ghost)]
-        #[ensures(result == (offset_seconds_value(&self) < 0i32))]
-        fn is_negative(self) -> bool;
-    }
-
-    impl jiff::fmt::temporal::PiecesNumericOffset {
-        #[check(ghost)]
-        #[ensures(offset_seconds_value(&result) == pno_offset_seconds_value(&self))]
-        fn offset(&self) -> jiff::tz::Offset;
-
-        #[check(ghost)]
-        #[ensures(result == pno_is_negative_value(&self))]
-        fn is_negative(&self) -> bool;
-
-        #[check(ghost)]
-        #[ensures(
-            pno_offset_seconds_value(&result) == pno_offset_seconds_value(&self)
-            && pno_is_negative_value(&result) == true
-        )]
-        fn with_negative_zero(self) -> jiff::fmt::temporal::PiecesNumericOffset;
-    }
-
-    impl core::convert::From<jiff::tz::Offset> for jiff::fmt::temporal::PiecesNumericOffset {
-        #[check(ghost)]
-        #[ensures(
-            pno_offset_seconds_value(&result) == offset_seconds_value(&offset)
-            && pno_is_negative_value(&result) == (offset_seconds_value(&offset) < 0i32)
-        )]
-        fn from(offset: jiff::tz::Offset) -> jiff::fmt::temporal::PiecesNumericOffset;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, FMT_TEMPORAL_PIECES_NUMERIC_OFFSET_FROM_AND_WITH_NEGATIVE_ZERO_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::fmt::temporal::

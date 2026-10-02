@@ -29,7 +29,9 @@ pub(crate) use accessors::{
     span_get_nanoseconds_value, span_get_seconds_value, span_get_weeks_value, span_get_years_value,
 };
 #[cfg(creusot)]
-pub(crate) use lemmas::{span_i64_of_i16_lemma, span_i64_of_i32_lemma, span_i64_of_i64_lemma};
+pub(crate) use lemmas::logic::{
+    span_i64_of_i16_lemma, span_i64_of_i32_lemma, span_i64_of_i64_lemma,
+};
 #[cfg(creusot)]
 pub(crate) use ranges::{
     span_days_in_jiff_range, span_hours_in_jiff_range, span_microseconds_in_jiff_range,

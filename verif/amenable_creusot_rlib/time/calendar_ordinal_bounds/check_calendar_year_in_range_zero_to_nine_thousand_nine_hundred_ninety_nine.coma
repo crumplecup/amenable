@@ -1,0 +1,25 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 308 8 308 105 *)
+
+let%span scalendar_ordinal_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 309 20 309 27
+let%span scalendar_ordinal_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 306 19 306 23
+let%span scalendar_ordinal_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 307 18 307 107
+let%span scalendar_ordinal_bounds'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 288 24 288 52
+
+use creusot.int.UInt16
+use creusot.prelude.Any
+
+predicate calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 287 8 287 124] (year: UInt16.t) (outcome: bool) =
+  [%#scalendar_ordinal_bounds'2] outcome = UInt16.lt year (10000: UInt16.t)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/calendar_ordinal_bounds.rs" 308 8 308 105]
+  (year: UInt16.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_ret <- UInt16.le year ([%#scalendar_ordinal_bounds] (9999: UInt16.t)) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l () | & year: UInt16.t = year ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine ensures] [%#scalendar_ordinal_bounds'1] calendar_year_in_range_zero_to_nine_thousand_nine_hundred_ninety_nine_holds year result}
+    (! return {result}) ]

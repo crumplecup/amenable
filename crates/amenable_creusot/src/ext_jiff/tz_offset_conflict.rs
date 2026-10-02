@@ -33,11 +33,11 @@ mod mirror {
     pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires};
 }
 #[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
+use crate::ext_jiff::offset::logic::offset_seconds_value;
 #[cfg(creusot)]
-use crate::ext_jiff::tz_ambiguous_timestamp::tz_fixed_seconds_value;
+use crate::ext_jiff::tz_ambiguous_timestamp::logic::tz_fixed_seconds_value;
 #[cfg(creusot)]
-use crate::ext_jiff::tz_ambiguous_zoned::{
+use crate::ext_jiff::tz_ambiguous_zoned::logic::{
     amb_zoned_offset_is_unambiguous_value, amb_zoned_offset_seconds_value,
 };
 #[cfg(creusot)]

@@ -33,76 +33,9 @@
 //! `#[non_exhaustive]` reason `fmt_friendly_fractional_unit.rs`
 //! documents (`TimeZoneAnnotationKind` is `#[non_exhaustive]`).
 
+mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn tza_is_critical_value(_t: &jiff::fmt::temporal::TimeZoneAnnotation<'static>) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn tza_kind_is_named_value(_t: &jiff::fmt::temporal::TimeZoneAnnotation<'static>) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn tza_kind_offset_seconds_value(_t: &jiff::fmt::temporal::TimeZoneAnnotation<'static>) -> i32 {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::fmt::temporal::TimeZoneAnnotation<'static> {
-        #[check(ghost)]
-        #[ensures(result == tza_is_critical_value(&self))]
-        fn is_critical(&self) -> bool;
-
-        #[check(ghost)]
-        #[ensures(match result {
-            jiff::fmt::temporal::TimeZoneAnnotationKind::Named(_) => {
-                tza_kind_is_named_value(&self) == true
-            }
-            jiff::fmt::temporal::TimeZoneAnnotationKind::Offset(o) => {
-                tza_kind_is_named_value(&self) == false
-                    && offset_seconds_value(o) == tza_kind_offset_seconds_value(&self)
-            }
-            _ => true,
-        })]
-        fn kind<'a>(&'a self) -> &'a jiff::fmt::temporal::TimeZoneAnnotationKind<'static>;
-    }
-
-    impl<'n> core::convert::From<&'n str> for jiff::fmt::temporal::TimeZoneAnnotation<'n> {
-        #[check(ghost)]
-        #[ensures(
-            tza_kind_is_named_value(&result) == true
-            && tza_is_critical_value(&result) == false
-        )]
-        fn from(string: &'n str) -> jiff::fmt::temporal::TimeZoneAnnotation<'n>;
-    }
-
-    impl core::convert::From<jiff::tz::Offset> for jiff::fmt::temporal::TimeZoneAnnotation<'static> {
-        #[check(ghost)]
-        #[ensures(
-            tza_kind_is_named_value(&result) == false
-            && tza_kind_offset_seconds_value(&result) == offset_seconds_value(&offset)
-            && tza_is_critical_value(&result) == false
-        )]
-        fn from(offset: jiff::tz::Offset) -> jiff::fmt::temporal::TimeZoneAnnotation<'static>;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, FMT_TEMPORAL_TIME_ZONE_ANNOTATION_FROM_NAME_AND_FROM_OFFSET_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::fmt::temporal::

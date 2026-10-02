@@ -15,45 +15,15 @@
 //! reference the same opaque `offset_seconds_value` axiom instead of
 //! calling each other.
 //!
-//! `offset_seconds_value` is `pub(crate)` at this module's own top
-//! level, not nested in a private `mirror` module: `fmt_temporal_
-//! pieces_numeric_offset.rs` needs to reuse it (its own
-//! `PiecesNumericOffset` extern_specs need to relate to the real
-//! `Offset` a `PiecesNumericOffset` wraps), and Creusot only allows one
-//! `extern_spec!` per real function crate-wide, so `Offset::seconds()`'s
-//! own contract can't be redeclared there. The `pub(crate)`-at-top-level
-//! shape is `civil_date.rs`'s own established fix for the identical
-//! class of problem — see that file's own doc comment.
+//! `offset_seconds_value` lives in the `logic` submodule (self-gated,
+//! `pub(crate)` there, see its own doc comment for the full list of
+//! cross-file reusers) — Creusot only allows one `extern_spec!` per
+//! real function crate-wide, so `Offset::seconds()`'s own contract
+//! can't be redeclared at any of those call sites.
 
+pub(crate) mod logic;
 #[cfg(creusot)]
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn offset_seconds_value(_o: &jiff::tz::Offset) -> i32 {
-    dead
-}
-
-// jiff's own documented valid range for `Offset::from_seconds`
-// (`-25:59:59..=25:59:59`, in seconds) — the same constant the Kani
-// harness for this type independently confirms, restated here as the
-// trusted axiom's own failure-side claim.
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::Offset {
-        #[check(ghost)]
-        #[ensures(match result {
-            Ok(ref offset) => offset_seconds_value(offset) == seconds,
-            Err(_) => seconds < -93_599i32 || seconds > 93_599i32,
-        })]
-        fn from_seconds(seconds: i32) -> Result<jiff::tz::Offset, jiff::Error>;
-
-        #[check(ghost)]
-        #[ensures(result == offset_seconds_value(&self))]
-        fn seconds(self) -> i32;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! {
     creusot, OFFSET_FROM_SECONDS_ROUND_TRIPS_HOLDS_SRC, {

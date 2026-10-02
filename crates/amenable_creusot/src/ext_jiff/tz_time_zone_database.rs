@@ -9,32 +9,9 @@
 //! comment for why `get()`/`bundled()`/etc. are out of scope
 //! (real IANA tzdb data / `jiff::Error` construction).
 
+mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-}
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-fn tzdb_is_definitively_empty_value(_db: &jiff::tz::TimeZoneDatabase) -> bool {
-    dead
-}
-
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::tz::TimeZoneDatabase {
-        #[check(ghost)]
-        #[ensures(tzdb_is_definitively_empty_value(&result) == true)]
-        fn none() -> jiff::tz::TimeZoneDatabase;
-
-        #[check(ghost)]
-        #[ensures(result == tzdb_is_definitively_empty_value(&self))]
-        fn is_definitively_empty(&self) -> bool;
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! { creusot, TZ_TIME_ZONE_DATABASE_NONE_IS_DEFINITIVELY_EMPTY_HOLDS_SRC, {
     /// The `amenable_ext::ExtStandard<jiff::tz::TimeZoneDatabase>`

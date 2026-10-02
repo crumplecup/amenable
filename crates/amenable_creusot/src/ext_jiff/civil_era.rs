@@ -24,66 +24,41 @@
 //! `civil_date.rs`'s own doc comment for the confirmed compiler
 //! error this file's first draft hit).
 //!
-//! `era_discriminant` is a plain `pub fn` at this module's own top
-//! level, not `pub(crate)` and not nested in a private `mirror`
-//! module — a real, MORE STRICT visibility requirement than the
-//! cross-file-reuse fix above (`date_year_value` only needed
-//! `pub(crate)`, confirmed working in the `extern_spec!`'s own
-//! `#[ensures(..)]` below). The stricter requirement is specific to
-//! `#[logic(open)]` helper functions (the ones `harness!` generates
-//! from a `#[logic(open)] fn ... { pearlite! { .. } }` block):
-//! confirmed via two real, DISTINCT compiler errors from two
-//! successive attempts — first "Cannot make ... transparent ... as
-//! it would call a less-visible item" with `era_discriminant` as
-//! `pub(super)` inside `mirror`, THEN THE SAME ERROR AGAIN with it
-//! promoted to `pub(crate)` (not `mirror`-nested) — only a full `pub`
-//! resolved it. `harness!`'s generated `#[logic(open)]` function is
-//! evidently itself fully `pub`, and Creusot's proof-transparency
-//! check requires anything an open/transparent function calls to be
-//! at least as visible as the function itself — `pub(crate)` isn't
-//! enough once the caller is `pub`, even though the SAME `pub(crate)`
-//! accessor is fine when called from an ordinary `extern_spec!`
-//! `#[ensures(..)]` clause instead (as `date_year_value` and
-//! `span_get_years_value`/etc. already are, confirmed by both working
-//! in this exact file and in `span_fieldwise.rs`). This refines this
-//! crate's own `reference_creusot_toolchain_findings` memory's
-//! existing proof-transparency finding, which only documents the
+//! `era_discriminant` and the `era_year` `extern_spec!` live in this
+//! file's own `logic` submodule (self-gated via its own
+//! `#![cfg(creusot)]`, collapsing what was four separately
+//! `#[cfg(creusot)]`-gated items here down to one — cordial's
+//! CFG-SCATTER finding), referenced below by the qualified
+//! `logic::era_discriminant` path rather than a bare-name `use`, to
+//! avoid reintroducing a second gated import. `era_discriminant`
+//! stays a plain `pub fn` there, not `pub(crate)` — a real, MORE
+//! STRICT visibility requirement than the cross-file-reuse case above
+//! (`date_year_value` only needed `pub(crate)`, confirmed working in
+//! the `extern_spec!`'s own `#[ensures(..)]`). The stricter
+//! requirement is specific to `#[logic(open)]` helper functions (the
+//! ones `harness!` generates from a `#[logic(open)] fn ... {
+//! pearlite! { .. } }` block): confirmed via two real, DISTINCT
+//! compiler errors from two successive attempts — first "Cannot make
+//! ... transparent ... as it would call a less-visible item" with
+//! `era_discriminant` as `pub(super)` inside a private `mirror`
+//! module, THEN THE SAME ERROR AGAIN with it promoted to
+//! `pub(crate)` — only a full `pub` resolved it. `harness!`'s
+//! generated `#[logic(open)]` function is evidently itself fully
+//! `pub`, and Creusot's proof-transparency check requires anything an
+//! open/transparent function calls to be at least as visible as the
+//! function itself — `pub(crate)` isn't enough once the caller is
+//! `pub`, even though the SAME `pub(crate)` accessor is fine when
+//! called from an ordinary `extern_spec!` `#[ensures(..)]` clause
+//! instead (as `date_year_value` and `span_get_years_value`/etc.
+//! already are, confirmed by both working in this exact file and in
+//! `span_fieldwise.rs`). This refines this crate's own
+//! `reference_creusot_toolchain_findings` memory's existing
+//! proof-transparency finding, which only documents the
 //! `extern_spec!`-on-public-trait-method case.
 
+mod logic;
 #[cfg(creusot)]
-mod mirror {
-    pub(super) use creusot_std::macros::{check, ensures, extern_spec, requires};
-}
-#[cfg(creusot)]
-use super::civil_date::date_year_value;
-#[cfg(creusot)]
-use creusot_std::macros::{logic, trusted};
-#[cfg(creusot)]
-use mirror::{check, ensures, extern_spec, requires};
-
-#[cfg(creusot)]
-#[trusted]
-#[logic(opaque)]
-pub fn era_discriminant(_e: &jiff::civil::Era) -> i8 {
-    dead
-}
-
-// This crate's own axiom for "which Era variant this is" — 0 for
-// BCE, 1 for CE. Doesn't need to match jiff's real discriminant
-// values (private either way); only needs to be internally
-// consistent within this file's own extern_spec.
-#[cfg(creusot)]
-extern_spec! {
-    impl jiff::civil::Date {
-        #[check(ghost)]
-        #[ensures(if date_year_value(&self) >= 1i16 {
-            result.0 == date_year_value(&self) && era_discriminant(&result.1) == 1i8
-        } else {
-            result.0 == -date_year_value(&self) + 1i16 && era_discriminant(&result.1) == 0i8
-        })]
-        fn era_year(self) -> (i16, jiff::civil::Era);
-    }
-}
+use creusot_std::macros::{ensures, logic, requires};
 
 amenable_derive::harness! {
     creusot, CIVIL_ERA_YEAR_CLASSIFIES_BCE_AND_CE_CORRECTLY_HOLDS_SRC, {
@@ -97,9 +72,9 @@ amenable_derive::harness! {
         ) -> bool {
             pearlite! {
                 if year >= 1i16 {
-                    observed.0 == year && era_discriminant(&observed.1) == 1i8
+                    observed.0 == year && logic::era_discriminant(&observed.1) == 1i8
                 } else {
-                    observed.0 == -year + 1i16 && era_discriminant(&observed.1) == 0i8
+                    observed.0 == -year + 1i16 && logic::era_discriminant(&observed.1) == 0i8
                 }
             }
         }

@@ -1,0 +1,46 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 315 8 315 76 *)
+
+let%span sleap_year_core = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 316 19 316 22
+let%span sleap_year_core'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 316 12 316 22
+let%span sleap_year_core'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 316 26 316 27
+let%span sleap_year_core'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 313 19 313 23
+let%span sleap_year_core'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 314 18 314 78
+let%span sleap_year_core'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 295 24 295 53
+
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.prelude.Any
+use int.ComputerDivision
+
+predicate centennial_year_divisible_by_one_hundred_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 294 8 294 95] (year: Int32.t) (outcome: bool) =
+  [%#sleap_year_core'4] outcome = (ComputerDivision.mod (Int32.to_int year) 100 = 0)
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let check_centennial_year_divisible_by_one_hundred [#"/home/erik/repos/amenable/crates/amenable_creusot/src/time/leap_year_core.rs" 315 8 315 76]
+  (year: Int32.t) (return (x: bool)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_6 <- year ] s1
+    | s1 = [ &_7 <- ([%#sleap_year_core] (100: Int32.t)) = ([%#sleap_year_core'0] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#sleap_year_core'0] not _7} s3
+    | s3 = [ &_8 <- ([%#sleap_year_core] (100: Int32.t)) = ([%#sleap_year_core'0] (-1: Int32.t)) ] s4
+    | s4 = [ &_9 <- _6 = ([%#sleap_year_core'0] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_10 <- Bool.bw_and _8 _9 ] s6
+    | s6 = {[@expl:Rem overflow] [%#sleap_year_core'0] not _10} s7
+    | s7 = Int32.rem [%#sleap_year_core'0] {_6} {[%#sleap_year_core] (100: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_5 <- _x ] s8)
+    | s8 = [ &_ret <- _5 = ([%#sleap_year_core'1] (0: Int32.t)) ] s9
+    | s9 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & year: Int32.t = year
+  | & _5: Int32.t = Any.any_l ()
+  | & _6: Int32.t = Any.any_l ()
+  | & _7: bool = Any.any_l ()
+  | & _8: bool = Any.any_l ()
+  | & _9: bool = Any.any_l ()
+  | & _10: bool = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:check_centennial_year_divisible_by_one_hundred ensures] [%#sleap_year_core'3] centennial_year_divisible_by_one_hundred_holds year result}
+    (! return {result}) ]

@@ -26,9 +26,9 @@ mod mirror {
     pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires};
 }
 #[cfg(creusot)]
-use crate::ext_jiff::fmt_temporal_pieces_numeric_offset::pno_offset_seconds_value;
+use crate::ext_jiff::fmt_temporal_pieces_numeric_offset::logic::pno_offset_seconds_value;
 #[cfg(creusot)]
-use crate::ext_jiff::offset::offset_seconds_value;
+use crate::ext_jiff::offset::logic::offset_seconds_value;
 #[cfg(creusot)]
 use mirror::{check, ensures, extern_spec, logic, requires};
 
