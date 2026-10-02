@@ -61,6 +61,75 @@ where
 {
 }
 
+/// Native `resolve_local_date_time_native`, `attach_named_zone_native`, `confirm_named_zone_revision_native` exchange(s).
+pub trait TemporalNativeZoneFactory<V: Verifier>:
+    Sized
+    + TemporalCivilProps
+    + TemporalInstantProps
+    + TemporalZoneProps
+    + Send
+    + Sync
+    + Exchange<
+        ResolveLocalDateTimeNativeInput<Self>,
+        ResolveLocalDateTimeNativeOutput<Self>,
+        V,
+        Error = TemporalError,
+    > + Exchange<
+        AttachNamedZoneNativeInput<Self>,
+        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
+        V,
+        Error = TemporalError,
+    > + Exchange<
+        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
+        ConfirmNamedZoneRevisionNativeOutput,
+        V,
+        Error = TemporalError,
+    >
+where
+    NamedTimeZoneRevisionBundle: Witness<V>,
+    ResolveLocalDateTimeNativeEstablished: Witness<V>,
+    TemporalInputReceived: Witness<V>,
+    ZonedDateTimeSemanticBundle: Witness<V>,
+{
+}
+
+/// Native `order_offset_endpoints_native` exchange(s).
+pub trait TemporalNativeIntervalFactory<V: Verifier>:
+    Sized
+    + TemporalInstantProps
+    + Send
+    + Sync
+    + Exchange<
+        OrderOffsetEndpointsNativeInput<Self>,
+        OrderOffsetEndpointsNativeOutput,
+        V,
+        Error = TemporalError,
+    >
+where
+    IntervalEndpointOrderingBundle: Witness<V>,
+    TemporalInputReceived: Witness<V>,
+{
+}
+
+/// Native `evaluate_date_time_formula_native` exchange(s).
+pub trait TemporalNativeDateTimeFormulaFactory<V: Verifier>:
+    Sized
+    + TemporalDateTimeFormulaProps
+    + TemporalExplicitTemporalFormProps
+    + Send
+    + Sync
+    + Exchange<
+        ProvenDateTimeFormulaCarrier<Self::DateTimeFormula>,
+        EvaluateDateTimeFormulaNativeOutput<Self>,
+        V,
+        Error = TemporalError,
+    >
+where
+    DateTimeFormulaSemanticBundle: Witness<V>,
+    EvaluateDateTimeFormulaNativeEstablished: Witness<V>,
+{
+}
+
 impl<B, V> TemporalNativeConversionFactory<V> for B
 where
     V: Verifier,
@@ -98,38 +167,6 @@ where
 {
 }
 
-/// Native `resolve_local_date_time_native`, `attach_named_zone_native`, `confirm_named_zone_revision_native` exchange(s).
-pub trait TemporalNativeZoneFactory<V: Verifier>:
-    Sized
-    + TemporalCivilProps
-    + TemporalInstantProps
-    + TemporalZoneProps
-    + Send
-    + Sync
-    + Exchange<
-        ResolveLocalDateTimeNativeInput<Self>,
-        ResolveLocalDateTimeNativeOutput<Self>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        AttachNamedZoneNativeInput<Self>,
-        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
-        V,
-        Error = TemporalError,
-    > + Exchange<
-        ProvenZonedDateTimeCarrier<Self::ZonedDateTime>,
-        ConfirmNamedZoneRevisionNativeOutput,
-        V,
-        Error = TemporalError,
-    >
-where
-    NamedTimeZoneRevisionBundle: Witness<V>,
-    ResolveLocalDateTimeNativeEstablished: Witness<V>,
-    TemporalInputReceived: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-
 impl<B, V> TemporalNativeZoneFactory<V> for B
 where
     V: Verifier,
@@ -161,24 +198,6 @@ where
 {
 }
 
-/// Native `order_offset_endpoints_native` exchange(s).
-pub trait TemporalNativeIntervalFactory<V: Verifier>:
-    Sized
-    + TemporalInstantProps
-    + Send
-    + Sync
-    + Exchange<
-        OrderOffsetEndpointsNativeInput<Self>,
-        OrderOffsetEndpointsNativeOutput,
-        V,
-        Error = TemporalError,
-    >
-where
-    IntervalEndpointOrderingBundle: Witness<V>,
-    TemporalInputReceived: Witness<V>,
-{
-}
-
 impl<B, V> TemporalNativeIntervalFactory<V> for B
 where
     V: Verifier,
@@ -193,25 +212,6 @@ where
         >,
     IntervalEndpointOrderingBundle: Witness<V>,
     TemporalInputReceived: Witness<V>,
-{
-}
-
-/// Native `evaluate_date_time_formula_native` exchange(s).
-pub trait TemporalNativeDateTimeFormulaFactory<V: Verifier>:
-    Sized
-    + TemporalDateTimeFormulaProps
-    + TemporalExplicitTemporalFormProps
-    + Send
-    + Sync
-    + Exchange<
-        ProvenDateTimeFormulaCarrier<Self::DateTimeFormula>,
-        EvaluateDateTimeFormulaNativeOutput<Self>,
-        V,
-        Error = TemporalError,
-    >
-where
-    DateTimeFormulaSemanticBundle: Witness<V>,
-    EvaluateDateTimeFormulaNativeEstablished: Witness<V>,
 {
 }
 

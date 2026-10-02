@@ -42,27 +42,6 @@ where
 {
 }
 
-impl<B, V> TemporalCivilNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalCivilProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedLocalDateTime,
-            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
-            ReflectedLocalDateTime,
-            V,
-            Error = TemporalError,
-        >,
-    LocalDateTimeSemanticBundle: Witness<V>,
-{
-}
-
 /// Realize and reflect native `offset_date_time` carriers.
 pub trait TemporalInstantNativeBridge<V: Verifier>:
     TemporalInstantProps
@@ -80,27 +59,6 @@ pub trait TemporalInstantNativeBridge<V: Verifier>:
         Error = TemporalError,
     >
 where
-    OffsetDateTimeSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalInstantNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalInstantProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedOffsetDateTime,
-            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
-            ReflectedOffsetDateTime,
-            V,
-            Error = TemporalError,
-        >,
     OffsetDateTimeSemanticBundle: Witness<V>,
 {
 }
@@ -138,6 +96,59 @@ where
 {
 }
 
+/// Aggregate native bridge: TemporalCivilNativeBridge, TemporalInstantNativeBridge, TemporalZoneNativeBridge.
+pub trait TemporalNativeBridge<V: Verifier>:
+    TemporalCivilNativeBridge<V> + TemporalInstantNativeBridge<V> + TemporalZoneNativeBridge<V>
+where
+    LocalDateTimeSemanticBundle: Witness<V>,
+    OffsetDateTimeSemanticBundle: Witness<V>,
+    NamedTimeZoneSemanticBundle: Witness<V>,
+    ZonedDateTimeSemanticBundle: Witness<V>,
+{
+}
+
+impl<B, V> TemporalCivilNativeBridge<V> for B
+where
+    V: Verifier,
+    B: TemporalCivilProps
+        + Send
+        + Sync
+        + Exchange<
+            ReflectedLocalDateTime,
+            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
+            V,
+            Error = TemporalError,
+        > + Exchange<
+            ProvenLocalDateTimeCarrier<B::LocalDateTime>,
+            ReflectedLocalDateTime,
+            V,
+            Error = TemporalError,
+        >,
+    LocalDateTimeSemanticBundle: Witness<V>,
+{
+}
+
+impl<B, V> TemporalInstantNativeBridge<V> for B
+where
+    V: Verifier,
+    B: TemporalInstantProps
+        + Send
+        + Sync
+        + Exchange<
+            ReflectedOffsetDateTime,
+            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
+            V,
+            Error = TemporalError,
+        > + Exchange<
+            ProvenOffsetDateTimeCarrier<B::OffsetDateTime>,
+            ReflectedOffsetDateTime,
+            V,
+            Error = TemporalError,
+        >,
+    OffsetDateTimeSemanticBundle: Witness<V>,
+{
+}
+
 impl<B, V> TemporalZoneNativeBridge<V> for B
 where
     V: Verifier,
@@ -166,16 +177,6 @@ where
             V,
             Error = TemporalError,
         >,
-    NamedTimeZoneSemanticBundle: Witness<V>,
-    ZonedDateTimeSemanticBundle: Witness<V>,
-{
-}
-/// Aggregate native bridge: TemporalCivilNativeBridge, TemporalInstantNativeBridge, TemporalZoneNativeBridge.
-pub trait TemporalNativeBridge<V: Verifier>:
-    TemporalCivilNativeBridge<V> + TemporalInstantNativeBridge<V> + TemporalZoneNativeBridge<V>
-where
-    LocalDateTimeSemanticBundle: Witness<V>,
-    OffsetDateTimeSemanticBundle: Witness<V>,
     NamedTimeZoneSemanticBundle: Witness<V>,
     ZonedDateTimeSemanticBundle: Witness<V>,
 {

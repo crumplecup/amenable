@@ -32,18 +32,6 @@ where
 {
 }
 
-impl<B, V> TemporalDurationNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalDurationProps
-        + Send
-        + Sync
-        + Exchange<ReflectedDuration, ProvenDurationCarrier<B::Duration>, V, Error = TemporalError>
-        + Exchange<ProvenDurationCarrier<B::Duration>, ReflectedDuration, V, Error = TemporalError>,
-    DurationSemanticBundle: Witness<V>,
-{
-}
-
 /// Realize and reflect native `time_interval` carriers.
 pub trait TemporalTimeIntervalNativeBridge<V: Verifier>:
     TemporalTimeIntervalProps
@@ -61,27 +49,6 @@ pub trait TemporalTimeIntervalNativeBridge<V: Verifier>:
         Error = TemporalError,
     >
 where
-    TimeIntervalSemanticBundle: Witness<V>,
-{
-}
-
-impl<B, V> TemporalTimeIntervalNativeBridge<V> for B
-where
-    V: Verifier,
-    B: TemporalTimeIntervalProps
-        + Send
-        + Sync
-        + Exchange<
-            ReflectedTimeInterval,
-            ProvenTimeIntervalCarrier<B::TimeInterval>,
-            V,
-            Error = TemporalError,
-        > + Exchange<
-            ProvenTimeIntervalCarrier<B::TimeInterval>,
-            ReflectedTimeInterval,
-            V,
-            Error = TemporalError,
-        >,
     TimeIntervalSemanticBundle: Witness<V>,
 {
 }
@@ -107,6 +74,51 @@ where
 {
 }
 
+/// Aggregate native bridge: TemporalDurationNativeBridge, TemporalTimeIntervalNativeBridge, TemporalRecurringIntervalNativeBridge.
+pub trait TemporalNativeSpanBridge<V: Verifier>:
+    TemporalDurationNativeBridge<V>
+    + TemporalTimeIntervalNativeBridge<V>
+    + TemporalRecurringIntervalNativeBridge<V>
+where
+    DurationSemanticBundle: Witness<V>,
+    TimeIntervalSemanticBundle: Witness<V>,
+    RecurringIntervalSemanticBundle: Witness<V>,
+{
+}
+
+impl<B, V> TemporalDurationNativeBridge<V> for B
+where
+    V: Verifier,
+    B: TemporalDurationProps
+        + Send
+        + Sync
+        + Exchange<ReflectedDuration, ProvenDurationCarrier<B::Duration>, V, Error = TemporalError>
+        + Exchange<ProvenDurationCarrier<B::Duration>, ReflectedDuration, V, Error = TemporalError>,
+    DurationSemanticBundle: Witness<V>,
+{
+}
+
+impl<B, V> TemporalTimeIntervalNativeBridge<V> for B
+where
+    V: Verifier,
+    B: TemporalTimeIntervalProps
+        + Send
+        + Sync
+        + Exchange<
+            ReflectedTimeInterval,
+            ProvenTimeIntervalCarrier<B::TimeInterval>,
+            V,
+            Error = TemporalError,
+        > + Exchange<
+            ProvenTimeIntervalCarrier<B::TimeInterval>,
+            ReflectedTimeInterval,
+            V,
+            Error = TemporalError,
+        >,
+    TimeIntervalSemanticBundle: Witness<V>,
+{
+}
+
 impl<B, V> TemporalRecurringIntervalNativeBridge<V> for B
 where
     V: Verifier,
@@ -124,18 +136,6 @@ where
             V,
             Error = TemporalError,
         >,
-    RecurringIntervalSemanticBundle: Witness<V>,
-{
-}
-
-/// Aggregate native bridge: TemporalDurationNativeBridge, TemporalTimeIntervalNativeBridge, TemporalRecurringIntervalNativeBridge.
-pub trait TemporalNativeSpanBridge<V: Verifier>:
-    TemporalDurationNativeBridge<V>
-    + TemporalTimeIntervalNativeBridge<V>
-    + TemporalRecurringIntervalNativeBridge<V>
-where
-    DurationSemanticBundle: Witness<V>,
-    TimeIntervalSemanticBundle: Witness<V>,
     RecurringIntervalSemanticBundle: Witness<V>,
 {
 }
