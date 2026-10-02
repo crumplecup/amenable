@@ -4,9 +4,10 @@ use amenable_core::{Metadata, Witness};
 use amenable_derive::{
     Provenance as ProvenanceDerive, Standard as StandardDerive, Witness as WitnessDerive,
 };
+use support::shared::{FixtureVerifier, WitnessLeaf};
 use support::{
-    DeriveFixtureKind, FixtureCase, FixtureVerifier, WitnessLeaf, expected_keys, expected_report,
-    expected_values, for_each_fixture_type,
+    DeriveFixtureKind, FixtureCase, expected_keys, expected_report, expected_values,
+    for_each_fixture_type,
 };
 
 fn assert_witness_fixture<F>() -> miette::Result<()>
