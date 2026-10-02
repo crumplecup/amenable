@@ -4,7 +4,7 @@ use super::super::catalog;
 use super::super::cli::{AssessmentListArgs, AssessmentQueueArgs, VerificationFailuresArgs};
 use super::super::record::{self, ProofAssessment};
 use super::super::vocabulary::{Recommendation, ResolutionPath, Rubric};
-use super::{format_timestamp, print_json, start_of_utc_date_timestamp};
+use super::shared::{format_timestamp, print_json, start_of_utc_date_timestamp};
 use crate::kani::{self, ProofStatus};
 use crate::{AmenableResult, write_stderr_line, write_stdout_line};
 use serde::Serialize;

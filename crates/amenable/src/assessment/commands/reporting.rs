@@ -5,7 +5,7 @@ use super::super::cli::{AssessmentReportArgs, AssessmentSummaryArgs};
 use super::super::record::{self, ProofAssessment};
 use super::super::vocabulary::{Recommendation, ResolutionPath, SummaryDimension};
 use super::queries::filtered_assessments;
-use super::{print_json, start_of_utc_date_timestamp};
+use super::shared::{print_json, start_of_utc_date_timestamp};
 use crate::{AmenableError, AmenableResult, write_stdout_line};
 use clap::ValueEnum;
 use serde::Serialize;
