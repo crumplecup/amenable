@@ -1,0 +1,9 @@
+[
+  {
+    "file": "src/jiff/mod.rs",
+    "line": 1,
+    "rule_id": "MODULARITY-LOPSIDED",
+    "context": "jiff",
+    "reason": "jiff holds 98% of amenable_ext's sibling mass (6938 vs ext_type 160) because amenable_ext is deliberately one-module-per-target-crate (jiff is the first; see the crate's own doc comment), and adopting a crate here commits to covering its entire public type surface -- jiff's backend alone is already split across ~35 real-domain files, none over the file-size threshold, so there is no split here that improves readability rather than just relocating lines. ext_type/macros/provenance_vocab are deliberately narrow shared plumbing, not a coverage library, so they can't grow to rebalance the ratio. Temporary scope: this imbalance will ease (and the exception can be deleted) once a second target crate (e.g. chrono) lands alongside jiff, the same way amenable_verus's own rust_std/jiff ratio is expected to shift over time."
+  }
+]

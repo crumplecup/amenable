@@ -1,21 +1,8 @@
 [
   {
-    "file": "src/rust_std/mod.rs",
-    "line": 1,
+    "file": "src/jiff/fmt_strtime_broken_down_time/mod.rs",
     "rule_id": "MODULARITY-LOPSIDED",
-    "context": "rust_std",
-    "reason": "rust_std holds 80% of amenable_verus's sibling mass (11364 vs gallery 2394 + exchange_support 374) because it's the crate's one-file-per-std-carrier proof library covering 12 thematic subdirectories, matching elicitation_verus/amenable_kani::rust_std's own granularity -- already split to its practical floor (one file per carrier, one mod.rs per family, confirmed via the crate's own modularity findings: every rust_std leaf file scores far below the file-size threshold). gallery/exchange_support are deliberately narrow by design (single-investigation-case and shared-infrastructure modules, not std-coverage libraries), so they can't grow to rebalance the ratio, and rust_std can't shrink without dropping real std-type coverage. The LOPSIDED signal compares subtree totals, not packing quality -- there is no split/extract action here that reduces total content, only one that would relocate it."
-  },
-  {
-    "file": "src/ext/jiff/mod.rs",
-    "rule_id": "MODULARITY-COLLAPSE",
-    "context": "ext::jiff",
-    "reason": "ext is deliberately one-module-per-target-crate (jiff now, chrono etc. later per amenable_verus::ext's own doc comment); collapsing the unary jiff child now would fight that design. Temporary: goes away once a second target crate lands."
-  },
-  {
-    "file": "src/ext/jiff/fmt_strtime_broken_down_time/mod.rs",
-    "rule_id": "MODULARITY-LOPSIDED",
-    "context": "ext::jiff::fmt_strtime_broken_down_time",
-    "reason": "fmt_strtime_broken_down_time holds 79% of its sibling pair's mass (637 vs span 166) because it's the crate's only real &mut self setter model, 12 numeric fields each needing a range predicate + post-state predicate + setter method -- already split to its practical floor (mod.rs/predicates.rs/setters.rs). span's simpler structure can't grow to rebalance the ratio, and fmt_strtime_broken_down_time can't shrink without dropping real setter coverage. Same reasoning as amenable_verus's existing rust_std MODULARITY-LOPSIDED exception: the signal compares subtree totals, not packing quality."
+    "context": "jiff::fmt_strtime_broken_down_time",
+    "reason": "fmt_strtime_broken_down_time holds 80% of its sibling pair's mass (651 vs span 166) because it's the crate's only real &mut self setter model, 12 numeric fields each needing a range predicate + post-state predicate + setter method -- already split to its practical floor (mod.rs/predicates.rs/setters.rs). span's simpler structure can't grow to rebalance the ratio, and fmt_strtime_broken_down_time can't shrink without dropping real setter coverage. The LOPSIDED signal compares subtree totals, not packing quality -- there is no split/extract action here that reduces total content, only one that would relocate it. Temporary scope: this ratio will ease as more target crates land alongside jiff under this module (jiff is deliberately the first of several, per the crate's own doc comment); re-check once a second target crate exists. (Context/file corrected here: the original entry targeted the old ext::jiff:: path, which went stale and silently stopped matching once the ext wrapper directory was dropped.)"
   }
 ]
