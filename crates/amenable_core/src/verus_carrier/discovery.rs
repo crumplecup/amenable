@@ -95,7 +95,8 @@ pub fn find_fn(name: &str) -> Option<(PathBuf, String, verus_syn::ItemFn)> {
                 // walk is broken -- in which case there's no lawful module
                 // path to report, so keep searching rather than trust an
                 // unreachable branch never to fire.
-                let Ok(module_path) = super::module_path_for(&root, &path, name) else {
+                let Ok(module_path) = super::module_path::module_path_for(&root, &path, name)
+                else {
                     continue;
                 };
                 return Some((path, module_path, item_fn));
