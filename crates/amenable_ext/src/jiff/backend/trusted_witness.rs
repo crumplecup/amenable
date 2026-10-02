@@ -1,4 +1,4 @@
-use super::types::JiffVerifier;
+use crate::JiffVerifier;
 use amenable_core::{ClassifiedWitness, Standard, Witness, WitnessSupportSummary};
 use amenable_time::TemporalProvenance;
 

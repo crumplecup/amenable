@@ -1,4 +1,4 @@
-use super::types::JiffTimeBackend;
+use crate::JiffTimeBackend;
 use amenable_time::{SerializationProfile, TemporalReporter};
 
 // ── Reporter (Phase 6) ───────────────────────────────────────────────

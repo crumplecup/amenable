@@ -1,15 +1,14 @@
-use super::types::{JiffDateTime, JiffTimeBackend, JiffVerifier};
 use crate::jiff::backend::duration::fractional_seconds_digits_to_nanos;
 use crate::jiff::backend::duration::nanos_to_fractional_seconds_digits;
+use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
     CalendarDateDescriptor, CompleteDateDescriptor, FractionalSecondDescriptor,
     InvalidDescriptorSource, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
     LocalTimeDescriptorBuilder, OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder,
-    ProvenLocalDateTimeCarrier, ProvenOffsetDateTimeCarrier, ReflectedLocalDateTime,
-    ReflectedOffsetDateTime, TemporalError, TemporalErrorKind, TemporalInstantProps,
-    UnsupportedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetRelationship,
-    UtcOffsetSign,
+    ProvenOffsetDateTimeCarrier, ReflectedOffsetDateTime, TemporalError, TemporalErrorKind,
+    TemporalInstantProps, UnsupportedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
+    UtcOffsetRelationship, UtcOffsetSign,
 };
 
 // ── Phase 2: Instant ─────────────────────────────────────────────────
@@ -428,49 +427,5 @@ impl
                 &input,
             );
         Ok(ReflectedOffsetDateTime::new(descriptor, token))
-    }
-}
-
-// ── Civil native bridge ──────────────────────────────────────────────
-//
-// `TemporalCivilNativeBridge<JiffVerifier>` is the `realize_local_date_
-// time` / `reflect_local_date_time` inverse pair. Both are real, and
-// both now cover all three complete-date forms (calendar, ordinal,
-// week) via `complete_date_descriptor_to_jiff_date` above — a genuine
-// widening of Phase 2's own calendar-only scope, not a duplicate of it.
-
-impl Exchange<ReflectedLocalDateTime, ProvenLocalDateTimeCarrier<JiffDateTime>, JiffVerifier>
-    for JiffTimeBackend
-{
-    type Error = TemporalError;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
-    fn exchange(
-        &self,
-        input: ReflectedLocalDateTime,
-    ) -> Result<ProvenLocalDateTimeCarrier<JiffDateTime>, TemporalError> {
-        let datetime = local_date_time_descriptor_to_jiff_civil_datetime(input.descriptor())?;
-        let token = <ReflectedLocalDateTime as Sidecar<JiffVerifier>>::sidecar(&input);
-        Ok(ProvenLocalDateTimeCarrier::<JiffDateTime>::new(
-            JiffDateTime::new(datetime),
-            token,
-        ))
-    }
-}
-
-impl Exchange<ProvenLocalDateTimeCarrier<JiffDateTime>, ReflectedLocalDateTime, JiffVerifier>
-    for JiffTimeBackend
-{
-    type Error = TemporalError;
-
-    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
-    fn exchange(
-        &self,
-        input: ProvenLocalDateTimeCarrier<JiffDateTime>,
-    ) -> Result<ReflectedLocalDateTime, TemporalError> {
-        let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(**input.carrier())?;
-        let token =
-            <ProvenLocalDateTimeCarrier<JiffDateTime> as Sidecar<JiffVerifier>>::sidecar(&input);
-        Ok(ReflectedLocalDateTime::new(descriptor, token))
     }
 }

@@ -2,8 +2,8 @@ use super::instant::{
     JiffOffsetDateTime, jiff_parts_to_offset_date_time_descriptor,
     offset_date_time_descriptor_to_jiff_parts,
 };
-use super::types::{JiffTimeBackend, JiffVerifier, JiffZoned};
 use super::zone_conversions::zoned_date_time_descriptor_to_jiff_zoned;
+use crate::{JiffTimeBackend, JiffVerifier, JiffZoned};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyInput,

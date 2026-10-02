@@ -1,10 +1,34 @@
-use super::types::{JiffSpan, JiffTimeBackend, JiffVerifier};
+use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
     DurationDescriptor, DurationDescriptorBuilder, DurationFractionDescriptor,
     InvalidDescriptorSource, ProvenDurationCarrier, ReflectedDuration, TemporalComponent,
-    TemporalError, TemporalErrorKind, UnsupportedSource,
+    TemporalDurationProps, TemporalError, TemporalErrorKind, UnsupportedSource,
 };
+
+// ── Native carrier ───────────────────────────────────────────────────
+
+/// A [`jiff::Span`] as a temporal duration carrier.
+///
+/// `jiff::Span` derives only `Clone, Copy, Default` (a manual, non-derived
+/// `Debug` impl, and deliberately no `PartialEq`/`Eq`/`Hash` — confirmed
+/// by reading jiff's real source; see `amenable_ext::jiff`'s own
+/// `SpanFieldwise` witness for why equal-elapsed spans can legitimately
+/// compare unequal fieldwise). This wrapper mirrors that: no
+/// `PartialEq`/`Eq`/`Hash` derive here either, and comparisons in tests
+/// go through `jiff::Span`'s own getters, not `==` on the whole carrier.
+#[derive(
+    Debug, Clone, Copy, Default, amenable_derive::Evidence, derive_more::Deref, derive_new::new,
+)]
+#[evidence(basis = "Self")]
+pub struct JiffSpan(
+    /// The wrapped span.
+    jiff::Span,
+);
+
+impl TemporalDurationProps for JiffTimeBackend {
+    type Duration = JiffSpan;
+}
 
 // ── Real conversions to/from `jiff::Span` ───────────────────────────
 

@@ -5,7 +5,7 @@ use super::formatter_helpers::{
     format_reduced_calendar_date, format_reduced_local_time, format_time_interval_representation,
     format_utc_offset, format_week_date, format_zoned_date_time, unsupported_format,
 };
-use super::types::{JiffTimeBackend, JiffVerifier};
+use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
     CalendarDateBasicFormatted, CalendarDateExtendedFormatted, DurationFormatted,

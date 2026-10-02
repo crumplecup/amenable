@@ -1,8 +1,4 @@
 use super::instant::JiffOffsetDateTime;
-use super::types::{
-    JiffRecurringInterval, JiffTimeBackend, JiffTimeInterval, JiffTimeIntervalEndpoint,
-    JiffTimeIntervalRepresentation, JiffVerifier,
-};
 use crate::jiff::backend::duration::duration_descriptor_to_jiff_span;
 use crate::jiff::backend::duration::jiff_span_to_duration_descriptor;
 use crate::jiff::backend::instant::complete_date_descriptor_to_jiff_date;
@@ -12,6 +8,7 @@ use crate::jiff::backend::instant::local_date_time_descriptor_to_jiff_civil_date
 use crate::jiff::backend::instant::offset_date_time_descriptor_to_jiff_parts;
 use crate::jiff::backend::zone_conversions::jiff_zoned_to_zoned_date_time_descriptor;
 use crate::jiff::backend::zone_conversions::zoned_date_time_descriptor_to_jiff_zoned;
+use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
     CalendarDateDescriptor, CompleteDateDescriptor, IntervalEndpointOrderingBundle,
@@ -20,9 +17,124 @@ use amenable_time::{
     ProvenRecurringIntervalCarrier, ProvenTimeIntervalCarrier,
     QualifiedOrBareTemporalValueDescriptor, RecurringIntervalDescriptorBuilder,
     ReflectedRecurringInterval, ReflectedTimeInterval, TemporalError, TemporalErrorKind,
-    TemporalInputToken, TemporalValueDescriptor, TimeIntervalDescriptor, TimeIntervalEndpoint,
+    TemporalInputToken, TemporalRecurringIntervalProps, TemporalTimeIntervalProps,
+    TemporalValueDescriptor, TimeIntervalDescriptor, TimeIntervalEndpoint,
     TimeIntervalRepresentation, UnsupportedSource,
 };
+
+// ── Time interval / recurring interval carriers (Phase 8) ───────────
+//
+// `TimeIntervalEndpoint::Value` wraps `QualifiedOrBareTemporalValueDescriptor`,
+// itself wrapping `TemporalValueDescriptor` -- a broad enum spanning
+// every temporal form in the whole accord. This backend honestly backs
+// the real, jiff-representable forms this session already built native
+// carriers for (calendar/ordinal/week dates fold to one `jiff::civil::
+// Date` variant, per Phase 3's own precision-not-preserved-on-reflect
+// convention; local/offset/zoned date-times keep their own distinct
+// jiff type) and rejects every other form -- the CalConnect/ISO 8601-2
+// extension family (`ReducedCalendarDate`/`Decade`/`Century`/
+// `ExtendedYear`/`DateWithShift`/`TimeOfDayWithShift`/`SubYearGrouping`/
+// `Seasonal`/`Unspecified`, plus any explicitly `Qualified` value) --
+// with a real, honest `Unsupported`, not a silent default.
+
+/// A real jiff-backed time-interval boundary.
+#[derive(Debug, Clone, Default, amenable_derive::Evidence)]
+#[evidence(basis = "Self")]
+pub enum JiffTimeIntervalEndpoint {
+    /// An explicit open boundary.
+    #[default]
+    Open,
+    /// An explicit unknown boundary.
+    Unknown,
+    /// A calendar date (also backs the ordinal- and week-date forms,
+    /// which canonicalize to this same jiff type on realize).
+    CalendarDate(jiff::civil::Date),
+    /// A local date-time.
+    LocalDateTime(jiff::civil::DateTime),
+    /// An offset date-time.
+    OffsetDateTime(JiffOffsetDateTime),
+    /// A zoned date-time.
+    ZonedDateTime(jiff::Zoned),
+}
+
+/// The top-level real jiff-backed interval representation form.
+#[derive(Debug, Clone)]
+pub enum JiffTimeIntervalRepresentation {
+    /// Concrete start and end boundaries.
+    StartEnd {
+        /// Interval start boundary.
+        start: JiffTimeIntervalEndpoint,
+        /// Interval end boundary.
+        end: JiffTimeIntervalEndpoint,
+    },
+    /// Concrete start boundary and a duration.
+    StartDuration {
+        /// Interval start boundary.
+        start: JiffTimeIntervalEndpoint,
+        /// Interval duration.
+        duration: jiff::Span,
+    },
+    /// Duration followed by a concrete end boundary.
+    DurationEnd {
+        /// Interval duration.
+        duration: jiff::Span,
+        /// Interval end boundary.
+        end: JiffTimeIntervalEndpoint,
+    },
+}
+
+impl Default for JiffTimeIntervalRepresentation {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self::StartEnd {
+            start: JiffTimeIntervalEndpoint::default(),
+            end: JiffTimeIntervalEndpoint::default(),
+        }
+    }
+}
+
+/// A real jiff-backed time-interval carrier.
+#[derive(Debug, Clone, amenable_derive::Evidence, derive_more::Deref, derive_new::new)]
+#[evidence(basis = "Self")]
+pub struct JiffTimeInterval(
+    /// The wrapped representation.
+    JiffTimeIntervalRepresentation,
+);
+
+impl Default for JiffTimeInterval {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self(JiffTimeIntervalRepresentation::default())
+    }
+}
+
+/// A real jiff-backed recurring-interval carrier.
+#[derive(Debug, Clone, amenable_derive::Evidence, derive_getters::Getters, derive_new::new)]
+#[evidence(basis = "Self")]
+pub struct JiffRecurringInterval {
+    /// Bounded repetition count; `None` denotes unbounded recurrence.
+    repetitions: Option<u32>,
+    /// Repeated interval payload.
+    interval: JiffTimeInterval,
+}
+
+impl Default for JiffRecurringInterval {
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn default() -> Self {
+        Self {
+            repetitions: None,
+            interval: JiffTimeInterval::default(),
+        }
+    }
+}
+
+impl TemporalTimeIntervalProps for JiffTimeBackend {
+    type TimeInterval = JiffTimeInterval;
+}
+
+impl TemporalRecurringIntervalProps for JiffTimeBackend {
+    type RecurringInterval = JiffRecurringInterval;
+}
 
 /// Decompose a real `jiff::civil::Date` into a calendar date
 /// descriptor. No existing helper covers this direction alone: every

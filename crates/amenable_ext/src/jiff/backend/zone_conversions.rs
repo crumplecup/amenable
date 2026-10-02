@@ -1,7 +1,7 @@
-use super::types::{JiffTimeBackend, JiffTimeZone, JiffVerifier, JiffZoned};
 use crate::jiff::backend::instant::jiff_parts_to_offset_date_time_descriptor;
 use crate::jiff::backend::instant::offset_date_time_descriptor_to_jiff_parts;
 use crate::jiff::backend::zone_factory::offset_is_consistent_with_named_zone;
+use crate::{JiffTimeBackend, JiffTimeZone, JiffVerifier, JiffZoned};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
     InvalidDescriptorSource, NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder,

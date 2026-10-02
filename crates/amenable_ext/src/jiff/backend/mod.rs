@@ -14,21 +14,25 @@
 //! `docs/AMENABLE_TIME_JIFF_BACKEND_PLAN.md` for the full ~129-edge
 //! surface map and the phased checklist this module works through.
 //!
-//! Split one file per phase (plus `types`, holding every real local
-//! carrier type the phases below build on, and `trusted_witness`, the
-//! one machine-checkable structural contract):
+//! Split one file per phase (plus `identity`, the backend struct and
+//! verifier marker every phase's `Exchange` impls target, and
+//! `trusted_witness`, the one machine-checkable structural contract):
 //!
 //! **Phase 1** (`duration`): `TemporalDurationProps` +
-//! `TemporalDurationNativeBridge` over `jiff::Span`. **Phase 2**
-//! (`instant`): `TemporalInstantProps` + `TemporalInstantNativeBridge`
-//! over `jiff::Timestamp`/`jiff::tz::Offset`/a small `JiffOffsetDateTime`
+//! `TemporalDurationNativeBridge` over `jiff::Span` — also defines that
+//! one type directly, alongside its own bridge. **Phase 2** (`instant`):
+//! `TemporalInstantProps` + `TemporalInstantNativeBridge` over
+//! `jiff::Timestamp`/`jiff::tz::Offset`/a small `JiffOffsetDateTime`
 //! composite — also defines those three types directly, alongside its
-//! own bridge. **Phase 3** (`types`): `TemporalCivilProps` +
+//! own bridge, and its own shared civil/offset conversion helpers reused
+//! by every later phase. **Phase 3** (`civil`): `TemporalCivilProps` +
 //! `TemporalCivilNativeBridge` over
 //! `jiff::civil::{Date,Time,DateTime,ISOWeekDate}` — widens Phase 2's
 //! own calendar-date-only `LocalDateTime` realize/reflect to real
-//! ordinal- and week-date support too. **Phase 4** (`zone_conversions`):
-//! `TemporalZoneProps` plus `TemporalZoneNativeBridge` over
+//! ordinal- and week-date support too; also defines its own carrier
+//! types directly, alongside its own bridge. **Phase 4** (`zone`/
+//! `zone_conversions`): `TemporalZoneProps` (carrier types in `zone`)
+//! plus `TemporalZoneNativeBridge` (in `zone_conversions`) over
 //! `jiff::tz::TimeZone`/`jiff::Zoned`, real IANA tzdb lookups and
 //! zoned-instant construction, the biggest genuine capability jump over
 //! the `std::time` canary, which can't touch named zones at all.
@@ -48,7 +52,7 @@
 //! `order_offset_endpoints` arithmetic; the two full interval-text-parse
 //! edges are an honest `Unsupported` for now, since they need
 //! `TemporalParser` (Phase 9), not yet built. **Phase 8**
-//! (`time_interval`, with its own carrier types in `types`):
+//! (`time_interval`, also defining its own carrier types directly):
 //! `TemporalTimeIntervalProps` + `TemporalRecurringIntervalProps` plus
 //! their `NativeBridge`s, and `TemporalNativeIntervalFactory`'s own
 //! `order_offset_endpoints_native` edge — real for every
@@ -71,10 +75,12 @@
 //! doc's checklist lands in later commits, each widening this same
 //! `JiffTimeBackend` struct with its own real `Exchange` impls.
 
+mod civil;
 mod conversion;
 mod duration;
 mod formatter_exchanges;
 mod formatter_helpers;
+mod identity;
 mod instant;
 mod interval;
 mod parser_exchanges;
@@ -82,14 +88,19 @@ mod parser_helpers;
 mod reporter;
 mod time_interval;
 mod trusted_witness;
-mod types;
+mod zone;
 mod zone_conversions;
 mod zone_factory;
 
-pub use instant::{JiffOffset, JiffOffsetDateTime, JiffTimestamp};
-pub use types::{
-    JiffDate, JiffDateTime, JiffISOWeekDate, JiffRecurringInterval, JiffReducedCalendarDate,
-    JiffReducedLocalTime, JiffSpan, JiffTime, JiffTimeBackend, JiffTimeInterval,
-    JiffTimeIntervalEndpoint, JiffTimeIntervalRepresentation, JiffTimeZone, JiffVerifier,
-    JiffVerifierMetadata, JiffZoned,
+pub use civil::{
+    JiffDate, JiffDateTime, JiffISOWeekDate, JiffReducedCalendarDate, JiffReducedLocalTime,
+    JiffTime,
 };
+pub use duration::JiffSpan;
+pub use identity::{JiffTimeBackend, JiffVerifier, JiffVerifierMetadata};
+pub use instant::{JiffOffset, JiffOffsetDateTime, JiffTimestamp};
+pub use time_interval::{
+    JiffRecurringInterval, JiffTimeInterval, JiffTimeIntervalEndpoint,
+    JiffTimeIntervalRepresentation,
+};
+pub use zone::{JiffTimeZone, JiffZoned};

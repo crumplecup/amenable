@@ -1,6 +1,6 @@
-use super::types::{JiffTimeBackend, JiffVerifier};
 use crate::jiff::backend::duration::jiff_span_to_duration_descriptor;
 use crate::jiff::backend::instant::offset_date_time_descriptor_to_jiff_parts;
+use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
     DurationFormValid, InvalidDescriptorSource, OrderOffsetEndpointsEstablished,
