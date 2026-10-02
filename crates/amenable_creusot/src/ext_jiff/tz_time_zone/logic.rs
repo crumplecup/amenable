@@ -13,9 +13,10 @@
 //! `unknown`/`is_unknown`/`to_fixed_offset`, the first real
 //! TimeZone-only claims not already covered by a sibling file's own
 //! `AmbiguousTimestamp`/`AmbiguousZoned`/`OffsetConflict` proof.
-//! `tz_is_unknown_value` is `pub(crate)` so `tz_ambiguous_timestamp.
-//! rs`'s own `fixed` extern_spec can extend its ensures with an extra
-//! conjunct (`fixed`-constructed values are never unknown) instead of
+//! `tz_is_unknown_value` itself now lives in `ext_jiff::shared_
+//! trusted_accessors` so `tz_ambiguous_timestamp.rs`'s own `fixed`
+//! extern_spec can extend its ensures with an extra conjunct
+//! (`fixed`-constructed values are never unknown) instead of
 //! redeclaring `fixed` itself.
 //!
 //! `to_fixed_offset`'s own real body ALSO dispatches through
@@ -23,18 +24,13 @@
 //! but that's irrelevant to Creusot — `extern_spec!` never executes
 //! the real body, it's a trusted axiom either way. Scoped the same
 //! way every sibling `TimeZone`-touching file is: only the
-//! `TimeZone::fixed`-constructed case is exercised, reusing
-//! `tz_ambiguous_timestamp.rs`'s own `tz_fixed_seconds_value`.
+//! `TimeZone::fixed`-constructed case is exercised, reusing the
+//! shared `tz_fixed_seconds_value`.
 
-use crate::ext_jiff::offset::logic::offset_seconds_value;
-use crate::ext_jiff::tz_ambiguous_timestamp::logic::tz_fixed_seconds_value;
-use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_is_unknown_value(_tz: &jiff::tz::TimeZone) -> bool {
-    dead
-}
+use crate::ext_jiff::shared_trusted_accessors::{
+    offset_seconds_value, tz_fixed_seconds_value, tz_is_unknown_value,
+};
+use creusot_std::macros::{check, ensures, extern_spec};
 
 extern_spec! {
     impl jiff::tz::TimeZone {

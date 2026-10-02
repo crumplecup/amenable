@@ -6,7 +6,7 @@
 //! was five separately `#[cfg(creusot)]`-gated items in the parent
 //! file down to zero there, cordial's CFG-SCATTER finding.
 
-use crate::ext_jiff::offset::logic::offset_seconds_value;
+use crate::ext_jiff::shared_trusted_accessors::offset_seconds_value;
 use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
 
 #[trusted]

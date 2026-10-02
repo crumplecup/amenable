@@ -29,13 +29,18 @@ pub(crate) use accessors::{
     span_get_nanoseconds_value, span_get_seconds_value, span_get_weeks_value, span_get_years_value,
 };
 #[cfg(creusot)]
-pub(crate) use lemmas::logic::{
-    span_i64_of_i16_lemma, span_i64_of_i32_lemma, span_i64_of_i64_lemma,
-};
-#[cfg(creusot)]
 pub(crate) use ranges::{
     span_days_in_jiff_range, span_hours_in_jiff_range, span_microseconds_in_jiff_range,
     span_milliseconds_in_jiff_range, span_minutes_in_jiff_range, span_months_in_jiff_range,
     span_nanoseconds_in_jiff_range, span_seconds_in_jiff_range, span_weeks_in_jiff_range,
     span_years_in_jiff_range,
+};
+// `lemmas` itself stays private (making it `pub(crate)` just to reach
+// these three names would itself be a thin `pub(crate)` module —
+// cordial's `VIS-MOD-THIN-001` again, just moved one level up); only
+// the specific names `ext_jiff::shared_trusted_accessors` needs are
+// re-exported through `span`'s own already well-populated surface.
+#[cfg(creusot)]
+pub(crate) use lemmas::{
+    span_i64_of_i16_matches_cast, span_i64_of_i32_matches_cast, span_i64_of_i64_matches_cast,
 };

@@ -50,11 +50,14 @@ use super::span::{
 use mirror::{ensures, extern_spec, requires};
 
 #[cfg(creusot)]
+use crate::ext_jiff::shared_trusted_accessors::{
+    span_i64_of_i16_lemma, span_i64_of_i32_lemma, span_i64_of_i64_lemma,
+};
+#[cfg(creusot)]
 use crate::ext_jiff::span::{
     span_get_days_value, span_get_hours_value, span_get_microseconds_value,
     span_get_milliseconds_value, span_get_minutes_value, span_get_months_value,
     span_get_nanoseconds_value, span_get_seconds_value, span_get_weeks_value, span_get_years_value,
-    span_i64_of_i16_lemma, span_i64_of_i32_lemma, span_i64_of_i64_lemma,
 };
 
 #[cfg(creusot)]

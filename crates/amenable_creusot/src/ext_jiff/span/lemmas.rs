@@ -22,7 +22,6 @@
 //! site. Three lemmas cover all ten fields, since the generic-over-`I`
 //! opaqueness is shared.
 
-pub(crate) mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::logic;
 
@@ -31,10 +30,12 @@ amenable_derive::harness! {
         /// The opaque `span_i64_of::<i16>` stand-in agrees with the
         /// real `as i64` cast it stands in for — named so `span_i64_of_
         /// i16_lemma`'s own postcondition points at a real predicate
-        /// instead of restating the comparison inline.
+        /// instead of restating the comparison inline. `pub(crate)`:
+        /// `ext_jiff::shared_trusted_accessors` reuses it (where
+        /// `span_i64_of_i16_lemma`'s own `#[ensures(..)]` now lives).
         #[logic(open)]
-        fn span_i64_of_i16_matches_cast(x: i16) -> bool {
-            pearlite! { logic::span_i64_of::<i16>(x) == x as i64 }
+        pub(crate) fn span_i64_of_i16_matches_cast(x: i16) -> bool {
+            pearlite! { crate::ext_jiff::shared_trusted_accessors::span_i64_of::<i16>(x) == x as i64 }
         }
     }
 }
@@ -54,8 +55,8 @@ amenable_derive::harness! {
         /// The opaque `span_i64_of::<i32>` stand-in agrees with the
         /// real `as i64` cast it stands in for.
         #[logic(open)]
-        fn span_i64_of_i32_matches_cast(x: i32) -> bool {
-            pearlite! { logic::span_i64_of::<i32>(x) == x as i64 }
+        pub(crate) fn span_i64_of_i32_matches_cast(x: i32) -> bool {
+            pearlite! { crate::ext_jiff::shared_trusted_accessors::span_i64_of::<i32>(x) == x as i64 }
         }
     }
 }
@@ -76,8 +77,8 @@ amenable_derive::harness! {
         /// real `as i64` cast it stands in for (the identity cast, but
         /// checked the same way as the narrower widths for uniformity).
         #[logic(open)]
-        fn span_i64_of_i64_matches_cast(x: i64) -> bool {
-            pearlite! { logic::span_i64_of::<i64>(x) == x as i64 }
+        pub(crate) fn span_i64_of_i64_matches_cast(x: i64) -> bool {
+            pearlite! { crate::ext_jiff::shared_trusted_accessors::span_i64_of::<i64>(x) == x as i64 }
         }
     }
 }

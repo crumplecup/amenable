@@ -23,19 +23,19 @@
 //! offset a `Fixed` value wraps from ordinary harness-body code, only
 //! from inside an extern_spec's own `#[ensures(..)]`), and `dt` stays
 //! completely opaque (`civil::DateTime` is trusted by deliberate
-//! Phase 1 design). Reuses `offset.rs`'s own `offset_seconds_value`
-//! and `tz_ambiguous_timestamp.rs`'s own `tz_fixed_seconds_value`.
+//! Phase 1 design). Reuses `ext_jiff::shared_trusted_accessors`'s own
+//! `offset_seconds_value` and `tz_fixed_seconds_value`.
 //!
 //! `amb_zoned_offset_is_unambiguous_value`/`amb_zoned_offset_seconds_
-//! value` are `pub(crate)`: `tz_offset_conflict.rs` needs to reuse
-//! them (its own `OffsetConflict::resolve` extern_spec needs to
-//! relate to the real `AmbiguousZoned` it returns). Also extern-specs
-//! `TimeZone::into_ambiguous_zoned` (the by-value sibling of
-//! `to_ambiguous_zoned`, a DIFFERENT real function, not yet
+//! value` live in that same shared module too: `tz_offset_conflict.rs`
+//! needs to reuse them (its own `OffsetConflict::resolve` extern_spec
+//! needs to relate to the real `AmbiguousZoned` it returns). Also
+//! extern-specs `TimeZone::into_ambiguous_zoned` (the by-value sibling
+//! of `to_ambiguous_zoned`, a DIFFERENT real function, not yet
 //! contracted anywhere) for the same reason — `OffsetConflict::
 //! resolve_with`'s real `AlwaysTimeZone` branch calls it directly.
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

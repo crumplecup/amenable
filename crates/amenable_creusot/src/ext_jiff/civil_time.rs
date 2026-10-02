@@ -18,7 +18,7 @@
 //! FULL documented validity condition, not a narrowed sufficient
 //! sub-range.
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

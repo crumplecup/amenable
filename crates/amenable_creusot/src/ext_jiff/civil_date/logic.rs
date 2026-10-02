@@ -1,32 +1,19 @@
 #![cfg(creusot)]
-//! `jiff::civil::Date`'s trusted logic axioms and `extern_spec!` bridge.
+//! `jiff::civil::Date`'s `extern_spec!` bridge.
 //!
 //! Self-gated via this file's own `#![cfg(creusot)]` rather than a
-//! `#[cfg(creusot)]` on its `mod` declaration in the parent — collapses
-//! what was four separately `#[cfg(creusot)]`-gated items (one `use`,
-//! three `fn`s) in the parent file into zero, since this file's
-//! inclusion is already conditional on its own first line (cordial's
+//! `#[cfg(creusot)]` on its `mod` declaration in the parent (cordial's
 //! CFG-SCATTER finding; same fix as every sibling `ext_jiff` module).
+//! The opaque `date_*_value` accessors themselves now live in
+//! `ext_jiff::shared_trusted_accessors` (reused by `civil_era.rs` and
+//! `fmt_temporal_pieces.rs`, so a module too thin on its own to clear
+//! cordial's `VIS-MOD-THIN-001` floor would have had to exist here
+//! otherwise — see that module's own doc comment).
 
-use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_year_value(_d: &jiff::civil::Date) -> i16 {
-    dead
-}
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_month_value(_d: &jiff::civil::Date) -> i8 {
-    dead
-}
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn date_day_value(_d: &jiff::civil::Date) -> i8 {
-    dead
-}
+use crate::ext_jiff::shared_trusted_accessors::{
+    date_day_value, date_month_value, date_year_value,
+};
+use creusot_std::macros::{check, ensures, extern_spec};
 
 extern_spec! {
     impl jiff::civil::Date {

@@ -1,40 +1,19 @@
 #![cfg(creusot)]
-//! `jiff::civil::Time`'s trusted logic axioms and `extern_spec!` bridge.
+//! `jiff::civil::Time`'s `extern_spec!` bridge.
 //!
-//! Self-gated via this file's own `#![cfg(creusot)]` — collapses what
-//! was six separately `#[cfg(creusot)]`-gated items in the parent file
-//! (three `use`, four `fn`, counting only "fn"/"use" kinds per
-//! cordial's own classification) down to zero there, since the whole
-//! file's inclusion is already conditional on its own first line
-//! (cordial's CFG-SCATTER finding). `civil_time_*_value` stay
-//! `pub(crate)`, declared directly at this module's own top level:
-//! reused by `fmt_temporal_pieces.rs` and `fmt_strtime_meridiem.rs`.
+//! Self-gated via this file's own `#![cfg(creusot)]` (cordial's
+//! CFG-SCATTER finding; same fix as every sibling `ext_jiff` module).
+//! The opaque `civil_time_*_value` accessors themselves now live in
+//! `ext_jiff::shared_trusted_accessors` (reused by `fmt_temporal_
+//! pieces.rs` and `fmt_strtime_meridiem.rs`, so a module too thin on
+//! its own to clear cordial's `VIS-MOD-THIN-001` floor would have had
+//! to exist here otherwise — see that module's own doc comment).
 
-use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn civil_time_hour_value(_t: &jiff::civil::Time) -> i8 {
-    dead
-}
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn civil_time_minute_value(_t: &jiff::civil::Time) -> i8 {
-    dead
-}
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn civil_time_second_value(_t: &jiff::civil::Time) -> i8 {
-    dead
-}
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn civil_time_subsec_nanosecond_value(_t: &jiff::civil::Time) -> i32 {
-    dead
-}
+use crate::ext_jiff::shared_trusted_accessors::{
+    civil_time_hour_value, civil_time_minute_value, civil_time_second_value,
+    civil_time_subsec_nanosecond_value,
+};
+use creusot_std::macros::{check, ensures, extern_spec};
 
 extern_spec! {
     impl jiff::civil::Time {

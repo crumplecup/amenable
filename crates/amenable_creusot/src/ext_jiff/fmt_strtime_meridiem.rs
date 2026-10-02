@@ -30,7 +30,7 @@ mod mirror {
     pub(super) use creusot_std::macros::{check, ensures, extern_spec, logic, requires};
 }
 #[cfg(creusot)]
-use crate::ext_jiff::civil_time::logic::civil_time_hour_value;
+use crate::ext_jiff::shared_trusted_accessors::civil_time_hour_value;
 #[cfg(creusot)]
 use mirror::{check, ensures, extern_spec, logic, requires};
 

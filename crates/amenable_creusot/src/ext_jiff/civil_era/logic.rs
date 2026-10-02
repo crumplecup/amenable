@@ -12,7 +12,7 @@
 //! compiler errors, resolved only once this was plain `pub`; see the
 //! parent file's own doc comment for the full story).
 
-use crate::ext_jiff::civil_date::logic::date_year_value;
+use crate::ext_jiff::shared_trusted_accessors::date_year_value;
 use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
 
 #[trusted]

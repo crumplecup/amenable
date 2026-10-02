@@ -20,21 +20,17 @@
 //! needing to model days-in-month for a symbolic year/month
 //! combination while still checking the full year/month range.
 //!
-//! `date_year_value`/`date_month_value`/`date_day_value` live in the
-//! `logic` submodule (self-gated via its own `#![cfg(creusot)]`,
-//! collapsing what was four separately `#[cfg(creusot)]`-gated items
-//! here into the single macro-import `use` below — cordial's
-//! CFG-SCATTER finding), `pub(crate)` there and reached by
-//! `civil_era.rs` via the full `super::civil_date::logic::
-//! date_year_value` path: its own `Date::era_year` extern_spec needs
-//! `date_year_value` to state anything about `self`, and Creusot only
-//! allows one `extern_spec!` per real function crate-wide — confirmed
-//! via a genuine "duplicate extern specification for
-//! jiff::civil::Date::new" compiler error from a first attempt that
-//! (wrongly) redeclared `Date::new`'s own contract in `civil_era.rs`
-//! instead of reusing this one.
+//! `date_year_value`/`date_month_value`/`date_day_value` live in
+//! `ext_jiff::shared_trusted_accessors`, not here — reached by
+//! `civil_era.rs`/`fmt_temporal_pieces.rs` from there directly: its
+//! own `Date::era_year` extern_spec needs `date_year_value` to state
+//! anything about `self`, and Creusot only allows one `extern_spec!`
+//! per real function crate-wide — confirmed via a genuine "duplicate
+//! extern specification for jiff::civil::Date::new" compiler error
+//! from a first attempt that (wrongly) redeclared `Date::new`'s own
+//! contract in `civil_era.rs` instead of reusing this one.
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

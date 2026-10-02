@@ -22,20 +22,15 @@
 //! (`fixed`-constructed values are never unknown) extends THIS
 //! ensures clause with an extra conjunct rather than redeclaring
 //! `fixed` itself — only one `extern_spec!` per real function
-//! crate-wide. `tz_fixed_seconds_value` stays `pub(crate)`, declared
-//! directly at this module's own top level: reused by `tz_time_zone.
-//! rs`, `tz_time_zone_offset_info.rs`, `tz_offset_conflict.rs`, and
-//! `tz_ambiguous_zoned.rs`.
+//! crate-wide. `tz_fixed_seconds_value` itself now lives in
+//! `ext_jiff::shared_trusted_accessors` (reused by `tz_time_zone.rs`,
+//! `tz_time_zone_offset_info.rs`, `tz_offset_conflict.rs`, and
+//! `tz_ambiguous_zoned.rs` — see that module's own doc comment).
 
-use crate::ext_jiff::offset::logic::offset_seconds_value;
-use crate::ext_jiff::tz_time_zone::logic::tz_is_unknown_value;
+use crate::ext_jiff::shared_trusted_accessors::{
+    offset_seconds_value, tz_fixed_seconds_value, tz_is_unknown_value,
+};
 use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn tz_fixed_seconds_value(_tz: &jiff::tz::TimeZone) -> i32 {
-    dead
-}
 
 #[trusted]
 #[logic(opaque)]

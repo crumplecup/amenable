@@ -5,14 +5,13 @@
 //! symbolic execution.
 //!
 //! `PiecesNumericOffset` wraps a real `jiff::tz::Offset` plus one
-//! `is_negative` bit. Reuses `offset.rs`'s own `offset_seconds_value`
-//! opaque accessor (now `pub(crate)` at that module's top level, per
-//! its own doc comment) rather than redeclaring a disconnected copy —
-//! that accessor is the one already tied, via `offset.rs`'s own
-//! `extern_spec!`, to `Offset::from_seconds`/`Offset::seconds()`'s real
-//! behavior, so reusing it keeps this proof's claims meaningfully
-//! connected to jiff's actual `Offset` semantics rather than resting on
-//! a fresh, unconnected axiom.
+//! `is_negative` bit. Reuses `ext_jiff::shared_trusted_accessors`'s
+//! own `offset_seconds_value` opaque accessor rather than redeclaring
+//! a disconnected copy — that accessor is the one already tied, via
+//! `offset.rs`'s own `extern_spec!`, to `Offset::from_seconds`/
+//! `Offset::seconds()`'s real behavior, so reusing it keeps this
+//! proof's claims meaningfully connected to jiff's actual `Offset`
+//! semantics rather than resting on a fresh, unconnected axiom.
 //!
 //! Two new opaque accessors decompose `PiecesNumericOffset` itself
 //! (the same `DeepModel`-avoidance shape `fmt_temporal_pieces.rs` uses
@@ -24,14 +23,13 @@
 //! `false`, `offset(0)` → `false`, `offset(-5)` → `true`) confirm this
 //! is exactly what it means for a seconds-backed offset.
 //!
-//! `pno_offset_seconds_value` is `pub(crate)` (not module-private):
-//! `fmt_temporal_pieces_offset.rs` needs to reuse it (its own
-//! `PiecesOffset::to_numeric_offset` extern_spec needs to relate to
-//! the real `PiecesNumericOffset` its `Numeric` variant wraps), the
-//! same cross-file-reuse shape `offset.rs`'s own `offset_seconds_value`
-//! now has.
+//! `pno_offset_seconds_value` lives in `ext_jiff::shared_trusted_
+//! accessors` too (not module-private): `fmt_temporal_pieces_offset.rs`
+//! needs to reuse it (its own `PiecesOffset::to_numeric_offset`
+//! extern_spec needs to relate to the real `PiecesNumericOffset` its
+//! `Numeric` variant wraps).
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

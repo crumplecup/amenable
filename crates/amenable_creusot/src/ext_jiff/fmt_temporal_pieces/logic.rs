@@ -35,10 +35,9 @@
 //! uses, sidestepping the need for frame conditions entirely rather
 //! than writing them.
 
-use crate::ext_jiff::civil_date::logic::{date_day_value, date_month_value, date_year_value};
-use crate::ext_jiff::civil_time::logic::{
+use crate::ext_jiff::shared_trusted_accessors::{
     civil_time_hour_value, civil_time_minute_value, civil_time_second_value,
-    civil_time_subsec_nanosecond_value,
+    civil_time_subsec_nanosecond_value, date_day_value, date_month_value, date_year_value,
 };
 use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
 

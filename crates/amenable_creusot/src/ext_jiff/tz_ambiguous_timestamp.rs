@@ -15,10 +15,8 @@
 //! `.is_ambiguous()`, decomposed via fresh opaque accessors (`amb_ts_
 //! offset_is_unambiguous_value`/`amb_ts_offset_seconds_value`) tied
 //! to a `TimeZone::fixed`-specific opaque accessor
-//! (`tz_fixed_seconds_value`, `pub(crate)` at this module's own top
-//! level for future reuse — `TimeZone` itself is a later, not-yet-
-//! assessed checklist entry, matching `civil_date.rs`'s own
-//! established cross-file-reuse convention).
+//! (`tz_fixed_seconds_value`, in `ext_jiff::shared_trusted_accessors`
+//! for future reuse).
 //!
 //! Matches directly on `AmbiguousOffset`'s own public variants (the
 //! `fmt_friendly_fractional_unit.rs`-established technique) rather
@@ -31,7 +29,7 @@
 //! `fixed` itself — only one `extern_spec!` per real function
 //! crate-wide.
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

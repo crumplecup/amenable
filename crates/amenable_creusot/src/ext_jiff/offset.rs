@@ -15,13 +15,13 @@
 //! reference the same opaque `offset_seconds_value` axiom instead of
 //! calling each other.
 //!
-//! `offset_seconds_value` lives in the `logic` submodule (self-gated,
-//! `pub(crate)` there, see its own doc comment for the full list of
-//! cross-file reusers) — Creusot only allows one `extern_spec!` per
-//! real function crate-wide, so `Offset::seconds()`'s own contract
-//! can't be redeclared at any of those call sites.
+//! `offset_seconds_value` lives in `ext_jiff::shared_trusted_
+//! accessors` (see that module's own doc comment for the full list
+//! of cross-file reusers) — Creusot only allows one `extern_spec!`
+//! per real function crate-wide, so `Offset::seconds()`'s own
+//! contract can't be redeclared at any of those call sites.
 
-pub(crate) mod logic;
+mod logic;
 #[cfg(creusot)]
 use creusot_std::macros::{ensures, logic, requires};
 

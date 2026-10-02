@@ -7,20 +7,14 @@
 //! was four separately `#[cfg(creusot)]`-gated items in the parent
 //! file down to zero there, cordial's CFG-SCATTER finding.
 //!
-//! `pno_offset_seconds_value` stays `pub(crate)`, declared directly
-//! at this module's own top level: `fmt_temporal_pieces_offset.rs`
-//! needs to reuse it (its own `PiecesOffset::to_numeric_offset`
-//! extern_spec needs to relate to the real `PiecesNumericOffset` its
-//! `Numeric` variant wraps).
+//! `pno_offset_seconds_value` itself now lives in `ext_jiff::shared_
+//! trusted_accessors`: `fmt_temporal_pieces_offset.rs` needs to reuse
+//! it (its own `PiecesOffset::to_numeric_offset` extern_spec needs to
+//! relate to the real `PiecesNumericOffset` its `Numeric` variant
+//! wraps).
 
-use crate::ext_jiff::offset::logic::offset_seconds_value;
+use crate::ext_jiff::shared_trusted_accessors::{offset_seconds_value, pno_offset_seconds_value};
 use creusot_std::macros::{check, ensures, extern_spec, logic, trusted};
-
-#[trusted]
-#[logic(opaque)]
-pub(crate) fn pno_offset_seconds_value(_p: &jiff::fmt::temporal::PiecesNumericOffset) -> i32 {
-    dead
-}
 
 #[trusted]
 #[logic(opaque)]
