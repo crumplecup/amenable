@@ -42,16 +42,17 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
         &collect_witness_field_types(&input.data)?,
     )?;
 
-    let proof_type_context = ProofTypeContext {
-        evidence_ident,
-        evidence_ty_generics: evidence_ty_generics.clone(),
-        evidence_generics: &input.generics,
-        proof_ident: &proof_ident,
-        proof_generics: &proof_generics,
-        display_generics: &display_generics,
-        artifact_generics: &artifact_generics,
-        verus_module_path: &verus_module_path,
-    };
+    let proof_type_context = ProofTypeContextBuilder::default()
+        .evidence_ident(evidence_ident)
+        .evidence_ty_generics(evidence_ty_generics.clone())
+        .evidence_generics(&input.generics)
+        .proof_ident(&proof_ident)
+        .proof_generics(&proof_generics)
+        .display_generics(&display_generics)
+        .artifact_generics(&artifact_generics)
+        .verus_module_path(&verus_module_path)
+        .build()
+        .map_err(|error| Error::new_spanned(input, error.to_string()))?;
 
     let proof_definition = match &input.data {
         Data::Struct(data) => expand_struct_proof_type(&proof_type_context, data)?,
@@ -131,13 +132,18 @@ pub fn expand_witness(input: &DeriveInput) -> syn::Result<TokenStream> {
 /// per-variant) needs from the enclosing `#[derive(Witness)]` invocation --
 /// bundled so each expansion function stays under clippy's argument-count
 /// lint without losing any of the context.
+/// Bundled rather than passed positionally since 8 fields is well past
+/// a plain `new` clippy would accept -- `derive_builder::Builder`, not
+/// `derive_new::new`, same reasoning as `ProofAssessmentBuilder`'s own
+/// doc comment.
+#[derive(derive_getters::Getters, derive_builder::Builder)]
 pub(super) struct ProofTypeContext<'a> {
-    pub(super) evidence_ident: &'a syn::Ident,
-    pub(super) evidence_ty_generics: syn::TypeGenerics<'a>,
-    pub(super) evidence_generics: &'a Generics,
-    pub(super) proof_ident: &'a syn::Ident,
-    pub(super) proof_generics: &'a Generics,
-    pub(super) display_generics: &'a Generics,
-    pub(super) artifact_generics: &'a Generics,
-    pub(super) verus_module_path: &'a str,
+    evidence_ident: &'a syn::Ident,
+    evidence_ty_generics: syn::TypeGenerics<'a>,
+    evidence_generics: &'a Generics,
+    proof_ident: &'a syn::Ident,
+    proof_generics: &'a Generics,
+    display_generics: &'a Generics,
+    artifact_generics: &'a Generics,
+    verus_module_path: &'a str,
 }

@@ -93,6 +93,7 @@ dependencies = [
  "amenable_core",
  "derive-getters",
  "derive-new",
+ "derive_builder",
  "inventory",
  "miette",
  "proc-macro2",

@@ -13,14 +13,14 @@ pub(super) fn expand_struct_proof_type(
     ctx: &ProofTypeContext<'_>,
     data: &DataStruct,
 ) -> syn::Result<TokenStream> {
-    let evidence_ident = ctx.evidence_ident;
-    let evidence_ty_generics = &ctx.evidence_ty_generics;
-    let evidence_generics = ctx.evidence_generics;
-    let proof_ident = ctx.proof_ident;
-    let proof_generics = ctx.proof_generics;
-    let display_generics = ctx.display_generics;
-    let artifact_generics = ctx.artifact_generics;
-    let verus_module_path = ctx.verus_module_path;
+    let evidence_ident = ctx.evidence_ident();
+    let evidence_ty_generics = ctx.evidence_ty_generics();
+    let evidence_generics = ctx.evidence_generics();
+    let proof_ident = ctx.proof_ident();
+    let proof_generics = ctx.proof_generics();
+    let display_generics = ctx.display_generics();
+    let artifact_generics = ctx.artifact_generics();
+    let verus_module_path = ctx.verus_module_path();
     let shape_name = match &data.fields {
         Fields::Named(_) => "named_struct",
         Fields::Unnamed(_) => "tuple_struct",
