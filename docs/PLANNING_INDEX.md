@@ -130,7 +130,15 @@ direction (a complete map, not a narrow slice).
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
 
-**Status:** 🟡 Phases 0-1 done (2026-09-13). Phase 0: `crates/amenable_ext`
+**Status:** ✅ Complete for jiff (2026-09-26). Phases 0-1 landed the
+registration skeleton (below); the real jiff temporal backend this
+plan's own Phase 3 names as "the payoff" is done too — see the
+[jiff-backend plan entry](#a-real-jiff-backed-amenable_time-backend)
+above, which tracks that work in full (all 10 phases, `JiffTimeBackend`
+implementing the complete jiff-representable slice of `amenable_time`'s
+trait surface, three-backend witness coverage for jiff's own types).
+`chrono`/`chrono-tz` remain the deliberate next target; `uuid` stays
+deferred, unrelated to time. Phase 0: `crates/amenable_ext`
 exists, `ExtType`/`ExtStandard<T>` landed, `jiff::Timestamp` registered
 first (kept the skeleton free of dead code). Phase 1: `Zoned`/
 `civil::DateTime` added (the full set verified against `elicitation`'s

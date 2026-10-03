@@ -234,6 +234,8 @@ option set.
 | [`amenable_derive`](crates/amenable_derive/README.md) | Proc macros the trait family needs — derives (`Standard`, `Provenance`, `Evidence`, `ProofToken`, `Sidecar`, `StateMachine`, `Witness`, `KaniCompose`), attributes (`#[exchange]`, `#[establish]`, `#[calculation]`, …), and `harness!` |
 | [`amenable_gaap`](crates/amenable_gaap/README.md) | GAAP ledger worked example — a real, backend-neutral evidence chain proven on all three verifiers, doubling as the reference walkthrough for building a new one |
 | [`amenable_std`](crates/amenable_std/README.md) | `RustStdType` + the registry where all three verifiers' witnesses converge |
+| [`amenable_time`](crates/amenable_time/README.md) | Standards-anchored temporal contracts — 345 citation-grounded propositions over date/time/zone/duration, 23 machine-checked on all three backends |
+| [`amenable_ext`](crates/amenable_ext/README.md) | Third-party crate support — `ExtType`/`ExtStandard<T>` registration, plus a real jiff-backed implementation of `amenable_time`'s trait surface |
 | [`amenable_kani`](crates/amenable_kani/README.md) | Kani backend — ~445 proof harnesses |
 | [`amenable_creusot`](crates/amenable_creusot/README.md) | Creusot backend — ~175 harnesses |
 | [`amenable_verus`](crates/amenable_verus/README.md) | Verus backend — ~485 verified proof functions |
@@ -293,12 +295,20 @@ confirmed false-negatives in the audit tool's own type-alias resolution
 (`core::range::*`, a few `os::unix` raw-type aliases) is untriaged
 backlog.
 
-**Roadmap.** With `std` at parity, the next expansion targets are key
-third-party crates — `jiff` and `chrono` for time handling — and
-higher-level exchange-based trait interfaces built on top of them (e.g.
-an `amenable_time`). Every addition ships with full Kani, Creusot, and
-Verus support; that parity is a standing invariant of the project, not
-a phase.
+**Roadmap.** With `std` at parity, the project has already expanded
+into its first real third-party domain: [`amenable_time`](crates/amenable_time/README.md)
+defines a standards-anchored temporal contract interface, and
+[`amenable_ext`](crates/amenable_ext/README.md) backs most of it with a
+real implementation over `jiff` — calendar arithmetic, time zone
+resolution, ISO 8601 / RFC 3339 / RFC 9557 parsing and formatting —
+checked by all three verifiers against jiff's own types, not just
+`std`'s. The next targets are additional third-party crates beyond
+jiff (`chrono` is the obvious next one) and the CalConnect / ISO
+8601-2 extension edges no general-purpose date-time library models
+natively, tracked honestly as out of scope rather than silently
+dropped. Every addition ships with full Kani, Creusot, and Verus
+support; that parity is a standing invariant of the project, not a
+phase.
 
 Not yet built: structural proof-quality heuristics on `Witness` itself
 (automatic detection of vacuous or corner-cut proofs — `amenable.md`
