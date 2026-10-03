@@ -58,7 +58,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # crumplecup/cordial -- bump when a cordial change is needed here.
-      CORDIAL_REV: bc0fc3f09a78b69cdf026335ecc52a1441850e1c
+      # 2026-10-03: picks up "Keep proc-macro entry points in lib.rs as
+      # shims, with a configurable limit." -- the PAGEANTRY-BARREL-001
+      # false positive this session reported upstream (a proc-macro
+      # entry point must live at the crate root; the prior cordial
+      # revision had no exemption for that real Rust-language
+      # constraint).
+      CORDIAL_REV: 3cd54f5fa046e207bf9bbb1e44a0d84a0c963e8d
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
