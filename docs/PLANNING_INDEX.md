@@ -126,6 +126,15 @@ own Phase 3 ("the payoff") and `AMENABLE_TIME_PLAN.md`'s Phase 7 open
 follow-on, worked out in full before execution per explicit user
 direction (a complete map, not a narrow slice).
 
+### Full chrono support in `amenable_ext`
+
+**Document:** [CHRONO_SUPPORT_PLAN.md](CHRONO_SUPPORT_PLAN.md)
+
+**Status:** Decisions complete; implementation not started (2026-10-06). Covers
+chrono 0.4 and chrono-tz 0.10: 59 inventory types, 67 checklist rows, mirroring the
+jiff effort. Phase 0 wiring is done. The plan's Phase 12 (factories, parsers,
+formatters) is an open scope decision, recorded at the top of the document.
+
 ### amenable_ext (third-party crate support)
 
 **Document:** [AMENABLE_EXT_PLAN.md](AMENABLE_EXT_PLAN.md)
