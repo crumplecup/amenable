@@ -57,7 +57,7 @@ pub use contract::{Ensures, Requires};
 pub use evidence::Evidence;
 pub use exchange::{Establish, Exchange, ProofToken, Sidecar};
 pub use link::{
-    ContractRecord, EvidenceLink, ExchangeEdgeRecord, ProofRecord, ProofTokenMintRecord,
+    ContractRecord, EvidenceLink, ExchangeEdgeRecord, Premise, ProofRecord, ProofTokenMintRecord,
 };
 pub use metadata::{
     Entry, ErasedEntry, Metadata, MetadataRecord, MetadataReport, MetadataValue, OwnedEntry,

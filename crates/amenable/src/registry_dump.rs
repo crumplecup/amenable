@@ -7,12 +7,22 @@ use tracing::instrument;
 
 use crate::{ContractRecord, EvidenceLink, KaniProofRegistration, ProofRecord, witness_exports};
 
-/// One [`crate::EvidenceLink`], owned for JSON serialization.
+/// One [`crate::EvidenceLink`], owned for JSON serialization. Concrete links
+/// serialize `bounds` and `premises` as empty; generic links carry both.
 #[derive(serde::Serialize)]
 struct EvidenceLinkDump {
     name: String,
     basis: String,
     index: usize,
+    bounds: Vec<String>,
+    premises: Vec<PremiseDump>,
+}
+
+/// One [`crate::Premise`], owned for JSON serialization.
+#[derive(serde::Serialize)]
+struct PremiseDump {
+    id: String,
+    statement: String,
 }
 
 /// One [`crate::ProofRecord`], owned for JSON serialization. Never
@@ -121,6 +131,15 @@ impl RegistryDump {
                     name: link.name().to_owned(),
                     basis: link.basis().to_owned(),
                     index: link.index(),
+                    bounds: link.bounds().iter().map(|b| (*b).to_owned()).collect(),
+                    premises: link
+                        .premises()
+                        .iter()
+                        .map(|p| PremiseDump {
+                            id: p.id().to_owned(),
+                            statement: p.statement().to_owned(),
+                        })
+                        .collect(),
                 })
                 .collect(),
             proof_records: inventory::iter::<ProofRecord>()
