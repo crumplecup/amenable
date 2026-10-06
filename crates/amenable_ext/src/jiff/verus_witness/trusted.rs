@@ -349,6 +349,7 @@ impl_verus_witness_trusted_ext!(
     jiff::civil::TimeDifference,
     jiff::civil::TimeRound,
     jiff::civil::TimeWith,
+    jiff::fmt::DefmtWrite<'static>,
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,

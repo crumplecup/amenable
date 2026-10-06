@@ -225,6 +225,7 @@ use amenable_ext::{ExtProvenance, ExtStandard};
 use super::bridge::{bridge_creusot_witness, impl_creusot_witness_trusted_ext};
 
 impl_creusot_witness_trusted_ext!(
+    jiff::fmt::DefmtWrite<'static>,
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,

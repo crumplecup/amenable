@@ -19,6 +19,14 @@
 //! `W = Vec<u8>`, whose `write_all` is documented to never fail (it
 //! just extends the vector), so the `Err` arm is never reached.
 //!
+//! `jiff::fmt::DefmtWrite<'static>` stays trusted, and this one is a
+//! must-trust case rather than a choice. Its `write_str` is visibly
+//! `Ok` in source (`defmt::write!` then `Ok(())`), but the wrapped
+//! `defmt::Formatter` has only a `pub(crate)` field and no public
+//! constructor, so no proof can obtain a value to call it on. The
+//! write path belongs to defmt's runtime, and that is what must be
+//! trusted.
+//!
 //! `jiff::fmt::friendly::Designator` stays trusted, the first
 //! `jiff::fmt::*` type to land here rather than get a checked
 //! property: checked directly against jiff's real source
@@ -246,6 +254,7 @@
 use crate::jiff::macros::impl_kani_witness_trusted_ext;
 
 impl_kani_witness_trusted_ext!(
+    jiff::fmt::DefmtWrite<'static>,
     jiff::fmt::friendly::Designator,
     jiff::fmt::friendly::Direction,
     jiff::fmt::friendly::Spacing,
