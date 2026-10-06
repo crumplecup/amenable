@@ -21,6 +21,8 @@ amenable_derive = { workspace = true }
 # "Relationship to amenable_time". Not pulled in by non-temporal targets
 # (uuid, when it lands).
 amenable_time = { workspace = true, optional = true }
+chrono = { workspace = true, optional = true }
+chrono-tz = { workspace = true, optional = true }
 derive-getters = { workspace = true }
 derive-new = { workspace = true }
 derive_more = { workspace = true }
@@ -34,7 +36,37 @@ miette = { workspace = true }
 
 [features]
 default = []
-jiff = ["dep:jiff", "dep:amenable_time"]
+# All jiff features are on for the same coverage reason as chrono below
+# (cordial's shadow-dep build inventories the full public surface).
+jiff = [
+    "dep:jiff",
+    "dep:amenable_time",
+    "jiff/serde",
+    "jiff/defmt",
+    "jiff/logging",
+    "jiff/js",
+    "jiff/static",
+    "jiff/tzdb-bundle-always",
+]
+# All chrono and chrono-tz features are on so cordial's shadow-dep build
+# inventories the full public surface, not one feature set's slice of it.
+# rkyv: only the default 32-bit size variant, since rkyv's size_* features
+# are mutually exclusive.
+chrono = [
+    "dep:chrono",
+    "chrono/serde",
+    "chrono/defmt",
+    "chrono/unstable-locales",
+    "chrono/rkyv",
+    "chrono/rkyv-validation",
+]
+chrono-tz = [
+    "chrono",
+    "dep:chrono-tz",
+    "chrono-tz/serde",
+    "chrono-tz/case-insensitive",
+    "chrono-tz/filter-by-regex",
+]
 # The Witness<VerusVerifier> bridge for every target's ExtStandard<T>
 # (src/jiff/verus_witness.rs and siblings) -- off by default like every
 # other verifier feature in this workspace.

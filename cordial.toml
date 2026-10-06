@@ -161,3 +161,14 @@ enabled = false
 # normally.
 [visibility]
 mod_thin_skip = { amenable_verus = ["gallery", "derived_witness", "rust_std"] }
+
+# amenable_ext coverage targets. Declared targets REPLACE the built-in
+# default (jiff), so jiff is listed explicitly alongside chrono.
+[[amenable_ext.target]]
+name = "jiff"
+
+[[amenable_ext.target]]
+name = "chrono"
+
+[[amenable_ext.target]]
+name = "chrono-tz"
