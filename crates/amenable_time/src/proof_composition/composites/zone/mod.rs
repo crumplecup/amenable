@@ -3,6 +3,7 @@
 mod identity;
 mod suffix;
 mod transition;
+mod zoned_date;
 
 pub use identity::{
     NamedTimeZoneIdentityValid, NamedTimeZoneInterpretationTracksTzdbRevision,
@@ -18,3 +19,4 @@ pub use transition::{
     ZoneTransitionGapSemanticsValid, ZoneTransitionResolutionAuthorityValid,
     ZonedDateTimeHasNamedZone,
 };
+pub use zoned_date::ZonedDateValid;

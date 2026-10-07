@@ -503,7 +503,8 @@ pub use proof_composition::{
     UnspecifiedComponentExpressionValid, UtcOfDayValid, UtcOffsetKnown, UtcOffsetPrecisionEvidence,
     UtcOffsetValid, UtcTimeScaleValid, WeekDateValid, ZoneTransitionAmbiguitySemanticsValid,
     ZoneTransitionGapSemanticsValid, ZoneTransitionResolutionAuthorityValid,
-    ZonedDateTimeHasNamedZone, ZonedTimestampEvidence, ZuluTimeZoneInconsistencyAvoidanceValid,
+    ZonedDateTimeHasNamedZone, ZonedDateValid, ZonedTimestampEvidence,
+    ZuluTimeZoneInconsistencyAvoidanceValid,
 };
 pub use provenance::TemporalProvenance;
 pub use provenance_vocab::{

@@ -53,7 +53,7 @@ pub use composites::{
     TimestampRepresentsFixedInstant, UnspecifiedComponentExpressionValid, UtcOfDayValid,
     UtcOffsetKnown, UtcOffsetValid, UtcTimeScaleValid, WeekDateValid,
     ZoneTransitionAmbiguitySemanticsValid, ZoneTransitionGapSemanticsValid,
-    ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone,
+    ZoneTransitionResolutionAuthorityValid, ZonedDateTimeHasNamedZone, ZonedDateValid,
     ZuluTimeZoneInconsistencyAvoidanceValid,
 };
 pub use evidence::{

@@ -79,5 +79,5 @@ pub use zone::{
     OffsetOnlyZoneSemanticsLimited, OffsetTimeZoneAnnotationConsistentWithTimestamp,
     UtcOffsetKnown, UtcOffsetValid, UtcTimeScaleValid, ZoneTransitionAmbiguitySemanticsValid,
     ZoneTransitionGapSemanticsValid, ZoneTransitionResolutionAuthorityValid,
-    ZonedDateTimeHasNamedZone, ZuluTimeZoneInconsistencyAvoidanceValid,
+    ZonedDateTimeHasNamedZone, ZonedDateValid, ZuluTimeZoneInconsistencyAvoidanceValid,
 };
