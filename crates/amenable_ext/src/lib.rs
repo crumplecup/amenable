@@ -32,15 +32,23 @@ mod ext_type;
 #[cfg(feature = "jiff")]
 mod jiff;
 // Shared by every target module's registrations (`impl_ext_type!`,
-// `register_ext_standard_evidence!`); gated by the union of target
-// features rather than compiled unconditionally, since with none active
-// there is nothing left to consume it -- change to `any(feature =
-// "jiff", feature = "chrono", ...)` once a second target lands
-// (`any(...)` of a single feature is itself a clippy lint).
-#[cfg(feature = "jiff")]
+// `register_ext_standard_evidence!`); gated by the union of target features
+// rather than compiled unconditionally, since with none active there is
+// nothing left to consume it.
+#[cfg(feature = "chrono")]
+mod chrono;
+#[cfg(any(feature = "jiff", feature = "chrono"))]
 mod macros;
 mod provenance_vocab;
+// Fractional-second conversions shared by the jiff and chrono backends.
+#[cfg(any(feature = "jiff", feature = "chrono"))]
+mod temporal_fraction;
 
+#[cfg(feature = "chrono")]
+pub use chrono::{
+    ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
+    ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata,
+};
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]
 pub use jiff::{
