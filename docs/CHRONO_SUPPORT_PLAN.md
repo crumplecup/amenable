@@ -240,11 +240,19 @@ pass on the chrono backend for every civil carrier.
   (`partitions_are_exhaustive_and_disjoint`) that the partitions cover the whole
   domain with no gaps or overlaps, since Kani's own `proof_for_contract`/
   `stub_verified` mechanism doesn't check that for us (confirmed in
-  `chrono_naive_week_span_contract_mechanism_test`). Creusot witnesses for
-  `NaiveDate` (model-based, refinement premise), `FixedOffset`, and `Utc` (both real
-  `extern_spec!`s against chrono's actual API, no model layer — `Utc`'s is the first
-  `extern_spec!` in this crate against a trait impl block rather than an inherent
-  one).
+  `chrono_naive_week_span_contract_mechanism_test`). Creusot witnesses for all seven
+  types: `FixedOffset`, `NaiveTime`, and `NaiveDateTime` are real `extern_spec!`s
+  against chrono's actual API, no model layer (`Utc`'s is the first `extern_spec!` in
+  this crate against a trait impl block rather than an inherent one). `NaiveDate`,
+  `NaiveWeek`, and `IsoWeek` are model-based, each with a stated refinement premise
+  that the model matches chrono's real behavior, independently confirmed by the
+  matching Kani witness. `NaiveWeek`'s and `IsoWeek`'s models directly reuse the
+  insight `amenable_verus`'s own models for those two types already validated
+  (restated in Pearlite), with one real toolchain difference found along the way:
+  Creusot's `%`/`/` logic traits aren't implemented for `i64` at all (only for the
+  unbounded `Int` type), so `IsoWeek`'s model avoids modulo and division entirely by
+  taking the weekday and week-count as given inputs, rather than correcting for a
+  remainder-sign mismatch the way the Verus model's own fix does.
 - Done (2026-10-07): Verus witnesses for all seven types. Six are real,
   hand-verified accommodation models (chrono has zero `vstd` coverage and Verus
   never resolves `Cargo.toml`, so there's no way to reach chrono's real code at
@@ -257,10 +265,8 @@ pass on the chrono backend for every civil carrier.
   than re-deriving chrono's year-selection rule). `Utc` stays trusted: its claim has
   no input-dependent content for Verus to model, and Verus has no `extern_spec!`-
   style escape hatch to reach the real trait impl the way Kani/Creusot do.
-- Not done: Creusot witnesses for `NaiveTime`, `NaiveDateTime`, `IsoWeek`, and
-  `NaiveWeek` (4 of 7 types). The proof-chain tests in `proof_chain_test.rs` (none
-  exist yet, for any type). `cordial coverage` has not yet been checked against
-  these seven rows.
+- Not done: the proof-chain tests in `proof_chain_test.rs` (none exist yet, for any
+  type). `cordial coverage` has not yet been checked against these seven rows.
 
 ## Phase 3: Offset and zone bridges, zoned types (15 rows)
 
