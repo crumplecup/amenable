@@ -16,6 +16,28 @@
 //! the behavior we needed to confirm.
 
 mod atomic_ptr_compare_exchange;
+#[cfg(feature = "chrono")]
+mod chrono_day_count_staging;
+#[cfg(feature = "chrono")]
+mod chrono_day_span_growth;
+#[cfg(feature = "chrono")]
+mod chrono_month_span_growth;
+#[cfg(feature = "chrono")]
+mod chrono_naive_week_span;
+#[cfg(feature = "chrono")]
+mod chrono_naive_week_span_contract_mechanism_test;
+#[cfg(feature = "chrono")]
+mod chrono_naive_week_span_partition_test;
+#[cfg(feature = "chrono")]
+mod chrono_naive_week_stub_composition;
+#[cfg(feature = "chrono")]
+mod chrono_year_partition_exhaustiveness_test;
+#[cfg(feature = "chrono")]
+mod chrono_year_partition_sweep;
+#[cfg(feature = "chrono")]
+mod chrono_year_span_growth;
+#[cfg(feature = "chrono")]
+mod chrono_year_span_with_free_month_day_growth;
 mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
 mod iter_materialization;
