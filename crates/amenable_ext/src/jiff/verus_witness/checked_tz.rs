@@ -55,8 +55,8 @@
 //! confirmed structural mirror, not assumed — see `amenable_kani::
 //! ext::jiff`'s own doc comment).
 
-use super::bridge::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use crate::ExtStandard;
+use crate::ext_verus_witness::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use amenable_core::{ClassifiedWitness, Evidence, VerusVerifier, Witness, WitnessSupportSummary};
 
 impl_verus_witness_checked_ext!(

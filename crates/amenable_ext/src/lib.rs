@@ -29,6 +29,11 @@
 use amenable_core::VerusVerifier;
 
 mod ext_type;
+// Shared by every target's own `verus_witness` submodule (`jiff::
+// verus_witness`, `chrono::verus_witness`): the trusted/checked macros
+// and the `ExtCheckedProof` proof artifact, target-agnostic.
+#[cfg(feature = "verus")]
+mod ext_verus_witness;
 #[cfg(feature = "jiff")]
 mod jiff;
 // Shared by every target module's registrations (`impl_ext_type!`,

@@ -99,8 +99,8 @@
 //! ext_jiff::fmt_temporal_time_zone_annotation_name` both check
 //! against jiff's real `From<&str>`/`as_str` API.
 
-use super::bridge::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use crate::ExtStandard;
+use crate::ext_verus_witness::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use amenable_core::{ClassifiedWitness, Evidence, VerusVerifier, Witness, WitnessSupportSummary};
 
 impl_verus_witness_checked_ext!(

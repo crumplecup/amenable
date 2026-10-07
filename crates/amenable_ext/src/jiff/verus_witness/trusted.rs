@@ -314,9 +314,9 @@
 //! only a `pub(crate) from_jcore` conversion. Nothing
 //! non-tautological to state about it on any backend.
 
-use super::bridge::impl_verus_witness_trusted_ext;
 use crate::ExtProvenance;
 use crate::ExtStandard;
+use crate::ext_verus_witness::impl_verus_witness_trusted_ext;
 use amenable_core::{ClassifiedWitness, Evidence, VerusVerifier, Witness, WitnessSupportSummary};
 
 impl_verus_witness_trusted_ext!(

@@ -1,8 +1,8 @@
 //! Checked `jiff::civil::*` types -- real, hand-verified Verus
 //! accommodation models.
 
-use super::bridge::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use crate::ExtStandard;
+use crate::ext_verus_witness::{ExtCheckedProof, impl_verus_witness_checked_ext};
 use amenable_core::{ClassifiedWitness, Evidence, VerusVerifier, Witness, WitnessSupportSummary};
 
 impl_verus_witness_checked_ext!(

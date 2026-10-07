@@ -6,15 +6,15 @@
 //! mirroring `amenable_std::verus_witness`'s own placement (see
 //! `docs/AMENABLE_EXT_PLAN.md`'s Architecture section).
 //!
-//! Split by concern: `bridge` (the trusted/checked macros and the
-//! `ExtCheckedProof` proof artifact), `trusted` (the types with
-//! nothing beyond `Evidence::basis().audit()` to rest on), and
+//! Split by concern: `crate::ext_verus_witness` (the trusted/checked
+//! macros and the `ExtCheckedProof` proof artifact, shared with every
+//! other target's own `verus_witness` module), `trusted` (the types
+//! with nothing beyond `Evidence::basis().audit()` to rest on), and
 //! `checked_{top_level,civil,fmt,tz}` (types backed by a real,
 //! hand-verified Verus accommodation model in `amenable_verus::jiff`,
 //! grouped by jiff sub-namespace). See `trusted.rs`'s own doc comment
 //! for the trusted/checked split rationale in full.
 
-mod bridge;
 mod checked_civil;
 mod checked_fmt;
 mod checked_top_level;
