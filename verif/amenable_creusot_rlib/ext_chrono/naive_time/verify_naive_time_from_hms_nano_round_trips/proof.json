@@ -1,0 +1,17 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_elim_Some": { "prover": "z3", "time": 0.005 },
+      "vc_from_hms_nano_opt": { "prover": "z3", "time": 0.003 },
+      "vc_hour_NaiveTime": { "prover": "z3", "time": 0.005 },
+      "vc_minute_NaiveTime": { "prover": "z3", "time": 0.003 },
+      "vc_nanosecond_NaiveTime": { "prover": "z3", "time": 0.005 },
+      "vc_second_NaiveTime": { "prover": "z3", "time": 0.004 },
+      "vc_verify_naive_time_from_hms_nano_round_trips": {
+        "prover": "z3",
+        "time": 0.007
+      }
+    }
+  }
+}

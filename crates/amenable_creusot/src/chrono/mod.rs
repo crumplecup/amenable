@@ -4,4 +4,5 @@
 
 mod civil_naive_date;
 mod fixed_offset;
+mod naive_time;
 mod utc;

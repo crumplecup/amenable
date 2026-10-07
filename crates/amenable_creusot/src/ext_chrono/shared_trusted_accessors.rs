@@ -18,3 +18,29 @@ use creusot_std::macros::{logic, trusted};
 pub(crate) fn fixed_offset_local_minus_utc_value(_o: &chrono::FixedOffset) -> i32 {
     dead
 }
+
+// ── naive_time ───────────────────────────────────────────────────────
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_time_hour_value(_t: &chrono::NaiveTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_time_minute_value(_t: &chrono::NaiveTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_time_second_value(_t: &chrono::NaiveTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_time_nanosecond_value(_t: &chrono::NaiveTime) -> u32 {
+    dead
+}
