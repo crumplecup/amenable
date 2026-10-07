@@ -61,14 +61,44 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, NAIVE_DATE_FROM_YMD_MODEL_ROUND_TRIP_HOLDS_SRC, {
+        /// The round-trip law: a `Some` result reports back the year, month, and
+        /// day it was built from, and `None` exactly when the triple is not a
+        /// valid Gregorian date. Named so every caller's `ensures` points at a
+        /// real, registered contract fragment instead of a raw tuple equation.
+        #[logic(open)]
+        pub fn naive_date_from_ymd_model_round_trip_holds(
+            year: i32,
+            month: u32,
+            day: u32,
+            result: Option<(i32, u32, u32)>,
+        ) -> bool {
+            pearlite! {
+                match result {
+                    Some(date) => date == (year, month, day) && valid_gregorian_spec(year, month, day),
+                    None => !valid_gregorian_spec(year, month, day),
+                }
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::civil_naive_date::naive_date_from_ymd_model_round_trip_holds",
+        "creusot",
+        "ensures",
+        || NAIVE_DATE_FROM_YMD_MODEL_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, NAIVE_DATE_FROM_YMD_MODEL_SRC, {
         /// The model of `NaiveDate::from_ymd_opt`. Returns `Some` exactly when the
         /// triple is a valid Gregorian date, and the `Some` value is the triple.
         #[requires(true)]
-        #[ensures(match result {
-            Some(date) => valid_gregorian_spec(year, month, day) && date == (year, month, day),
-            None => !valid_gregorian_spec(year, month, day),
-        })]
+        #[ensures(naive_date_from_ymd_model_round_trip_holds(year, month, day, result))]
         fn gregorian_from_ymd_model(year: i32, month: u32, day: u32) -> Option<(i32, u32, u32)> {
             if -262143i32 <= year
                 && year <= 262142i32
@@ -111,10 +141,7 @@ amenable_derive::harness! {
         /// `Some` result reports back the year, month, and day it was built from,
         /// and `None` exactly when the triple is not a valid Gregorian date.
         #[requires(true)]
-        #[ensures(match result {
-            Some(date) => date == (year, month, day) && valid_gregorian_spec(year, month, day),
-            None => !valid_gregorian_spec(year, month, day),
-        })]
+        #[ensures(naive_date_from_ymd_model_round_trip_holds(year, month, day, result))]
         fn verify_naive_date_model_round_trips(year: i32, month: u32, day: u32) -> Option<(i32, u32, u32)> {
             gregorian_from_ymd_model(year, month, day)
         }

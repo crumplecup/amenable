@@ -3,20 +3,15 @@
   "proofs": {
     "Coma": {
       "vc_verify_naive_week_span_model": {
-        "tactic": "compute_specified",
+        "tactic": "split_vc",
         "children": [
-          {
-            "tactic": "split_vc",
-            "children": [
-              { "prover": "alt-ergo", "time": 0.032 },
-              { "prover": "alt-ergo", "time": 0.037 },
-              { "prover": "alt-ergo", "time": 0.042 },
-              { "prover": "alt-ergo", "time": 0.048 },
-              { "prover": "alt-ergo", "time": 0.075 },
-              { "prover": "alt-ergo", "time": 0.043 },
-              { "prover": "alt-ergo", "time": 0.084 }
-            ]
-          }
+          { "prover": "alt-ergo", "time": 0.031 },
+          { "prover": "alt-ergo", "time": 0.04 },
+          { "prover": "alt-ergo", "time": 0.042 },
+          { "prover": "alt-ergo", "time": 0.047 },
+          { "prover": "alt-ergo", "time": 0.09 },
+          { "prover": "alt-ergo", "time": 0.047 },
+          { "prover": "alt-ergo", "time": 0.122 }
         ]
       }
     }

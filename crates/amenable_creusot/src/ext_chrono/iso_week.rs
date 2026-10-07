@@ -48,24 +48,52 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, ISO_WEEK_ROUND_TRIP_MODEL_INPUTS_VALID_SRC, {
+        /// `verify_iso_week_round_trips_model`'s own precondition: `weekday` is
+        /// one of the seven positions within a week, `back_weeks` is one of the
+        /// whole weeks `m1`'s year spans, `weeks_in_year` is a real ISO week
+        /// count, `day_count` is exactly `m1` offset by `back_weeks` whole weeks
+        /// and `weekday` more days, and both `day_count` and `m1` stay within
+        /// `±100_000_000` (so `i64` arithmetic can't overflow near the edges).
+        /// Named so the harness's `requires` points at a real, registered
+        /// contract fragment instead of a raw conjunction.
+        #[logic(open)]
+        pub fn iso_week_round_trip_model_inputs_valid(
+            day_count: i64,
+            m1: i64,
+            weekday: i64,
+            back_weeks: i64,
+            weeks_in_year: i64,
+        ) -> bool {
+            pearlite! {
+                weekday >= 0i64 && weekday <= 6i64
+                    && back_weeks >= 0i64 && back_weeks < weeks_in_year
+                    && (weeks_in_year == 52i64 || weeks_in_year == 53i64)
+                    && day_count == m1 + back_weeks * 7i64 + weekday
+                    && day_count >= -100_000_000i64 && day_count <= 100_000_000i64
+                    && m1 >= -100_000_000i64 && m1 <= 100_000_000i64
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::iso_week::iso_week_round_trip_model_inputs_valid",
+        "creusot",
+        "requires",
+        || ISO_WEEK_ROUND_TRIP_MODEL_INPUTS_VALID_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_ISO_WEEK_ROUND_TRIPS_MODEL_SRC, {
         /// A model of `(date.iso_week().year(), date.iso_week().week(),
         /// date.weekday())`, then `NaiveDate::from_isoywd_opt` applied to
-        /// that triple: given `weekday` (this date's position within its
-        /// week), `back_weeks` (how many whole weeks separate `m1`, the
-        /// Monday starting this date's ISO year's week 1, from this date's
-        /// own week-Monday), and `weeks_in_year` (that year's real week
-        /// count), related the way chrono's own algorithm guarantees, the
-        /// computed week number and the rebuilt day-count satisfy the round
-        /// trip.
-        #[requires(
-            weekday >= 0i64 && weekday <= 6i64
-                && back_weeks >= 0i64 && back_weeks < weeks_in_year
-                && (weeks_in_year == 52i64 || weeks_in_year == 53i64)
-                && day_count == m1 + back_weeks * 7i64 + weekday
-                && day_count >= -100_000_000i64 && day_count <= 100_000_000i64
-                && m1 >= -100_000_000i64 && m1 <= 100_000_000i64
-        )]
+        /// that triple — see `iso_week_round_trip_model_inputs_valid`'s own
+        /// doc comment for the exact precondition.
+        #[requires(iso_week_round_trip_model_inputs_valid(day_count, m1, weekday, back_weeks, weeks_in_year))]
         #[ensures(iso_week_round_trip_holds(result.0, result.1, day_count))]
         fn verify_iso_week_round_trips_model(
             day_count: i64,

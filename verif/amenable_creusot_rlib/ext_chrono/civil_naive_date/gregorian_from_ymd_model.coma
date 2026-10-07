@@ -1,18 +1,19 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 72 8 72 95 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 102 8 102 95 *)
 
-let%span scivil_naive_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 73 15 73 25
-let%span scivil_naive_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 74 27 74 36
-let%span scivil_naive_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 75 19 75 23
-let%span scivil_naive_date'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 76 28 76 33
-let%span scivil_naive_date'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 77 19 77 23
-let%span scivil_naive_date'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 78 26 78 58
-let%span scivil_naive_date'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 67 19 67 23
-let%span scivil_naive_date'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 68 18 71 9
-let%span scivil_naive_date'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 91 19 91 23
-let%span scivil_naive_date'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 92 18 92 59
-let%span scivil_naive_date'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 55 16 57 76
+let%span scivil_naive_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 103 15 103 25
+let%span scivil_naive_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 104 27 104 36
+let%span scivil_naive_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 105 19 105 23
+let%span scivil_naive_date'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 106 28 106 33
+let%span scivil_naive_date'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 107 19 107 23
+let%span scivil_naive_date'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 108 26 108 58
+let%span scivil_naive_date'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 100 19 100 23
+let%span scivil_naive_date'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 101 18 101 86
+let%span scivil_naive_date'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 121 19 121 23
+let%span scivil_naive_date'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 122 18 122 59
+let%span scivil_naive_date'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 77 16 80 17
 let%span scivil_naive_date'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 34 16 42 17
-let%span scivil_naive_date'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 22 24 22 80
+let%span scivil_naive_date'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 55 16 57 76
+let%span scivil_naive_date'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 22 24 22 80
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 
 use creusot.int.Int32
@@ -21,7 +22,7 @@ use int.ComputerDivision
 use creusot.prelude.Any
 
 predicate is_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 21 8 21 46] (year: Int32.t) =
-  [%#scivil_naive_date'11] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  [%#scivil_naive_date'12] ComputerDivision.mod (Int32.to_int year) 4 = 0
   /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
 
 predicate ge_log_u32 [@inline:trivial] (self: UInt32.t) (other: UInt32.t) = [%#sord] UInt32.le other self
@@ -49,16 +50,22 @@ type tup3_i32_u32_u32 = { f0: Int32.t; f1: UInt32.t; f2: UInt32.t }
 type t_Option_tup3_i32_u32_u32 = None | Some tup3_i32_u32_u32
 
 predicate valid_gregorian_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 53 8 53 76] (year: Int32.t) (month: UInt32.t) (day: UInt32.t) =
-  [%#scivil_naive_date'9] Int32.le (Int32.neg (262143: Int32.t)) year
+  [%#scivil_naive_date'11] Int32.le (Int32.neg (262143: Int32.t)) year
   /\ Int32.le year (262142: Int32.t)
   /\ ge_log_u32 month (1: UInt32.t)
   /\ UInt32.le month (12: UInt32.t) /\ ge_log_u32 day (1: UInt32.t) /\ UInt32.le day (days_in_month_spec year month)
+
+predicate naive_date_from_ymd_model_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 70 8 75 17] (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (result: t_Option_tup3_i32_u32_u32) =
+  [%#scivil_naive_date'9] match result with
+    | Some date -> date = { f0 = year; f1 = month; f2 = day } /\ valid_gregorian_spec year month day
+    | None -> not valid_gregorian_spec year month day
+    end
 
 meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let gregorian_from_ymd_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 72 8 72 95]
+let gregorian_from_ymd_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 102 8 102 95]
   (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (return (x: t_Option_tup3_i32_u32_u32)) = (! bb0
   [ bb0 = s0
     [ s0 = [ &_9 <- Int32.le ([%#scivil_naive_date] (-262143: Int32.t)) year ] s1
@@ -95,8 +102,5 @@ let gregorian_from_ymd_model [#"/home/erik/repos/amenable/crates/amenable_creuso
   | & _21: UInt32.t = Any.any_l ()
   | & _24: tup3_i32_u32_u32 = Any.any_l () ])
   [ return (result: t_Option_tup3_i32_u32_u32) ->
-  {[@stop_split] [@expl:gregorian_from_ymd_model ensures] [%#scivil_naive_date'6] match result with
-      | Some date -> valid_gregorian_spec year month day /\ date = { f0 = year; f1 = month; f2 = day }
-      | None -> not valid_gregorian_spec year month day
-      end}
+  {[@stop_split] [@expl:gregorian_from_ymd_model ensures] [%#scivil_naive_date'6] naive_date_from_ymd_model_round_trip_holds year month day result}
     (! return {result}) ]

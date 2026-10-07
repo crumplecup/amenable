@@ -64,6 +64,22 @@ kani_ensures_ext!(
     }
 );
 
+/// `Utc`'s own fixed-offset bound, named so the harness's second `assert!`
+/// points at a real, registered contract fragment instead of a raw equation.
+#[cfg(kani)]
+fn utc_fixed_offset_is_zero_holds() -> bool {
+    Utc.fix() == FixedOffset::east_opt(0).unwrap()
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::utc::utc_fixed_offset_is_zero_holds",
+        "kani",
+        "ensures",
+        || "Utc.fix() == FixedOffset::east_opt(0).unwrap()",
+    )
+}
+
 amenable_derive::harness! {
     kani, VERIFY_UTC_LOCAL_OFFSET_IS_ALWAYS_SINGLE_AND_FIXED_OFFSET_IS_ZERO_SRC, {
         /// For every valid calendar date over every `i32` year and `u32` month and
@@ -80,7 +96,7 @@ amenable_derive::harness! {
                 "Utc's local offset must always be Single(Utc), for every valid date"
             );
             assert!(
-                Utc.fix() == FixedOffset::east_opt(0).unwrap(),
+                utc_fixed_offset_is_zero_holds(),
                 "Utc's fixed offset must always be zero"
             );
         }

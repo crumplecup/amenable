@@ -111,6 +111,46 @@ fn in_partition(year: i32, n: i32) -> bool {
     year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE
 }
 
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::week_span_partitions::in_partition",
+        "kani",
+        "ensures",
+        || "year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE",
+    )
+}
+
+/// `partitions_are_exhaustive_and_disjoint`'s own `kani::assume` bound, named so it
+/// points at a real, registered contract fragment instead of a raw equation.
+#[cfg(kani)]
+fn year_in_supported_range_holds(year: i32) -> bool {
+    year >= MIN_YEAR && year <= MAX_YEAR
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::week_span_partitions::year_in_supported_range_holds",
+        "kani",
+        "requires",
+        || "year >= MIN_YEAR && year <= MAX_YEAR",
+    )
+}
+
+/// The computed partition index's own bound, named for the same reason.
+#[cfg(kani)]
+fn computed_partition_index_in_range_holds(computed: i32) -> bool {
+    computed >= 0 && computed < PARTITION_COUNT
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::week_span_partitions::computed_partition_index_in_range_holds",
+        "kani",
+        "ensures",
+        || "computed >= 0 && computed < PARTITION_COUNT",
+    )
+}
+
 amenable_derive::harness! {
     kani, PARTITIONS_ARE_EXHAUSTIVE_AND_DISJOINT_SRC, {
         /// For every year chrono supports, exactly one of the 100 partitions above
@@ -121,10 +161,13 @@ amenable_derive::harness! {
         #[kani::proof]
         fn partitions_are_exhaustive_and_disjoint() {
             let year: i32 = kani::any();
-            kani::assume(year >= MIN_YEAR && year <= MAX_YEAR);
+            kani::assume(year_in_supported_range_holds(year));
 
             let computed = (year - MIN_YEAR).div_euclid(PARTITION_SIZE);
-            assert!(computed >= 0 && computed < PARTITION_COUNT, "computed index out of range");
+            assert!(
+                computed_partition_index_in_range_holds(computed),
+                "computed index out of range"
+            );
             assert!(in_partition(year, computed), "computed index does not actually contain year");
 
             if computed > 0 {

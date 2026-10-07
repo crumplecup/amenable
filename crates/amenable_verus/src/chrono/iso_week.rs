@@ -72,6 +72,21 @@ pub open spec fn iso_week_round_trip_holds(
         && rebuilt_day_count == day_count
 }
 
+/// `verify_iso_week_round_trips_model`'s own precondition: `weeks_in_year`
+/// is a real ISO week count, this date's own week-Monday falls somewhere
+/// in `m1 .. m1 + 7 * weeks_in_year` on the same 7-day grid as `m1`, and
+/// both `day_count` and `m1` stay within `±100_000_000` (so `i64`
+/// arithmetic can't overflow near the edges). Named so the function's
+/// `requires` points at a real spec fn instead of a raw conjunction.
+pub open spec fn iso_week_round_trip_model_inputs_valid(day_count: int, m1: int, weeks_in_year: int) -> bool {
+    (weeks_in_year == 52 || weeks_in_year == 53)
+        && m1 <= iso_week_monday_of(day_count)
+        && iso_week_monday_of(day_count) < m1 + 7 * weeks_in_year
+        && (iso_week_monday_of(day_count) - m1) % 7 == 0
+        && day_count >= -100_000_000 && day_count <= 100_000_000
+        && m1 >= -100_000_000 && m1 <= 100_000_000
+}
+
 /// Euclidean weekday index, proven equal to the specification -- Rust's
 /// native `%` on `i64` truncates toward zero (a negative remainder for
 /// a negative `day_count`), unlike Verus's own `int % 7`, which is
@@ -100,12 +115,7 @@ pub fn verify_iso_week_round_trips_model(
     iso_year: i64,
 ) -> (result: (i64, i64, i64))
     requires
-        _weeks_in_year == 52 || _weeks_in_year == 53,
-        m1 <= iso_week_monday_of(day_count as int),
-        iso_week_monday_of(day_count as int) < m1 + 7 * _weeks_in_year,
-        (iso_week_monday_of(day_count as int) - m1) % 7 == 0,
-        day_count >= -100_000_000 && day_count <= 100_000_000,
-        m1 >= -100_000_000 && m1 <= 100_000_000,
+        iso_week_round_trip_model_inputs_valid(day_count as int, m1 as int, _weeks_in_year as int),
     ensures
         iso_week_round_trip_holds(
             day_count as int,

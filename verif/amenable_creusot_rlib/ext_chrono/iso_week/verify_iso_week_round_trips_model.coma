@@ -1,15 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 70 8 76 23 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 98 8 104 23 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span siso_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 77 43 77 47
-let%span siso_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 77 30 77 47
-let%span siso_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 78 44 78 48
-let%span siso_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 78 31 78 48
-let%span siso_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 78 26 78 48
-let%span siso_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 78 26 78 58
-let%span siso_week'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 62 12 67 64
-let%span siso_week'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 69 18 69 74
-let%span siso_week'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 43 16 44 53
+let%span siso_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 105 43 105 47
+let%span siso_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 105 30 105 47
+let%span siso_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 106 44 106 48
+let%span siso_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 106 31 106 48
+let%span siso_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 106 26 106 48
+let%span siso_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 106 26 106 58
+let%span siso_week'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 96 19 96 108
+let%span siso_week'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 97 18 97 74
+let%span siso_week'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 69 16 74 68
+let%span siso_week'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 43 16 44 53
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -20,18 +21,8 @@ predicate ge_log_i64 [@inline:trivial] (self: Int64.t) (other: Int64.t) = [%#sor
 
 meta "rewrite_def" predicate ge_log_i64
 
-predicate iso_week_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 37 8 41 17] (week_number: Int64.t) (rebuilt_day_count: Int64.t) (day_count: Int64.t) =
-  [%#siso_week'7] ge_log_i64 week_number (1: Int64.t)
-  /\ Int64.le week_number (53: Int64.t) /\ rebuilt_day_count = day_count
-
-meta "compute_max_steps" 1000000
-
-meta "select_lsinst" "all"
-
-let verify_iso_week_round_trips_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 70 8 76 23]
-  (day_count: Int64.t) (m1: Int64.t) (weekday: Int64.t) (back_weeks: Int64.t) (weeks_in_year: Int64.t)
-  (return (x: tup2_i64_i64)) =
-{[@stop_split] [@expl:verify_iso_week_round_trips_model requires] [%#siso_week'5] ge_log_i64 weekday (0: Int64.t)
+predicate iso_week_round_trip_model_inputs_valid [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 61 8 67 17] (day_count: Int64.t) (m1: Int64.t) (weekday: Int64.t) (back_weeks: Int64.t) (weeks_in_year: Int64.t) =
+  [%#siso_week'7] ge_log_i64 weekday (0: Int64.t)
   /\ Int64.le weekday (6: Int64.t)
   /\ ge_log_i64 back_weeks (0: Int64.t)
   /\ Int64.lt back_weeks weeks_in_year
@@ -39,7 +30,20 @@ let verify_iso_week_round_trips_model [#"/home/erik/repos/amenable/crates/amenab
   /\ day_count = Int64.add (Int64.add m1 (Int64.mul back_weeks (7: Int64.t))) weekday
   /\ ge_log_i64 day_count (Int64.neg (100000000: Int64.t))
   /\ Int64.le day_count (100000000: Int64.t)
-  /\ ge_log_i64 m1 (Int64.neg (100000000: Int64.t)) /\ Int64.le m1 (100000000: Int64.t)}
+  /\ ge_log_i64 m1 (Int64.neg (100000000: Int64.t)) /\ Int64.le m1 (100000000: Int64.t)
+
+predicate iso_week_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 37 8 41 17] (week_number: Int64.t) (rebuilt_day_count: Int64.t) (day_count: Int64.t) =
+  [%#siso_week'8] ge_log_i64 week_number (1: Int64.t)
+  /\ Int64.le week_number (53: Int64.t) /\ rebuilt_day_count = day_count
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_iso_week_round_trips_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 98 8 104 23]
+  (day_count: Int64.t) (m1: Int64.t) (weekday: Int64.t) (back_weeks: Int64.t) (weeks_in_year: Int64.t)
+  (return (x: tup2_i64_i64)) =
+{[@stop_split] [@expl:verify_iso_week_round_trips_model requires] [%#siso_week'5] iso_week_round_trip_model_inputs_valid day_count m1 weekday back_weeks weeks_in_year}
   (! bb0
   [ bb0 = s0
     [ s0 = Int64.add [%#siso_week'0] {back_weeks} {[%#siso_week] (1: Int64.t)}

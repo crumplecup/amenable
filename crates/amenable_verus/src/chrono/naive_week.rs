@@ -55,14 +55,28 @@ pub open spec fn naive_week_span_holds(first: Option<i64>, last: Option<i64>) ->
     }
 }
 
+/// `verify_naive_week_span_model`'s own precondition: `back` is one of
+/// the seven possible weekday-to-week-start offsets, `min_day` is at
+/// most `max_day`, and all three day-count values stay within
+/// `±100_000_000` (so `i64` arithmetic can't overflow near the edges).
+/// Named so the function's `requires` points at a real spec fn instead
+/// of a raw conjunction.
+pub open spec fn naive_week_span_model_inputs_valid(day_count: i64, back: i64, min_day: i64, max_day: i64) -> bool {
+    back >= 0 && back <= 6
+        && min_day <= max_day
+        && day_count >= -100_000_000 && day_count <= 100_000_000
+        && min_day >= -100_000_000 && min_day <= 100_000_000
+        && max_day >= -100_000_000 && max_day <= 100_000_000
+}
+
 /// A model of `(week.checked_first_day(), week.checked_last_day())`:
 /// `day_count` stands for the date's position on the calendar's own
 /// number line, `back` for how many days separate it from the week's
-/// start (`0..=6`, one of the seven possible weekday-to-week-start
-/// offsets), and `min_day`/`max_day` for the representable range's own
-/// bounds, at any value. `first`/`last` exist exactly when stepping
-/// `back` days back, respectively `6 - back` days forward, stays
-/// within `min_day..=max_day` — the same shape
+/// start, and `min_day`/`max_day` for the representable range's own
+/// bounds — see `naive_week_span_model_inputs_valid`'s own doc comment
+/// for the exact precondition. `first`/`last` exist exactly when
+/// stepping `back` days back, respectively `6 - back` days forward,
+/// stays within `min_day..=max_day` — the same shape
 /// `checked_first_day`/`checked_last_day`'s own `Option` result takes.
 pub fn verify_naive_week_span_model(
     day_count: i64,
@@ -71,11 +85,7 @@ pub fn verify_naive_week_span_model(
     max_day: i64,
 ) -> (result: (Option<i64>, Option<i64>))
     requires
-        back >= 0 && back <= 6,
-        min_day <= max_day,
-        day_count >= -100_000_000 && day_count <= 100_000_000,
-        min_day >= -100_000_000 && min_day <= 100_000_000,
-        max_day >= -100_000_000 && max_day <= 100_000_000,
+        naive_week_span_model_inputs_valid(day_count, back, min_day, max_day),
     ensures
         naive_week_span_holds(result.0, result.1),
 {

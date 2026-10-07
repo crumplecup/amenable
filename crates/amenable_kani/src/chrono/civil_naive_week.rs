@@ -96,6 +96,77 @@ fn days_back_to(date: chrono::NaiveDate, start: Weekday) -> u32 {
     (date.weekday().num_days_from_monday() + 7 - start.num_days_from_monday()) % 7
 }
 
+/// Piece 1's own bound, named so each harness's `assert!` points at a real,
+/// registered contract fragment instead of a raw equation.
+#[cfg(kani)]
+fn first_day_starts_on_the_chosen_weekday_holds(first: chrono::NaiveDate, start: Weekday) -> bool {
+    first.weekday() == start
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::civil_naive_week::first_day_starts_on_the_chosen_weekday_holds",
+        "kani",
+        "ensures",
+        || "first.weekday() == start",
+    )
+}
+
+/// Piece 2's own bound, named for the same reason.
+#[cfg(kani)]
+fn first_and_last_day_bracket_the_date_holds(
+    first: chrono::NaiveDate,
+    date: chrono::NaiveDate,
+    last: chrono::NaiveDate,
+) -> bool {
+    first <= date && date <= last
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::civil_naive_week::first_and_last_day_bracket_the_date_holds",
+        "kani",
+        "ensures",
+        || "first <= date && date <= last",
+    )
+}
+
+/// Piece 3's own bound, named for the same reason.
+#[cfg(kani)]
+fn first_day_exists_exactly_when_the_date_can_step_back_holds(
+    checked_some: bool,
+    fits: bool,
+) -> bool {
+    checked_some == fits
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::civil_naive_week::first_day_exists_exactly_when_the_date_can_step_back_holds",
+        "kani",
+        "ensures",
+        || "date.week(start).checked_first_day().is_some() == fits",
+    )
+}
+
+/// Piece 4's own bound, named for the same reason.
+#[cfg(kani)]
+fn last_day_exists_exactly_when_the_date_can_step_forward_holds(
+    checked_some: bool,
+    fits: bool,
+) -> bool {
+    checked_some == fits
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::civil_naive_week::last_day_exists_exactly_when_the_date_can_step_forward_holds",
+        "kani",
+        "ensures",
+        || "date.week(start).checked_last_day().is_some() == fits",
+    )
+}
+
 amenable_derive::harness! {
     kani, FIRST_DAY_WEEKDAY_SRC, {
         /// Piece 1: when both checked ends exist, the first day's weekday is the start.
@@ -108,7 +179,7 @@ amenable_derive::harness! {
             if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) {
                 let week = date.week(start);
                 if let (Some(first), Some(_)) = (week.checked_first_day(), week.checked_last_day()) {
-                    assert!(first.weekday() == start);
+                    assert!(first_day_starts_on_the_chosen_weekday_holds(first, start));
                 }
             }
         }
@@ -128,7 +199,7 @@ amenable_derive::harness! {
             if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) {
                 let week = date.week(start);
                 if let (Some(first), Some(last)) = (week.checked_first_day(), week.checked_last_day()) {
-                    assert!(first <= date && date <= last);
+                    assert!(first_and_last_day_bracket_the_date_holds(first, date, last));
                 }
             }
         }
@@ -149,7 +220,10 @@ amenable_derive::harness! {
                 let fits = date
                     .checked_sub_days(Days::new(u64::from(days_back_to(date, start))))
                     .is_some();
-                assert!(date.week(start).checked_first_day().is_some() == fits);
+                assert!(first_day_exists_exactly_when_the_date_can_step_back_holds(
+                    date.week(start).checked_first_day().is_some(),
+                    fits
+                ));
             }
         }
     }
@@ -169,7 +243,10 @@ amenable_derive::harness! {
                 let fits = date
                     .checked_add_days(Days::new(u64::from(6 - days_back_to(date, start))))
                     .is_some();
-                assert!(date.week(start).checked_last_day().is_some() == fits);
+                assert!(last_day_exists_exactly_when_the_date_can_step_forward_holds(
+                    date.week(start).checked_last_day().is_some(),
+                    fits
+                ));
             }
         }
     }

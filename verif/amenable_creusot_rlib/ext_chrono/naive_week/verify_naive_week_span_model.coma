@@ -1,15 +1,16 @@
-(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 60 8 65 39 *)
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 85 8 90 39 *)
 
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span snaive_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 66 26 66 30
-let%span snaive_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 66 26 66 37
-let%span snaive_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 67 27 67 43
-let%span snaive_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 67 62 67 78
-let%span snaive_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 68 26 68 45
-let%span snaive_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 68 64 68 83
-let%span snaive_week'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 54 12 57 74
-let%span snaive_week'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 59 18 59 59
-let%span snaive_week'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 34 16 37 17
+let%span snaive_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 91 26 91 30
+let%span snaive_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 91 26 91 37
+let%span snaive_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 92 27 92 43
+let%span snaive_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 92 62 92 78
+let%span snaive_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 93 26 93 45
+let%span snaive_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 93 64 93 83
+let%span snaive_week'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 83 19 83 88
+let%span snaive_week'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 84 18 84 59
+let%span snaive_week'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 56 16 59 78
+let%span snaive_week'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 34 16 37 17
 
 use creusot.int.Int64
 use creusot.prelude.Any
@@ -22,8 +23,18 @@ predicate ge_log_i64 [@inline:trivial] (self: Int64.t) (other: Int64.t) = [%#sor
 
 meta "rewrite_def" predicate ge_log_i64
 
+predicate naive_week_span_model_inputs_valid [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 54 8 54 112] (day_count: Int64.t) (back: Int64.t) (min_day: Int64.t) (max_day: Int64.t) =
+  [%#snaive_week'7] ge_log_i64 back (0: Int64.t)
+  /\ Int64.le back (6: Int64.t)
+  /\ Int64.le min_day max_day
+  /\ ge_log_i64 day_count (Int64.neg (100000000: Int64.t))
+  /\ Int64.le day_count (100000000: Int64.t)
+  /\ ge_log_i64 min_day (Int64.neg (100000000: Int64.t))
+  /\ Int64.le min_day (100000000: Int64.t)
+  /\ ge_log_i64 max_day (Int64.neg (100000000: Int64.t)) /\ Int64.le max_day (100000000: Int64.t)
+
 predicate naive_week_span_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 32 8 32 83] (first: t_Option_i64) (last: t_Option_i64) =
-  [%#snaive_week'7] match { f0 = first; f1 = last } with
+  [%#snaive_week'8] match { f0 = first; f1 = last } with
     | {f0 = Some f; f1 = Some l} -> Int64.sub l f = (6: Int64.t)
     | _ -> true
     end
@@ -32,16 +43,9 @@ meta "compute_max_steps" 1000000
 
 meta "select_lsinst" "all"
 
-let verify_naive_week_span_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 60 8 65 39]
+let verify_naive_week_span_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 85 8 90 39]
   (day_count: Int64.t) (back: Int64.t) (min_day: Int64.t) (max_day: Int64.t) (return (x: tup2_Option_i64_Option_i64)) =
-{[@stop_split] [@expl:verify_naive_week_span_model requires] [%#snaive_week'5] ge_log_i64 back (0: Int64.t)
-  /\ Int64.le back (6: Int64.t)
-  /\ Int64.le min_day max_day
-  /\ ge_log_i64 day_count (Int64.neg (100000000: Int64.t))
-  /\ Int64.le day_count (100000000: Int64.t)
-  /\ ge_log_i64 min_day (Int64.neg (100000000: Int64.t))
-  /\ Int64.le min_day (100000000: Int64.t)
-  /\ ge_log_i64 max_day (Int64.neg (100000000: Int64.t)) /\ Int64.le max_day (100000000: Int64.t)}
+{[@stop_split] [@expl:verify_naive_week_span_model requires] [%#snaive_week'5] naive_week_span_model_inputs_valid day_count back min_day max_day}
   (! bb0
   [ bb0 = s0
     [ s0 = Int64.sub [%#snaive_week'0] {[%#snaive_week] (6: Int64.t)} {back}

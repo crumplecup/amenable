@@ -41,21 +41,46 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, NAIVE_WEEK_SPAN_MODEL_INPUTS_VALID_SRC, {
+        /// `verify_naive_week_span_model`'s own precondition: `back` is one of
+        /// the seven possible weekday-to-week-start offsets, `min_day` is at
+        /// most `max_day`, and all three day-count values stay within
+        /// `±100_000_000` (so `i64` arithmetic can't overflow near the edges;
+        /// chrono's own day-count range is roughly `±95_600_000`, comfortably
+        /// inside that margin, not narrowed by it). Named so the harness's
+        /// `requires` points at a real, registered contract fragment instead of
+        /// a raw conjunction.
+        #[logic(open)]
+        pub fn naive_week_span_model_inputs_valid(day_count: i64, back: i64, min_day: i64, max_day: i64) -> bool {
+            pearlite! {
+                back >= 0i64 && back <= 6i64 && min_day <= max_day
+                    && day_count >= -100_000_000i64 && day_count <= 100_000_000i64
+                    && min_day >= -100_000_000i64 && min_day <= 100_000_000i64
+                    && max_day >= -100_000_000i64 && max_day <= 100_000_000i64
+            }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::naive_week::naive_week_span_model_inputs_valid",
+        "creusot",
+        "requires",
+        || NAIVE_WEEK_SPAN_MODEL_INPUTS_VALID_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, VERIFY_NAIVE_WEEK_SPAN_MODEL_SRC, {
         /// A model of `(week.checked_first_day(), week.checked_last_day())`:
         /// `day_count` stands for the date's position on the calendar's own
         /// number line, `back` for how many days separate it from the
-        /// week's start (`0..=6`), and `min_day`/`max_day` for the
-        /// representable range's own bounds, at any value within
-        /// `±100_000_000` (so `i64` arithmetic can't overflow near the
-        /// edges; chrono's own day-count range is roughly `±95_600_000`,
-        /// comfortably inside that margin, not narrowed by it).
-        #[requires(
-            back >= 0i64 && back <= 6i64 && min_day <= max_day
-                && day_count >= -100_000_000i64 && day_count <= 100_000_000i64
-                && min_day >= -100_000_000i64 && min_day <= 100_000_000i64
-                && max_day >= -100_000_000i64 && max_day <= 100_000_000i64
-        )]
+        /// week's start, and `min_day`/`max_day` for the representable
+        /// range's own bounds — see `naive_week_span_model_inputs_valid`'s
+        /// own doc comment for the exact precondition.
+        #[requires(naive_week_span_model_inputs_valid(day_count, back, min_day, max_day))]
         #[ensures(naive_week_span_holds(result.0, result.1))]
         fn verify_naive_week_span_model(
             day_count: i64,
