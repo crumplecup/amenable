@@ -94,6 +94,7 @@ chrono = [
     "dep:amenable_ext",
     "amenable_ext/chrono",
 ]
+chrono-tz = ["dep:amenable_ext", "amenable_ext/chrono-tz"]
 
 [lints]
 workspace = true
