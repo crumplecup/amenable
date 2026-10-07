@@ -84,3 +84,19 @@ amenable_derive::verus_ensures_predicate!(
     ),
     "naive_week_span_holds"
 );
+
+impl_verus_witness_checked_ext!(
+    chrono::IsoWeek,
+    "verify_iso_week_round_trips_model",
+    "../../../../amenable_verus/src/chrono/iso_week.rs"
+);
+
+amenable_derive::verus_ensures_predicate!(
+    ExtStandard<chrono::IsoWeek>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(chrono::IsoWeek),
+        ">"
+    ),
+    "iso_week_round_trip_holds"
+);
