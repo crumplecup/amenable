@@ -30,6 +30,11 @@ derive_setters = { workspace = true }
 inventory = { workspace = true }
 # Optional, gated by the `jiff` feature below.
 jiff = { workspace = true, optional = true }
+# Optional, gated by the `chrono` feature below.
+chrono = { workspace = true, optional = true }
+# Optional, gated by the `chrono` feature below: generates the year-partition gallery
+# sweep's harnesses, one real function per partition.
+seq-macro = { workspace = true, optional = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 
@@ -39,6 +44,7 @@ miette = { workspace = true }
 [features]
 default = []
 jiff = ["dep:amenable_ext", "amenable_ext/jiff", "dep:jiff"]
+chrono = ["dep:amenable_ext", "amenable_ext/chrono", "dep:chrono", "dep:seq-macro"]
 
 [lints]
 workspace = true

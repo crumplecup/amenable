@@ -85,8 +85,8 @@ cordial-coverage:
 # itself is generic (a real 0.67.0 tooling limitation, not a project
 # convention): contracted logic lives on plain inherent methods instead,
 # with trait impls reduced to single-expression delegation.
-verify-kani harness="":
-    cargo run -p amenable -- verify kani {{ if harness == "" { "" } else { "--proof " + harness } }} --harness-timeout 3m
+verify-kani harness="" features="":
+    cargo run -p amenable {{ if features == "" { "" } else { "--features " + features } }} -- verify kani {{ if harness == "" { "" } else { "--proof " + harness } }} --harness-timeout 3m
 
 # Per-contract proof-coverage report for the temporal contract graph:
 # one row per atomic contract, showing which of Kani / Creusot / Verus

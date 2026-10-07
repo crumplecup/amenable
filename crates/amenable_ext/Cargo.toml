@@ -54,6 +54,7 @@ jiff = [
 # are mutually exclusive.
 chrono = [
     "dep:chrono",
+    "dep:amenable_time",
     "chrono/serde",
     "chrono/defmt",
     "chrono/unstable-locales",

@@ -19,6 +19,8 @@ amenable_derive = { workspace = true }
 # Optional: only pulled in by a target feature that needs it (jiff so
 # far) -- see docs/AMENABLE_EXT_PLAN.md.
 amenable_ext = { workspace = true, optional = true }
+# Optional, gated by the `chrono` feature below.
+chrono = { workspace = true, optional = true }
 amenable_gaap = { workspace = true }
 amenable_std = { workspace = true }
 amenable_time = { workspace = true }
@@ -32,6 +34,7 @@ jiff = { workspace = true, optional = true }
 [features]
 default = []
 jiff = ["dep:amenable_ext", "amenable_ext/jiff", "dep:jiff"]
+chrono = ["dep:amenable_ext", "amenable_ext/chrono", "dep:chrono"]
 
 [lints]
 workspace = true
