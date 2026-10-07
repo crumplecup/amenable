@@ -245,10 +245,22 @@ pass on the chrono backend for every civil carrier.
   `extern_spec!`s against chrono's actual API, no model layer — `Utc`'s is the first
   `extern_spec!` in this crate against a trait impl block rather than an inherent
   one).
+- Done (2026-10-07): Verus witnesses for all seven types. Six are real,
+  hand-verified accommodation models (chrono has zero `vstd` coverage and Verus
+  never resolves `Cargo.toml`, so there's no way to reach chrono's real code at
+  all): `FixedOffset`, `NaiveDate` (full leap-year rule, not narrowed), `NaiveTime`
+  (including the leap-second exception), `NaiveDateTime`, `NaiveWeek` (trivial for
+  Verus's SMT reasoning — no partitioning needed, unlike the Kani witness), and
+  `IsoWeek` (the hard one: needed chrono's real ISO week-date algorithm, modeled by
+  taking the real algorithm's own per-year outputs — the week-1 Monday and that
+  year's week count — as given inputs with their real guaranteed properties, rather
+  than re-deriving chrono's year-selection rule). `Utc` stays trusted: its claim has
+  no input-dependent content for Verus to model, and Verus has no `extern_spec!`-
+  style escape hatch to reach the real trait impl the way Kani/Creusot do.
 - Not done: Creusot witnesses for `NaiveTime`, `NaiveDateTime`, `IsoWeek`, and
-  `NaiveWeek` (4 of 7 types). Verus witnesses for all seven types (none exist yet).
-  The proof-chain tests in `proof_chain_test.rs` (none exist yet, for any type).
-  `cordial coverage` has not yet been checked against these seven rows.
+  `NaiveWeek` (4 of 7 types). The proof-chain tests in `proof_chain_test.rs` (none
+  exist yet, for any type). `cordial coverage` has not yet been checked against
+  these seven rows.
 
 ## Phase 3: Offset and zone bridges, zoned types (15 rows)
 
