@@ -1,0 +1,6 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": { "vc_days_in_month_model": { "prover": "z3", "time": 0.056 } }
+  }
+}

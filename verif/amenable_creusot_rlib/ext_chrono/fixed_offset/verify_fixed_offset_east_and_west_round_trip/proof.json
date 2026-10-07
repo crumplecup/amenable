@@ -1,0 +1,15 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_east_opt": { "prover": "z3", "time": 0.007 },
+      "vc_elim_Some": { "prover": "z3", "time": 0.001 },
+      "vc_local_minus_utc": { "prover": "z3", "time": 0.004 },
+      "vc_verify_fixed_offset_east_and_west_round_trip": {
+        "prover": "z3",
+        "time": 0.01
+      },
+      "vc_west_opt": { "prover": "z3", "time": 0.007 }
+    }
+  }
+}

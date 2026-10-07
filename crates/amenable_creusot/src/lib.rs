@@ -21,6 +21,14 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+#[cfg(not(creusot))]
+#[cfg(feature = "chrono")]
+mod chrono;
+#[cfg(not(creusot))]
+#[cfg(any(feature = "jiff", feature = "chrono"))]
+mod ext_bridge;
+#[cfg(feature = "chrono")]
+mod ext_chrono;
 #[cfg(feature = "jiff")]
 mod ext_jiff;
 #[cfg(not(creusot))]
@@ -34,6 +42,11 @@ mod stoplight;
 mod time;
 mod witness;
 
+#[cfg(feature = "chrono")]
+pub use ext_chrono::{
+    VERIFY_FIXED_OFFSET_EAST_AND_WEST_ROUND_TRIP_SRC, VERIFY_NAIVE_DATE_MODEL_ROUND_TRIPS_SRC,
+    VERIFY_UTC_LOCAL_OFFSET_IS_ALWAYS_SINGLE_AND_FIXED_OFFSET_IS_ZERO_SRC,
+};
 #[cfg(feature = "jiff")]
 pub use ext_jiff::{
     ERROR_CLASSIFICATION_PREDICATES_ARE_MUTUALLY_EXCLUSIVE_HOLDS_SRC,

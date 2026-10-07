@@ -1,0 +1,75 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 118 8 118 106 *)
+
+let%span scivil_naive_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 119 12 119 54
+let%span scivil_naive_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 113 19 113 23
+let%span scivil_naive_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 114 18 117 9
+let%span scivil_naive_date'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 67 19 67 23
+let%span scivil_naive_date'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 68 18 71 9
+let%span scivil_naive_date'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 55 16 57 76
+let%span scivil_naive_date'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 34 16 42 17
+let%span scivil_naive_date'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 22 24 22 80
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+
+use creusot.int.Int32
+use creusot.int.UInt32
+use int.ComputerDivision
+use creusot.prelude.Any
+
+type tup3_i32_u32_u32 = { f0: Int32.t; f1: UInt32.t; f2: UInt32.t }
+
+type t_Option_tup3_i32_u32_u32 = None | Some tup3_i32_u32_u32
+
+predicate ge_log_u32 [@inline:trivial] (self: UInt32.t) (other: UInt32.t) = [%#sord] UInt32.le other self
+
+meta "rewrite_def" predicate ge_log_u32
+
+predicate is_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 21 8 21 46] (year: Int32.t) =
+  [%#scivil_naive_date'6] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+
+function days_in_month_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 32 8 32 63] (year: Int32.t) (month: UInt32.t) : UInt32.t
+ = [%#scivil_naive_date'5] if month = (2: UInt32.t) then
+    if is_leap_year year then (29: UInt32.t) else (28: UInt32.t)
+  else
+    if month = (4: UInt32.t) \/ month = (6: UInt32.t) \/ month = (9: UInt32.t) \/ month = (11: UInt32.t) then
+      (30: UInt32.t)
+    else
+      if ge_log_u32 month (1: UInt32.t) /\ UInt32.le month (12: UInt32.t) then (31: UInt32.t) else (0: UInt32.t)
+  
+
+
+predicate valid_gregorian_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 53 8 53 76] (year: Int32.t) (month: UInt32.t) (day: UInt32.t) =
+  [%#scivil_naive_date'4] Int32.le (Int32.neg (262143: Int32.t)) year
+  /\ Int32.le year (262142: Int32.t)
+  /\ ge_log_u32 month (1: UInt32.t)
+  /\ UInt32.le month (12: UInt32.t) /\ ge_log_u32 day (1: UInt32.t) /\ UInt32.le day (days_in_month_spec year month)
+
+let gregorian_from_ymd_model (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (return (x: t_Option_tup3_i32_u32_u32)) =
+any
+  [ return (result: t_Option_tup3_i32_u32_u32) ->
+  {[@stop_split] [@expl:gregorian_from_ymd_model ensures] [%#scivil_naive_date'3] match result with
+      | Some date -> valid_gregorian_spec year month day /\ date = { f0 = year; f1 = month; f2 = day }
+      | None -> not valid_gregorian_spec year month day
+      end}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_naive_date_model_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 118 8 118 106]
+  (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (return (x: t_Option_tup3_i32_u32_u32)) = (! bb0
+  [ bb0 = s0
+    [ s0 = gregorian_from_ymd_model [%#scivil_naive_date] {year} {month} {day}
+        (fun (_x: t_Option_tup3_i32_u32_u32) -> [ &_ret <- _x ] s1)
+    | s1 = return {_ret} ] ]
+  [ & _ret: t_Option_tup3_i32_u32_u32 = Any.any_l ()
+  | & year: Int32.t = year
+  | & month: UInt32.t = month
+  | & day: UInt32.t = day ])
+  [ return (result: t_Option_tup3_i32_u32_u32) ->
+  {[@stop_split] [@expl:verify_naive_date_model_round_trips ensures] [%#scivil_naive_date'1] match result with
+      | Some date -> date = { f0 = year; f1 = month; f2 = day } /\ valid_gregorian_spec year month day
+      | None -> not valid_gregorian_spec year month day
+      end}
+    (! return {result}) ]

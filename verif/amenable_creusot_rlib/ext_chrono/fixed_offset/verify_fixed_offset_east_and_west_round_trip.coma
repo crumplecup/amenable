@@ -1,0 +1,118 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 61 8 61 97 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sfixed_offset = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 63 16 63 51
+let%span sfixed_offset'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 65 16 65 51
+let%span sfixed_offset'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 68 35 68 59
+let%span sfixed_offset'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 59 19 59 23
+let%span sfixed_offset'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 60 18 60 75
+let%span sfixed_offset'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 31 16 34 17
+let%span sfixed = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 62 4 62 59
+let%span sfixed'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 97 4 97 59
+let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 16 18 19 9
+let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 23 18 26 9
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 31 28 31 32
+let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 30 18 30 68
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+
+use creusot.int.Int32
+use creusot.prelude.Any
+
+type t_FixedOffset
+
+type t_Option_FixedOffset = None | Some t_FixedOffset
+
+predicate inv_FixedOffset (_1: t_FixedOffset)
+
+predicate inv_Option_FixedOffset (_1: t_Option_FixedOffset)
+
+axiom inv_axiom [@rewrite]: forall x: t_Option_FixedOffset [inv_Option_FixedOffset x]. inv_Option_FixedOffset x
+    = match x with
+      | None -> true
+      | Some f0 -> inv_FixedOffset f0
+      end
+
+function fixed_offset_local_minus_utc_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 18 0 18 81] (_o: t_FixedOffset) : Int32.t
+
+predicate ge_log_i32 [@inline:trivial] (self: Int32.t) (other: Int32.t) = [%#sord] Int32.le other self
+
+meta "rewrite_def" predicate ge_log_i32
+
+let east_opt (secs: Int32.t) (return (x: t_Option_FixedOffset)) = any
+  [ return (result: t_Option_FixedOffset) ->
+  {[@stop_split] [@expl:east_opt ensures] ([@stop_split] [@expl:east_opt result type invariant] [%#sfixed] inv_Option_FixedOffset result)
+    /\ ([@stop_split] [@expl:east_opt ensures] [%#slogic] match result with
+      | Some offset -> fixed_offset_local_minus_utc_value offset = secs
+      | None -> Int32.le secs (Int32.neg (86400: Int32.t)) \/ ge_log_i32 secs (86400: Int32.t)
+      end)}
+    (! return {result}) ]
+
+let west_opt (secs: Int32.t) (return (x: t_Option_FixedOffset)) = any
+  [ return (result: t_Option_FixedOffset) ->
+  {[@stop_split] [@expl:west_opt ensures] ([@stop_split] [@expl:west_opt result type invariant] [%#sfixed'0] inv_Option_FixedOffset result)
+    /\ ([@stop_split] [@expl:west_opt ensures] [%#slogic'0] match result with
+      | Some offset -> fixed_offset_local_minus_utc_value offset = Int32.neg secs
+      | None -> Int32.le secs (Int32.neg (86400: Int32.t)) \/ ge_log_i32 secs (86400: Int32.t)
+      end)}
+    (! return {result}) ]
+
+let elim_Some (_x: t_Option_FixedOffset) (return (f0: t_FixedOffset)) = any
+  [ _k (f0: t_FixedOffset) -> {Some f0 = _x} (! return {f0})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate invariant_ref_FixedOffset [@inline:trivial] (self: t_FixedOffset) = [%#sinvariant] inv_FixedOffset self
+
+meta "rewrite_def" predicate invariant_ref_FixedOffset
+
+predicate inv_ref_FixedOffset [@inline:trivial] (_1: t_FixedOffset) = invariant_ref_FixedOffset _1
+
+meta "rewrite_def" predicate inv_ref_FixedOffset
+
+let local_minus_utc (self_: t_FixedOffset) (return (x: Int32.t)) =
+{[@stop_split] [@expl:local_minus_utc 'self_' type invariant] [%#slogic'1] inv_ref_FixedOffset self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:local_minus_utc ensures] [%#slogic'2] result
+    = fixed_offset_local_minus_utc_value self_}
+    (! return {result}) ]
+
+type t_Result_i32_unit = Ok Int32.t | Err ()
+
+predicate fixed_offset_east_and_west_round_trip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 25 8 29 17] (secs: Int32.t) (east: bool) (round_trip: t_Result_i32_unit) =
+  [%#sfixed_offset'4] match round_trip with
+    | Ok got -> if east then got = secs else got = Int32.neg secs
+    | Err _ -> Int32.le secs (Int32.neg (86400: Int32.t)) \/ ge_log_i32 secs (86400: Int32.t)
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_fixed_offset_east_and_west_round_trip [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 61 8 61 97]
+  (secs: Int32.t) (east: bool) (return (x: t_Result_i32_unit)) = (! bb0
+  [ bb0 = any [ br0 -> {east = false} (! bb3) | br1 -> {east} (! bb1) ]
+  | bb1 = s0
+    [ s0 = east_opt [%#sfixed_offset] {secs} (fun (_x: t_Option_FixedOffset) -> [ &constructed <- _x ] s1) | s1 = bb5 ]
+  | bb3 = s0
+    [ s0 = west_opt [%#sfixed_offset'0] {secs} (fun (_x: t_Option_FixedOffset) -> [ &constructed <- _x ] s1)
+    | s1 = bb5 ]
+  | bb5 = any [ br0 -> {constructed = None} (! bb8) | br1 (x0: t_FixedOffset) -> {constructed = Some x0} (! bb9) ]
+  | bb9 = s0
+    [ s0 = elim_Some {constructed} (fun (r0: t_FixedOffset) -> [ &offset <- r0 ] s1)
+    | s1 = local_minus_utc [%#sfixed_offset'1] {offset} (fun (_x: Int32.t) -> [ &_13 <- _x ] s2)
+    | s2 = [ &_ret <- Ok _13 ] s3
+    | s3 = return {_ret} ]
+  | bb8 = s0 [ s0 = [ &_ret <- Err _15 ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: t_Result_i32_unit = Any.any_l ()
+  | & secs: Int32.t = secs
+  | & east: bool = east
+  | & constructed: t_Option_FixedOffset = Any.any_l ()
+  | & offset: t_FixedOffset = Any.any_l ()
+  | & _13: Int32.t = Any.any_l ()
+  | & _15: () = Any.any_l () ])
+  [ return (result: t_Result_i32_unit) ->
+  {[@stop_split] [@expl:verify_fixed_offset_east_and_west_round_trip ensures] [%#sfixed_offset'3] fixed_offset_east_and_west_round_trip secs east result}
+    (! return {result}) ]

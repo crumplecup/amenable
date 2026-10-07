@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_days_in_month_model": { "prover": "z3", "time": 0.004 },
+      "vc_gregorian_from_ymd_model": { "prover": "z3", "time": 0.022 }
+    }
+  }
+}

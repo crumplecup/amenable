@@ -1,0 +1,12 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_gregorian_from_ymd_model": { "prover": "z3", "time": 0.004 },
+      "vc_verify_naive_date_model_round_trips": {
+        "prover": "z3",
+        "time": 0.019
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_fix_Utc": { "prover": "alt-ergo", "time": 0.019 },
+      "vc_local_minus_utc": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_offset_from_local_date_Utc": {
+        "prover": "alt-ergo",
+        "time": 0.019
+      },
+      "vc_verify_utc_local_offset_is_always_single_and_fixed_offset_is_zero": {
+        "prover": "alt-ergo",
+        "time": 0.03
+      }
+    }
+  }
+}

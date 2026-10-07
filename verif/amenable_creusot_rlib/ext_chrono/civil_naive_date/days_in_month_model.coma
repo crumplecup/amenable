@@ -1,0 +1,159 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 93 8 93 60 *)
+
+let%span scivil_naive_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 31 94 32
+let%span scivil_naive_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 24 94 32
+let%span scivil_naive_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 36 94 37
+let%span scivil_naive_date'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 48 94 51
+let%span scivil_naive_date'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 41 94 51
+let%span scivil_naive_date'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 55 94 56
+let%span scivil_naive_date'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 23 94 76
+let%span scivil_naive_date'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 68 94 71
+let%span scivil_naive_date'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 61 94 71
+let%span scivil_naive_date'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 94 75 94 76
+let%span scivil_naive_date'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 95 24 95 28
+let%span scivil_naive_date'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 96 26 96 31
+let%span scivil_naive_date'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 96 41 96 46
+let%span scivil_naive_date'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 97 31 97 35
+let%span scivil_naive_date'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 97 48 97 52
+let%span scivil_naive_date'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 97 65 97 69
+let%span scivil_naive_date'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 97 82 97 87
+let%span scivil_naive_date'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 98 16 98 21
+let%span scivil_naive_date'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 99 31 99 35
+let%span scivil_naive_date'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 99 48 99 53
+let%span scivil_naive_date'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 100 16 100 21
+let%span scivil_naive_date'20 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 102 16 102 20
+let%span scivil_naive_date'21 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 91 19 91 23
+let%span scivil_naive_date'22 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 92 18 92 59
+let%span scivil_naive_date'23 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 34 16 42 17
+let%span scivil_naive_date'24 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 22 24 22 80
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+
+use creusot.int.Int32
+use creusot.prelude.Bool
+use creusot.int.UInt32
+use creusot.prelude.Any
+use int.ComputerDivision
+
+predicate is_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 21 8 21 46] (year: Int32.t) =
+  [%#scivil_naive_date'24] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+
+predicate ge_log_u32 [@inline:trivial] (self: UInt32.t) (other: UInt32.t) = [%#sord] UInt32.le other self
+
+meta "rewrite_def" predicate ge_log_u32
+
+function days_in_month_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 32 8 32 63] (year: Int32.t) (month: UInt32.t) : UInt32.t
+ = [%#scivil_naive_date'23] if month = (2: UInt32.t) then
+    if is_leap_year year then (29: UInt32.t) else (28: UInt32.t)
+  else
+    if month = (4: UInt32.t) \/ month = (6: UInt32.t) \/ month = (9: UInt32.t) \/ month = (11: UInt32.t) then
+      (30: UInt32.t)
+    else
+      if ge_log_u32 month (1: UInt32.t) /\ UInt32.le month (12: UInt32.t) then (31: UInt32.t) else (0: UInt32.t)
+  
+
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let days_in_month_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 93 8 93 60]
+  (year: Int32.t) (month: UInt32.t) (return (x: UInt32.t)) = (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_10 <- year ] s1
+    | s1 = [ &_11 <- ([%#scivil_naive_date] (4: Int32.t)) = ([%#scivil_naive_date'0] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#scivil_naive_date'0] not _11} s3
+    | s3 = [ &_12 <- ([%#scivil_naive_date] (4: Int32.t)) = ([%#scivil_naive_date'0] (-1: Int32.t)) ] s4
+    | s4 = [ &_13 <- _10 = ([%#scivil_naive_date'0] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_14 <- Bool.bw_and _12 _13 ] s6
+    | s6 = {[@expl:Rem overflow] [%#scivil_naive_date'0] not _14} s7
+    | s7 = Int32.rem [%#scivil_naive_date'0] {_10} {[%#scivil_naive_date] (4: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_9 <- _x ] s8)
+    | s8 = [ &_8 <- _9 = ([%#scivil_naive_date'1] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_8 = false} (! bb9) | br1 -> {_8} (! bb3) ] ]
+  | bb3 = s0
+    [ s0 = [ &_17 <- year ] s1
+    | s1 = [ &_18 <- ([%#scivil_naive_date'2] (100: Int32.t)) = ([%#scivil_naive_date'3] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#scivil_naive_date'3] not _18} s3
+    | s3 = [ &_19 <- ([%#scivil_naive_date'2] (100: Int32.t)) = ([%#scivil_naive_date'3] (-1: Int32.t)) ] s4
+    | s4 = [ &_20 <- _17 = ([%#scivil_naive_date'3] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_21 <- Bool.bw_and _19 _20 ] s6
+    | s6 = {[@expl:Rem overflow] [%#scivil_naive_date'3] not _21} s7
+    | s7 = Int32.rem [%#scivil_naive_date'3] {_17} {[%#scivil_naive_date'2] (100: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_16 <- _x ] s8)
+    | s8 = [ &_15 <- _16 <> ([%#scivil_naive_date'4] (0: Int32.t)) ] s9
+    | s9 = any [ br0 -> {_15 = false} (! bb9) | br1 -> {_15} (! bb6) ] ]
+  | bb6 = s0 [ s0 = [ &leap <- [%#scivil_naive_date'5] true ] s1 | s1 = bb12 ]
+  | bb9 = s0
+    [ s0 = [ &_23 <- year ] s1
+    | s1 = [ &_24 <- ([%#scivil_naive_date'6] (400: Int32.t)) = ([%#scivil_naive_date'7] (0: Int32.t)) ] s2
+    | s2 = {[@expl:remainder by zero] [%#scivil_naive_date'7] not _24} s3
+    | s3 = [ &_25 <- ([%#scivil_naive_date'6] (400: Int32.t)) = ([%#scivil_naive_date'7] (-1: Int32.t)) ] s4
+    | s4 = [ &_26 <- _23 = ([%#scivil_naive_date'7] (-2147483648: Int32.t)) ] s5
+    | s5 = [ &_27 <- Bool.bw_and _25 _26 ] s6
+    | s6 = {[@expl:Rem overflow] [%#scivil_naive_date'7] not _27} s7
+    | s7 = Int32.rem [%#scivil_naive_date'7] {_23} {[%#scivil_naive_date'6] (400: Int32.t)}
+        (fun (_x: Int32.t) -> [ &_22 <- _x ] s8)
+    | s8 = [ &leap <- _22 = ([%#scivil_naive_date'8] (0: Int32.t)) ] s9
+    | s9 = bb12 ]
+  | bb12 = s0
+    [ s0 = [ &_28 <- month = ([%#scivil_naive_date'9] (2: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_28 = false} (! bb17) | br1 -> {_28} (! bb13) ] ]
+  | bb13 = any [ br0 -> {leap = false} (! bb15) | br1 -> {leap} (! bb14) ]
+  | bb14 = s0 [ s0 = [ &_ret <- [%#scivil_naive_date'10] (29: UInt32.t) ] s1 | s1 = return {_ret} ]
+  | bb15 = s0 [ s0 = [ &_ret <- [%#scivil_naive_date'11] (28: UInt32.t) ] s1 | s1 = return {_ret} ]
+  | bb17 = s0
+    [ s0 = [ &_31 <- month = ([%#scivil_naive_date'12] (4: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_31 = false} (! bb19) | br1 -> {_31} (! bb25) ] ]
+  | bb19 = s0
+    [ s0 = [ &_33 <- month = ([%#scivil_naive_date'13] (6: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_33 = false} (! bb21) | br1 -> {_33} (! bb25) ] ]
+  | bb21 = s0
+    [ s0 = [ &_35 <- month = ([%#scivil_naive_date'14] (9: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_35 = false} (! bb23) | br1 -> {_35} (! bb25) ] ]
+  | bb23 = s0
+    [ s0 = [ &_37 <- month = ([%#scivil_naive_date'15] (11: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_37 = false} (! bb26) | br1 -> {_37} (! bb25) ] ]
+  | bb25 = s0 [ s0 = [ &_ret <- [%#scivil_naive_date'16] (30: UInt32.t) ] s1 | s1 = return {_ret} ]
+  | bb26 = s0
+    [ s0 = [ &_39 <- UInt32.ge month ([%#scivil_naive_date'17] (1: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_39 = false} (! bb31) | br1 -> {_39} (! bb27) ] ]
+  | bb27 = s0
+    [ s0 = [ &_41 <- UInt32.le month ([%#scivil_naive_date'18] (12: UInt32.t)) ] s1
+    | s1 = any [ br0 -> {_41 = false} (! bb31) | br1 -> {_41} (! bb28) ] ]
+  | bb28 = s0 [ s0 = [ &_ret <- [%#scivil_naive_date'19] (31: UInt32.t) ] s1 | s1 = return {_ret} ]
+  | bb31 = s0 [ s0 = [ &_ret <- [%#scivil_naive_date'20] (0: UInt32.t) ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: UInt32.t = Any.any_l ()
+  | & year: Int32.t = year
+  | & month: UInt32.t = month
+  | & leap: bool = Any.any_l ()
+  | & _8: bool = Any.any_l ()
+  | & _9: Int32.t = Any.any_l ()
+  | & _10: Int32.t = Any.any_l ()
+  | & _11: bool = Any.any_l ()
+  | & _12: bool = Any.any_l ()
+  | & _13: bool = Any.any_l ()
+  | & _14: bool = Any.any_l ()
+  | & _15: bool = Any.any_l ()
+  | & _16: Int32.t = Any.any_l ()
+  | & _17: Int32.t = Any.any_l ()
+  | & _18: bool = Any.any_l ()
+  | & _19: bool = Any.any_l ()
+  | & _20: bool = Any.any_l ()
+  | & _21: bool = Any.any_l ()
+  | & _22: Int32.t = Any.any_l ()
+  | & _23: Int32.t = Any.any_l ()
+  | & _24: bool = Any.any_l ()
+  | & _25: bool = Any.any_l ()
+  | & _26: bool = Any.any_l ()
+  | & _27: bool = Any.any_l ()
+  | & _28: bool = Any.any_l ()
+  | & _31: bool = Any.any_l ()
+  | & _33: bool = Any.any_l ()
+  | & _35: bool = Any.any_l ()
+  | & _37: bool = Any.any_l ()
+  | & _39: bool = Any.any_l ()
+  | & _41: bool = Any.any_l () ])
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:days_in_month_model ensures] [%#scivil_naive_date'22] result
+    = days_in_month_spec year month}
+    (! return {result}) ]
