@@ -55,7 +55,9 @@ it to 15.
    witness is labeled with its reason.
 2. **Four kinds of claim, per case.**
    - *Proven:* the witness calls the real public API on a domain the backend can
-     model. This is the default.
+     model. This is the strongest level and always the first attempt. Trust is
+     reached only after a real proof attempt fails, and the failure (tool, harness,
+     and reason) is recorded on the row. A row never starts as trusted.
    - *Trusted by construction:* the only path needs a non-public constructor, or
      the behavior is an external side effect the backend cannot observe. Example:
      `jiff::fmt::DefmtWrite`. Still Complete, with the trust stated.
@@ -193,14 +195,22 @@ Existing dump tests must still pass unchanged.
    - `CalendarDate` → `NaiveDate`
    - `LocalTime` → `NaiveTime`
    - `LocalDateTime` → `NaiveDateTime`
-   - `WeekDate` → `IsoWeek`
+   - `WeekDate` → `NaiveDate`. Corrected from an earlier `IsoWeek`: an `IsoWeek` is
+     year and week only, with no weekday, so a week date needs `NaiveDate`
+     (resolved through `from_isoywd_opt`).
    - `OrdinalDate` → `NaiveDate`, reached through `from_yo` and `ordinal`, the same
      route jiff uses. Verify this in chrono's source first.
    - `ReducedCalendarDate` and `ReducedLocalTime` have no chrono type. Use thin
      wrapper types, the same approach the jiff backend used.
 2. **Props impl:** `TemporalCivilProps` on the chrono backend type.
-3. **Exchanges and witnesses:** the bridge's realize and reflect Exchanges and its
-   semantic-bundle witnesses, per verifier. Count these from the trait source before
+3. **Exchanges and witnesses (measured from source):** the civil bridge has 2
+   Exchanges (realize and reflect `LocalDateTime`) and 1 witness bound,
+   `LocalDateTimeSemanticBundle`. Exchanges are implemented once, for the chrono
+   backend's own verifier (`ChronoVerifier`). The bundle's witness is derived from
+   its leaves: structural leaves are verifier-generic in `amenable_time`, and the
+   machine-checked leaves need a `ChronoVerifier` trusted citation, the same list jiff
+   carries (`jiff_backend_trusts!`). Kani, Creusot, and Verus witness the registered
+   types, not the bridge. Count the remaining details from the trait source before
    writing anything (see working rules).
 4. **Registrations:** `impl_ext_type!` and `register_ext_standard_evidence!` for
    the seven types, under the `chrono` feature.
@@ -212,6 +222,33 @@ Existing dump tests must still pass unchanged.
 
 **Gate:** the seven rows are Complete in `cordial coverage`. The civil bridge tests
 pass on the chrono backend for every civil carrier.
+
+**Status (2026-10-06):**
+- Done and tested: the `ChronoVerifier`/`ChronoTimeBackend` identity, the civil carriers
+  and `TemporalCivilProps`, the `LocalDateTime` realize and reflect Exchanges, the
+  `ChronoVerifier` trusted citations for the 12 leaves the bridge reaches
+  (`chrono/trusted_witness.rs`), and six bridge tests (`tests/chrono_backend_civil_test.rs`).
+- Done: the fractional-second helpers moved to `temporal_fraction.rs`, shared by the
+  jiff and chrono backends. The jiff backend re-exports them, so its call sites are
+  unchanged.
+- Done (2026-10-07): all seven `impl_ext_type!`/`register_ext_standard_evidence!`
+  registrations. Kani witnesses for all seven types, including `NaiveWeek`'s span
+  claim — its naive full-domain harness times out at three minutes (root-caused to
+  the unbounded ~262,000-year range specifically, documented across several gallery
+  cases starting at `chrono_naive_week_span`); resolved by year-partitioning into
+  100 slices (`chrono/week_span_partitions.rs`), with a separate proof
+  (`partitions_are_exhaustive_and_disjoint`) that the partitions cover the whole
+  domain with no gaps or overlaps, since Kani's own `proof_for_contract`/
+  `stub_verified` mechanism doesn't check that for us (confirmed in
+  `chrono_naive_week_span_contract_mechanism_test`). Creusot witnesses for
+  `NaiveDate` (model-based, refinement premise), `FixedOffset`, and `Utc` (both real
+  `extern_spec!`s against chrono's actual API, no model layer — `Utc`'s is the first
+  `extern_spec!` in this crate against a trait impl block rather than an inherent
+  one).
+- Not done: Creusot witnesses for `NaiveTime`, `NaiveDateTime`, `IsoWeek`, and
+  `NaiveWeek` (4 of 7 types). Verus witnesses for all seven types (none exist yet).
+  The proof-chain tests in `proof_chain_test.rs` (none exist yet, for any type).
+  `cordial coverage` has not yet been checked against these seven rows.
 
 ## Phase 3: Offset and zone bridges, zoned types (15 rows)
 
@@ -228,10 +265,10 @@ pass on the chrono backend for every civil carrier.
 **Work:**
 1. Props impls: `TemporalInstantProps` and `TemporalZoneProps`, on the chrono backend
    type.
-2. Instant bridge Exchanges: 2 per verifier, plus 1 witness per verifier. Count from
-   source first.
-3. Zone bridge Exchanges: 4 per verifier, plus 2 witnesses per verifier. Count from
-   source first.
+2. Instant bridge: 2 Exchanges and 1 witness bound, implemented once for
+   `ChronoVerifier`. Count from source first.
+3. Zone bridge: 4 Exchanges and 2 witness bounds, implemented once for
+   `ChronoVerifier`. Count from source first.
 4. **`ZonedDateValid`** (decision 11), in amenable_time:
    - New file `crates/amenable_time/src/proof_composition/composites/zone/zoned_date.rs`.
    - Fields `date: DateValid` and `zone: NamedTimeZoneIdentityValid`. Derives match
@@ -413,8 +450,8 @@ would need a new decision.
    `NaiveDate::parse_from_str` with `%Y-%m-%d`, `%j` for ordinal, `%G-W%V-%u` for week
    date, `NaiveTime::parse_from_str`, and `to_rfc3339` for formatting. Verify each
    against chrono 0.4.45 before writing its impl.
-2. Write the parser Exchange, and the formatter Exchange, for each verifier: three
-   verifiers, so three impls per edge per direction.
+2. Write the parser and formatter Exchange for each edge, once, for `ChronoVerifier`.
+   Kani, Creusot, and Verus witness the registered types, not the edges.
 3. Where chrono's API cannot produce the exact descriptor form, record the claim kind
    (trusted or boundary) with its reason, before writing the witness.
 4. Each Exchange's witness comes from the contract its descriptor names in
@@ -428,7 +465,7 @@ model. Native factories are counted from source at the start.
 (maximum fractional digits, leap-second support, IANA revision, and similar) come
 from chrono's documented behavior and are checked by test.
 
-**Gate:** every in-scope edge has a Exchange impl on all three verifiers, with its
+**Gate:** every in-scope edge has an Exchange impl for `ChronoVerifier`, with its
 witness and a test. Out-of-scope edges are listed in the plan with their reasons.
 
 ## Decisions carried into Phase 12
@@ -457,5 +494,5 @@ witness and a test. Out-of-scope edges are listed in the plan with their reasons
 
 67 checklist rows Complete. Every trusted witness, boundary, and approved exception
 is recorded with its reason. Per-size rkyv results are recorded. Phase 12's in-scope
-edges each have a witness and a test on all three verifiers, and its out-of-scope
+edges each have an Exchange impl and a witness and a test, and its out-of-scope
 edges are listed with their reasons.
