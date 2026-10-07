@@ -16,6 +16,8 @@ mod civil;
 mod identity;
 mod trusted_witness;
 mod value_types;
+#[cfg(feature = "verus")]
+mod verus_witness;
 
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
