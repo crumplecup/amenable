@@ -166,7 +166,7 @@
 //! `TimeZoneName<'static>` already established, confirmed
 //! independently rather than assumed from that resemblance.
 
-use crate::jiff::macros::impl_kani_witness_trusted_ext;
+use crate::ext_macros::impl_kani_witness_trusted_ext;
 
 impl_kani_witness_trusted_ext!(
     jiff::tz::AmbiguousOffset,

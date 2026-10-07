@@ -26,7 +26,6 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 
-use super::macros::{ExtCheckedProof, kani_ensures_ext};
 use super::span::{
     SPAN_DAYS_MAX, SPAN_DAYS_MIN, SPAN_HOURS_MAX, SPAN_HOURS_MIN, SPAN_MICROSECONDS_MAX,
     SPAN_MICROSECONDS_MIN, SPAN_MILLISECONDS_MAX, SPAN_MILLISECONDS_MIN, SPAN_MINUTES_MAX,
@@ -34,6 +33,7 @@ use super::span::{
     SPAN_SECONDS_MAX, SPAN_SECONDS_MIN, SPAN_WEEKS_MAX, SPAN_WEEKS_MIN, SPAN_YEARS_MAX,
     SPAN_YEARS_MIN, SpanUnitFields,
 };
+use crate::ext_macros::{ExtCheckedProof, kani_ensures_ext};
 use crate::rust_std::bridge_kani_witness;
 
 impl crate::KaniWitness for ExtStandard<jiff::SpanFieldwise> {

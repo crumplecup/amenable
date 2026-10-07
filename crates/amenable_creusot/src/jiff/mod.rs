@@ -39,10 +39,9 @@ mod tz_time_zone_database;
 mod tz_time_zone_offset_info;
 mod zoned_series;
 
-mod bridge;
 mod trusted_civil;
 mod trusted_fmt;
 mod trusted_top_level;
 mod trusted_tz;
 
-pub(crate) use bridge::{ExtCheckedProof, bridge_creusot_witness};
+pub(crate) use crate::ext_bridge::{ExtCheckedProof, bridge_creusot_witness};

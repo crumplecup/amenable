@@ -189,7 +189,7 @@
 //! extern_spec/model and finding the real obstacle above, not assumed
 //! upfront.
 
-use crate::jiff::macros::impl_kani_witness_trusted_ext;
+use crate::ext_macros::impl_kani_witness_trusted_ext;
 
 impl_kani_witness_trusted_ext!(
     jiff::Timestamp,

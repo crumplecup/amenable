@@ -20,10 +20,14 @@ extern crate self as amenable_kani;
 mod backtrace_model;
 mod btree_model;
 mod calculator;
+#[cfg(feature = "chrono")]
+mod chrono;
 mod compose;
 mod env_model;
 mod env_path_model;
 mod error;
+#[cfg(any(feature = "jiff", feature = "chrono"))]
+mod ext_macros;
 mod fd_model;
 mod fmt_model;
 mod fs_model;

@@ -3,8 +3,6 @@
 //! that has earned a checked harness, plus the trusted carriers that
 //! haven't (below).
 
-mod macros;
-
 mod civil_date;
 mod civil_era;
 mod civil_iso_week_date;

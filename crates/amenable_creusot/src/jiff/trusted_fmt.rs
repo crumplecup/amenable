@@ -222,7 +222,7 @@ use crate::CreusotWitness;
 use amenable_core::{Evidence, Metadata};
 use amenable_ext::{ExtProvenance, ExtStandard};
 
-use super::bridge::{bridge_creusot_witness, impl_creusot_witness_trusted_ext};
+use crate::ext_bridge::{bridge_creusot_witness, impl_creusot_witness_trusted_ext};
 
 impl_creusot_witness_trusted_ext!(
     jiff::fmt::DefmtWrite<'static>,

@@ -251,7 +251,7 @@
 //! field, with a real, checkable round trip —
 //! `TimeZoneAnnotationName::from(s).as_str() == s` for every `&str`.
 
-use crate::jiff::macros::impl_kani_witness_trusted_ext;
+use crate::ext_macros::impl_kani_witness_trusted_ext;
 
 impl_kani_witness_trusted_ext!(
     jiff::fmt::DefmtWrite<'static>,
