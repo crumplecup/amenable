@@ -88,7 +88,12 @@ verus = ["amenable_std/verus", "amenable_time/verus", "amenable_ext?/verus"]
 # dependency on, never forcing it on by itself (keeping `creusot`'s own
 # "opt-in, not default" rationale above intact).
 jiff = ["amenable_kani/jiff", "amenable_creusot?/jiff", "dep:amenable_ext", "amenable_ext/jiff"]
-chrono = ["amenable_kani/chrono", "dep:amenable_ext", "amenable_ext/chrono"]
+chrono = [
+    "amenable_kani/chrono",
+    "amenable_creusot?/chrono",
+    "dep:amenable_ext",
+    "amenable_ext/chrono",
+]
 
 [lints]
 workspace = true

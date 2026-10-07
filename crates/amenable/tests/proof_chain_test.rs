@@ -9701,3 +9701,89 @@ fn ext_tz_time_zone_transition_proof_chain_reports_all_three_verifiers() -> miet
     );
     Ok(())
 }
+
+// ── chrono (Phase 2 value types) ────────────────────────────────────
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_naive_date_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::NaiveDate>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::NaiveDate>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_naive_time_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::NaiveTime>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::NaiveTime>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_naive_date_time_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::NaiveDateTime>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::NaiveDateTime>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_iso_week_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::IsoWeek>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::IsoWeek>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_naive_week_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::NaiveWeek>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::NaiveWeek>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_utc_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::Utc>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::Utc>");
+    Ok(())
+}
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_fixed_offset_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono::FixedOffset>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::FixedOffset>");
+    Ok(())
+}
