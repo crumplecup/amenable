@@ -2,11 +2,11 @@
 
 (* ledger::ledger_validate::mirror::Ledger *)
 
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
 let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 122 25 122 35
 let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 121 22 121 26
 let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 110 0 110 93
 let%span sreject = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 45
 let%span sreject'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 53

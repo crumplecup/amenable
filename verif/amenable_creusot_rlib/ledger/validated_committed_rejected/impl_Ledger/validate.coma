@@ -2,10 +2,11 @@
 
 (* ledger::ledger_validate::mirror::Ledger *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 74 19 74 23
 let%span sledger_validate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 75 18 75 68
 let%span sledger_validate'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 100 19 100 23
@@ -37,7 +38,6 @@ let%span stransfer_and_types'11 = "/home/erik/repos/amenable/crates/amenable_cre
 let%span stransfer_and_types'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
 let%span stransfer_and_types'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 332 24 332 41
 let%span stransfer_and_types'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 356 24 356 41
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
 let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 281 16 291 17
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 45
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 53

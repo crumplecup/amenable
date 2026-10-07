@@ -1,9 +1,9 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 139 8 139 68 *)
 
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 137 19 137 23
 let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 138 18 138 65
 let%span scontract_bounds'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
 
 use creusot.int.Int64
 use creusot.prelude.Any

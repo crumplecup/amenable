@@ -2,10 +2,10 @@
 
 (* <ledger::ledger_validate::mirror::Ledger as amenable_core::Exchange<ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>, ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, witness::CreusotVerifier>> *)
 
-let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
-let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
+let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
 let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 281 16 291 17
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 67 8 67 47

@@ -2,8 +2,8 @@
 
 (* <ledger::transfer_and_types::mirror::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
-let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
 let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/clone.rs" 13 26 13 30
 
 use creusot.int.UInt64
