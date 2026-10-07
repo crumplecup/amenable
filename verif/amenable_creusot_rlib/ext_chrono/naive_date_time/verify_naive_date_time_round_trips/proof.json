@@ -1,0 +1,23 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_day_NaiveDateTime": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_elim_Some": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_elim_Some'0": { "prover": "alt-ergo", "time": 0.037 },
+      "vc_from_hms_nano_opt": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_from_ymd_opt": { "prover": "alt-ergo", "time": 0.021 },
+      "vc_hour_NaiveDateTime": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_minute_NaiveDateTime": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_month_NaiveDateTime": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_nanosecond_NaiveDateTime": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_new": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_second_NaiveDateTime": { "prover": "alt-ergo", "time": 0.028 },
+      "vc_verify_naive_date_time_round_trips": {
+        "prover": "z3",
+        "time": 0.012
+      },
+      "vc_year_NaiveDateTime": { "prover": "alt-ergo", "time": 0.036 }
+    }
+  }
+}

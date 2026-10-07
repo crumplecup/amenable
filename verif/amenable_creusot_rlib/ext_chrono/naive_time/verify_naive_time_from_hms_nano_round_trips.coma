@@ -10,6 +10,7 @@ let%span slogic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_c
 let%span slogic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 51 23 51 27
 let%span slogic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 50 18 50 61
 let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 428 4 428 97
 let%span snaive_time = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 73 18 73 82
 let%span snaive_time'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 74 31 74 39
 let%span snaive_time'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 74 41 74 51
@@ -18,7 +19,6 @@ let%span snaive_time'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/
 let%span snaive_time'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 65 19 65 23
 let%span snaive_time'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 66 18 66 90
 let%span snaive_time'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 36 16 40 17
-let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 428 4 428 97
 
 use creusot.int.UInt32
 use creusot.prelude.Any

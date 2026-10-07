@@ -44,3 +44,67 @@ pub(crate) fn naive_time_second_value(_t: &chrono::NaiveTime) -> u32 {
 pub(crate) fn naive_time_nanosecond_value(_t: &chrono::NaiveTime) -> u32 {
     dead
 }
+
+// ── naive_date ───────────────────────────────────────────────────────
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_year_value(_d: &chrono::NaiveDate) -> i32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_month_value(_d: &chrono::NaiveDate) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_day_value(_d: &chrono::NaiveDate) -> u32 {
+    dead
+}
+
+// ── naive_date_time ──────────────────────────────────────────────────
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_year_value(_dt: &chrono::NaiveDateTime) -> i32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_month_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_day_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_hour_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_minute_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_second_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn naive_date_time_nanosecond_value(_dt: &chrono::NaiveDateTime) -> u32 {
+    dead
+}

@@ -1,0 +1,325 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 74 8 82 60 *)
+
+let%span scivil_naive_date = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 55 16 57 76
+let%span scivil_naive_date'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 34 16 42 17
+let%span scivil_naive_date'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 22 24 22 80
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 25 18 31 9
+let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 23 18 32 9
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 50 15 50 19
+let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 50 40 50 44
+let%span slogic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 42 12 48 98
+let%span slogic'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 56 17 56 21
+let%span slogic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 55 18 55 60
+let%span slogic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 60 18 60 22
+let%span slogic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 59 18 59 61
+let%span slogic'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 64 16 64 20
+let%span slogic'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 63 18 63 59
+let%span slogic'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 70 17 70 21
+let%span slogic'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 69 18 69 60
+let%span slogic'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 74 19 74 23
+let%span slogic'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 73 18 73 62
+let%span slogic'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 78 19 78 23
+let%span slogic'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 77 18 77 62
+let%span slogic'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 82 23 82 27
+let%span slogic'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time/logic.rs" 81 18 81 66
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span snaive_date_time = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 84 16 84 65
+let%span snaive_date_time'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 85 16 85 80
+let%span snaive_date_time'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 88 35 88 73
+let%span snaive_date_time'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 90 24 90 39
+let%span snaive_date_time'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 91 24 91 40
+let%span snaive_date_time'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 92 24 92 38
+let%span snaive_date_time'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 93 24 93 39
+let%span snaive_date_time'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 94 24 94 41
+let%span snaive_date_time'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 95 24 95 41
+let%span snaive_date_time'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 96 24 96 45
+let%span snaive_date_time'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 72 19 72 23
+let%span snaive_date_time'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 73 18 73 99
+let%span snaive_date_time'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 38 16 41 17
+let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/date/mod.rs" 196 4 196 83
+let%span smod'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 428 4 428 97
+let%span smod'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/datetime/mod.rs" 99 4 99 71
+
+use creusot.int.Int32
+use creusot.int.UInt32
+use int.ComputerDivision
+use creusot.prelude.Any
+
+type t_NaiveDate
+
+type t_Option_NaiveDate = None | Some t_NaiveDate
+
+predicate inv_NaiveDate (_1: t_NaiveDate)
+
+predicate inv_Option_NaiveDate (_1: t_Option_NaiveDate)
+
+axiom inv_axiom [@rewrite]: forall x: t_Option_NaiveDate [inv_Option_NaiveDate x]. inv_Option_NaiveDate x
+    = match x with
+      | None -> true
+      | Some f0 -> inv_NaiveDate f0
+      end
+
+predicate ge_log_u32 [@inline:trivial] (self: UInt32.t) (other: UInt32.t) = [%#sord] UInt32.le other self
+
+meta "rewrite_def" predicate ge_log_u32
+
+predicate is_leap_year [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 21 8 21 46] (year: Int32.t) =
+  [%#scivil_naive_date'1] ComputerDivision.mod (Int32.to_int year) 4 = 0
+  /\ (ComputerDivision.mod (Int32.to_int year) 100 <> 0 \/ ComputerDivision.mod (Int32.to_int year) 400 = 0)
+
+function days_in_month_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 32 8 32 63] (year: Int32.t) (month: UInt32.t) : UInt32.t
+ = [%#scivil_naive_date'0] if month = (2: UInt32.t) then
+    if is_leap_year year then (29: UInt32.t) else (28: UInt32.t)
+  else
+    if month = (4: UInt32.t) \/ month = (6: UInt32.t) \/ month = (9: UInt32.t) \/ month = (11: UInt32.t) then
+      (30: UInt32.t)
+    else
+      if ge_log_u32 month (1: UInt32.t) /\ UInt32.le month (12: UInt32.t) then (31: UInt32.t) else (0: UInt32.t)
+  
+
+
+predicate valid_gregorian_spec [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/civil_naive_date.rs" 53 8 53 76] (year: Int32.t) (month: UInt32.t) (day: UInt32.t) =
+  [%#scivil_naive_date] Int32.le (Int32.neg (262143: Int32.t)) year
+  /\ Int32.le year (262142: Int32.t)
+  /\ ge_log_u32 month (1: UInt32.t)
+  /\ UInt32.le month (12: UInt32.t) /\ ge_log_u32 day (1: UInt32.t) /\ UInt32.le day (days_in_month_spec year month)
+
+function naive_date_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 52 0 52 66] (_d: t_NaiveDate) : Int32.t
+
+function naive_date_month_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 58 0 58 67] (_d: t_NaiveDate) : UInt32.t
+
+function naive_date_day_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 64 0 64 65] (_d: t_NaiveDate) : UInt32.t
+
+let from_ymd_opt (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (return (x: t_Option_NaiveDate)) = any
+  [ return (result: t_Option_NaiveDate) ->
+  {[@stop_split] [@expl:from_ymd_opt ensures] ([@stop_split] [@expl:from_ymd_opt result type invariant] [%#smod] inv_Option_NaiveDate result)
+    /\ ([@stop_split] [@expl:from_ymd_opt ensures] [%#slogic] match result with
+      | Some d -> valid_gregorian_spec year month day
+      /\ naive_date_year_value d = year /\ naive_date_month_value d = month /\ naive_date_day_value d = day
+      | None -> not valid_gregorian_spec year month day
+      end)}
+    (! return {result}) ]
+
+type t_NaiveTime
+
+type t_Option_NaiveTime = None'0 | Some'0 t_NaiveTime
+
+predicate inv_NaiveTime (_1: t_NaiveTime)
+
+predicate inv_Option_NaiveTime (_1: t_Option_NaiveTime)
+
+axiom inv_axiom'0 [@rewrite]: forall x: t_Option_NaiveTime [inv_Option_NaiveTime x]. inv_Option_NaiveTime x
+    = match x with
+      | None'0 -> true
+      | Some'0 f0 -> inv_NaiveTime f0
+      end
+
+function naive_time_hour_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 26 0 26 66] (_t: t_NaiveTime) : UInt32.t
+
+function naive_time_minute_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 32 0 32 68] (_t: t_NaiveTime) : UInt32.t
+
+function naive_time_second_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 38 0 38 68] (_t: t_NaiveTime) : UInt32.t
+
+function naive_time_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 44 0 44 72] (_t: t_NaiveTime) : UInt32.t
+
+let from_hms_nano_opt (hour: UInt32.t) (minute: UInt32.t) (second: UInt32.t) (nano: UInt32.t)
+  (return (x: t_Option_NaiveTime)) = any
+  [ return (result: t_Option_NaiveTime) ->
+  {[@stop_split] [@expl:from_hms_nano_opt ensures] ([@stop_split] [@expl:from_hms_nano_opt result type invariant] [%#smod'0] inv_Option_NaiveTime result)
+    /\ ([@stop_split] [@expl:from_hms_nano_opt ensures] [%#slogic'0] match result with
+      | Some'0 t -> UInt32.lt hour (24: UInt32.t)
+      /\ UInt32.lt minute (60: UInt32.t)
+      /\ UInt32.lt second (60: UInt32.t)
+      /\ UInt32.lt nano (2000000000: UInt32.t)
+      /\ (UInt32.lt nano (1000000000: UInt32.t) \/ second = (59: UInt32.t))
+      /\ naive_time_hour_value t = hour
+      /\ naive_time_minute_value t = minute
+      /\ naive_time_second_value t = second /\ naive_time_nanosecond_value t = nano
+      | None'0 -> not (UInt32.lt hour (24: UInt32.t)
+      /\ UInt32.lt minute (60: UInt32.t)
+      /\ UInt32.lt second (60: UInt32.t)
+      /\ UInt32.lt nano (2000000000: UInt32.t) /\ (UInt32.lt nano (1000000000: UInt32.t) \/ second = (59: UInt32.t)))
+      end)}
+    (! return {result}) ]
+
+type tup2_Option_NaiveDate_Option_NaiveTime = { f0: t_Option_NaiveDate; f1: t_Option_NaiveTime }
+
+type tup7_i32_u32_u32_u32_u32_u32_u32 = {
+  f0'0: Int32.t;
+  f1'0: UInt32.t;
+  f2'0: UInt32.t;
+  f3'0: UInt32.t;
+  f4'0: UInt32.t;
+  f5'0: UInt32.t;
+  f6'0: UInt32.t }
+
+type t_Result_tup7_i32_u32_u32_u32_u32_u32_u32_unit = Ok tup7_i32_u32_u32_u32_u32_u32_u32 | Err ()
+
+let elim_Some (_x: t_Option_NaiveDate) (return (f0'1: t_NaiveDate)) = any
+  [ _k (f0'1: t_NaiveDate) -> {Some f0'1 = _x} (! return {f0'1})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+let elim_Some'0 (_x: t_Option_NaiveTime) (return (f0'1: t_NaiveTime)) = any
+  [ _k (f0'1: t_NaiveTime) -> {Some'0 f0'1 = _x} (! return {f0'1})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some'0 _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+type t_NaiveDateTime
+
+predicate inv_NaiveDateTime (_1: t_NaiveDateTime)
+
+function naive_date_time_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 72 0 72 76] (_dt: t_NaiveDateTime) : Int32.t
+
+function naive_date_time_month_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 78 0 78 77] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_day_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 84 0 84 75] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_hour_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 90 0 90 76] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_minute_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 96 0 96 78] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_second_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 102 0 102 78] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 108 0 108 82] (_dt: t_NaiveDateTime) : UInt32.t
+
+let new (date: t_NaiveDate) (time: t_NaiveTime) (return (x: t_NaiveDateTime)) =
+{[@stop_split] [@expl:new requires] ([@stop_split] [@expl:new 'date' type invariant] [%#slogic'1] inv_NaiveDate date)
+  /\ ([@stop_split] [@expl:new 'time' type invariant] [%#slogic'2] inv_NaiveTime time)}
+  any
+  [ return (result: t_NaiveDateTime) ->
+  {[@stop_split] [@expl:new ensures] ([@stop_split] [@expl:new result type invariant] [%#smod'1] inv_NaiveDateTime result)
+    /\ ([@stop_split] [@expl:new ensures] [%#slogic'3] naive_date_time_year_value result = naive_date_year_value date
+    /\ naive_date_time_month_value result = naive_date_month_value date
+    /\ naive_date_time_day_value result = naive_date_day_value date
+    /\ naive_date_time_hour_value result = naive_time_hour_value time
+    /\ naive_date_time_minute_value result = naive_time_minute_value time
+    /\ naive_date_time_second_value result = naive_time_second_value time
+    /\ naive_date_time_nanosecond_value result = naive_time_nanosecond_value time)}
+    (! return {result}) ]
+
+predicate invariant_ref_NaiveDateTime [@inline:trivial] (self: t_NaiveDateTime) = [%#sinvariant] inv_NaiveDateTime self
+
+meta "rewrite_def" predicate invariant_ref_NaiveDateTime
+
+predicate inv_ref_NaiveDateTime [@inline:trivial] (_1: t_NaiveDateTime) = invariant_ref_NaiveDateTime _1
+
+meta "rewrite_def" predicate inv_ref_NaiveDateTime
+
+let year_NaiveDateTime (self_: t_NaiveDateTime) (return (x: Int32.t)) =
+{[@stop_split] [@expl:year 'self_' type invariant] [%#slogic'4] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:year ensures] [%#slogic'5] result
+    = naive_date_time_year_value self_}
+    (! return {result}) ]
+
+let month_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:month 'self_' type invariant] [%#slogic'6] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:month ensures] [%#slogic'7] result
+    = naive_date_time_month_value self_}
+    (! return {result}) ]
+
+let day_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:day 'self_' type invariant] [%#slogic'8] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:day ensures] [%#slogic'9] result
+    = naive_date_time_day_value self_}
+    (! return {result}) ]
+
+let hour_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:hour 'self_' type invariant] [%#slogic'10] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:hour ensures] [%#slogic'11] result
+    = naive_date_time_hour_value self_}
+    (! return {result}) ]
+
+let minute_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:minute 'self_' type invariant] [%#slogic'12] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:minute ensures] [%#slogic'13] result
+    = naive_date_time_minute_value self_}
+    (! return {result}) ]
+
+let second_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:second 'self_' type invariant] [%#slogic'14] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:second ensures] [%#slogic'15] result
+    = naive_date_time_second_value self_}
+    (! return {result}) ]
+
+let nanosecond_NaiveDateTime (self_: t_NaiveDateTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:nanosecond 'self_' type invariant] [%#slogic'16] inv_ref_NaiveDateTime self_}
+  any
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:nanosecond ensures] [%#slogic'17] result
+    = naive_date_time_nanosecond_value self_}
+    (! return {result}) ]
+
+predicate naive_date_time_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 27 8 36 17] (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (hour: UInt32.t) (minute: UInt32.t) (second: UInt32.t) (nano: UInt32.t) (round_trip: t_Result_tup7_i32_u32_u32_u32_u32_u32_u32_unit) =
+  [%#snaive_date_time'11] match round_trip with
+    | Ok got -> got = { f0'0 = year; f1'0 = month; f2'0 = day; f3'0 = hour; f4'0 = minute; f5'0 = second; f6'0 = nano }
+    | Err _ -> true
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_naive_date_time_round_trips [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_date_time.rs" 74 8 82 60]
+  (year: Int32.t) (month: UInt32.t) (day: UInt32.t) (hour: UInt32.t) (minute: UInt32.t) (second: UInt32.t)
+  (nano: UInt32.t) (return (x: t_Result_tup7_i32_u32_u32_u32_u32_u32_u32_unit)) = (! bb0
+  [ bb0 = s0
+    [ s0 = from_ymd_opt [%#snaive_date_time] {year} {month} {day} (fun (_x: t_Option_NaiveDate) -> [ &_18 <- _x ] s1)
+    | s1 = from_hms_nano_opt [%#snaive_date_time'0] {hour} {minute} {second} {nano}
+        (fun (_x: t_Option_NaiveTime) -> [ &_22 <- _x ] s2)
+    | s2 = [ &_17 <- { f0 = _18; f1 = _22 } ] s3
+    | s3 = any [ br0 -> {_17.f0 = None} (! bb3) | br1 (x0: t_NaiveDate) -> {_17.f0 = Some x0} (! bb4) ] ]
+  | bb4 = any [ br0 -> {_17.f1 = None'0} (! bb3) | br1 (x0: t_NaiveTime) -> {_17.f1 = Some'0 x0} (! bb6) ]
+  | bb3 = s0 [ s0 = [ &_ret <- Err _49 ] s1 | s1 = return {_ret} ]
+  | bb6 = s0
+    [ s0 = elim_Some {_17.f0} (fun (r0: t_NaiveDate) -> [ &date <- r0 ] s1)
+    | s1 = elim_Some'0 {_17.f1} (fun (r0: t_NaiveTime) -> [ &time <- r0 ] s2)
+    | s2 = new [%#snaive_date_time'1] {date} {time} (fun (_x: t_NaiveDateTime) -> [ &combined <- _x ] s3)
+    | s3 = year_NaiveDateTime [%#snaive_date_time'2] {combined} (fun (_x: Int32.t) -> [ &_35 <- _x ] s4)
+    | s4 = month_NaiveDateTime [%#snaive_date_time'3] {combined} (fun (_x: UInt32.t) -> [ &_37 <- _x ] s5)
+    | s5 = day_NaiveDateTime [%#snaive_date_time'4] {combined} (fun (_x: UInt32.t) -> [ &_39 <- _x ] s6)
+    | s6 = hour_NaiveDateTime [%#snaive_date_time'5] {combined} (fun (_x: UInt32.t) -> [ &_41 <- _x ] s7)
+    | s7 = minute_NaiveDateTime [%#snaive_date_time'6] {combined} (fun (_x: UInt32.t) -> [ &_43 <- _x ] s8)
+    | s8 = second_NaiveDateTime [%#snaive_date_time'7] {combined} (fun (_x: UInt32.t) -> [ &_45 <- _x ] s9)
+    | s9 = nanosecond_NaiveDateTime [%#snaive_date_time'8] {combined} (fun (_x: UInt32.t) -> [ &_47 <- _x ] s10)
+    | s10 = [ &_34 <- { f0'0 = _35; f1'0 = _37; f2'0 = _39; f3'0 = _41; f4'0 = _43; f5'0 = _45; f6'0 = _47 } ] s11
+    | s11 = [ &_ret <- Ok _34 ] s12
+    | s12 = return {_ret} ] ]
+  [ & _ret: t_Result_tup7_i32_u32_u32_u32_u32_u32_u32_unit = Any.any_l ()
+  | & year: Int32.t = year
+  | & month: UInt32.t = month
+  | & day: UInt32.t = day
+  | & hour: UInt32.t = hour
+  | & minute: UInt32.t = minute
+  | & second: UInt32.t = second
+  | & nano: UInt32.t = nano
+  | & _17: tup2_Option_NaiveDate_Option_NaiveTime = Any.any_l ()
+  | & _18: t_Option_NaiveDate = Any.any_l ()
+  | & _22: t_Option_NaiveTime = Any.any_l ()
+  | & date: t_NaiveDate = Any.any_l ()
+  | & time: t_NaiveTime = Any.any_l ()
+  | & combined: t_NaiveDateTime = Any.any_l ()
+  | & _34: tup7_i32_u32_u32_u32_u32_u32_u32 = Any.any_l ()
+  | & _35: Int32.t = Any.any_l ()
+  | & _37: UInt32.t = Any.any_l ()
+  | & _39: UInt32.t = Any.any_l ()
+  | & _41: UInt32.t = Any.any_l ()
+  | & _43: UInt32.t = Any.any_l ()
+  | & _45: UInt32.t = Any.any_l ()
+  | & _47: UInt32.t = Any.any_l ()
+  | & _49: () = Any.any_l () ])
+  [ return (result: t_Result_tup7_i32_u32_u32_u32_u32_u32_u32_unit) ->
+  {[@stop_split] [@expl:verify_naive_date_time_round_trips ensures] [%#snaive_date_time'10] naive_date_time_round_trips year month day hour minute second nano result}
+    (! return {result}) ]
