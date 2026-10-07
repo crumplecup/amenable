@@ -7,6 +7,7 @@ mod civil_naive_date;
 mod fixed_offset;
 mod naive_date_time;
 mod naive_time;
+mod naive_week;
 mod shared_trusted_accessors;
 mod utc;
 
@@ -14,4 +15,5 @@ pub use civil_naive_date::VERIFY_NAIVE_DATE_MODEL_ROUND_TRIPS_SRC;
 pub use fixed_offset::VERIFY_FIXED_OFFSET_EAST_AND_WEST_ROUND_TRIP_SRC;
 pub use naive_date_time::VERIFY_NAIVE_DATE_TIME_ROUND_TRIPS_SRC;
 pub use naive_time::VERIFY_NAIVE_TIME_FROM_HMS_NANO_ROUND_TRIPS_SRC;
+pub use naive_week::VERIFY_NAIVE_WEEK_SPAN_MODEL_SRC;
 pub use utc::VERIFY_UTC_LOCAL_OFFSET_IS_ALWAYS_SINGLE_AND_FIXED_OFFSET_IS_ZERO_SRC;

@@ -1,0 +1,83 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 60 8 65 39 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span snaive_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 66 26 66 30
+let%span snaive_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 66 26 66 37
+let%span snaive_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 67 27 67 43
+let%span snaive_week'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 67 62 67 78
+let%span snaive_week'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 68 26 68 45
+let%span snaive_week'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 68 64 68 83
+let%span snaive_week'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 54 12 57 74
+let%span snaive_week'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 59 18 59 59
+let%span snaive_week'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 34 16 37 17
+
+use creusot.int.Int64
+use creusot.prelude.Any
+
+type t_Option_i64 = None | Some Int64.t
+
+type tup2_Option_i64_Option_i64 = { f0: t_Option_i64; f1: t_Option_i64 }
+
+predicate ge_log_i64 [@inline:trivial] (self: Int64.t) (other: Int64.t) = [%#sord] Int64.le other self
+
+meta "rewrite_def" predicate ge_log_i64
+
+predicate naive_week_span_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 32 8 32 83] (first: t_Option_i64) (last: t_Option_i64) =
+  [%#snaive_week'7] match { f0 = first; f1 = last } with
+    | {f0 = Some f; f1 = Some l} -> Int64.sub l f = (6: Int64.t)
+    | _ -> true
+    end
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_naive_week_span_model [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 60 8 65 39]
+  (day_count: Int64.t) (back: Int64.t) (min_day: Int64.t) (max_day: Int64.t) (return (x: tup2_Option_i64_Option_i64)) =
+{[@stop_split] [@expl:verify_naive_week_span_model requires] [%#snaive_week'5] ge_log_i64 back (0: Int64.t)
+  /\ Int64.le back (6: Int64.t)
+  /\ Int64.le min_day max_day
+  /\ ge_log_i64 day_count (Int64.neg (100000000: Int64.t))
+  /\ Int64.le day_count (100000000: Int64.t)
+  /\ ge_log_i64 min_day (Int64.neg (100000000: Int64.t))
+  /\ Int64.le min_day (100000000: Int64.t)
+  /\ ge_log_i64 max_day (Int64.neg (100000000: Int64.t)) /\ Int64.le max_day (100000000: Int64.t)}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = Int64.sub [%#snaive_week'0] {[%#snaive_week] (6: Int64.t)} {back}
+        (fun (_x: Int64.t) -> [ &forward <- _x ] s1)
+    | s1 = Int64.sub [%#snaive_week'1] {day_count} {back} (fun (_x: Int64.t) -> [ &_15 <- _x ] s2)
+    | s2 = [ &_14 <- Int64.ge _15 min_day ] s3
+    | s3 = any [ br0 -> {_14 = false} (! bb2) | br1 -> {_14} (! bb1) ] ]
+  | bb1 = s0
+    [ s0 = Int64.sub [%#snaive_week'2] {day_count} {back} (fun (_x: Int64.t) -> [ &_19 <- _x ] s1)
+    | s1 = [ &first <- Some _19 ] s2
+    | s2 = bb3 ]
+  | bb2 = s0 [ s0 = [ &first <- None ] s1 | s1 = bb3 ]
+  | bb3 = s0
+    [ s0 = Int64.add [%#snaive_week'3] {day_count} {forward} (fun (_x: Int64.t) -> [ &_24 <- _x ] s1)
+    | s1 = [ &_23 <- Int64.le _24 max_day ] s2
+    | s2 = any [ br0 -> {_23 = false} (! bb5) | br1 -> {_23} (! bb4) ] ]
+  | bb4 = s0
+    [ s0 = Int64.add [%#snaive_week'4] {day_count} {forward} (fun (_x: Int64.t) -> [ &_28 <- _x ] s1)
+    | s1 = [ &last <- Some _28 ] s2
+    | s2 = bb6 ]
+  | bb5 = s0 [ s0 = [ &last <- None ] s1 | s1 = bb6 ]
+  | bb6 = s0 [ s0 = [ &_ret <- { f0 = first; f1 = last } ] s1 | s1 = return {_ret} ] ]
+  [ & _ret: tup2_Option_i64_Option_i64 = Any.any_l ()
+  | & day_count: Int64.t = day_count
+  | & back: Int64.t = back
+  | & min_day: Int64.t = min_day
+  | & max_day: Int64.t = max_day
+  | & forward: Int64.t = Any.any_l ()
+  | & first: t_Option_i64 = Any.any_l ()
+  | & _14: bool = Any.any_l ()
+  | & _15: Int64.t = Any.any_l ()
+  | & _19: Int64.t = Any.any_l ()
+  | & last: t_Option_i64 = Any.any_l ()
+  | & _23: bool = Any.any_l ()
+  | & _24: Int64.t = Any.any_l ()
+  | & _28: Int64.t = Any.any_l () ])
+  [ return (result: tup2_Option_i64_Option_i64) ->
+  {[@stop_split] [@expl:verify_naive_week_span_model ensures] [%#snaive_week'6] naive_week_span_holds result.f0 result.f1}
+    (! return {result}) ]

@@ -6,4 +6,5 @@ mod civil_naive_date;
 mod fixed_offset;
 mod naive_date_time;
 mod naive_time;
+mod naive_week;
 mod utc;
