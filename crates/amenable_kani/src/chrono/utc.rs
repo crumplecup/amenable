@@ -15,8 +15,6 @@ use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 use chrono::{Datelike, MappedLocalTime, TimeZone, Utc};
-#[cfg(kani)]
-use chrono::{FixedOffset, Offset};
 
 use super::gregorian::days_in_month;
 use crate::ext_macros::{ExtCheckedProof, kani_ensures_ext};
@@ -64,12 +62,23 @@ kani_ensures_ext!(
     }
 );
 
-/// `Utc`'s own fixed-offset bound, named so the harness's second `assert!`
-/// points at a real, registered contract fragment instead of a raw equation.
-#[cfg(kani)]
-fn utc_fixed_offset_is_zero_holds() -> bool {
-    Utc.fix() == FixedOffset::east_opt(0).unwrap()
+/// Gathers the one `cfg(kani)`-only item left after `Ensures`/the harness itself
+/// into a single gate, rather than scattering `#[cfg(kani)]` across each item
+/// individually (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
+
+    use chrono::{FixedOffset, Offset, Utc};
+
+    /// `Utc`'s own fixed-offset bound, named so the harness's second `assert!`
+    /// points at a real, registered contract fragment instead of a raw equation.
+    pub(super) fn utc_fixed_offset_is_zero_holds() -> bool {
+        Utc.fix() == FixedOffset::east_opt(0).unwrap()
+    }
 }
+
+#[cfg(kani)]
+use kani_only::utc_fixed_offset_is_zero_holds;
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(

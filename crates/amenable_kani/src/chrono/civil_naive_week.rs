@@ -33,10 +33,88 @@
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 use chrono::NaiveWeek;
-#[cfg(kani)]
-use chrono::{Datelike, Days, Weekday};
 
 use crate::rust_std::bridge_kani_witness;
+
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
+
+    use chrono::{Datelike, Days, Weekday};
+
+    /// Map any `u8` onto the seven weekdays, so a symbolic `u8` covers every
+    /// weekday. Used only inside the harnesses below, and re-exported one level
+    /// up for `week_span_partitions`, a sibling module under `chrono`.
+    pub(in crate::chrono) fn weekday_of(index: u8) -> Weekday {
+        match index % 7 {
+            0 => Weekday::Mon,
+            1 => Weekday::Tue,
+            2 => Weekday::Wed,
+            3 => Weekday::Thu,
+            4 => Weekday::Fri,
+            5 => Weekday::Sat,
+            _ => Weekday::Sun,
+        }
+    }
+
+    /// Days a date steps back from its own weekday to reach `start` (`0..=6`). Used
+    /// only inside the harnesses below.
+    pub(super) fn days_back_to(date: chrono::NaiveDate, start: Weekday) -> u32 {
+        (date.weekday().num_days_from_monday() + 7 - start.num_days_from_monday()) % 7
+    }
+
+    /// Piece 1's own bound, named so each harness's `assert!` points at a real,
+    /// registered contract fragment instead of a raw equation.
+    pub(super) fn first_day_starts_on_the_chosen_weekday_holds(
+        first: chrono::NaiveDate,
+        start: Weekday,
+    ) -> bool {
+        first.weekday() == start
+    }
+
+    /// Piece 2's own bound, named for the same reason.
+    pub(super) fn first_and_last_day_bracket_the_date_holds(
+        first: chrono::NaiveDate,
+        date: chrono::NaiveDate,
+        last: chrono::NaiveDate,
+    ) -> bool {
+        first <= date && date <= last
+    }
+
+    /// Piece 3's own bound, named for the same reason.
+    pub(super) fn first_day_exists_exactly_when_the_date_can_step_back_holds(
+        checked_some: bool,
+        fits: bool,
+    ) -> bool {
+        checked_some == fits
+    }
+
+    /// Piece 4's own bound, named for the same reason.
+    pub(super) fn last_day_exists_exactly_when_the_date_can_step_forward_holds(
+        checked_some: bool,
+        fits: bool,
+    ) -> bool {
+        checked_some == fits
+    }
+}
+
+// `Days` is used directly by the harness bodies below (`checked_sub_days`/
+// `checked_add_days`), not by anything inside `kani_only`.
+#[cfg(kani)]
+use chrono::Days;
+// Re-exported: `week_span_partitions` (a sibling module under `chrono`) reuses this
+// same weekday mapping rather than duplicating it.
+#[cfg(kani)]
+pub(super) use kani_only::weekday_of;
+#[cfg(kani)]
+use kani_only::{
+    days_back_to, first_and_last_day_bracket_the_date_holds,
+    first_day_exists_exactly_when_the_date_can_step_back_holds,
+    first_day_starts_on_the_chosen_weekday_holds,
+    last_day_exists_exactly_when_the_date_can_step_forward_holds,
+};
 
 impl crate::KaniWitness for ExtStandard<NaiveWeek> {
     type SupportingEvidence = Self;
@@ -74,35 +152,6 @@ bridge_kani_witness!(ExtStandard<NaiveWeek>);
     )
 }
 
-/// Map any `u8` onto the seven weekdays, so a symbolic `u8` covers every weekday. Used
-/// only inside the harnesses below, which are themselves `cfg(kani)`-gated.
-#[cfg(kani)]
-pub(super) fn weekday_of(index: u8) -> Weekday {
-    match index % 7 {
-        0 => Weekday::Mon,
-        1 => Weekday::Tue,
-        2 => Weekday::Wed,
-        3 => Weekday::Thu,
-        4 => Weekday::Fri,
-        5 => Weekday::Sat,
-        _ => Weekday::Sun,
-    }
-}
-
-/// Days a date steps back from its own weekday to reach `start` (`0..=6`). Used only
-/// inside the harnesses below.
-#[cfg(kani)]
-fn days_back_to(date: chrono::NaiveDate, start: Weekday) -> u32 {
-    (date.weekday().num_days_from_monday() + 7 - start.num_days_from_monday()) % 7
-}
-
-/// Piece 1's own bound, named so each harness's `assert!` points at a real,
-/// registered contract fragment instead of a raw equation.
-#[cfg(kani)]
-fn first_day_starts_on_the_chosen_weekday_holds(first: chrono::NaiveDate, start: Weekday) -> bool {
-    first.weekday() == start
-}
-
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
         "amenable_kani::chrono::civil_naive_week::first_day_starts_on_the_chosen_weekday_holds",
@@ -110,16 +159,6 @@ fn first_day_starts_on_the_chosen_weekday_holds(first: chrono::NaiveDate, start:
         "ensures",
         || "first.weekday() == start",
     )
-}
-
-/// Piece 2's own bound, named for the same reason.
-#[cfg(kani)]
-fn first_and_last_day_bracket_the_date_holds(
-    first: chrono::NaiveDate,
-    date: chrono::NaiveDate,
-    last: chrono::NaiveDate,
-) -> bool {
-    first <= date && date <= last
 }
 
 ::inventory::submit! {
@@ -131,15 +170,6 @@ fn first_and_last_day_bracket_the_date_holds(
     )
 }
 
-/// Piece 3's own bound, named for the same reason.
-#[cfg(kani)]
-fn first_day_exists_exactly_when_the_date_can_step_back_holds(
-    checked_some: bool,
-    fits: bool,
-) -> bool {
-    checked_some == fits
-}
-
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
         "amenable_kani::chrono::civil_naive_week::first_day_exists_exactly_when_the_date_can_step_back_holds",
@@ -147,15 +177,6 @@ fn first_day_exists_exactly_when_the_date_can_step_back_holds(
         "ensures",
         || "date.week(start).checked_first_day().is_some() == fits",
     )
-}
-
-/// Piece 4's own bound, named for the same reason.
-#[cfg(kani)]
-fn last_day_exists_exactly_when_the_date_can_step_forward_holds(
-    checked_some: bool,
-    fits: bool,
-) -> bool {
-    checked_some == fits
 }
 
 ::inventory::submit! {

@@ -38,29 +38,35 @@
 //! `stub_verified` this claim, the contract bought nothing here and cost real time, so
 //! this file uses plain proofs throughout.
 
-#[cfg(kani)]
-use chrono::{Datelike, NaiveDate, Weekday};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
+
+    pub(super) use chrono::{Datelike, NaiveDate, Weekday};
+
+    pub(super) use crate::chrono::civil_naive_week::weekday_of;
+
+    /// chrono's real minimum supported year.
+    pub(super) const MIN_YEAR: i32 = -262_143;
+
+    /// chrono's real maximum supported year.
+    pub(super) const MAX_YEAR: i32 = 262_142;
+
+    /// Years per partition: `ceil(524_286 / 100)`. The last partition's upper bound
+    /// overshoots `MAX_YEAR` by 14 years; those extra years produce `None` from
+    /// `NaiveDate::from_ymd_opt`, which every partition harness already handles.
+    pub(super) const PARTITION_SIZE: i32 = 5243;
+
+    /// Number of partitions.
+    pub(super) const PARTITION_COUNT: i32 = 100;
+}
 
 #[cfg(kani)]
-use super::civil_naive_week::weekday_of;
-
-/// chrono's real minimum supported year.
-#[cfg(kani)]
-const MIN_YEAR: i32 = -262_143;
-
-/// chrono's real maximum supported year.
-#[cfg(kani)]
-const MAX_YEAR: i32 = 262_142;
-
-/// Years per partition: `ceil(524_286 / 100)`. The last partition's upper bound
-/// overshoots `MAX_YEAR` by 14 years; those extra years produce `None` from
-/// `NaiveDate::from_ymd_opt`, which every partition harness already handles.
-#[cfg(kani)]
-const PARTITION_SIZE: i32 = 5243;
-
-/// Number of partitions.
-#[cfg(kani)]
-const PARTITION_COUNT: i32 = 100;
+use kani_only::{
+    Datelike, MAX_YEAR, MIN_YEAR, NaiveDate, PARTITION_COUNT, PARTITION_SIZE, Weekday, weekday_of,
+};
 
 amenable_derive::gallery_harness! {
     kani, WEEK_SPAN_HOLDS_SRC, {
