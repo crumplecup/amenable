@@ -184,6 +184,7 @@ amenable_derive::harness! {
 /// 100 partition harnesses' own source isn't inlined: they are mechanically identical
 /// in shape, differing only in which slice of the year range each one assumes, so the
 /// claim and the exhaustiveness proof are the content that actually matters for audit.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub(super) fn proof_summary() -> String {
     format!(
         "{WEEK_SPAN_HOLDS_SRC}\n\n-- partitions_are_exhaustive_and_disjoint --\n{PARTITIONS_ARE_EXHAUSTIVE_AND_DISJOINT_SRC}"

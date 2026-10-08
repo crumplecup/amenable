@@ -148,6 +148,7 @@ impl TemporalCivilProps for ChronoTimeBackend {
 // ── Descriptor conversions ───────────────────────────────────────────
 
 /// Build a [`TemporalError`] for a descriptor that chrono cannot represent.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn invalid(detail: String) -> TemporalError {
     TemporalError::new(TemporalErrorKind::InvalidDescriptor(
         InvalidDescriptorSource::new(detail),
@@ -156,6 +157,7 @@ fn invalid(detail: String) -> TemporalError {
 
 /// Map an ISO weekday number (`1` = Monday, `7` = Sunday) to chrono's
 /// weekday. chrono has no ISO-number constructor, so this is explicit.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 fn iso_weekday(number: u8) -> Result<chrono::Weekday, TemporalError> {
     match number {
         1 => Ok(chrono::Weekday::Mon),
@@ -173,6 +175,7 @@ fn iso_weekday(number: u8) -> Result<chrono::Weekday, TemporalError> {
 ///
 /// Calendar, ordinal, and week dates all resolve. Out-of-range components
 /// return `Err`, never a silently clamped date.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(date)))]
 pub(super) fn complete_date_descriptor_to_naive_date(
     date: CompleteDateDescriptor,
 ) -> Result<chrono::NaiveDate, TemporalError> {
@@ -201,6 +204,7 @@ pub(super) fn complete_date_descriptor_to_naive_date(
 /// A leap second (second `60`) is rejected: chrono encodes a leap second as
 /// nanoseconds past `999_999_999` on second `59`, and the descriptor form does
 /// not map onto that. The rejection is an `Err`, not a silent adjustment.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 pub(super) fn local_date_time_descriptor_to_naive(
     descriptor: &LocalDateTimeDescriptor,
 ) -> Result<chrono::NaiveDateTime, TemporalError> {
@@ -228,6 +232,7 @@ pub(super) fn local_date_time_descriptor_to_naive(
 ///
 /// Leap seconds (chrono's nanoseconds past `999_999_999`) are rejected for the
 /// same reason as the inverse direction.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(datetime)))]
 pub(super) fn naive_date_time_to_local_date_time_descriptor(
     datetime: chrono::NaiveDateTime,
 ) -> Result<LocalDateTimeDescriptor, TemporalError> {

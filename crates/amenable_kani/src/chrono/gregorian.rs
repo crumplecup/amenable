@@ -5,6 +5,7 @@
 
 /// Days in `month` of `year` under the proleptic Gregorian calendar, or `0` for a
 /// month outside `1..=12`.
+#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
 pub(super) fn days_in_month(year: i32, month: u32) -> u32 {
     match month {
         1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
