@@ -10,8 +10,8 @@
 //! different real reason (chrono's internals aren't visible to Creusot at
 //! all).
 //!
-//! The model is the same one `amenable_verus::chrono::naive_week`'s own
-//! Verus model already validated: a date is represented abstractly by its
+//! The model is the same one `amenable_verus::verify_naive_week_span_model`'s
+//! own Verus model already validated: a date is represented abstractly by its
 //! signed day-count, and `back`/`forward` (days from the week's start to this
 //! date, and from this date to the week's end) are the two complementary
 //! halves of a 7-day week, always summing to six by construction. The proof

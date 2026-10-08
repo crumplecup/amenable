@@ -4,16 +4,18 @@
 //!
 //! Real chrono source read first (`NaiveDate::from_isoywd_opt`'s
 //! `YearFlags`/`isoweek_delta` machinery), the same investigation
-//! `amenable_verus::chrono::iso_week`'s own doc comment describes in full.
-//! Rather than re-deriving chrono's own rule for exactly which Monday starts
-//! week 1 of a given year -- real, but orthogonal to this claim, and
-//! independently confirmed by `amenable_kani::chrono::civil_iso_week`'s own
-//! harness against chrono's real API -- this model takes that Monday (`m1`)
-//! and that year's real week count (`52` or `53`) as given inputs,
-//! constrained only by the two properties chrono's own algorithm guarantees.
+//! `amenable_verus::verify_iso_week_round_trips_model`'s own doc comment
+//! describes in full. Rather than re-deriving chrono's own rule for exactly
+//! which Monday starts week 1 of a given year -- real, but orthogonal to
+//! this claim, and independently confirmed by
+//! `amenable_kani::chrono::civil_iso_week`'s own harness against chrono's
+//! real API -- this model takes that Monday (`m1`) and that year's real
+//! week count (`52` or `53`) as given inputs, constrained only by the two
+//! properties chrono's own algorithm guarantees.
 //!
-//! Unlike `amenable_verus::chrono::iso_week`'s own model, this one avoids `%`
-//! and `/` entirely, rather than correcting their behavior: a real toolchain
+//! Unlike `amenable_verus::verify_iso_week_round_trips_model`'s own model,
+//! this one avoids `%` and `/` entirely, rather than correcting their
+//! behavior: a real toolchain
 //! wall found directly (`cannot calculate the remainder of i64 ... in
 //! logic` -- `creusot-std`'s `RemLogic`/division traits are implemented only
 //! for the unbounded `Int` type, not for `i64`, inside any `#[logic]`/

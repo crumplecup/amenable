@@ -6,7 +6,8 @@
 //! `crate::ext_verus_witness` (the trusted/checked macros and the
 //! `ExtCheckedProof` proof artifact, shared with every other target's own
 //! `verus_witness` module) and `checked_civil` (types backed by a real,
-//! hand-verified Verus accommodation model in `amenable_verus::chrono`).
+//! hand-verified Verus accommodation model, re-exported from
+//! `amenable_verus`'s own private `chrono` module).
 
 mod checked_civil;
 mod trusted;
