@@ -71,7 +71,7 @@ pub(super) fn run_audit(args: AuditArgs) -> AmenableResult<()> {
 
 #[instrument(level = "info", skip(args))]
 pub(super) fn run_dump_registry(args: DumpRegistryArgs) -> AmenableResult<()> {
-    let dump = crate::registry_dump::RegistryDump::collect();
+    let dump = crate::registry_dump::RegistryDump::collect()?;
     let json = serde_json::to_string_pretty(&dump)?;
     fs::write(&args.out, json).map_err(|error| crate::AmenableError::io(&args.out, error))?;
     crate::write_stdout_line(format!("Wrote registry dump to {}", args.out.display()))?;

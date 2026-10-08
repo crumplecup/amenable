@@ -24,9 +24,15 @@ pub(crate) struct RegistryDump {
 impl RegistryDump {
     /// Walk every registered `inventory` type and shape it into an owned,
     /// serializable snapshot.
+    ///
+    /// Fallible only because [`WitnessExportRecordDumpBuilder::build`]
+    /// returns a `Result` by construction (`derive_builder`'s own
+    /// shape) -- every field is always set just above each call, so this
+    /// never actually fails in practice, but library code still reports
+    /// through the crate's own error type rather than aborting.
     #[instrument(level = "debug")]
-    pub(crate) fn collect() -> Self {
-        Self {
+    pub(crate) fn collect() -> crate::AmenableResult<Self> {
+        Ok(Self {
             evidence_links: inventory::iter::<EvidenceLink>()
                 .map(|link| {
                     EvidenceLinkDump::new(
@@ -72,9 +78,9 @@ impl RegistryDump {
                         .opaque(support.opaque())
                         .artifact(dump_witness_artifact(artifact))
                         .build()
-                        .expect("every WitnessExportRecordDump field is set above")
+                        .map_err(|error| crate::AmenableError::invariant(error.to_string()))
                 })
-                .collect(),
+                .collect::<crate::AmenableResult<Vec<_>>>()?,
             kani_proofs: inventory::iter::<KaniProofRegistration>()
                 .map(|registration| (registration.proof())())
                 .map(|record| {
@@ -82,6 +88,6 @@ impl RegistryDump {
                     KaniProofDump::new(id, harness, package)
                 })
                 .collect(),
-        }
+        })
     }
 }
