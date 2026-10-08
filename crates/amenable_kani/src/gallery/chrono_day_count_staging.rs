@@ -106,59 +106,68 @@
 //! This case is a false trail for the direct equality. It records the measured
 //! boundary, not a verdict on chrono.
 
-#[cfg(kani)]
-use chrono::{Datelike, NaiveDate};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// The day count from the common era of 1970-01-01.
-#[cfg(kani)]
-pub(super) const CE_OFFSET_FROM_EPOCH: i64 = 719_163;
+    use chrono::{Datelike, NaiveDate};
 
-/// The abandoned spec: days since 1970-01-01, derived independently of chrono's own
-/// formula shape (Howard Hinnant's civil-days algorithm).
-#[cfg(kani)]
-pub(super) fn civil_days_spec(year: i64, month: i64, day: i64) -> i64 {
-    let y = if month <= 2 { year - 1 } else { year };
-    let era = y.div_euclid(400);
-    let yoe = y.rem_euclid(400);
-    let mp = (month + 9) % 12;
-    let doy = (153 * mp + 2) / 5 + day - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    era * 146_097 + doe - 719_468
-}
+    /// The day count from the common era of 1970-01-01. Re-exported one level up:
+    /// several sibling gallery files reuse it rather than duplicating it.
+    pub(in crate::gallery) const CE_OFFSET_FROM_EPOCH: i64 = 719_163;
 
-/// chrono's real day count from the common era, for a valid date.
-#[cfg(kani)]
-pub(super) fn forward_day_count(year: i32, month: u32, day: u32) -> Option<i32> {
-    NaiveDate::from_ymd_opt(year, month, day).map(|date| date.num_days_from_ce())
-}
-
-/// The accommodation model attempt: chrono's own year-part formula, copied in shape.
-/// Unsound outside chrono's supported year range (see `model_overflows_outside_supported_range`
-/// below): `year * 1461` overflows `i32` for `year` far from that range.
-#[cfg(kani)]
-fn model_year_part(year: i32) -> i32 {
-    let mut year = year - 1;
-    let mut ndays = 0;
-    if year < 0 {
-        let excess = 1 + (-year) / 400;
-        year += excess * 400;
-        ndays -= excess * 146_097;
+    /// The abandoned spec: days since 1970-01-01, derived independently of chrono's
+    /// own formula shape (Howard Hinnant's civil-days algorithm). Re-exported one
+    /// level up for the same reason.
+    pub(in crate::gallery) fn civil_days_spec(year: i64, month: i64, day: i64) -> i64 {
+        let y = if month <= 2 { year - 1 } else { year };
+        let era = y.div_euclid(400);
+        let yoe = y.rem_euclid(400);
+        let mp = (month + 9) % 12;
+        let doy = (153 * mp + 2) / 5 + day - 1;
+        let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+        era * 146_097 + doe - 719_468
     }
-    let div_100 = year / 100;
-    ndays + ((year * 1461) >> 2) - div_100 + (div_100 >> 2)
+
+    /// chrono's real day count from the common era, for a valid date. Re-exported one
+    /// level up for the same reason.
+    pub(in crate::gallery) fn forward_day_count(year: i32, month: u32, day: u32) -> Option<i32> {
+        NaiveDate::from_ymd_opt(year, month, day).map(|date| date.num_days_from_ce())
+    }
+
+    /// The accommodation model attempt: chrono's own year-part formula, copied in
+    /// shape. Unsound outside chrono's supported year range (see
+    /// `model_overflows_outside_supported_range` below): `year * 1461` overflows
+    /// `i32` for `year` far from that range.
+    pub(super) fn model_year_part(year: i32) -> i32 {
+        let mut year = year - 1;
+        let mut ndays = 0;
+        if year < 0 {
+            let excess = 1 + (-year) / 400;
+            year += excess * 400;
+            ndays -= excess * 146_097;
+        }
+        let div_100 = year / 100;
+        ndays + ((year * 1461) >> 2) - div_100 + (div_100 >> 2)
+    }
+
+    /// chrono's real year part: its total day count minus its ordinal, both public.
+    fn chrono_year_part(date: NaiveDate) -> i32 {
+        date.num_days_from_ce() - i32::try_from(date.ordinal()).unwrap_or(0)
+    }
+
+    /// The forward wrapper: chrono's year part for a valid date.
+    pub(super) fn forward_year_part(year: i32, month: u32, day: u32) -> Option<i32> {
+        NaiveDate::from_ymd_opt(year, month, day).map(chrono_year_part)
+    }
 }
 
-/// chrono's real year part: its total day count minus its ordinal, both public.
 #[cfg(kani)]
-fn chrono_year_part(date: NaiveDate) -> i32 {
-    date.num_days_from_ce() - i32::try_from(date.ordinal()).unwrap_or(0)
-}
-
-/// The forward wrapper: chrono's year part for a valid date.
+pub(super) use kani_only::{CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
 #[cfg(kani)]
-fn forward_year_part(year: i32, month: u32, day: u32) -> Option<i32> {
-    NaiveDate::from_ymd_opt(year, month, day).map(chrono_year_part)
-}
+use kani_only::{forward_year_part, model_year_part};
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(

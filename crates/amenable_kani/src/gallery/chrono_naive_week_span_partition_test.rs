@@ -12,28 +12,48 @@
 //! investigation (`BASE_YEAR = 2001`, `PARTITION_SIZE = 5243`), month, day, and the
 //! week-start day all left fully symbolic.
 
-#[cfg(kani)]
-use chrono::{Datelike, NaiveDate, Weekday};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// Map any `u8` onto the seven weekdays.
-#[cfg(kani)]
-fn weekday_of(index: u8) -> Weekday {
-    match index % 7 {
-        0 => Weekday::Mon,
-        1 => Weekday::Tue,
-        2 => Weekday::Wed,
-        3 => Weekday::Thu,
-        4 => Weekday::Fri,
-        5 => Weekday::Sat,
-        _ => Weekday::Sun,
+    use chrono::Weekday;
+
+    /// Map any `u8` onto the seven weekdays.
+    pub(super) fn weekday_of(index: u8) -> Weekday {
+        match index % 7 {
+            0 => Weekday::Mon,
+            1 => Weekday::Tue,
+            2 => Weekday::Wed,
+            3 => Weekday::Thu,
+            4 => Weekday::Fri,
+            5 => Weekday::Sat,
+            _ => Weekday::Sun,
+        }
     }
+
+    pub(super) const BASE_YEAR: i32 = 2001;
+    pub(super) const PARTITION_SIZE: i32 = 5243;
 }
 
 #[cfg(kani)]
-const BASE_YEAR: i32 = 2001;
-
+use chrono::{Datelike, NaiveDate};
 #[cfg(kani)]
-const PARTITION_SIZE: i32 = 5243;
+use kani_only::{BASE_YEAR, PARTITION_SIZE, weekday_of};
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::chrono_naive_week_span_partition_test::real_span_claim_one_partition".to_owned(),
+            "gallery::chrono_naive_week_span_partition_test::real_span_claim_one_partition".to_owned(),
+            "amenable_kani".to_owned(),
+            "the year-partitioning technique that resolved chrono_day_count_staging's timeout transfers to the real week-span claim, restricted to one representative partition".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
 
 amenable_derive::gallery_harness! {
     kani, REAL_SPAN_CLAIM_ONE_PARTITION_SRC, {
@@ -54,6 +74,19 @@ amenable_derive::gallery_harness! {
             }
         }
     }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::chrono_naive_week_span_partition_test::real_span_claim_boundary_partition".to_owned(),
+            "gallery::chrono_naive_week_span_partition_test::real_span_claim_boundary_partition".to_owned(),
+            "amenable_kani".to_owned(),
+            "the same real week-span claim, restricted to the partition touching chrono's minimum supported year".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
 }
 
 amenable_derive::gallery_harness! {

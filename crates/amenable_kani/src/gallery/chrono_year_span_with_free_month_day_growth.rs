@@ -35,12 +35,22 @@
 //! full range is roughly 16-32x past where this combined test already crosses the
 //! practical bound, and the growth trend gives no reason to expect it to level off.
 
-#[cfg(kani)]
-use super::chrono_day_count_staging::{CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// The same base year the other axes use.
+    pub(super) use super::super::chrono_day_count_staging::{
+        CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count,
+    };
+
+    /// The same base year the other axes use.
+    pub(super) const BASE_YEAR: i32 = 2001;
+}
+
 #[cfg(kani)]
-const BASE_YEAR: i32 = 2001;
+use kani_only::{BASE_YEAR, CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
 
 amenable_derive::gallery_harness! {
     kani, YEAR_SPAN_FREE_MD_1_SRC, {

@@ -46,103 +46,99 @@
 //! the general technique: the two independently verified contracts (first and last day,
 //! one-sided) remain sound; only their use as a basis for the span relation was wrong.
 
-#[cfg(kani)]
-use chrono::{Datelike, Days, NaiveDate, Weekday};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`). `days_back_to`, present in the sibling
+/// production file this case is modeled on, is dropped here: never called in this
+/// file, dead code worth not perpetuating while restructuring it anyway.
+mod kani_only {
+    #![cfg(kani)]
 
-/// Map any `u8` onto the seven weekdays.
-#[cfg(kani)]
-fn weekday_of(index: u8) -> Weekday {
-    match index % 7 {
-        0 => Weekday::Mon,
-        1 => Weekday::Tue,
-        2 => Weekday::Wed,
-        3 => Weekday::Thu,
-        4 => Weekday::Fri,
-        5 => Weekday::Sat,
-        _ => Weekday::Sun,
+    use chrono::{Datelike, Days, NaiveDate, Weekday};
+
+    /// Map any `u8` onto the seven weekdays.
+    pub(super) fn weekday_of(index: u8) -> Weekday {
+        match index % 7 {
+            0 => Weekday::Mon,
+            1 => Weekday::Tue,
+            2 => Weekday::Wed,
+            3 => Weekday::Thu,
+            4 => Weekday::Fri,
+            5 => Weekday::Sat,
+            _ => Weekday::Sun,
+        }
     }
-}
 
-/// Days a date steps back from its own weekday to reach `start` (`0..=6`).
-#[cfg(kani)]
-fn days_back_to(date: NaiveDate, start: Weekday) -> u32 {
-    (date.weekday().num_days_from_monday() + 7 - start.num_days_from_monday()) % 7
-}
+    /// A `NaiveDate` newtype `kani::Arbitrary` can generate: the one piece this
+    /// attempt did resolve, since `Option<NaiveDate>` itself is not `Arbitrary` and
+    /// chrono cannot be made to implement it from outside the crate.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub(super) struct KaniDate(NaiveDate);
 
-/// A `NaiveDate` newtype `kani::Arbitrary` can generate: the one piece this attempt did
-/// resolve, since `Option<NaiveDate>` itself is not `Arbitrary` and chrono cannot be
-/// made to implement it from outside the crate.
-#[cfg(kani)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-struct KaniDate(NaiveDate);
-
-#[cfg(kani)]
-impl kani::Arbitrary for KaniDate {
-    fn any() -> Self {
-        let year: i32 = kani::any();
-        let month: u32 = kani::any();
-        let day: u32 = kani::any();
-        let in_range = (NaiveDate::MIN.year()..=NaiveDate::MAX.year()).contains(&year);
-        kani::assume(
-            in_range
-                && (1..=12).contains(&month)
-                && day >= 1
-                && day
-                    <= match month {
-                        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
-                        4 | 6 | 9 | 11 => 30,
-                        2 if (year % 4 == 0 && year % 100 != 0) || year % 400 == 0 => 29,
-                        2 => 28,
-                        _ => 0,
-                    },
-        );
-        KaniDate(
-            NaiveDate::from_ymd_opt(year, month, day)
-                .expect("assumed a valid Gregorian date, so from_ymd_opt is Some"),
-        )
+    impl kani::Arbitrary for KaniDate {
+        fn any() -> Self {
+            let year: i32 = kani::any();
+            let month: u32 = kani::any();
+            let day: u32 = kani::any();
+            let in_range = (NaiveDate::MIN.year()..=NaiveDate::MAX.year()).contains(&year);
+            kani::assume(
+                in_range
+                    && (1..=12).contains(&month)
+                    && day >= 1
+                    && day
+                        <= match month {
+                            1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+                            4 | 6 | 9 | 11 => 30,
+                            2 if (year % 4 == 0 && year % 100 != 0) || year % 400 == 0 => 29,
+                            2 => 28,
+                            _ => 0,
+                        },
+            );
+            KaniDate(
+                NaiveDate::from_ymd_opt(year, month, day)
+                    .expect("assumed a valid Gregorian date, so from_ymd_opt is Some"),
+            )
+        }
     }
-}
 
-/// The first day of the week, one-sided contract: on or before the date. Says nothing
-/// about exactly which day it is.
-#[cfg_attr(kani, kani::requires(true))]
-#[cfg_attr(
-    kani,
-    kani::ensures(|result: &Option<KaniDate>| match *result {
+    /// The first day of the week, one-sided contract: on or before the date. Says
+    /// nothing about exactly which day it is.
+    #[kani::requires(true)]
+    #[kani::ensures(|result: &Option<KaniDate>| match *result {
         Some(first) => first.0 <= date,
         None => true,
-    })
-)]
-#[cfg(kani)]
-fn week_first_day(date: NaiveDate, start: Weekday) -> Option<KaniDate> {
-    date.week(start).checked_first_day().map(KaniDate)
-}
+    })]
+    pub(super) fn week_first_day(date: NaiveDate, start: Weekday) -> Option<KaniDate> {
+        date.week(start).checked_first_day().map(KaniDate)
+    }
 
-/// The last day of the week, one-sided contract: on or after the date.
-#[cfg_attr(kani, kani::requires(true))]
-#[cfg_attr(
-    kani,
-    kani::ensures(|result: &Option<KaniDate>| match *result {
+    /// The last day of the week, one-sided contract: on or after the date.
+    #[kani::requires(true)]
+    #[kani::ensures(|result: &Option<KaniDate>| match *result {
         Some(last) => date <= last.0,
         None => true,
-    })
-)]
-#[cfg(kani)]
-fn week_last_day(date: NaiveDate, start: Weekday) -> Option<KaniDate> {
-    date.week(start).checked_last_day().map(KaniDate)
-}
+    })]
+    pub(super) fn week_last_day(date: NaiveDate, start: Weekday) -> Option<KaniDate> {
+        date.week(start).checked_last_day().map(KaniDate)
+    }
 
-/// The composed claim: when both ends exist, they span six days. Fails under stubbing,
-/// because the one-sided contracts above do not pin the ends six days apart.
-#[cfg_attr(kani, kani::requires(true))]
-#[cfg_attr(kani, kani::ensures(|result: &bool| *result))]
-#[cfg(kani)]
-fn week_span_holds(date: NaiveDate, start: Weekday) -> bool {
-    match (week_first_day(date, start), week_last_day(date, start)) {
-        (Some(first), Some(last)) => (last.0 - first.0).num_days() == 6,
-        _ => true,
+    /// The composed claim: when both ends exist, they span six days. Fails under
+    /// stubbing, because the one-sided contracts above do not pin the ends six days
+    /// apart.
+    #[kani::requires(true)]
+    #[kani::ensures(|result: &bool| *result)]
+    pub(super) fn week_span_holds(date: NaiveDate, start: Weekday) -> bool {
+        match (week_first_day(date, start), week_last_day(date, start)) {
+            (Some(first), Some(last)) => (last.0 - first.0).num_days() == 6,
+            _ => true,
+        }
     }
 }
+
+#[cfg(kani)]
+use chrono::NaiveDate;
+#[cfg(kani)]
+use kani_only::{week_first_day, week_last_day, week_span_holds, weekday_of};
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
