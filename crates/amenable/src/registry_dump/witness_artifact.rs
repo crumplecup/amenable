@@ -4,18 +4,22 @@
 use tracing::instrument;
 
 /// One explicit [`crate::WitnessExportRecord`], owned for JSON
-/// serialization.
-#[derive(serde::Serialize)]
+/// serialization. Built via [`WitnessExportRecordDumpBuilder`] rather than
+/// a many-argument constructor -- nine fields is well past a plain `new`
+/// clippy would accept, the same threshold `ProofAssessment`'s own
+/// doc comment names.
+#[derive(serde::Serialize, derive_builder::Builder)]
+#[builder(pattern = "owned")]
 pub(super) struct WitnessExportRecordDump {
-    pub(super) verifier: String,
-    pub(super) evidence: String,
-    pub(super) destination_module: String,
-    pub(super) support_kind: String,
-    pub(super) trivial: usize,
-    pub(super) checked: usize,
-    pub(super) trusted: usize,
-    pub(super) opaque: usize,
-    pub(super) artifact: WitnessArtifactNodeDump,
+    verifier: String,
+    evidence: String,
+    destination_module: String,
+    support_kind: String,
+    trivial: usize,
+    checked: usize,
+    trusted: usize,
+    opaque: usize,
+    artifact: WitnessArtifactNodeDump,
 }
 
 /// One structured witness artifact node, owned for JSON serialization.
