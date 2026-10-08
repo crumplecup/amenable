@@ -285,5 +285,5 @@ fn adding_evidence_to_descriptors_left_the_aggregate_registry_alone() {
         .map(EvidenceLink::name)
         .filter(|n| n.contains("proof_composition::composites"))
         .count();
-    assert_eq!(composites, 93);
+    assert_eq!(composites, 94);
 }

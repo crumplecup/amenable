@@ -90,6 +90,6 @@ fn every_aggregate_self_registers_an_evidence_link() {
         .filter(|name| name.contains("proof_composition::proof_branches::"))
         .count();
 
-    assert_eq!(composites, 93, "composites: {composites}");
+    assert_eq!(composites, 94, "composites: {composites}");
     assert_eq!(proof_branches, 13, "proof branches: {proof_branches}");
 }
