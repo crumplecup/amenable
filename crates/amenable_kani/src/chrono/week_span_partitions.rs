@@ -61,11 +61,30 @@ mod kani_only {
 
     /// Number of partitions.
     pub(super) const PARTITION_COUNT: i32 = 100;
+
+    /// Whether `year` falls inside partition `n`'s half-open range, the same formula
+    /// the 100 partition harnesses' `kani::assume` bounds use.
+    pub(super) fn in_partition(year: i32, n: i32) -> bool {
+        year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE
+    }
+
+    /// `partitions_are_exhaustive_and_disjoint`'s own `kani::assume` bound, named so
+    /// it points at a real, registered contract fragment instead of a raw equation.
+    pub(super) fn year_in_supported_range_holds(year: i32) -> bool {
+        year >= MIN_YEAR && year <= MAX_YEAR
+    }
+
+    /// The computed partition index's own bound, named for the same reason.
+    pub(super) fn computed_partition_index_in_range_holds(computed: i32) -> bool {
+        computed >= 0 && computed < PARTITION_COUNT
+    }
 }
 
 #[cfg(kani)]
 use kani_only::{
-    Datelike, MAX_YEAR, MIN_YEAR, NaiveDate, PARTITION_COUNT, PARTITION_SIZE, Weekday, weekday_of,
+    Datelike, MAX_YEAR, MIN_YEAR, NaiveDate, PARTITION_COUNT, PARTITION_SIZE, Weekday,
+    computed_partition_index_in_range_holds, in_partition, weekday_of,
+    year_in_supported_range_holds,
 };
 
 amenable_derive::gallery_harness! {
@@ -110,13 +129,6 @@ seq_macro::seq!(N in 0..100 {
     }
 });
 
-/// Whether `year` falls inside partition `n`'s half-open range, the same formula the
-/// 100 partition harnesses' `kani::assume` bounds use.
-#[cfg(kani)]
-fn in_partition(year: i32, n: i32) -> bool {
-    year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE
-}
-
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
         "amenable_kani::chrono::week_span_partitions::in_partition",
@@ -126,13 +138,6 @@ fn in_partition(year: i32, n: i32) -> bool {
     )
 }
 
-/// `partitions_are_exhaustive_and_disjoint`'s own `kani::assume` bound, named so it
-/// points at a real, registered contract fragment instead of a raw equation.
-#[cfg(kani)]
-fn year_in_supported_range_holds(year: i32) -> bool {
-    year >= MIN_YEAR && year <= MAX_YEAR
-}
-
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
         "amenable_kani::chrono::week_span_partitions::year_in_supported_range_holds",
@@ -140,12 +145,6 @@ fn year_in_supported_range_holds(year: i32) -> bool {
         "requires",
         || "year >= MIN_YEAR && year <= MAX_YEAR",
     )
-}
-
-/// The computed partition index's own bound, named for the same reason.
-#[cfg(kani)]
-fn computed_partition_index_in_range_holds(computed: i32) -> bool {
-    computed >= 0 && computed < PARTITION_COUNT
 }
 
 ::inventory::submit! {

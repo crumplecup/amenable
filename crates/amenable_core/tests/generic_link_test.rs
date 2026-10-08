@@ -11,6 +11,7 @@ static PREMISES: &[Premise] = &[Premise::new(
 
 #[test]
 fn concrete_link_has_no_bounds_or_premises() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let link = EvidenceLink::new(
         "amenable_ext::ExtStandard<Foo>",
         "amenable_ext::ExtStandard<Foo>",
@@ -23,6 +24,7 @@ fn concrete_link_has_no_bounds_or_premises() -> miette::Result<()> {
 
 #[test]
 fn generic_link_carries_bounds_and_premises() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let link = EvidenceLink::generic(
         "amenable_ext::ExtGeneric<DateTime<Tz>>",
         "amenable_ext::ExtGeneric<DateTime<Tz>>",
@@ -43,6 +45,7 @@ fn generic_link_carries_bounds_and_premises() -> miette::Result<()> {
 
 #[test]
 fn generic_link_keeps_name_and_index() -> miette::Result<()> {
+    amenable_core::init_tracing();
     let link = EvidenceLink::generic("generic-name", "generic-name", 3, BOUNDS, PREMISES);
     assert_eq!(link.name(), "generic-name");
     assert_eq!(link.basis(), "generic-name");
