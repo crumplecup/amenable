@@ -39,12 +39,23 @@
 //! axis alone was flat up to a span of 1024 (`chrono_year_span_growth`), the cost here
 //! comes from the full year range combined with a free day, not from month.
 
-#[cfg(kani)]
-use super::chrono_day_count_staging::{CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// The fixed year for every span below: the same base `chrono_year_span_growth` uses.
+    pub(super) use super::super::chrono_day_count_staging::{
+        CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count,
+    };
+
+    /// The fixed year for every span below: the same base `chrono_year_span_growth`
+    /// uses.
+    pub(super) const BASE_YEAR: i32 = 2001;
+}
+
 #[cfg(kani)]
-const BASE_YEAR: i32 = 2001;
+use kani_only::{BASE_YEAR, CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
 
 amenable_derive::gallery_harness! {
     kani, MONTH_SPAN_1_SRC, {

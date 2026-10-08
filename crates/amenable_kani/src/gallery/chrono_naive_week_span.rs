@@ -33,9 +33,6 @@
 //! and the span piece needs a stable result before the row is Complete. The witness stays unproven on Kani until the combined claim
 //! resolves, by a model of the arithmetic or by a different decomposition.
 
-#[cfg(kani)]
-use chrono::{Datelike, Weekday};
-
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(
         || ::amenable_kani::KaniGalleryCase::new(
@@ -49,19 +46,32 @@ use chrono::{Datelike, Weekday};
     )
 }
 
-/// Map any `u8` onto the seven weekdays, so a symbolic `u8` covers every weekday.
-#[cfg(kani)]
-fn weekday_of(index: u8) -> Weekday {
-    match index % 7 {
-        0 => Weekday::Mon,
-        1 => Weekday::Tue,
-        2 => Weekday::Wed,
-        3 => Weekday::Thu,
-        4 => Weekday::Fri,
-        5 => Weekday::Sat,
-        _ => Weekday::Sun,
+/// Every item here exists only for the Kani harness below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
+
+    use chrono::Weekday;
+
+    /// Map any `u8` onto the seven weekdays, so a symbolic `u8` covers every weekday.
+    pub(super) fn weekday_of(index: u8) -> Weekday {
+        match index % 7 {
+            0 => Weekday::Mon,
+            1 => Weekday::Tue,
+            2 => Weekday::Wed,
+            3 => Weekday::Thu,
+            4 => Weekday::Fri,
+            5 => Weekday::Sat,
+            _ => Weekday::Sun,
+        }
     }
 }
+
+#[cfg(kani)]
+use chrono::Datelike;
+#[cfg(kani)]
+use kani_only::weekday_of;
 
 amenable_derive::gallery_harness! {
     kani, IN_RANGE_WEEK_CLAIM_TIMES_OUT_SRC, {

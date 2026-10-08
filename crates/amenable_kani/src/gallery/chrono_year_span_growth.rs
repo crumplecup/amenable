@@ -46,33 +46,41 @@
 //! strategy has to bound year specifically; a 12-way split by month or a 31-way split
 //! by day, on their own, would not resolve the original timeout.
 
-#[cfg(kani)]
-use chrono::{Datelike, NaiveDate};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// chrono's real year part: its total day count minus its ordinal, both public.
-#[cfg(kani)]
-fn chrono_year_part(date: NaiveDate) -> i32 {
-    date.num_days_from_ce() - i32::try_from(date.ordinal()).unwrap_or(0)
-}
+    use chrono::{Datelike, NaiveDate};
 
-/// The model: chrono's own year-part formula, copied in shape.
-#[cfg(kani)]
-fn model_year_part(year: i32) -> i32 {
-    let mut year = year - 1;
-    let mut ndays = 0;
-    if year < 0 {
-        let excess = 1 + (-year) / 400;
-        year += excess * 400;
-        ndays -= excess * 146_097;
+    /// chrono's real year part: its total day count minus its ordinal, both public.
+    pub(super) fn chrono_year_part(date: NaiveDate) -> i32 {
+        date.num_days_from_ce() - i32::try_from(date.ordinal()).unwrap_or(0)
     }
-    let div_100 = year / 100;
-    ndays + ((year * 1461) >> 2) - div_100 + (div_100 >> 2)
+
+    /// The model: chrono's own year-part formula, copied in shape.
+    pub(super) fn model_year_part(year: i32) -> i32 {
+        let mut year = year - 1;
+        let mut ndays = 0;
+        if year < 0 {
+            let excess = 1 + (-year) / 400;
+            year += excess * 400;
+            ndays -= excess * 146_097;
+        }
+        let div_100 = year / 100;
+        ndays + ((year * 1461) >> 2) - div_100 + (div_100 >> 2)
+    }
+
+    /// The base year for every span below: inside chrono's supported range, and far
+    /// from any century or 400-year boundary.
+    pub(super) const BASE_YEAR: i32 = 2001;
 }
 
-/// The base year for every span below: inside chrono's supported range, and far from
-/// any century or 400-year boundary.
 #[cfg(kani)]
-const BASE_YEAR: i32 = 2001;
+use chrono::NaiveDate;
+#[cfg(kani)]
+use kani_only::{BASE_YEAR, chrono_year_part, model_year_part};
 
 amenable_derive::gallery_harness! {
     kani, YEAR_SPAN_1_SRC, {

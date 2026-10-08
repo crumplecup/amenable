@@ -31,18 +31,30 @@
 //! All three land in the same tight range, well under the 180s bound, with no sign of
 //! the per-partition cost depending on which part of the range it covers.
 
-#[cfg(kani)]
-use super::chrono_day_count_staging::{CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count};
+/// Every item here exists only for the Kani harnesses below, so the whole module is
+/// gated once, rather than scattering `#[cfg(kani)]` across each item individually
+/// (cordial's own `CFG-SCATTER-001`).
+mod kani_only {
+    #![cfg(kani)]
 
-/// chrono's real minimum supported year (`NaiveDate::MIN.year()`).
-#[cfg(kani)]
-const MIN_YEAR: i32 = -262_143;
+    pub(super) use super::super::chrono_day_count_staging::{
+        CE_OFFSET_FROM_EPOCH, civil_days_spec, forward_day_count,
+    };
 
-/// Years per partition: `ceil(524_286 / 100)`. The last partition's upper bound
-/// overshoots chrono's real maximum year by 14 years; those extra years simply produce
-/// `None` from `forward_day_count`, which the `if let Some` below already handles.
+    /// chrono's real minimum supported year (`NaiveDate::MIN.year()`).
+    pub(super) const MIN_YEAR: i32 = -262_143;
+
+    /// Years per partition: `ceil(524_286 / 100)`. The last partition's upper bound
+    /// overshoots chrono's real maximum year by 14 years; those extra years simply
+    /// produce `None` from `forward_day_count`, which the `if let Some` below already
+    /// handles.
+    pub(super) const PARTITION_SIZE: i32 = 5243;
+}
+
 #[cfg(kani)]
-const PARTITION_SIZE: i32 = 5243;
+use kani_only::{
+    CE_OFFSET_FROM_EPOCH, MIN_YEAR, PARTITION_SIZE, civil_days_spec, forward_day_count,
+};
 
 seq_macro::seq!(N in 0..100 {
     ::inventory::submit! {
