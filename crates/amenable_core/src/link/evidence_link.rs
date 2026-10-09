@@ -1,5 +1,5 @@
 //! A statically-registered fact: this evidence type rests on that basis
-//! type, plus the premises a generic claim relies on.
+//! type.
 
 /// A statically-registered fact: this evidence type rests on that basis
 /// type. A root `Standard` registers a link to itself, since it is its own
@@ -27,84 +27,14 @@ pub struct EvidenceLink {
     name: &'static str,
     basis: &'static str,
     index: usize,
-    bounds: &'static [&'static str],
-    premises: &'static [Premise],
-}
-
-/// A value-level assumption a generic evidence claim relies on, beyond what
-/// its trait bounds enforce by signature. Each premise is a contract: it gets
-/// its own proof and test, following the Exchange pattern.
-///
-/// Hand-written `const fn new`/getters, for the same `inventory::submit!`
-/// reason as [`EvidenceLink`].
-pub struct Premise {
-    id: &'static str,
-    statement: &'static str,
-}
-
-impl Premise {
-    /// Register a premise under a stable `id`, stating what it assumes.
-    #[must_use]
-    pub const fn new(id: &'static str, statement: &'static str) -> Self {
-        Self { id, statement }
-    }
-
-    /// The premise's stable identifier.
-    #[must_use]
-    pub const fn id(&self) -> &'static str {
-        self.id
-    }
-
-    /// What the premise assumes, in plain words.
-    #[must_use]
-    pub const fn statement(&self) -> &'static str {
-        self.statement
-    }
 }
 
 impl EvidenceLink {
-    /// Register a concrete link from `name` to `basis`, at fan-out position
-    /// `index`. A concrete link has no bounds and no premises.
+    /// Register a link from `name` to `basis`, at fan-out position
+    /// `index`.
     #[must_use]
     pub const fn new(name: &'static str, basis: &'static str, index: usize) -> Self {
-        Self {
-            name,
-            basis,
-            index,
-            bounds: &[],
-            premises: &[],
-        }
-    }
-
-    /// Register a generic link: `name` is generic over `bounds`, and relies on
-    /// `premises` beyond what those bounds enforce by signature.
-    #[must_use]
-    pub const fn generic(
-        name: &'static str,
-        basis: &'static str,
-        index: usize,
-        bounds: &'static [&'static str],
-        premises: &'static [Premise],
-    ) -> Self {
-        Self {
-            name,
-            basis,
-            index,
-            bounds,
-            premises,
-        }
-    }
-
-    /// The trait bounds this evidence is generic over. Empty for a concrete link.
-    #[must_use]
-    pub const fn bounds(&self) -> &'static [&'static str] {
-        self.bounds
-    }
-
-    /// The premises this generic claim relies on. Empty for a concrete link.
-    #[must_use]
-    pub const fn premises(&self) -> &'static [Premise] {
-        self.premises
+        Self { name, basis, index }
     }
 
     /// This evidence type's name.

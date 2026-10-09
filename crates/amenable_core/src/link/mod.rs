@@ -39,7 +39,7 @@ mod proof_record;
 mod proof_token_mint_record;
 
 pub use contract_record::ContractRecord;
-pub use evidence_link::{EvidenceLink, Premise};
+pub use evidence_link::EvidenceLink;
 pub use exchange_edge_record::ExchangeEdgeRecord;
 pub use proof_record::ProofRecord;
 pub use proof_token_mint_record::ProofTokenMintRecord;

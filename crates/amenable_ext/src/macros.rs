@@ -66,38 +66,3 @@ macro_rules! register_ext_standard_evidence {
 }
 
 pub(crate) use register_ext_standard_evidence;
-
-/// Register a generic evidence claim: `$ty` is generic over `bounds`, and
-/// relies on `premises` beyond what those bounds enforce by signature.
-///
-/// Emits a link named `amenable_ext::ExtGeneric<$ty>`. The wrapper differs
-/// from `ExtStandard<T>`, so a generic name can never equal a concrete one.
-/// Kani cannot express generics, so each concrete instantiation still gets its
-/// own witness type; this macro registers only the generic claim itself.
-///
-/// ```ignore
-/// register_ext_generic_evidence!(
-///     chrono::DateTime<Tz>,
-///     bounds = ["chrono::offset::TimeZone"],
-///     premises = [("offset-round-trip", "a local offset applied back gives the UTC instant")],
-/// );
-/// ```
-macro_rules! register_ext_generic_evidence {
-    (
-        $ty:ty,
-        bounds = [$($bound:expr),* $(,)?],
-        premises = [$(($pid:expr, $pstmt:expr)),* $(,)?] $(,)?
-    ) => {
-        inventory::submit! {
-            amenable_core::EvidenceLink::generic(
-                concat!("amenable_ext::ExtGeneric<", stringify!($ty), ">"),
-                concat!("amenable_ext::ExtGeneric<", stringify!($ty), ">"),
-                0,
-                &[$($bound),*],
-                &[$(amenable_core::Premise::new($pid, $pstmt)),*],
-            )
-        }
-    };
-}
-
-pub(crate) use register_ext_generic_evidence;

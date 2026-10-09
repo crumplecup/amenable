@@ -124,7 +124,12 @@ it to 15.
 
 A row is Complete when all of these hold:
 - [ ] Registered in `amenable_ext` under its feature, with `impl_ext_type!` and
-      `register_ext_standard_evidence!`, or the generic macro for generic claims.
+      `register_ext_standard_evidence!` for each concrete instantiation. A
+      generic claim needs no markup of its own (Phase 1's `ExtGeneric<T>`
+      registration was tried and rolled back, 2026-10-09): cordial derives
+      the bound straight from the generic type's own rustdoc definition and
+      checks it against the set of concrete `EvidenceLink`s that already
+      exist for its instantiations.
 - [ ] A witness on Kani (per-instantiation type), Creusot, and Verus. Each is proven
       or trusted, and labeled.
 - [ ] Every required contract from the bridge its bound names has a proof and a test
@@ -154,35 +159,31 @@ upstream features, and `cordial.toml` declares the three targets. Remaining item
 belongs to cordial: the shared dump's feature set must include `chrono` and
 `chrono-tz` (see cordial requests).
 
-## Phase 1: Registry schema for generic claims
+## Phase 1: Registry schema for generic claims (reverted, 2026-10-09)
 
-**Why first:** cordial cannot tell a generic claim from a concrete one until the
-dump carries `bounds` and `premises`. The cordial request closes at the end of this
-phase, for the generic half.
+**Superseded.** This phase added `EvidenceLink::generic`/`bounds`/`premises`,
+`Premise`, `EvidenceLinkDump::{bounds, premises}`/`PremiseDump`, and
+`register_ext_generic_evidence!` (the `ExtGeneric<T>` markup), on the theory
+that cordial needed amenable to hand it each generic claim's bounds and
+premises explicitly.
 
-**Files and changes:**
-1. `crates/amenable_core/src/link.rs`: `EvidenceLink` gains `bounds:
-   &'static [&'static str]` and `premises: &'static [Premise]`.
-   - `EvidenceLink::new(name, basis, index)` keeps its signature and sets both to
-     empty, so existing callers do not change.
-   - Add `EvidenceLink::generic(name, basis, index, bounds, premises)`.
-2. `crates/amenable_core`: new `Premise { id: &'static str, statement: &'static str }`.
-3. `crates/amenable/src/registry_dump.rs`: `EvidenceLinkDump` gains `bounds:
-   Vec<String>` and `premises: Vec<PremiseDump>`. Concrete links serialize both as
-   empty.
-4. `crates/amenable_ext/src/macros.rs`: `register_ext_generic_evidence!(ty, bounds =
-   [...], premises = [...])`. It emits a link named `amenable_ext::ExtGeneric<ty>`.
-   The wrapper differs from `ExtStandard<T>`, so a generic name can never equal a
-   concrete one.
+The user judged this a mistake and cordial's own history agrees: it cannot be
+written for every third-party generic, and flat bound strings can't say which
+parameter a bound belongs to (`HashMap<K, V>`). Cordial's `b2567d3` ("Derive
+generic-type bounds from rustdoc; drop the amenable markup") reads declared
+bounds straight from each type's own rustdoc definition instead, working on
+any library, not just amenable — a strictly more general fix that needs no
+markup on this side at all.
 
-**Verify before starting:** count the call sites of `EvidenceLink::new` across the
-workspace, including the derive macros in `amenable_derive`, so the signature stays
-stable.
+Rolled back here to match: `EvidenceLink` is back to `{name, basis, index}`
+only, `Premise`/`register_ext_generic_evidence!` are gone, and
+`EvidenceLinkDump` carries just `{name, basis, index}`. `register_ext_generic_
+evidence!` had zero real call sites the whole time it existed — the markup
+was never actually written for a real chrono generic before cordial moved on
+from needing it.
 
-**Tests:** a dump round-trip test covering one concrete link and one generic link.
-Existing dump tests must still pass unchanged.
-
-**Gate:** cordial reads `bounds` and `premises` from a regenerated dump.
+**Cordial request #2 ("read bounds/premises from the dump") is withdrawn,**
+not just closed — cordial no longer wants this from amenable at all.
 
 ## Phase 2: Value types and civil bridge (7 rows)
 
@@ -299,9 +300,11 @@ pass on the chrono backend for every civil carrier.
      and `NamedTimeZoneIdentityValid` are already re-exported at the root.
 5. **Registrations:**
    - `DateTime<T>` and `Date<T>` for the four zone types, eight in all, as instantiation
-     rows (decision 6).
-   - The generic claims as `ExtGeneric<DateTime<Tz>>` and `ExtGeneric<Date<Tz>>`,
-     using the Phase 1 macro. Each lists its bound and premises.
+     rows (decision 6), via `register_ext_standard_evidence!` per concrete type.
+   - No separate generic-claim registration: Phase 1's `ExtGeneric<T>` markup
+     was rolled back (2026-10-09). Cordial reports the generic claim itself,
+     derived from `DateTime<T>`/`Date<T>`'s own rustdoc bound plus the eight
+     instantiation rows above (cordial request 1).
 6. **chrono-tz rows:** `Tz` (zone bridge), `TzOffset`, `GapInfo`, and
    `chrono_tz::ParseError`. Decide each row's claim kind from its role before writing
    its witness. This is not settled yet, so read each type's source before Phase 3
@@ -497,16 +500,23 @@ witness and a test. Out-of-scope edges are listed in the plan with their reasons
 
 1. Report the eight instantiation rows as checklist rows, with the `DateTime` and
    `Date` rows as aggregates derived from them. Needed at the end of Phase 3.
-2. Read `bounds` and `premises` from the registry dump. Needed at the end of
-   Phase 1, which closes the generic half of the request.
+2. ~~Read `bounds` and `premises` from the registry dump.~~ **Withdrawn
+   (2026-10-09):** cordial derives declared bounds from rustdoc directly
+   (`b2567d3`) and needs nothing from amenable for this; see Phase 1's own
+   note. Phase 1's markup was rolled back to match.
 3. Confirm the shared dump's feature set includes `chrono` and `chrono-tz`.
+   **Still open** — `cordial coverage` currently reports 0/55 chrono types
+   complete, including types with full witness coverage, which points at
+   this dump still being built without the `chrono`/`chrono-tz` features
+   enabled (`cordial.toml` has no `features` key for either target).
 4. Record per-size rkyv results, so a Complete names its size. Needed in Phase 9.
 5. Normalize whitespace in evidence names before matching.
 
 ## When the cordial request closes
 
 - **Per-instantiation rows:** closed at the end of Phase 3.
-- **Generic claims readable from the dump:** closed at the end of Phase 1.
+- **Generic claims readable from the dump:** withdrawn, not closed — cordial
+  no longer needs this (see request 2 above).
 
 ## Exit criteria
 

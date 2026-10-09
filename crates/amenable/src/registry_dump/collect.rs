@@ -3,7 +3,7 @@
 
 use tracing::instrument;
 
-use super::evidence::{EvidenceLinkDump, PremiseDump};
+use super::evidence::EvidenceLinkDump;
 use super::kani_proof::KaniProofDump;
 use super::proof::{ContractRecordDump, ProofRecordDump};
 use super::witness_artifact::{
@@ -39,11 +39,6 @@ impl RegistryDump {
                         link.name().to_owned(),
                         link.basis().to_owned(),
                         link.index(),
-                        link.bounds().iter().map(|b| (*b).to_owned()).collect(),
-                        link.premises()
-                            .iter()
-                            .map(|p| PremiseDump::new(p.id().to_owned(), p.statement().to_owned()))
-                            .collect(),
                     )
                 })
                 .collect(),
