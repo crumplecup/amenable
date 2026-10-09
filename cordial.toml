@@ -169,6 +169,10 @@ name = "jiff"
 
 [[amenable_ext.target]]
 name = "chrono"
+# chrono_tz::Tz implements chrono::offset::TimeZone, so cordial must follow
+# into chrono_tz when resolving DateTime<T>/Date<T>'s implementors, or Tz is
+# never found.
+resolve_crates = ["chrono", "chrono_tz"]
 
 [[amenable_ext.target]]
 name = "chrono-tz"
