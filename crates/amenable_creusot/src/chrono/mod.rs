@@ -11,4 +11,6 @@ mod naive_time;
 mod naive_week;
 #[cfg(feature = "chrono-tz")]
 mod tz;
+#[cfg(feature = "chrono-tz")]
+mod tz_offset;
 mod utc;

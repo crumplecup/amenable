@@ -7,6 +7,8 @@
 //! `amenable_time` type to that Pearlite content. Structural contracts
 //! stay `Standard`-only and never reach this module.
 
+#[cfg(feature = "chrono-tz")]
+mod bounded_step_walk;
 mod calendar_month_and_week;
 mod calendar_ordinal_bounds;
 mod clock_bounds;

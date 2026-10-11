@@ -10,6 +10,10 @@
 //! `amenable_verus`'s own private `chrono` module).
 
 #[cfg(feature = "chrono-tz")]
+mod checked_bounded_step_walk;
+#[cfg(feature = "chrono-tz")]
 mod checked_chrono_tz;
 mod checked_civil;
 mod trusted;
+#[cfg(feature = "chrono-tz")]
+mod trusted_chrono_tz;

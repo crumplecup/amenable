@@ -1,0 +1,9 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_check_bounded_step_walk": { "prover": "alt-ergo", "time": 0.027 },
+      "vc_min_i64": { "prover": "alt-ergo", "time": 0.024 }
+    }
+  }
+}

@@ -4,6 +4,8 @@
 //! narrowed to a sub-range to make CBMC finish: if a harness does not finish,
 //! that is reported as a finding, not worked around.
 
+#[cfg(feature = "chrono-tz")]
+mod bounded_step_walk;
 mod civil_iso_week;
 mod civil_naive_date;
 mod civil_naive_date_time;
@@ -14,5 +16,7 @@ mod gregorian;
 mod local;
 #[cfg(feature = "chrono-tz")]
 mod tz;
+#[cfg(feature = "chrono-tz")]
+mod tz_offset;
 mod utc;
 mod week_span_partitions;

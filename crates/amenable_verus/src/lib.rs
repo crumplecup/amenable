@@ -120,8 +120,9 @@ pub use amenable_core_metadata_entry::MetadataEntry;
 pub use amenable_core_state_machine::{StateMachine, Transition, TransitionAudit};
 pub use amenable_core_verifier::Verifier;
 pub use chrono::{
-    verify_fixed_offset_east_and_west_round_trips_model, verify_iso_week_round_trips_model,
-    verify_naive_date_from_ymd_round_trips_model, verify_naive_date_time_new_round_trips_model,
+    verify_bounded_step_walk, verify_fixed_offset_east_and_west_round_trips_model,
+    verify_iso_week_round_trips_model, verify_naive_date_from_ymd_round_trips_model,
+    verify_naive_date_time_new_round_trips_model,
     verify_naive_time_from_hms_nano_round_trips_model, verify_naive_week_span_model,
     verify_tz_name_round_trips_model,
 };

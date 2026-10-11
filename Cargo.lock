@@ -124,6 +124,7 @@ version = "0.1.0"
 dependencies = [
  "amenable_core",
  "amenable_derive",
+ "amenable_std",
  "amenable_time",
  "chrono",
  "chrono-tz",

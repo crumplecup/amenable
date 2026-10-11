@@ -18,6 +18,8 @@
 //!   chrono-tz.
 
 #[cfg(feature = "chrono-tz")]
+mod bounded_step_walk;
+#[cfg(feature = "chrono-tz")]
 mod chrono_tz_value_types;
 mod civil;
 mod identity;
@@ -29,6 +31,8 @@ mod verus_witness;
 #[cfg(feature = "chrono-tz")]
 mod zone;
 
+#[cfg(feature = "chrono-tz")]
+pub use bounded_step_walk::BoundedStepWalk;
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
 };

@@ -49,14 +49,14 @@ mod provenance_vocab;
 #[cfg(any(feature = "jiff", feature = "chrono"))]
 mod temporal_fraction;
 
+#[cfg(feature = "chrono-tz")]
+pub use chrono::{BoundedStepWalk, ChronoTz, ChronoZoned};
 #[cfg(feature = "chrono")]
 pub use chrono::{
     ChronoDate, ChronoDateTime, ChronoInstant, ChronoOffset, ChronoOffsetDateTime,
     ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime, ChronoTimeBackend,
     ChronoVerifier, ChronoVerifierMetadata,
 };
-#[cfg(feature = "chrono-tz")]
-pub use chrono::{ChronoTz, ChronoZoned};
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]
 pub use jiff::{
