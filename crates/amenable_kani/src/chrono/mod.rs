@@ -12,5 +12,7 @@ mod civil_naive_week;
 mod fixed_offset;
 mod gregorian;
 mod local;
+#[cfg(feature = "chrono-tz")]
+mod tz;
 mod utc;
 mod week_span_partitions;

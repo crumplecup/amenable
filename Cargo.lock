@@ -160,6 +160,7 @@ dependencies = [
  "amenable_std",
  "amenable_time",
  "chrono",
+ "chrono-tz",
  "derive-getters",
  "derive-new",
  "derive_builder",

@@ -17,6 +17,8 @@
 //!   `NamedTimeZone`/`ZonedDateTime` realize and reflect bridge, over
 //!   chrono-tz.
 
+#[cfg(feature = "chrono-tz")]
+mod chrono_tz_value_types;
 mod civil;
 mod identity;
 mod instant;
