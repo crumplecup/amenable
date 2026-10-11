@@ -42,6 +42,8 @@ mod stoplight;
 mod time;
 mod witness;
 
+#[cfg(feature = "chrono-tz")]
+pub use ext_chrono::VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC;
 #[cfg(feature = "chrono")]
 pub use ext_chrono::{
     VERIFY_FIXED_OFFSET_EAST_AND_WEST_ROUND_TRIP_SRC, VERIFY_ISO_WEEK_ROUND_TRIPS_MODEL_SRC,

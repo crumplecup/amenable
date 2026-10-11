@@ -108,3 +108,11 @@ pub(crate) fn naive_date_time_second_value(_dt: &chrono::NaiveDateTime) -> u32 {
 pub(crate) fn naive_date_time_nanosecond_value(_dt: &chrono::NaiveDateTime) -> u32 {
     dead
 }
+
+// ── chrono_tz::Tz ────────────────────────────────────────────────────
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn tz_name_logic(_t: &chrono_tz::Tz) -> &'static str {
+    dead
+}

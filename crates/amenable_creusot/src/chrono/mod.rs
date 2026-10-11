@@ -9,4 +9,6 @@ mod local;
 mod naive_date_time;
 mod naive_time;
 mod naive_week;
+#[cfg(feature = "chrono-tz")]
+mod tz;
 mod utc;

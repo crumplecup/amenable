@@ -21,6 +21,8 @@ amenable_derive = { workspace = true }
 amenable_ext = { workspace = true, optional = true }
 # Optional, gated by the `chrono` feature below.
 chrono = { workspace = true, optional = true }
+# Optional, gated by the `chrono-tz` feature below.
+chrono-tz = { workspace = true, optional = true }
 amenable_gaap = { workspace = true }
 amenable_std = { workspace = true }
 amenable_time = { workspace = true }
@@ -35,6 +37,7 @@ jiff = { workspace = true, optional = true }
 default = []
 jiff = ["dep:amenable_ext", "amenable_ext/jiff", "dep:jiff"]
 chrono = ["dep:amenable_ext", "amenable_ext/chrono", "dep:chrono"]
+chrono-tz = ["chrono", "amenable_ext/chrono-tz", "dep:chrono-tz"]
 
 [lints]
 workspace = true

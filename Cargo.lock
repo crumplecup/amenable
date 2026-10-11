@@ -91,6 +91,7 @@ dependencies = [
  "amenable_std",
  "amenable_time",
  "chrono",
+ "chrono-tz",
  "creusot-std",
  "derive-getters",
  "derive-new",
