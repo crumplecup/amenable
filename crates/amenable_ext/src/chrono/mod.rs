@@ -13,6 +13,9 @@
 //!   `LocalDateTime` realize and reflect bridge.
 //! - **instant (Phase 3):** the `TemporalInstantProps` carriers and the
 //!   `OffsetDateTime` realize and reflect bridge.
+//! - **zone (Phase 3):** the `TemporalZoneProps` carriers and the
+//!   `NamedTimeZone`/`ZonedDateTime` realize and reflect bridge, over
+//!   chrono-tz.
 
 mod civil;
 mod identity;
@@ -21,9 +24,13 @@ mod trusted_witness;
 mod value_types;
 #[cfg(feature = "verus")]
 mod verus_witness;
+#[cfg(feature = "chrono-tz")]
+mod zone;
 
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
 };
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{ChronoInstant, ChronoOffset, ChronoOffsetDateTime};
+#[cfg(feature = "chrono-tz")]
+pub use zone::{ChronoTz, ChronoZoned};

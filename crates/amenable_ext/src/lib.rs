@@ -55,6 +55,8 @@ pub use chrono::{
     ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime, ChronoTimeBackend,
     ChronoVerifier, ChronoVerifierMetadata,
 };
+#[cfg(feature = "chrono-tz")]
+pub use chrono::{ChronoTz, ChronoZoned};
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]
 pub use jiff::{
