@@ -9,5 +9,7 @@
 //! hand-verified Verus accommodation model, re-exported from
 //! `amenable_verus`'s own private `chrono` module).
 
+#[cfg(feature = "chrono-tz")]
+mod checked_chrono_tz;
 mod checked_civil;
 mod trusted;

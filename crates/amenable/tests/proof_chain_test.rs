@@ -9799,3 +9799,15 @@ fn ext_chrono_local_proof_chain_reports_all_three_verifiers() -> miette::Result<
     assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono::Local>");
     Ok(())
 }
+
+#[test]
+#[cfg_attr(
+    not(all(feature = "chrono-tz", feature = "creusot", feature = "verus")),
+    ignore
+)]
+fn ext_chrono_tz_proof_chain_reports_all_three_verifiers() -> miette::Result<()> {
+    amenable::init_tracing();
+    let report = support::chain(amenable::proof_chain("ExtStandard<chrono_tz::Tz>"))?;
+    assert_root_has_kani_creusot_and_verus(&report, "ExtStandard<chrono_tz::Tz>");
+    Ok(())
+}

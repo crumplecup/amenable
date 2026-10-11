@@ -123,6 +123,7 @@ pub use chrono::{
     verify_fixed_offset_east_and_west_round_trips_model, verify_iso_week_round_trips_model,
     verify_naive_date_from_ymd_round_trips_model, verify_naive_date_time_new_round_trips_model,
     verify_naive_time_from_hms_nano_round_trips_model, verify_naive_week_span_model,
+    verify_tz_name_round_trips_model,
 };
 pub use provenance_accommodation::{AsStandard, Provenance, Standard};
 pub use witness_accommodation::Witness;
