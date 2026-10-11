@@ -51,8 +51,9 @@ mod temporal_fraction;
 
 #[cfg(feature = "chrono")]
 pub use chrono::{
-    ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
-    ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata,
+    ChronoDate, ChronoDateTime, ChronoInstant, ChronoOffset, ChronoOffsetDateTime,
+    ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime, ChronoTimeBackend,
+    ChronoVerifier, ChronoVerifierMetadata,
 };
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]

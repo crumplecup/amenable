@@ -11,9 +11,12 @@
 //!   the struct every family's `Exchange` impls target.
 //! - **civil (Phase 2):** the `TemporalCivilProps` carriers and the
 //!   `LocalDateTime` realize and reflect bridge.
+//! - **instant (Phase 3):** the `TemporalInstantProps` carriers and the
+//!   `OffsetDateTime` realize and reflect bridge.
 
 mod civil;
 mod identity;
+mod instant;
 mod trusted_witness;
 mod value_types;
 #[cfg(feature = "verus")]
@@ -23,3 +26,4 @@ pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
 };
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
+pub use instant::{ChronoInstant, ChronoOffset, ChronoOffsetDateTime};
