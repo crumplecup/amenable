@@ -1,7 +1,7 @@
 # Full chrono support in `amenable_ext`
 
-**Status:** Decisions complete. Implementation not started. Last revised
-2026-10-06.
+**Status:** Phase 2 complete and gated (7/67 rows). Phase 3 starting. Last
+revised 2026-10-11.
 
 This plan adds full coverage of the chrono 0.4 and chrono-tz 0.10 public
 surfaces to `amenable_ext`. It mirrors the jiff effort: each type is registered
@@ -266,8 +266,17 @@ pass on the chrono backend for every civil carrier.
   than re-deriving chrono's year-selection rule). `Utc` stays trusted: its claim has
   no input-dependent content for Verus to model, and Verus has no `extern_spec!`-
   style escape hatch to reach the real trait impl the way Kani/Creusot do.
-- Not done: the proof-chain tests in `proof_chain_test.rs` (none exist yet, for any
-  type). `cordial coverage` has not yet been checked against these seven rows.
+- Done (2026-10-08): the seven proof-chain tests in `proof_chain_test.rs`
+  (`chrono::{NaiveDate, NaiveTime, NaiveDateTime, IsoWeek, NaiveWeek, Utc,
+  FixedOffset}`).
+- Done (2026-10-11): `cordial coverage` confirmed, after fixing two real
+  cordial-side gaps found along the way — the shared registry dump's feature
+  set was missing `chrono`/`chrono-tz` entirely (fixed on cordial's side),
+  and `cordial.toml`'s `chrono` target needed `resolve_crates = ["chrono",
+  "chrono-tz"]` for `Tz`'s implementor search (the package name is
+  hyphenated; `chrono_tz` — the Rust module name — fails cargo's package-ID
+  lookup). `amenable-ext-chrono.checklist.md` now reports **7/67 Complete
+  (10.4%)**, exactly these seven rows. **Phase 2 gate met.**
 
 ## Phase 3: Offset and zone bridges, zoned types (15 rows)
 
