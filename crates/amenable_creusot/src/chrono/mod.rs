@@ -5,6 +5,7 @@
 mod civil_naive_date;
 mod fixed_offset;
 mod iso_week;
+mod local;
 mod naive_date_time;
 mod naive_time;
 mod naive_week;

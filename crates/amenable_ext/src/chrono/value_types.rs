@@ -2,7 +2,9 @@
 //!
 //! Phase 2 registers the seven value types here. Each one is a concrete type
 //! with its own witness on Kani, Creusot, and Verus, so the registrations are
-//! added as their witnesses land.
+//! added as their witnesses land. Phase 3 adds `Local`: it shares the instant
+//! bridge with `Utc`/`FixedOffset` (decision 12), but needs its own value
+//! registration and witnesses, the same as any other type.
 
 use crate::macros::{impl_ext_type, register_ext_standard_evidence};
 
@@ -69,6 +71,15 @@ impl_ext_type!(
     "A time zone with a fixed offset from UTC, from -23:59:59 to +23:59:59."
 );
 
+impl_ext_type!(
+    chrono::Local,
+    "chrono contributors",
+    "chrono",
+    "chrono",
+    "https://docs.rs/chrono/latest/chrono/struct.Local.html",
+    "The local time zone: takes its offset rules from the host's timezone database."
+);
+
 register_ext_standard_evidence!(
     chrono::NaiveDate,
     chrono::NaiveTime,
@@ -77,4 +88,5 @@ register_ext_standard_evidence!(
     chrono::NaiveWeek,
     chrono::Utc,
     chrono::FixedOffset,
+    chrono::Local,
 );

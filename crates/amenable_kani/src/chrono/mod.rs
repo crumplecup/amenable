@@ -11,5 +11,6 @@ mod civil_naive_time;
 mod civil_naive_week;
 mod fixed_offset;
 mod gregorian;
+mod local;
 mod utc;
 mod week_span_partitions;
