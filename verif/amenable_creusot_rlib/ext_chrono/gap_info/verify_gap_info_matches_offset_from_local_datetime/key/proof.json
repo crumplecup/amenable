@@ -1,0 +1,15 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_day_NaiveDateTime": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_hour_NaiveDateTime": { "prover": "alt-ergo", "time": 0.03 },
+      "vc_key": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_minute_NaiveDateTime": { "prover": "alt-ergo", "time": 0.033 },
+      "vc_month_NaiveDateTime": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_nanosecond_NaiveDateTime": { "prover": "alt-ergo", "time": 0.031 },
+      "vc_second_NaiveDateTime": { "prover": "alt-ergo", "time": 0.034 },
+      "vc_year_NaiveDateTime": { "prover": "alt-ergo", "time": 0.034 }
+    }
+  }
+}

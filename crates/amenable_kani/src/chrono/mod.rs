@@ -12,6 +12,8 @@ mod civil_naive_date_time;
 mod civil_naive_time;
 mod civil_naive_week;
 mod fixed_offset;
+#[cfg(feature = "chrono-tz")]
+mod gap_info;
 mod gregorian;
 mod local;
 #[cfg(feature = "chrono-tz")]

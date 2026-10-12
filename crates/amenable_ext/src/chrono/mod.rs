@@ -23,6 +23,8 @@ mod bounded_step_walk;
 mod chrono_tz_value_types;
 mod civil;
 #[cfg(feature = "chrono-tz")]
+mod discovered_gap_table;
+#[cfg(feature = "chrono-tz")]
 mod discovered_offset_table;
 mod identity;
 mod instant;
@@ -35,19 +37,24 @@ mod verus_witness;
 #[cfg(feature = "chrono-tz")]
 mod zone;
 
+// One combined re-export, not five individually-gated `pub use` lines
+// -- cordial's own `cfg-scatter` etiquette flags five or more
+// individually-gated items of the same kind in one file as a sign to
+// consolidate behind a single gate instead.
 #[cfg(feature = "chrono-tz")]
-pub use bounded_step_walk::BoundedStepWalk;
+pub use self::{
+    bounded_step_walk::BoundedStepWalk,
+    discovered_gap_table::{DISCOVERED_GAP_TABLE, DiscoveredGapTableRow},
+    discovered_offset_table::{DISCOVERED_OFFSET_TABLE, DiscoveredOffsetTableRow},
+    offset_discovery::{
+        BoundedStepWalkToken, DiscoveredOffsetEntry, DiscoveredOffsetTable,
+        DiscoveredOffsetTableData, OffsetDiscoveryParams, OffsetDiscoveryRequest,
+    },
+    zone::{ChronoTz, ChronoZoned},
+};
+
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
 };
-#[cfg(feature = "chrono-tz")]
-pub use discovered_offset_table::{DISCOVERED_OFFSET_TABLE, DiscoveredOffsetTableRow};
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{ChronoInstant, ChronoOffset, ChronoOffsetDateTime};
-#[cfg(feature = "chrono-tz")]
-pub use offset_discovery::{
-    BoundedStepWalkToken, DiscoveredOffsetEntry, DiscoveredOffsetTable, DiscoveredOffsetTableData,
-    OffsetDiscoveryParams, OffsetDiscoveryRequest,
-};
-#[cfg(feature = "chrono-tz")]
-pub use zone::{ChronoTz, ChronoZoned};

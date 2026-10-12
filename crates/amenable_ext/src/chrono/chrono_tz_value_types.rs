@@ -1,13 +1,15 @@
 //! `ExtType` registration and `ExtStandard<T>` evidence for `chrono_tz`'s
 //! own value types (decision 4/6 in `docs/CHRONO_SUPPORT_PLAN.md`).
 //!
-//! `GapInfo` and `chrono_tz::ParseError` still need their claim kind
-//! decided from their real role (decision 6) before a witness is written
-//! for either -- not done yet, deliberately: `GapInfo` in particular has
-//! no derives at all in chrono-tz's own source (confirmed by reading
-//! it), which needs real thought about what, if anything, a wrapper's
-//! own derive stack and claim should look like, not a rushed trusted
-//! stub.
+//! `chrono_tz::ParseError` still needs its claim kind decided from its
+//! real role (decision 6) before a witness is written for it -- not
+//! done yet, deliberately.
+//!
+//! `GapInfo` has no derives at all in chrono-tz's own source (confirmed
+//! by reading it) -- irrelevant to this registration, since
+//! `ExtStandard<T>` is a bare `PhantomData<*const T>` marker that never
+//! stores a real `T` value, so `T`'s own derive stack (or lack of one)
+//! places no requirement on it.
 
 use crate::macros::{impl_ext_type, register_ext_standard_evidence};
 
@@ -29,4 +31,13 @@ impl_ext_type!(
     "A resolved offset for a specific Tz at a specific instant, carrying the base/DST split."
 );
 
-register_ext_standard_evidence!(chrono_tz::Tz, chrono_tz::TzOffset);
+impl_ext_type!(
+    chrono_tz::GapInfo,
+    "chrono-tz contributors",
+    "chrono-tz",
+    "chrono_tz",
+    "https://docs.rs/chrono-tz/latest/chrono_tz/struct.GapInfo.html",
+    "Information about a local-time gap (a DST forward jump): the real offset just before it and the real zoned instant just after it."
+);
+
+register_ext_standard_evidence!(chrono_tz::Tz, chrono_tz::TzOffset, chrono_tz::GapInfo);

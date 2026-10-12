@@ -51,9 +51,10 @@ mod temporal_fraction;
 
 #[cfg(feature = "chrono-tz")]
 pub use chrono::{
-    BoundedStepWalk, BoundedStepWalkToken, ChronoTz, ChronoZoned, DISCOVERED_OFFSET_TABLE,
-    DiscoveredOffsetEntry, DiscoveredOffsetTable, DiscoveredOffsetTableData,
-    DiscoveredOffsetTableRow, OffsetDiscoveryParams, OffsetDiscoveryRequest,
+    BoundedStepWalk, BoundedStepWalkToken, ChronoTz, ChronoZoned, DISCOVERED_GAP_TABLE,
+    DISCOVERED_OFFSET_TABLE, DiscoveredGapTableRow, DiscoveredOffsetEntry, DiscoveredOffsetTable,
+    DiscoveredOffsetTableData, DiscoveredOffsetTableRow, OffsetDiscoveryParams,
+    OffsetDiscoveryRequest,
 };
 #[cfg(feature = "chrono")]
 pub use chrono::{

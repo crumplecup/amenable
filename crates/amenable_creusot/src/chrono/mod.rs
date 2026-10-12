@@ -4,6 +4,8 @@
 
 mod civil_naive_date;
 mod fixed_offset;
+#[cfg(feature = "chrono-tz")]
+mod gap_info;
 mod iso_week;
 mod local;
 mod naive_date_time;

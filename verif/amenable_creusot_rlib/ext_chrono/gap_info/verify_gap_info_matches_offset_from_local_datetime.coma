@@ -1,0 +1,1358 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 43 8 46 17 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 336 8 336 53
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 141 41 141 55
+let%span sord'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 147 42 147 47
+let%span sord'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 148 42 148 47
+let%span sord'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 149 41 149 46
+let%span sord'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 155 41 155 91
+let%span sord'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 341 8 341 54
+let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 114 12 115 51
+let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 107 18 107 65
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 90 16 90 63
+let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 61 8 76 9
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
+let%span sgap_info = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 83 34 83 71
+let%span sgap_info'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 84 31 84 69
+let%span sgap_info'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 91 28 91 39
+let%span sgap_info'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 92 33 92 53
+let%span sgap_info'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 93 37 93 54
+let%span sgap_info'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 93 37 93 66
+let%span sgap_info'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 94 24 94 28
+let%span sgap_info'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 96 31 96 43
+let%span sgap_info'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 97 52 97 75
+let%span sgap_info'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 97 47 97 76
+let%span sgap_info'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 97 35 97 76
+let%span sgap_info'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 98 24 98 28
+let%span sgap_info'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 100 12 100 30
+let%span sgap_info'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 88 23 88 28
+let%span sgap_info'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 44 12 44 17
+let%span sgap_info'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 41 19 41 23
+let%span sgap_info'15 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 42 18 42 24
+let%span sgap_info'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 72 16 72 18
+let%span sgap_info'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 70 22 70 65
+let%span smod = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/macros/mod.rs" 436 17 436 22
+let%span smod'0 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/macros/mod.rs" 435 38 435 42
+let%span smod'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/datetime/mod.rs" 576 24 576 28
+let%span smod'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/datetime/mod.rs" 576 4 576 46
+let%span stimezone_impl = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 364 41 364 46
+let%span stimezone_impl'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 364 4 364 92
+let%span scarrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 79 29 79 34
+let%span scarrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 79 83 79 95
+let%span scarrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 77 14 77 64
+let%span scarrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 78 14 78 54
+let%span scarrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 86 31 86 35
+let%span scarrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 86 40 86 69
+let%span scarrier'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 85 14 85 54
+let%span scarrier'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 93 23 93 27
+let%span scarrier'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 93 32 93 71
+let%span scarrier'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 92 14 92 46
+let%span scmp = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/cmp.rs" 29 26 29 76
+let%span scontracts = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 37 16 38 52
+let%span scontracts'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 65 16 81 17
+let%span scontracts'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 156 24 156 58
+let%span scontracts'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 106 24 106 80
+let%span scontracts'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 130 24 130 72
+let%span smodel = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/model.rs" 37 8 37 28
+let%span stuples = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/tuples.rs" 19 28 19 57
+let%span snum = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 32 28 32 33
+let%span snum'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 32 28 32 33
+
+use creusot.int.Int32
+use creusot.int.UInt32
+use creusot.prelude.Any
+use int.Int
+
+type t_Tz =
+  | Africa__Abidjan
+  | Africa__Accra
+  | Africa__Addis_Ababa
+  | Africa__Algiers
+  | Africa__Asmara
+  | Africa__Asmera
+  | Africa__Bamako
+  | Africa__Bangui
+  | Africa__Banjul
+  | Africa__Bissau
+  | Africa__Blantyre
+  | Africa__Brazzaville
+  | Africa__Bujumbura
+  | Africa__Cairo
+  | Africa__Casablanca
+  | Africa__Ceuta
+  | Africa__Conakry
+  | Africa__Dakar
+  | Africa__Dar_es_Salaam
+  | Africa__Djibouti
+  | Africa__Douala
+  | Africa__El_Aaiun
+  | Africa__Freetown
+  | Africa__Gaborone
+  | Africa__Harare
+  | Africa__Johannesburg
+  | Africa__Juba
+  | Africa__Kampala
+  | Africa__Khartoum
+  | Africa__Kigali
+  | Africa__Kinshasa
+  | Africa__Lagos
+  | Africa__Libreville
+  | Africa__Lome
+  | Africa__Luanda
+  | Africa__Lubumbashi
+  | Africa__Lusaka
+  | Africa__Malabo
+  | Africa__Maputo
+  | Africa__Maseru
+  | Africa__Mbabane
+  | Africa__Mogadishu
+  | Africa__Monrovia
+  | Africa__Nairobi
+  | Africa__Ndjamena
+  | Africa__Niamey
+  | Africa__Nouakchott
+  | Africa__Ouagadougou
+  | Africa__PortoNovo
+  | Africa__Sao_Tome
+  | Africa__Timbuktu
+  | Africa__Tripoli
+  | Africa__Tunis
+  | Africa__Windhoek
+  | America__Adak
+  | America__Anchorage
+  | America__Anguilla
+  | America__Antigua
+  | America__Araguaina
+  | America__Argentina__Buenos_Aires
+  | America__Argentina__Catamarca
+  | America__Argentina__ComodRivadavia
+  | America__Argentina__Cordoba
+  | America__Argentina__Jujuy
+  | America__Argentina__La_Rioja
+  | America__Argentina__Mendoza
+  | America__Argentina__Rio_Gallegos
+  | America__Argentina__Salta
+  | America__Argentina__San_Juan
+  | America__Argentina__San_Luis
+  | America__Argentina__Tucuman
+  | America__Argentina__Ushuaia
+  | America__Aruba
+  | America__Asuncion
+  | America__Atikokan
+  | America__Atka
+  | America__Bahia
+  | America__Bahia_Banderas
+  | America__Barbados
+  | America__Belem
+  | America__Belize
+  | America__BlancSablon
+  | America__Boa_Vista
+  | America__Bogota
+  | America__Boise
+  | America__Buenos_Aires
+  | America__Cambridge_Bay
+  | America__Campo_Grande
+  | America__Cancun
+  | America__Caracas
+  | America__Catamarca
+  | America__Cayenne
+  | America__Cayman
+  | America__Chicago
+  | America__Chihuahua
+  | America__Ciudad_Juarez
+  | America__Coral_Harbour
+  | America__Cordoba
+  | America__Costa_Rica
+  | America__Coyhaique
+  | America__Creston
+  | America__Cuiaba
+  | America__Curacao
+  | America__Danmarkshavn
+  | America__Dawson
+  | America__Dawson_Creek
+  | America__Denver
+  | America__Detroit
+  | America__Dominica
+  | America__Edmonton
+  | America__Eirunepe
+  | America__El_Salvador
+  | America__Ensenada
+  | America__Fort_Nelson
+  | America__Fort_Wayne
+  | America__Fortaleza
+  | America__Glace_Bay
+  | America__Godthab
+  | America__Goose_Bay
+  | America__Grand_Turk
+  | America__Grenada
+  | America__Guadeloupe
+  | America__Guatemala
+  | America__Guayaquil
+  | America__Guyana
+  | America__Halifax
+  | America__Havana
+  | America__Hermosillo
+  | America__Indiana__Indianapolis
+  | America__Indiana__Knox
+  | America__Indiana__Marengo
+  | America__Indiana__Petersburg
+  | America__Indiana__Tell_City
+  | America__Indiana__Vevay
+  | America__Indiana__Vincennes
+  | America__Indiana__Winamac
+  | America__Indianapolis
+  | America__Inuvik
+  | America__Iqaluit
+  | America__Jamaica
+  | America__Jujuy
+  | America__Juneau
+  | America__Kentucky__Louisville
+  | America__Kentucky__Monticello
+  | America__Knox_IN
+  | America__Kralendijk
+  | America__La_Paz
+  | America__Lima
+  | America__Los_Angeles
+  | America__Louisville
+  | America__Lower_Princes
+  | America__Maceio
+  | America__Managua
+  | America__Manaus
+  | America__Marigot
+  | America__Martinique
+  | America__Matamoros
+  | America__Mazatlan
+  | America__Mendoza
+  | America__Menominee
+  | America__Merida
+  | America__Metlakatla
+  | America__Mexico_City
+  | America__Miquelon
+  | America__Moncton
+  | America__Monterrey
+  | America__Montevideo
+  | America__Montreal
+  | America__Montserrat
+  | America__Nassau
+  | America__New_York
+  | America__Nipigon
+  | America__Nome
+  | America__Noronha
+  | America__North_Dakota__Beulah
+  | America__North_Dakota__Center
+  | America__North_Dakota__New_Salem
+  | America__Nuuk
+  | America__Ojinaga
+  | America__Panama
+  | America__Pangnirtung
+  | America__Paramaribo
+  | America__Phoenix
+  | America__PortauPrince
+  | America__Port_of_Spain
+  | America__Porto_Acre
+  | America__Porto_Velho
+  | America__Puerto_Rico
+  | America__Punta_Arenas
+  | America__Rainy_River
+  | America__Rankin_Inlet
+  | America__Recife
+  | America__Regina
+  | America__Resolute
+  | America__Rio_Branco
+  | America__Rosario
+  | America__Santa_Isabel
+  | America__Santarem
+  | America__Santiago
+  | America__Santo_Domingo
+  | America__Sao_Paulo
+  | America__Scoresbysund
+  | America__Shiprock
+  | America__Sitka
+  | America__St_Barthelemy
+  | America__St_Johns
+  | America__St_Kitts
+  | America__St_Lucia
+  | America__St_Thomas
+  | America__St_Vincent
+  | America__Swift_Current
+  | America__Tegucigalpa
+  | America__Thule
+  | America__Thunder_Bay
+  | America__Tijuana
+  | America__Toronto
+  | America__Tortola
+  | America__Vancouver
+  | America__Virgin
+  | America__Whitehorse
+  | America__Winnipeg
+  | America__Yakutat
+  | America__Yellowknife
+  | Antarctica__Casey
+  | Antarctica__Davis
+  | Antarctica__DumontDUrville
+  | Antarctica__Macquarie
+  | Antarctica__Mawson
+  | Antarctica__McMurdo
+  | Antarctica__Palmer
+  | Antarctica__Rothera
+  | Antarctica__South_Pole
+  | Antarctica__Syowa
+  | Antarctica__Troll
+  | Antarctica__Vostok
+  | Arctic__Longyearbyen
+  | Asia__Aden
+  | Asia__Almaty
+  | Asia__Amman
+  | Asia__Anadyr
+  | Asia__Aqtau
+  | Asia__Aqtobe
+  | Asia__Ashgabat
+  | Asia__Ashkhabad
+  | Asia__Atyrau
+  | Asia__Baghdad
+  | Asia__Bahrain
+  | Asia__Baku
+  | Asia__Bangkok
+  | Asia__Barnaul
+  | Asia__Beirut
+  | Asia__Bishkek
+  | Asia__Brunei
+  | Asia__Calcutta
+  | Asia__Chita
+  | Asia__Choibalsan
+  | Asia__Chongqing
+  | Asia__Chungking
+  | Asia__Colombo
+  | Asia__Dacca
+  | Asia__Damascus
+  | Asia__Dhaka
+  | Asia__Dili
+  | Asia__Dubai
+  | Asia__Dushanbe
+  | Asia__Famagusta
+  | Asia__Gaza
+  | Asia__Harbin
+  | Asia__Hebron
+  | Asia__Ho_Chi_Minh
+  | Asia__Hong_Kong
+  | Asia__Hovd
+  | Asia__Irkutsk
+  | Asia__Istanbul
+  | Asia__Jakarta
+  | Asia__Jayapura
+  | Asia__Jerusalem
+  | Asia__Kabul
+  | Asia__Kamchatka
+  | Asia__Karachi
+  | Asia__Kashgar
+  | Asia__Kathmandu
+  | Asia__Katmandu
+  | Asia__Khandyga
+  | Asia__Kolkata
+  | Asia__Krasnoyarsk
+  | Asia__Kuala_Lumpur
+  | Asia__Kuching
+  | Asia__Kuwait
+  | Asia__Macao
+  | Asia__Macau
+  | Asia__Magadan
+  | Asia__Makassar
+  | Asia__Manila
+  | Asia__Muscat
+  | Asia__Nicosia
+  | Asia__Novokuznetsk
+  | Asia__Novosibirsk
+  | Asia__Omsk
+  | Asia__Oral
+  | Asia__Phnom_Penh
+  | Asia__Pontianak
+  | Asia__Pyongyang
+  | Asia__Qatar
+  | Asia__Qostanay
+  | Asia__Qyzylorda
+  | Asia__Rangoon
+  | Asia__Riyadh
+  | Asia__Saigon
+  | Asia__Sakhalin
+  | Asia__Samarkand
+  | Asia__Seoul
+  | Asia__Shanghai
+  | Asia__Singapore
+  | Asia__Srednekolymsk
+  | Asia__Taipei
+  | Asia__Tashkent
+  | Asia__Tbilisi
+  | Asia__Tehran
+  | Asia__Tel_Aviv
+  | Asia__Thimbu
+  | Asia__Thimphu
+  | Asia__Tokyo
+  | Asia__Tomsk
+  | Asia__Ujung_Pandang
+  | Asia__Ulaanbaatar
+  | Asia__Ulan_Bator
+  | Asia__Urumqi
+  | Asia__UstNera
+  | Asia__Vientiane
+  | Asia__Vladivostok
+  | Asia__Yakutsk
+  | Asia__Yangon
+  | Asia__Yekaterinburg
+  | Asia__Yerevan
+  | Atlantic__Azores
+  | Atlantic__Bermuda
+  | Atlantic__Canary
+  | Atlantic__Cape_Verde
+  | Atlantic__Faeroe
+  | Atlantic__Faroe
+  | Atlantic__Jan_Mayen
+  | Atlantic__Madeira
+  | Atlantic__Reykjavik
+  | Atlantic__South_Georgia
+  | Atlantic__St_Helena
+  | Atlantic__Stanley
+  | Australia__ACT
+  | Australia__Adelaide
+  | Australia__Brisbane
+  | Australia__Broken_Hill
+  | Australia__Canberra
+  | Australia__Currie
+  | Australia__Darwin
+  | Australia__Eucla
+  | Australia__Hobart
+  | Australia__LHI
+  | Australia__Lindeman
+  | Australia__Lord_Howe
+  | Australia__Melbourne
+  | Australia__NSW
+  | Australia__North
+  | Australia__Perth
+  | Australia__Queensland
+  | Australia__South
+  | Australia__Sydney
+  | Australia__Tasmania
+  | Australia__Victoria
+  | Australia__West
+  | Australia__Yancowinna
+  | Brazil__Acre
+  | Brazil__DeNoronha
+  | Brazil__East
+  | Brazil__West
+  | CET
+  | CST6CDT
+  | Canada__Atlantic
+  | Canada__Central
+  | Canada__Eastern
+  | Canada__Mountain
+  | Canada__Newfoundland
+  | Canada__Pacific
+  | Canada__Saskatchewan
+  | Canada__Yukon
+  | Chile__Continental
+  | Chile__EasterIsland
+  | Cuba
+  | EET
+  | EST
+  | EST5EDT
+  | Egypt
+  | Eire
+  | Etc__GMT
+  | Etc__GMTPlus0
+  | Etc__GMTPlus1
+  | Etc__GMTPlus10
+  | Etc__GMTPlus11
+  | Etc__GMTPlus12
+  | Etc__GMTPlus2
+  | Etc__GMTPlus3
+  | Etc__GMTPlus4
+  | Etc__GMTPlus5
+  | Etc__GMTPlus6
+  | Etc__GMTPlus7
+  | Etc__GMTPlus8
+  | Etc__GMTPlus9
+  | Etc__GMTMinus0
+  | Etc__GMTMinus1
+  | Etc__GMTMinus10
+  | Etc__GMTMinus11
+  | Etc__GMTMinus12
+  | Etc__GMTMinus13
+  | Etc__GMTMinus14
+  | Etc__GMTMinus2
+  | Etc__GMTMinus3
+  | Etc__GMTMinus4
+  | Etc__GMTMinus5
+  | Etc__GMTMinus6
+  | Etc__GMTMinus7
+  | Etc__GMTMinus8
+  | Etc__GMTMinus9
+  | Etc__GMT0
+  | Etc__Greenwich
+  | Etc__UCT
+  | Etc__UTC
+  | Etc__Universal
+  | Etc__Zulu
+  | Europe__Amsterdam
+  | Europe__Andorra
+  | Europe__Astrakhan
+  | Europe__Athens
+  | Europe__Belfast
+  | Europe__Belgrade
+  | Europe__Berlin
+  | Europe__Bratislava
+  | Europe__Brussels
+  | Europe__Bucharest
+  | Europe__Budapest
+  | Europe__Busingen
+  | Europe__Chisinau
+  | Europe__Copenhagen
+  | Europe__Dublin
+  | Europe__Gibraltar
+  | Europe__Guernsey
+  | Europe__Helsinki
+  | Europe__Isle_of_Man
+  | Europe__Istanbul
+  | Europe__Jersey
+  | Europe__Kaliningrad
+  | Europe__Kiev
+  | Europe__Kirov
+  | Europe__Kyiv
+  | Europe__Lisbon
+  | Europe__Ljubljana
+  | Europe__London
+  | Europe__Luxembourg
+  | Europe__Madrid
+  | Europe__Malta
+  | Europe__Mariehamn
+  | Europe__Minsk
+  | Europe__Monaco
+  | Europe__Moscow
+  | Europe__Nicosia
+  | Europe__Oslo
+  | Europe__Paris
+  | Europe__Podgorica
+  | Europe__Prague
+  | Europe__Riga
+  | Europe__Rome
+  | Europe__Samara
+  | Europe__San_Marino
+  | Europe__Sarajevo
+  | Europe__Saratov
+  | Europe__Simferopol
+  | Europe__Skopje
+  | Europe__Sofia
+  | Europe__Stockholm
+  | Europe__Tallinn
+  | Europe__Tirane
+  | Europe__Tiraspol
+  | Europe__Ulyanovsk
+  | Europe__Uzhgorod
+  | Europe__Vaduz
+  | Europe__Vatican
+  | Europe__Vienna
+  | Europe__Vilnius
+  | Europe__Volgograd
+  | Europe__Warsaw
+  | Europe__Zagreb
+  | Europe__Zaporozhye
+  | Europe__Zurich
+  | GB
+  | GBEire
+  | GMT
+  | GMTPlus0
+  | GMTMinus0
+  | GMT0
+  | Greenwich
+  | HST
+  | Hongkong
+  | Iceland
+  | Indian__Antananarivo
+  | Indian__Chagos
+  | Indian__Christmas
+  | Indian__Cocos
+  | Indian__Comoro
+  | Indian__Kerguelen
+  | Indian__Mahe
+  | Indian__Maldives
+  | Indian__Mauritius
+  | Indian__Mayotte
+  | Indian__Reunion
+  | Iran
+  | Israel
+  | Jamaica
+  | Japan
+  | Kwajalein
+  | Libya
+  | MET
+  | MST
+  | MST7MDT
+  | Mexico__BajaNorte
+  | Mexico__BajaSur
+  | Mexico__General
+  | NZ
+  | NZCHAT
+  | Navajo
+  | PRC
+  | PST8PDT
+  | Pacific__Apia
+  | Pacific__Auckland
+  | Pacific__Bougainville
+  | Pacific__Chatham
+  | Pacific__Chuuk
+  | Pacific__Easter
+  | Pacific__Efate
+  | Pacific__Enderbury
+  | Pacific__Fakaofo
+  | Pacific__Fiji
+  | Pacific__Funafuti
+  | Pacific__Galapagos
+  | Pacific__Gambier
+  | Pacific__Guadalcanal
+  | Pacific__Guam
+  | Pacific__Honolulu
+  | Pacific__Johnston
+  | Pacific__Kanton
+  | Pacific__Kiritimati
+  | Pacific__Kosrae
+  | Pacific__Kwajalein
+  | Pacific__Majuro
+  | Pacific__Marquesas
+  | Pacific__Midway
+  | Pacific__Nauru
+  | Pacific__Niue
+  | Pacific__Norfolk
+  | Pacific__Noumea
+  | Pacific__Pago_Pago
+  | Pacific__Palau
+  | Pacific__Pitcairn
+  | Pacific__Pohnpei
+  | Pacific__Ponape
+  | Pacific__Port_Moresby
+  | Pacific__Rarotonga
+  | Pacific__Saipan
+  | Pacific__Samoa
+  | Pacific__Tahiti
+  | Pacific__Tarawa
+  | Pacific__Tongatapu
+  | Pacific__Truk
+  | Pacific__Wake
+  | Pacific__Wallis
+  | Pacific__Yap
+  | Poland
+  | Portugal
+  | ROC
+  | ROK
+  | Singapore
+  | Turkey
+  | UCT
+  | US__Alaska
+  | US__Aleutian
+  | US__Arizona
+  | US__Central
+  | US__EastIndiana
+  | US__Eastern
+  | US__Hawaii
+  | US__IndianaStarke
+  | US__Michigan
+  | US__Mountain
+  | US__Pacific
+  | US__Samoa
+  | UTC
+  | Universal
+  | WSU
+  | WET
+  | Zulu
+
+type t_NaiveDateTime
+
+type t_TzOffset
+
+type t_LocalResult_TzOffset = Single t_TzOffset | Ambiguous t_TzOffset t_TzOffset | None
+
+predicate inv_NaiveDateTime (_1: t_NaiveDateTime)
+
+predicate invariant_ref_NaiveDateTime [@inline:trivial] (self: t_NaiveDateTime) = [%#sinvariant] inv_NaiveDateTime self
+
+meta "rewrite_def" predicate invariant_ref_NaiveDateTime
+
+predicate inv_ref_NaiveDateTime [@inline:trivial] (_1: t_NaiveDateTime) = invariant_ref_NaiveDateTime _1
+
+meta "rewrite_def" predicate inv_ref_NaiveDateTime
+
+predicate inv_TzOffset (_1: t_TzOffset)
+
+predicate inv_LocalResult_TzOffset (_1: t_LocalResult_TzOffset)
+
+axiom inv_axiom [@rewrite]: forall _1: t_LocalResult_TzOffset [inv_LocalResult_TzOffset _1]. inv_LocalResult_TzOffset _1
+    = match _1 with
+      | Single f0 -> inv_TzOffset f0
+      | Ambiguous f0 f1 -> inv_TzOffset f0 /\ inv_TzOffset f1
+      | None -> true
+      end
+
+predicate is_local_gap [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 188 0 188 86] (_tz: t_Tz) (_local: t_NaiveDateTime)
+
+let offset_from_local_datetime_Tz (self: t_Tz) (local: t_NaiveDateTime) (return (x: t_LocalResult_TzOffset)) =
+{[@stop_split] [@expl:offset_from_local_datetime 'local' type invariant] [%#stimezone_impl] inv_ref_NaiveDateTime local}
+  any
+  [ return (result: t_LocalResult_TzOffset) ->
+  {[@stop_split] [@expl:offset_from_local_datetime_Tz ensures] ([@stop_split] [@expl:offset_from_local_datetime result type invariant] [%#stimezone_impl'0] inv_LocalResult_TzOffset result)
+    /\ ([@stop_split] [@expl:offset_from_local_datetime ensures] [%#slogic] match result with
+        | None -> true
+        | _ -> false
+        end
+    = is_local_gap self local)}
+    (! return {result}) ]
+
+type t_GapInfoHandle
+
+type t_Option_GapInfoHandle = None'0 | Some'0 t_GapInfoHandle
+
+predicate inv_GapInfoHandle (_1: t_GapInfoHandle)
+
+predicate inv_Option_GapInfoHandle (_1: t_Option_GapInfoHandle)
+
+axiom inv_axiom'0 [@rewrite]:
+  forall _1: t_Option_GapInfoHandle [inv_Option_GapInfoHandle _1]. inv_Option_GapInfoHandle _1
+    = match _1 with
+      | None'0 -> true
+      | Some'0 f0 -> inv_GapInfoHandle f0
+      end
+
+predicate from_local_gap_detection_agrees [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 31 8 35 17] (outcome: t_Option_GapInfoHandle) (tz: t_Tz) (local: t_NaiveDateTime) =
+  [%#scontracts] match outcome with
+      | Some'0 _ -> true
+      | None'0 -> false
+      end
+  = is_local_gap tz local
+
+type t_Option_NaiveDateTime = None'1 | Some'1 t_NaiveDateTime
+
+function gap_info_handle_begin_naive_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 60 0 60 93] (_h: t_GapInfoHandle) : t_Option_NaiveDateTime
+
+type tup2_u32_u32 = { f0: UInt32.t; f1: UInt32.t }
+
+type tup2_u32_tup2_u32_u32 = { f0'0: UInt32.t; f1'0: tup2_u32_u32 }
+
+type tup2_u32_tup2_u32_tup2_u32_u32 = { f0'1: UInt32.t; f1'1: tup2_u32_tup2_u32_u32 }
+
+type tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = { f0'2: UInt32.t; f1'2: tup2_u32_tup2_u32_tup2_u32_u32 }
+
+type tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = {
+  f0'3: UInt32.t;
+  f1'3: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 }
+
+type tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = {
+  f0'4: Int32.t;
+  f1'4: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 }
+
+predicate lt_log_tup2_u32_u32 (self: tup2_u32_u32) (o: tup2_u32_u32) =
+  [%#sord] self.f0 = o.f0 /\ UInt32.lt self.f1 o.f1 \/ UInt32.lt self.f0 o.f0
+
+predicate le_log_tup2_u32_u32 (self: tup2_u32_u32) (o: tup2_u32_u32) =
+  [%#sord'5] self.f0 = o.f0 /\ UInt32.le self.f1 o.f1 \/ UInt32.lt self.f0 o.f0
+
+function le_lt_log_tup2_u32_u32 (self: tup2_u32_u32) (other: tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_u32_u32_spec:
+  forall self: tup2_u32_u32, other: tup2_u32_u32. [%#sord'4] le_log_tup2_u32_u32 self other
+    = (lt_log_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_u32_u32 (x: tup2_u32_u32) (y: tup2_u32_u32) (z: tup2_u32_u32) : ()
+
+axiom transitive_tup2_u32_u32_spec:
+  forall x: tup2_u32_u32, y: tup2_u32_u32, z: tup2_u32_u32. ([%#sord'1] lt_log_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_u32_u32 y z) -> ([%#sord'3] lt_log_tup2_u32_u32 x z)
+
+function irreflexive_tup2_u32_u32 (self: tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_u32_u32_spec: forall self: tup2_u32_u32. [%#sord'0] not lt_log_tup2_u32_u32 self self
+
+predicate le_log_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_u32) =
+  [%#sord'5] self.f0'0 = o.f0'0 /\ le_log_tup2_u32_u32 self.f1'0 o.f1'0 \/ UInt32.lt self.f0'0 o.f0'0
+
+predicate lt_log_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_u32) =
+  [%#sord] self.f0'0 = o.f0'0 /\ lt_log_tup2_u32_u32 self.f1'0 o.f1'0 \/ UInt32.lt self.f0'0 o.f0'0
+
+function le_lt_log_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_u32) (other: tup2_u32_tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_u32, other: tup2_u32_tup2_u32_u32. [%#sord'4] le_log_tup2_u32_tup2_u32_u32 self other
+    = (lt_log_tup2_u32_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_u32_tup2_u32_u32 (x: tup2_u32_tup2_u32_u32) (y: tup2_u32_tup2_u32_u32) (z: tup2_u32_tup2_u32_u32) : ()
+
+axiom transitive_tup2_u32_tup2_u32_u32_spec:
+  forall x: tup2_u32_tup2_u32_u32, y: tup2_u32_tup2_u32_u32, z: tup2_u32_tup2_u32_u32. ([%#sord'1] lt_log_tup2_u32_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_u32_tup2_u32_u32 y z) -> ([%#sord'3] lt_log_tup2_u32_tup2_u32_u32 x z)
+
+function irreflexive_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_u32. [%#sord'0] not lt_log_tup2_u32_tup2_u32_u32 self self
+
+predicate lt_log_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord] self.f0'1 = o.f0'1 /\ lt_log_tup2_u32_tup2_u32_u32 self.f1'1 o.f1'1 \/ UInt32.lt self.f0'1 o.f0'1
+
+predicate le_log_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord'5] self.f0'1 = o.f0'1 /\ le_log_tup2_u32_tup2_u32_u32 self.f1'1 o.f1'1 \/ UInt32.lt self.f0'1 o.f0'1
+
+function le_lt_log_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_u32) (other: tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_u32, other: tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'4] le_log_tup2_u32_tup2_u32_tup2_u32_u32 self other
+    = (lt_log_tup2_u32_tup2_u32_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_u32_tup2_u32_tup2_u32_u32 (x: tup2_u32_tup2_u32_tup2_u32_u32) (y: tup2_u32_tup2_u32_tup2_u32_u32) (z: tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom transitive_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall x: tup2_u32_tup2_u32_tup2_u32_u32, y: tup2_u32_tup2_u32_tup2_u32_u32, z: tup2_u32_tup2_u32_tup2_u32_u32. ([%#sord'1] lt_log_tup2_u32_tup2_u32_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_u32_tup2_u32_tup2_u32_u32 y z) -> ([%#sord'3] lt_log_tup2_u32_tup2_u32_tup2_u32_u32 x z)
+
+function irreflexive_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'0] not lt_log_tup2_u32_tup2_u32_tup2_u32_u32 self self
+
+predicate le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord'5] self.f0'2 = o.f0'2 /\ le_log_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'2 o.f1'2 \/ UInt32.lt self.f0'2 o.f0'2
+
+predicate lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord] self.f0'2 = o.f0'2 /\ lt_log_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'2 o.f1'2 \/ UInt32.lt self.f0'2 o.f0'2
+
+function le_lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (other: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, other: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'4] le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other
+    = (lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (x: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (y: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (z: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom transitive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall x: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, y: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, z: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. ([%#sord'1] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 y z)
+    -> ([%#sord'3] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x z)
+
+function irreflexive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'0] not lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self self
+
+predicate lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord] self.f0'3 = o.f0'3 /\ lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'3 o.f1'3
+  \/ UInt32.lt self.f0'3 o.f0'3
+
+predicate le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord'5] self.f0'3 = o.f0'3 /\ le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'3 o.f1'3
+  \/ UInt32.lt self.f0'3 o.f0'3
+
+function le_lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (other: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, other: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'4] le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other
+    = (lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (x: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (y: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (z: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom transitive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall x: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, y: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, z: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. ([%#sord'1] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 y z)
+    -> ([%#sord'3] lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x z)
+
+function irreflexive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'0] not lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self self
+
+predicate le_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord'5] self.f0'4 = o.f0'4 /\ le_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'4 o.f1'4
+  \/ Int32.lt self.f0'4 o.f0'4
+
+predicate lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (o: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) =
+  [%#sord] self.f0'4 = o.f0'4 /\ lt_log_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'4 o.f1'4
+  \/ Int32.lt self.f0'4 o.f0'4
+
+function le_lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (other: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom le_lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, other: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'4] le_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other
+    = (lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self other \/ self = other)
+
+function transitive_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (y: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (z: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom transitive_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, y: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32, z: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. ([%#sord'1] lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x y)
+    -> ([%#sord'2] lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 y z)
+    -> ([%#sord'3] lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 x z)
+
+function irreflexive_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : ()
+
+axiom irreflexive_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32_spec:
+  forall self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32. [%#sord'0] not lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self self
+
+function naive_date_time_year_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 81 0 81 69] (_dt: t_NaiveDateTime) : Int32.t
+
+function naive_date_time_month_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 87 0 87 70] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_day_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 93 0 93 68] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_hour_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 99 0 99 69] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_minute_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 105 0 105 71] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_second_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 111 0 111 71] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 117 0 117 75] (_dt: t_NaiveDateTime) : UInt32.t
+
+function naive_date_time_key [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 57 0 59 50] (dt: t_NaiveDateTime) : tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+ = [%#slogic'2] { f0'4 = naive_date_time_year_value dt;
+                  f1'4 = { f0'3 = naive_date_time_month_value dt;
+                           f1'3 = { f0'2 = naive_date_time_day_value dt;
+                                    f1'2 = { f0'1 = naive_date_time_hour_value dt;
+                                             f1'1 = { f0'0 = naive_date_time_minute_value dt;
+                                                      f1'0 = { f0 = naive_date_time_second_value dt;
+                                                               f1 = naive_date_time_nanosecond_value dt } } } } } }
+
+predicate naive_date_time_before [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/logic.rs" 89 0 89 91] (a: t_NaiveDateTime) (b: t_NaiveDateTime) =
+  [%#slogic'1] lt_log_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 (naive_date_time_key a) (naive_date_time_key b)
+
+type t_DateTime_Tz
+
+type t_Option_DateTime_Tz = None'2 | Some'2 t_DateTime_Tz
+
+function gap_info_handle_end_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/carrier.rs" 66 0 66 95] (_h: t_GapInfoHandle) : t_Option_DateTime_Tz
+
+function date_time_tz_naive_local_value_Tz [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 171 0 173 26] (_dt: t_DateTime_Tz) : t_NaiveDateTime
+
+predicate from_local_brackets_local [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 60 8 63 17] (outcome: t_Option_GapInfoHandle) (local: t_NaiveDateTime) =
+  [%#scontracts'0] match outcome with
+    | Some'0 h -> match gap_info_handle_begin_naive_value h with
+        | Some'1 b -> naive_date_time_before b local
+        | None'1 -> true
+        end
+    /\ match gap_info_handle_end_value h with
+      | Some'2 e -> naive_date_time_before local (date_time_tz_naive_local_value_Tz e)
+      | None'2 -> true
+      end
+    | None'0 -> true
+    end
+
+let from_local (local: t_NaiveDateTime) (tz: t_Tz) (return (x: t_Option_GapInfoHandle)) =
+{[@stop_split] [@expl:from_local 'local' type invariant] [%#scarrier] inv_ref_NaiveDateTime local}
+  any
+  [ return (result: t_Option_GapInfoHandle) ->
+  {[@stop_split] [@expl:from_local ensures] ([@stop_split] [@expl:from_local result type invariant] [%#scarrier'0] inv_Option_GapInfoHandle result)
+    /\ ([@stop_split] [@expl:from_local ensures #0] [%#scarrier'1] from_local_gap_detection_agrees result tz local)
+    /\ ([@stop_split] [@expl:from_local ensures #1] [%#scarrier'2] from_local_brackets_local result local)}
+    (! return {result}) ]
+
+predicate resolve_GapInfoHandle (_1: t_GapInfoHandle)
+
+let elim_Some (_x: t_Option_GapInfoHandle) (return (f0'5: t_GapInfoHandle)) = any
+  [ _k (f0'5: t_GapInfoHandle) -> {Some'0 f0'5 = _x} (! return {f0'5})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some'0 _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate key_matches_naive_date_time_key [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 152 8 155 17] (outcome: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (dt: t_NaiveDateTime) =
+  [%#scontracts'1] outcome = naive_date_time_key dt
+
+let key (dt: t_NaiveDateTime) (return (x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32)) =
+{[@stop_split] [@expl:key 'dt' type invariant] [%#sgap_info'16] inv_ref_NaiveDateTime dt}
+  any
+  [ return (result: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) ->
+  {[@stop_split] [@expl:key ensures] [%#sgap_info'17] key_matches_naive_date_time_key result dt}
+    (! return {result}) ]
+
+predicate invariant_ref_GapInfoHandle [@inline:trivial] (self: t_GapInfoHandle) = [%#sinvariant] inv_GapInfoHandle self
+
+meta "rewrite_def" predicate invariant_ref_GapInfoHandle
+
+predicate inv_ref_GapInfoHandle [@inline:trivial] (_1: t_GapInfoHandle) = invariant_ref_GapInfoHandle _1
+
+meta "rewrite_def" predicate inv_ref_GapInfoHandle
+
+predicate inv_Option_NaiveDateTime (_1: t_Option_NaiveDateTime)
+
+axiom inv_axiom'1 [@rewrite]:
+  forall _1: t_Option_NaiveDateTime [inv_Option_NaiveDateTime _1]. inv_Option_NaiveDateTime _1
+    = match _1 with
+      | None'1 -> true
+      | Some'1 f0'5 -> inv_NaiveDateTime f0'5
+      end
+
+predicate begin_naive_matches_handle [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 102 8 105 17] (outcome: t_Option_NaiveDateTime) (h: t_GapInfoHandle) =
+  [%#scontracts'2] outcome = gap_info_handle_begin_naive_value h
+
+let begin_naive (self: t_GapInfoHandle) (return (x: t_Option_NaiveDateTime)) =
+{[@stop_split] [@expl:begin_naive 'self' type invariant] [%#scarrier'3] inv_ref_GapInfoHandle self}
+  any
+  [ return (result: t_Option_NaiveDateTime) ->
+  {[@stop_split] [@expl:begin_naive ensures] ([@stop_split] [@expl:begin_naive result type invariant] [%#scarrier'4] inv_Option_NaiveDateTime result)
+    /\ ([@stop_split] [@expl:begin_naive ensures] [%#scarrier'5] begin_naive_matches_handle result self)}
+    (! return {result}) ]
+
+let elim_Some'0 (_x: t_Option_NaiveDateTime) (return (f0'5: t_NaiveDateTime)) = any
+  [ _k (f0'5: t_NaiveDateTime) -> {Some'1 f0'5 = _x} (! return {f0'5})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some'1 _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+type tup2_Int_Int = { f0'5: int; f1'5: int }
+
+type tup2_Int_tup2_Int_Int = { f0'6: int; f1'6: tup2_Int_Int }
+
+type tup2_Int_tup2_Int_tup2_Int_Int = { f0'7: int; f1'7: tup2_Int_tup2_Int_Int }
+
+type tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int = { f0'8: int; f1'8: tup2_Int_tup2_Int_tup2_Int_Int }
+
+type tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int = { f0'9: int; f1'9: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int }
+
+type tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int = {
+  f0'10: int;
+  f1'10: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int }
+
+predicate lt_log_tup2_Int_Int (self: tup2_Int_Int) (o: tup2_Int_Int) =
+  [%#sord] self.f0'5 = o.f0'5 /\ self.f1'5 < o.f1'5 \/ self.f0'5 < o.f0'5
+
+predicate le_log_tup2_Int_Int (self: tup2_Int_Int) (o: tup2_Int_Int) =
+  [%#sord'5] self.f0'5 = o.f0'5 /\ self.f1'5 <= o.f1'5 \/ self.f0'5 < o.f0'5
+
+function le_lt_log_tup2_Int_Int (self: tup2_Int_Int) (other: tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_Int_spec:
+  forall self: tup2_Int_Int, other: tup2_Int_Int. [%#sord'4] le_log_tup2_Int_Int self other
+    = (lt_log_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_Int (x: tup2_Int_Int) (y: tup2_Int_Int) (z: tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_Int_spec:
+  forall x: tup2_Int_Int, y: tup2_Int_Int, z: tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_Int y z) -> ([%#sord'3] lt_log_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_Int (self: tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_Int_spec: forall self: tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_Int self self
+
+predicate le_log_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_Int) =
+  [%#sord'5] self.f0'6 = o.f0'6 /\ le_log_tup2_Int_Int self.f1'6 o.f1'6 \/ self.f0'6 < o.f0'6
+
+predicate lt_log_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_Int) =
+  [%#sord] self.f0'6 = o.f0'6 /\ lt_log_tup2_Int_Int self.f1'6 o.f1'6 \/ self.f0'6 < o.f0'6
+
+function le_lt_log_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_Int) (other: tup2_Int_tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_Int, other: tup2_Int_tup2_Int_Int. [%#sord'4] le_log_tup2_Int_tup2_Int_Int self other
+    = (lt_log_tup2_Int_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_tup2_Int_Int (x: tup2_Int_tup2_Int_Int) (y: tup2_Int_tup2_Int_Int) (z: tup2_Int_tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_tup2_Int_Int_spec:
+  forall x: tup2_Int_tup2_Int_Int, y: tup2_Int_tup2_Int_Int, z: tup2_Int_tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_tup2_Int_Int y z) -> ([%#sord'3] lt_log_tup2_Int_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_tup2_Int_Int self self
+
+predicate lt_log_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord] self.f0'7 = o.f0'7 /\ lt_log_tup2_Int_tup2_Int_Int self.f1'7 o.f1'7 \/ self.f0'7 < o.f0'7
+
+predicate le_log_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord'5] self.f0'7 = o.f0'7 /\ le_log_tup2_Int_tup2_Int_Int self.f1'7 o.f1'7 \/ self.f0'7 < o.f0'7
+
+function le_lt_log_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_Int) (other: tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_Int, other: tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'4] le_log_tup2_Int_tup2_Int_tup2_Int_Int self other
+    = (lt_log_tup2_Int_tup2_Int_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_tup2_Int_tup2_Int_Int (x: tup2_Int_tup2_Int_tup2_Int_Int) (y: tup2_Int_tup2_Int_tup2_Int_Int) (z: tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall x: tup2_Int_tup2_Int_tup2_Int_Int, y: tup2_Int_tup2_Int_tup2_Int_Int, z: tup2_Int_tup2_Int_tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_tup2_Int_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_tup2_Int_tup2_Int_Int y z) -> ([%#sord'3] lt_log_tup2_Int_tup2_Int_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_tup2_Int_tup2_Int_Int self self
+
+predicate le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord'5] self.f0'8 = o.f0'8 /\ le_log_tup2_Int_tup2_Int_tup2_Int_Int self.f1'8 o.f1'8 \/ self.f0'8 < o.f0'8
+
+predicate lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord] self.f0'8 = o.f0'8 /\ lt_log_tup2_Int_tup2_Int_tup2_Int_Int self.f1'8 o.f1'8 \/ self.f0'8 < o.f0'8
+
+function le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'4] le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other
+    = (lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int y z)
+    -> ([%#sord'3] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self self
+
+predicate lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord] self.f0'9 = o.f0'9 /\ lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self.f1'9 o.f1'9 \/ self.f0'9 < o.f0'9
+
+predicate le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord'5] self.f0'9 = o.f0'9 /\ le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self.f1'9 o.f1'9 \/ self.f0'9 < o.f0'9
+
+function le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'4] le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other
+    = (lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int y z)
+    -> ([%#sord'3] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self self
+
+predicate le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord'5] self.f0'10 = o.f0'10 /\ le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self.f1'10 o.f1'10
+  \/ self.f0'10 < o.f0'10
+
+predicate lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (o: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) =
+  [%#sord] self.f0'10 = o.f0'10 /\ lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self.f1'10 o.f1'10
+  \/ self.f0'10 < o.f0'10
+
+function le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom le_lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, other: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'4] le_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other
+    = (lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self other \/ self = other)
+
+function transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) (z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom transitive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall x: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, y: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int, z: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. ([%#sord'1] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x y)
+    -> ([%#sord'2] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int y z)
+    -> ([%#sord'3] lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int x z)
+
+function irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int) : ()
+
+axiom irreflexive_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int_spec:
+  forall self: tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int. [%#sord'0] not lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int self self
+
+function deep_model_i32 [@inline:trivial] (self: Int32.t) : int = [%#snum] Int32.to_int self
+
+meta "rewrite_def" function deep_model_i32
+
+function deep_model_u32 [@inline:trivial] (self: UInt32.t) : int = [%#snum'0] UInt32.t'int self
+
+meta "rewrite_def" function deep_model_u32
+
+function deep_model_tup2_u32_u32 [@inline:trivial] (self: tup2_u32_u32) : tup2_Int_Int =
+  [%#stuples] { f0'5 = deep_model_u32 self.f0; f1'5 = deep_model_u32 self.f1 }
+
+meta "rewrite_def" function deep_model_tup2_u32_u32
+
+function deep_model_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_Int =
+  [%#stuples] { f0'6 = deep_model_u32 self.f0'0; f1'6 = deep_model_tup2_u32_u32 self.f1'0 }
+
+meta "rewrite_def" function deep_model_tup2_u32_tup2_u32_u32
+
+function deep_model_tup2_u32_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_u32_tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_tup2_Int_Int
+ = [%#stuples] { f0'7 = deep_model_u32 self.f0'1; f1'7 = deep_model_tup2_u32_tup2_u32_u32 self.f1'1 }
+
+meta "rewrite_def" function deep_model_tup2_u32_tup2_u32_tup2_u32_u32
+
+function deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int
+ = [%#stuples] { f0'8 = deep_model_u32 self.f0'2; f1'8 = deep_model_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'2 }
+
+meta "rewrite_def" function deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+
+function deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int
+ = [%#stuples] { f0'9 = deep_model_u32 self.f0'3; f1'9 = deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'3 }
+
+meta "rewrite_def" function deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+
+function deep_model_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int
+ = [%#stuples] { f0'10 = deep_model_i32 self.f0'4;
+                 f1'10 = deep_model_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self.f1'4 }
+
+meta "rewrite_def" function deep_model_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+
+function deep_model_ref_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [@inline:trivial] (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) : tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int
+ = [%#smodel] deep_model_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self
+
+meta "rewrite_def" function deep_model_ref_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+
+let lt_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32
+  (self: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32)
+  (other: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) (return (x: bool)) = any
+  [ return (result: bool) -> {[@stop_split] [@expl:lt ensures] [%#scmp] result
+    = lt_log_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_tup2_Int_Int (deep_model_ref_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 self) (deep_model_ref_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 other)}
+    (! return {result}) ]
+
+predicate inv_DateTime_Tz (_1: t_DateTime_Tz)
+
+predicate inv_Option_DateTime_Tz (_1: t_Option_DateTime_Tz)
+
+axiom inv_axiom'2 [@rewrite]: forall _1: t_Option_DateTime_Tz [inv_Option_DateTime_Tz _1]. inv_Option_DateTime_Tz _1
+    = match _1 with
+      | None'2 -> true
+      | Some'2 f0'11 -> inv_DateTime_Tz f0'11
+      end
+
+predicate end_matches_handle [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info/contracts.rs" 126 8 129 17] (outcome: t_Option_DateTime_Tz) (h: t_GapInfoHandle) =
+  [%#scontracts'3] outcome = gap_info_handle_end_value h
+
+let end' (self: t_GapInfoHandle) (return (x: t_Option_DateTime_Tz)) =
+{[@stop_split] [@expl:end 'self' type invariant] [%#scarrier'6] inv_ref_GapInfoHandle self}
+  any
+  [ return (result: t_Option_DateTime_Tz) ->
+  {[@stop_split] [@expl:end ensures] ([@stop_split] [@expl:end result type invariant] [%#scarrier'7] inv_Option_DateTime_Tz result)
+    /\ ([@stop_split] [@expl:end ensures] [%#scarrier'8] end_matches_handle result self)}
+    (! return {result}) ]
+
+let elim_Some'1 (_x: t_Option_DateTime_Tz) (return (f0'11: t_DateTime_Tz)) = any
+  [ _k (f0'11: t_DateTime_Tz) -> {Some'2 f0'11 = _x} (! return {f0'11})
+  | _chk -> (! {[@expl:elim Some] match _x with
+      | Some'2 _ -> true
+      | _ -> false
+      end}
+    any) ]
+
+predicate invariant_ref_DateTime_Tz [@inline:trivial] (self: t_DateTime_Tz) = [%#sinvariant] inv_DateTime_Tz self
+
+meta "rewrite_def" predicate invariant_ref_DateTime_Tz
+
+predicate inv_ref_DateTime_Tz [@inline:trivial] (_1: t_DateTime_Tz) = invariant_ref_DateTime_Tz _1
+
+meta "rewrite_def" predicate inv_ref_DateTime_Tz
+
+let naive_local_Tz (self: t_DateTime_Tz) (return (x: t_NaiveDateTime)) =
+{[@stop_split] [@expl:naive_local 'self' type invariant] [%#smod'1] inv_ref_DateTime_Tz self}
+  any
+  [ return (result: t_NaiveDateTime) ->
+  {[@stop_split] [@expl:naive_local_Tz ensures] ([@stop_split] [@expl:naive_local result type invariant] [%#smod'2] inv_NaiveDateTime result)
+    /\ ([@stop_split] [@expl:naive_local ensures] [%#slogic'0] result = date_time_tz_naive_local_value_Tz self)}
+    (! return {result}) ]
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_gap_info_matches_offset_from_local_datetime [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/gap_info.rs" 43 8 46 17]
+  (local: t_NaiveDateTime) (tz: t_Tz) (return (x: bool)) =
+{[@stop_split] [@expl:verify_gap_info_matches_offset_from_local_datetime 'local' type invariant] [%#sgap_info'13] inv_NaiveDateTime local}
+  (! bb0
+  [ bb0 = s0
+    [ s0 = [ &_9 <- local ] s1
+    | s1 = offset_from_local_datetime_Tz [%#sgap_info] {tz} {_9} (fun (_x: t_LocalResult_TzOffset) -> [ &_6 <- _x ] s2)
+    | s2 = any
+      [ br0 (x0: t_TzOffset) -> {_6 = Single x0} (! bb2)
+      | br1 (x0: t_TzOffset) (x1: t_TzOffset) -> {_6 = Ambiguous x0 x1} (! bb2)
+      | br2 -> {_6 = None} (! bb4) ] ]
+  | bb2 = s0 [ s0 = [ &is_gap <- [%#smod] false ] s1 | s1 = bb5 ]
+  | bb4 = s0 [ s0 = [ &is_gap <- [%#smod'0] true ] s1 | s1 = bb5 ]
+  | bb5 = s0
+    [ s0 = [ &_16 <- local ] s1
+    | s1 = [ &_18 <- tz ] s2
+    | s2 = from_local [%#sgap_info'0] {_16} {_18} (fun (_x: t_Option_GapInfoHandle) -> [ &_14 <- _x ] s3)
+    | s3 = any [ br0 -> {_14 = None'0} (! bb9) | br1 (x0: t_GapInfoHandle) -> {_14 = Some'0 x0} (! bb8) ] ]
+  | bb9 = s0
+    [ s0 = s1
+      [ _ck -> (! {[@expl:type invariant] match _14 with
+          | Some'0 x -> inv_GapInfoHandle x
+          | _ -> true
+          end}
+        any) ]
+    | s1 = -{match _14 with
+        | Some'0 x -> resolve_GapInfoHandle x
+        | _ -> true
+        end}-
+      s2
+    | s2 = [ &_ret <- not is_gap ] s3
+    | s3 = return {_ret} ]
+  | bb8 = s0
+    [ s0 = elim_Some {_14} (fun (r0: t_GapInfoHandle) -> [ &handle <- r0 ] s1)
+    | s1 = any [ br0 -> {is_gap = false} (! bb10) | br1 -> {is_gap} (! bb11) ] ]
+  | bb11 = s0
+    [ s0 = [ &_25 <- local ] s1
+    | s1 = key [%#sgap_info'1] {_25}
+        (fun (_x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) -> [ &local_key <- _x ] s2)
+    | s2 = begin_naive [%#sgap_info'2] {handle} (fun (_x: t_Option_NaiveDateTime) -> [ &_27 <- _x ] s3)
+    | s3 = any [ br0 -> {_27 = None'1} (! bb16) | br1 (x0: t_NaiveDateTime) -> {_27 = Some'1 x0} (! bb17) ] ]
+  | bb17 = s0
+    [ s0 = elim_Some'0 {_27} (fun (r0: t_NaiveDateTime) -> [ &begin_local <- r0 ] s1)
+    | s1 = [ &_34 <- begin_local ] s2
+    | s2 = key [%#sgap_info'3] {_34}
+        (fun (_x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) -> [ &_32 <- _x ] s3)
+    | s3 = lt_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [%#sgap_info'4] {_32} {local_key}
+        (fun (_x: bool) -> [ &begin_ok <- _x ] s4)
+    | s4 = bb20 ]
+  | bb16 = s0 [ s0 = [ &begin_ok <- [%#sgap_info'5] true ] s1 | s1 = bb20 ]
+  | bb20 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_GapInfoHandle handle} any) ]
+    | s1 = -{resolve_GapInfoHandle handle}- s2
+    | s2 = end' [%#sgap_info'6] {handle} (fun (_x: t_Option_DateTime_Tz) -> [ &_37 <- _x ] s3)
+    | s3 = any [ br0 -> {_37 = None'2} (! bb24) | br1 (x0: t_DateTime_Tz) -> {_37 = Some'2 x0} (! bb25) ] ]
+  | bb25 = s0
+    [ s0 = elim_Some'1 {_37} (fun (r0: t_DateTime_Tz) -> [ &end_zoned <- r0 ] s1)
+    | s1 = naive_local_Tz [%#sgap_info'7] {end_zoned} (fun (_x: t_NaiveDateTime) -> [ &_46 <- _x ] s2)
+    | s2 = [ &_45 <- _46 ] s3
+    | s3 = key [%#sgap_info'8] {_45}
+        (fun (_x: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32) -> [ &_43 <- _x ] s4)
+    | s4 = lt_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 [%#sgap_info'9] {local_key} {_43}
+        (fun (_x: bool) -> [ &end_ok <- _x ] s5)
+    | s5 = bb29 ]
+  | bb24 = s0 [ s0 = [ &end_ok <- [%#sgap_info'10] true ] s1 | s1 = bb29 ]
+  | bb29 = any [ br0 -> {begin_ok = false} (! bb31) | br1 -> {begin_ok} (! bb30) ]
+  | bb30 = s0 [ s0 = [ &_ret <- end_ok ] s1 | s1 = return {_ret} ]
+  | bb31 = s0 [ s0 = [ &_ret <- [%#sgap_info'11] false ] s1 | s1 = return {_ret} ]
+  | bb10 = s0
+    [ s0 = s1 [ _ck -> (! {[@expl:type invariant] inv_GapInfoHandle handle} any) ]
+    | s1 = -{resolve_GapInfoHandle handle}- s2
+    | s2 = [ &_ret <- [%#sgap_info'12] false ] s3
+    | s3 = return {_ret} ] ]
+  [ & _ret: bool = Any.any_l ()
+  | & local: t_NaiveDateTime = local
+  | & tz: t_Tz = tz
+  | & is_gap: bool = Any.any_l ()
+  | & _6: t_LocalResult_TzOffset = Any.any_l ()
+  | & _9: t_NaiveDateTime = Any.any_l ()
+  | & handle: t_GapInfoHandle = Any.any_l ()
+  | & _14: t_Option_GapInfoHandle = Any.any_l ()
+  | & _16: t_NaiveDateTime = Any.any_l ()
+  | & _18: t_Tz = Any.any_l ()
+  | & local_key: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = Any.any_l ()
+  | & _25: t_NaiveDateTime = Any.any_l ()
+  | & begin_ok: bool = Any.any_l ()
+  | & _27: t_Option_NaiveDateTime = Any.any_l ()
+  | & begin_local: t_NaiveDateTime = Any.any_l ()
+  | & _32: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = Any.any_l ()
+  | & _34: t_NaiveDateTime = Any.any_l ()
+  | & end_ok: bool = Any.any_l ()
+  | & _37: t_Option_DateTime_Tz = Any.any_l ()
+  | & end_zoned: t_DateTime_Tz = Any.any_l ()
+  | & _43: tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32 = Any.any_l ()
+  | & _45: t_NaiveDateTime = Any.any_l ()
+  | & _46: t_NaiveDateTime = Any.any_l () ])
+  [ return (result: bool) ->
+  {[@stop_split] [@expl:verify_gap_info_matches_offset_from_local_datetime ensures] [%#sgap_info'15] result}
+    (! return {result}) ]

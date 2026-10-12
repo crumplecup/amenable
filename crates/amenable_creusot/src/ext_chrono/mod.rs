@@ -5,6 +5,8 @@
 
 mod civil_naive_date;
 mod fixed_offset;
+#[cfg(feature = "chrono-tz")]
+mod gap_info;
 mod iso_week;
 mod naive_date_time;
 mod naive_time;
@@ -18,6 +20,8 @@ mod utc;
 
 pub use civil_naive_date::VERIFY_NAIVE_DATE_MODEL_ROUND_TRIPS_SRC;
 pub use fixed_offset::VERIFY_FIXED_OFFSET_EAST_AND_WEST_ROUND_TRIP_SRC;
+#[cfg(feature = "chrono-tz")]
+pub use gap_info::VERIFY_GAP_INFO_MATCHES_OFFSET_FROM_LOCAL_DATETIME_SRC;
 pub use iso_week::VERIFY_ISO_WEEK_ROUND_TRIPS_MODEL_SRC;
 pub use naive_date_time::VERIFY_NAIVE_DATE_TIME_ROUND_TRIPS_SRC;
 pub use naive_time::VERIFY_NAIVE_TIME_FROM_HMS_NANO_ROUND_TRIPS_SRC;

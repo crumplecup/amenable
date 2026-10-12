@@ -2,10 +2,10 @@
 
 **Status:** Phase 2 complete and gated. Phase 3 in progress: chrono
 8/67 rows (11.9%, unchanged -- the 8 instantiation-row registrations are
-still pending), chrono-tz 2/5 rows (40.0% -- `Tz` and `TzOffset` both
-genuinely proven/trusted-by-citation across all three backends;
-`GapInfo` and `chrono_tz::ParseError` still undecided). Last revised
-2026-10-12.
+still pending), chrono-tz 3/5 rows (60.0% -- `Tz`, `TzOffset`, and
+`GapInfo` all genuinely proven on Kani and Creusot, `TzOffset`/`Tz`
+also trusted-by-citation/proven on Verus; `chrono_tz::ParseError` still
+undecided). Last revised 2026-10-12.
 
 This plan adds full coverage of the chrono 0.4 and chrono-tz 0.10 public
 surfaces to `amenable_ext`. It mirrors the jiff effort: each type is registered
@@ -359,8 +359,41 @@ pass on the chrono backend for every civil carrier.
      construction. Confirmed non-vacuous the same way: a deliberately
      broken literal fails the exact right postcondition, then reverts
      clean.
-   - **`GapInfo`, `chrono_tz::ParseError`:** not yet decided. Read each
-     type's source before deciding its claim kind.
+   - **`GapInfo`: genuinely proven on Kani and Creusot.** Kani checks
+     the whole claim (gap detection *and* bracketing together) against
+     94 concrete, discovered real-world transition witnesses -- the
+     same discovery-to-collapse move `TzOffset` used, confirmed by a
+     real black-box scan (27,693 raw gap events, 1970-2100, collapsing
+     to 94 distinct `(prev_base, prev_dst) -> (next_base, next_dst)`
+     pairs) -- as 47 binned harnesses (bins of 2, decomposed before
+     partitioning: isolating `GapInfo::new`'s own cost from
+     `from_local_datetime`'s showed the two real lookups share CBMC
+     state rather than adding, so the bin size reflects `GapInfo::new`'s
+     genuine per-item cost, not an assumption carried over from
+     `TzOffset`'s own 16). **Creusot is also genuinely proven**, but via
+     a design turn worth recording: a direct `extern_spec!` on
+     `GapInfo::new` hit a confirmed upstream Creusot/WHY3 bug (its own
+     field `begin` collides with a WHY3 reserved word Creusot's
+     keyword-escaping table omits -- `end` is correctly escaped to
+     `end'`, `begin` isn't at all), reproducible regardless of whether
+     the ensures clause ever destructures the type. The fix: a
+     private-field newtype (`GapInfoHandle`) wrapping the real
+     `chrono_tz::GapInfo`, with every function that touches the real
+     type (construction or field access) `#[trusted]` and never naming
+     `chrono_tz::GapInfo` in its own signature -- confirmed to let
+     Creusot treat it as fully opaque, the same way `TzOffset`'s own
+     private fields already do. The proof then states two
+     independently-grounded facts on `GapInfoHandle::from_local`'s own
+     contract: gap-detection agreement with `Tz::
+     offset_from_local_datetime` (both real functions run the identical
+     binary search, confirmed by reading chrono-tz's source side by
+     side) cross-checked by a real execution wrapper, and the
+     bracketing property stated directly (no cross-check available for
+     that half, same epistemic shape as `TzOffset::fix()`'s own axiom).
+     Recorded as `amenable_std::creusot_gallery`'s
+     `public_field_foreign_struct_forces_full_record_translation` case.
+   - **`chrono_tz::ParseError`:** not yet decided. Read the type's
+     source before deciding its claim kind.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset
    bridge and the zone bridge, derived from the bounds. The current version
    treats `Local` as a named zone and must not be used.

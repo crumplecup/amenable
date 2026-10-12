@@ -1,0 +1,88 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_begin_naive": { "prover": "alt-ergo", "time": 0.041 },
+      "vc_elim_Some": { "prover": "alt-ergo", "time": 0.036 },
+      "vc_elim_Some'0": { "prover": "alt-ergo", "time": 0.039 },
+      "vc_elim_Some'1": { "prover": "alt-ergo", "time": 0.039 },
+      "vc_end'": { "prover": "alt-ergo", "time": 0.035 },
+      "vc_from_local": { "prover": "alt-ergo", "time": 0.04 },
+      "vc_key": { "prover": "alt-ergo", "time": 0.037 },
+      "vc_lt_tup2_i32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_tup2_u32_u32": {
+        "prover": "alt-ergo",
+        "time": 0.037
+      },
+      "vc_naive_local_Tz": { "prover": "alt-ergo", "time": 0.032 },
+      "vc_offset_from_local_datetime_Tz": {
+        "prover": "alt-ergo",
+        "time": 0.04
+      },
+      "vc_verify_gap_info_matches_offset_from_local_datetime": {
+        "tactic": "compute_specified",
+        "children": [
+          {
+            "tactic": "split_vc",
+            "children": [
+              { "prover": "z3", "time": 0.011 },
+              { "prover": "z3", "time": 0.012 },
+              {
+                "tactic": "split_vc",
+                "children": [
+                  { "prover": "z3", "time": 0.011 },
+                  { "prover": "z3", "time": 0.01 },
+                  { "prover": "z3", "time": 0.009 }
+                ]
+              },
+              { "prover": "z3", "time": 0.013 },
+              {
+                "tactic": "split_vc",
+                "children": [
+                  { "prover": "z3", "time": 0.113 },
+                  { "prover": "z3", "time": 0.113 },
+                  { "prover": "z3", "time": 0.011 }
+                ]
+              },
+              { "prover": "z3", "time": 0.169 },
+              { "prover": "z3", "time": 0.011 },
+              { "prover": "z3", "time": 0.088 },
+              { "prover": "z3", "time": 0.112 },
+              { "prover": "z3", "time": 0.092 },
+              { "prover": "z3", "time": 0.022 },
+              { "prover": "z3", "time": 0.021 },
+              { "prover": "z3", "time": 0.018 },
+              { "prover": "z3", "time": 0.015 },
+              { "prover": "z3", "time": 0.024 },
+              {
+                "tactic": "split_vc",
+                "children": [
+                  {
+                    "tactic": "split_vc",
+                    "children": [
+                      { "prover": "z3", "time": 0.009 },
+                      { "prover": "z3", "time": 0.027 }
+                    ]
+                  },
+                  {
+                    "tactic": "split_vc",
+                    "children": [
+                      { "prover": "z3", "time": 0.012 },
+                      { "prover": "z3", "time": 0.085 }
+                    ]
+                  }
+                ]
+              },
+              {
+                "tactic": "split_vc",
+                "children": [
+                  { "prover": "z3", "time": 0.005 },
+                  { "prover": "z3", "time": 0.028 }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

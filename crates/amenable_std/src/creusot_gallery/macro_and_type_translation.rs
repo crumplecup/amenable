@@ -316,3 +316,110 @@ pub struct CreusotVerifierMetadata;
         ),
     )
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::public_field_foreign_struct_forces_full_record_translation".to_owned(),
+            "any use of a public-field foreign struct type forces Creusot to emit its full WHY3 record, even with zero field projection -- confirmed fixable with a private-field newtype".to_owned(),
+            CreusotGalleryDisposition::BestPractice,
+            CreusotGalleryExpectation::Proved,
+            r#"
+// Failing form (chrono_tz::GapInfo, building amenable_creusot's own
+// chrono-tz proof pipeline): `pub struct GapInfo { pub begin:
+// Option<(NaiveDateTime, TzOffset)>, pub end: Option<DateTime<Tz>> }`
+// (chrono-tz 0.10.4's real, unmodified source). First attempt: extern_spec
+// `GapInfo::new`'s own `#[ensures]` destructures `&result.begin`/
+// `&result.end` directly:
+extern_spec! {
+    impl chrono_tz::GapInfo {
+        #[check(ghost)]
+        #[ensures(match &result {
+            Some(info) => match &info.begin { Some(pair) => ..., None => true },
+            None => true,
+        })]
+        fn new(local: &chrono::NaiveDateTime, tz: &chrono_tz::Tz) -> Option<chrono_tz::GapInfo>;
+    }
+}
+
+// Observed under `cargo creusot -- -p amenable_creusot --features
+// chrono-tz` (translation itself succeeds; `why3find prove` then fails
+// parsing the generated `.coma`):
+//   Fatal error: exception File "verif/.../gap_info/
+//   verify_gap_info_brackets_local.coma", line 655, characters 19-24:
+//   syntax error
+// Reading the generated `.coma` at that line: `type t_GapInfo = { begin:
+// t_Option_tup2_NaiveDateTime_TzOffset; end': t_Option_DateTime_Tz }` —
+// Creusot escaped `end` to `end'` (a real WHY3 reserved word, used in
+// `begin...end` block syntax) but left `begin` unescaped, even though
+// WHY3 reserves `begin` too. Confirmed directly against the installed
+// Creusot source (`~/repos/creusot/why3/src/name.rs`'s `RESERVED_STR`
+// constant): it lists `"end"` but has no `"begin"` entry at all — a
+// genuine upstream omission bug in the escaping table, not a translation
+// limit we triggered by writing something unusual.
+
+// Second attempt, testing whether the trigger is literal field
+// projection rather than mere type presence: rewrote the `#[ensures]` to
+// use brand-new opaque `#[logic(opaque)]` accessors
+// (`gap_info_begin_naive_value(&GapInfo) -> Option<NaiveDateTime>`, body
+// `dead`, never literally projecting `.begin`/`.end` anywhere) and
+// dropped all direct field destructuring from both the axiom and the
+// real-exec wrapper, keeping only a `GapInfo::new(...).is_some()` call
+// (no field access at all) cross-checked against a separately-axiomatized
+// `Tz::offset_from_local_datetime`.
+
+// Observed under `cargo creusot -- -p amenable_creusot --features
+// chrono-tz` again: translation succeeds, `why3find prove` fails at the
+// *same* line/column shape in a differently-named `.coma` file —
+// `type t_GapInfo = { begin: ...; end': ... }` is generated again,
+// confirming the record is forced by `chrono_tz::GapInfo` merely
+// *appearing* as a type anywhere Creusot must translate (here, only as
+// `GapInfo::new`'s own declared return type in the extern_spec, and as
+// the opaque accessors' own parameter type) — field projection was never
+// the actual trigger. `TzOffset` never hits this not because nothing
+// projects its fields, but because its fields are private to `chrono_tz`
+// itself: Creusot can never resolve ANY type's internal layout it has no
+// crate-level visibility into, regardless of what the calling crate's
+// code does with values of that type, and stays fully opaque (`type
+// t_TzOffset`, no body) unconditionally.
+
+// Working form (this is the real design, in amenable_creusot::
+// ext_chrono::gap_info::carrier today): a private-field newtype wrapper
+// defined inside amenable_creusot itself,
+pub(crate) struct GapInfoHandle(chrono_tz::GapInfo);   // field has no `pub`
+// lets Creusot treat `GapInfoHandle` the same way it treats `TzOffset` --
+// opaque, no record -- confirmed by real `cargo creusot` output (the
+// whole crate, 186 files, translates and proves clean with this design).
+// Two conditions both turned out necessary:
+// (a) every function that touches the real `.0.begin`/`.0.end`, or
+//     calls the real (uncontracted) `GapInfo::new`, is `#[trusted]`
+//     (skipping body translation, the same mechanism this gallery's own
+//     `NonZero::new` case already relies on for an uncontracted call);
+// (b) `chrono_tz::GapInfo` never appears in any *signature* Creusot must
+//     translate -- not even an opaque logic accessor's own parameter
+//     list, which the second attempt above shows is just as fatal as a
+//     return type. Every accessor needing `GapInfo`'s real content
+//     instead takes `&GapInfoHandle`, and every `#[trusted]` function's
+//     own signature (e.g. `from_local(&NaiveDateTime, &Tz) ->
+//     Option<GapInfoHandle>`) never names `chrono_tz::GapInfo` either --
+//     only its *body* does, which `#[trusted]` keeps untranslated.
+//
+// A second, independent lesson surfaced getting the wrapper's own real-
+// execution cross-check to actually discharge (18/21 goals proved, 3
+// stuck on `not begin_ok = False`, per real `why3find prove -X` output):
+// the real exec helper that builds a comparison key from `.year()`/
+// `.month()`/etc. needs its *own* `#[ensures(result == <the matching
+// logic-side key function>(dt))]` tying it to the exact logic
+// definition the axiom being exercised is stated in terms of --
+// otherwise the caller only knows the helper's return *type*, and two
+// independently-defined-but-equivalent orderings (a hand-written
+// if/else cascade vs. a nested-tuple `<`) never connect on their own,
+// no matter how obviously equivalent they are to a human reader. Same
+// root cause this crate's own "no hand-written second form" policy
+// already names for `Ensures`/`Requires` substitution; this is the same
+// principle showing up one level down, inside a single proof's own
+// helper functions.
+"#.to_owned(),
+        ),
+    )
+}

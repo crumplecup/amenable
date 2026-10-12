@@ -51,6 +51,7 @@ pub use ext_chrono::{
 };
 #[cfg(feature = "chrono-tz")]
 pub use ext_chrono::{
+    VERIFY_GAP_INFO_MATCHES_OFFSET_FROM_LOCAL_DATETIME_SRC,
     VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC, VERIFY_TZ_OFFSET_CONSISTENCY_SRC,
 };
 #[cfg(feature = "jiff")]
