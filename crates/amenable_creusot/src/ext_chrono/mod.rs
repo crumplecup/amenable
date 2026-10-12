@@ -12,6 +12,8 @@ mod naive_week;
 mod shared_trusted_accessors;
 #[cfg(feature = "chrono-tz")]
 mod tz;
+#[cfg(feature = "chrono-tz")]
+mod tz_offset;
 mod utc;
 
 pub use civil_naive_date::VERIFY_NAIVE_DATE_MODEL_ROUND_TRIPS_SRC;
@@ -22,4 +24,6 @@ pub use naive_time::VERIFY_NAIVE_TIME_FROM_HMS_NANO_ROUND_TRIPS_SRC;
 pub use naive_week::VERIFY_NAIVE_WEEK_SPAN_MODEL_SRC;
 #[cfg(feature = "chrono-tz")]
 pub use tz::VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC;
+#[cfg(feature = "chrono-tz")]
+pub use tz_offset::VERIFY_TZ_OFFSET_CONSISTENCY_SRC;
 pub use utc::VERIFY_UTC_LOCAL_OFFSET_IS_ALWAYS_SINGLE_AND_FIXED_OFFSET_IS_ZERO_SRC;

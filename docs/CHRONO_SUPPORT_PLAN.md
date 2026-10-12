@@ -334,10 +334,19 @@ pass on the chrono backend for every civil carrier.
      per-item cost (real `binary_search` over a zone's timespan table)
      doesn't collapse as fully as `Tz`'s own hashing-dominated cost once
      concrete, so the bin size was re-measured from scratch, not assumed from
-     `Tz`'s own resolution. Creusot and Verus stay trusted-by-citation:
-     neither toolchain can execute chrono-tz's real lookup the way CBMC can
-     (Creusot has no foreign-execution capability; Verus never resolves
-     `Cargo.toml`), an honest asymmetric classification, not a shortcut.
+     `Tz`'s own resolution. Creusot is **also genuinely proven**, not
+     trusted: three independent `extern_spec!` axioms (`fix()`,
+     `base_utc_offset()`, `dst_offset()`), each grounded in chrono-tz's
+     real source and its own public `OffsetComponents` doctest (which
+     asserts this exact relationship), combined by a wrapper Creusot's
+     real prover (z3, via `why3find`) discharges -- confirmed non-vacuous
+     by deliberately breaking one axiom and watching the proof genuinely
+     fail at exactly that goal, then revert. An earlier version of this
+     doc wrongly concluded Creusot couldn't do this without attempting
+     it; the correction was to actually try. Verus stays trusted-by-
+     citation: it never resolves `Cargo.toml` at all, so it has no way
+     to even reach chrono-tz's real `TzOffset` type, a structural
+     boundary `extern_spec!`-based reasoning doesn't share.
    - **`GapInfo`, `chrono_tz::ParseError`:** not yet decided. Read each
      type's source before deciding its claim kind.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset

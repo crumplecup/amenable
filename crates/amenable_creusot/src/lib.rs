@@ -42,14 +42,16 @@ mod stoplight;
 mod time;
 mod witness;
 
-#[cfg(feature = "chrono-tz")]
-pub use ext_chrono::VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC;
 #[cfg(feature = "chrono")]
 pub use ext_chrono::{
     VERIFY_FIXED_OFFSET_EAST_AND_WEST_ROUND_TRIP_SRC, VERIFY_ISO_WEEK_ROUND_TRIPS_MODEL_SRC,
     VERIFY_NAIVE_DATE_MODEL_ROUND_TRIPS_SRC, VERIFY_NAIVE_DATE_TIME_ROUND_TRIPS_SRC,
     VERIFY_NAIVE_TIME_FROM_HMS_NANO_ROUND_TRIPS_SRC, VERIFY_NAIVE_WEEK_SPAN_MODEL_SRC,
     VERIFY_UTC_LOCAL_OFFSET_IS_ALWAYS_SINGLE_AND_FIXED_OFFSET_IS_ZERO_SRC,
+};
+#[cfg(feature = "chrono-tz")]
+pub use ext_chrono::{
+    VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC, VERIFY_TZ_OFFSET_CONSISTENCY_SRC,
 };
 #[cfg(feature = "jiff")]
 pub use ext_jiff::{

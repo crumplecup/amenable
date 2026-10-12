@@ -116,3 +116,34 @@ pub(crate) fn naive_date_time_nanosecond_value(_dt: &chrono::NaiveDateTime) -> u
 pub(crate) fn tz_name_logic(_t: &chrono_tz::Tz) -> &'static str {
     dead
 }
+
+// ── chrono_tz::TzOffset ──────────────────────────────────────────────
+//
+// `TzOffset` wraps two private `i32` fields (`FixedTimespan { utc_offset,
+// dst_offset, .. }`, confirmed in source), unreachable here the same way
+// `fixed_offset_local_minus_utc_value` above stands in for a value this
+// crate cannot read directly. `fix()`/`base_utc_offset()`/`dst_offset()`
+// are all real, independent public methods over that same private state
+// -- each gets its own opaque accessor below, exactly the two-pillar
+// shape `tz_name_logic` already uses for `Tz` itself.
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn tz_offset_utc_offset_seconds_logic(_o: &chrono_tz::TzOffset) -> i64 {
+    dead
+}
+
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn tz_offset_dst_offset_seconds_logic(_o: &chrono_tz::TzOffset) -> i64 {
+    dead
+}
+
+// `chrono::Duration::num_seconds()` -- no existing `extern_spec!` for it
+// anywhere in this crate yet, needed here since `base_utc_offset()`/
+// `dst_offset()` both return a `Duration`, not a bare `i64`.
+#[trusted]
+#[logic(opaque)]
+pub(crate) fn duration_num_seconds_value(_d: &chrono::Duration) -> i64 {
+    dead
+}

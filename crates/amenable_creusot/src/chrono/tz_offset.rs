@@ -1,25 +1,39 @@
-//! `CreusotWitness` for `amenable_ext::ExtStandard<chrono_tz::TzOffset>`.
+//! `CreusotWitness` bridge for `amenable_ext::ExtStandard<chrono_tz::TzOffset>`.
 //!
-//! Trusted, not proven -- but not because the claim has no real content
-//! (it does: see `amenable_kani::chrono::tz_offset`'s own doc comment
-//! for the full investigation, including a genuine CBMC wall and its
-//! resolution). Kani achieves "proven" here by *really executing*
-//! chrono-tz's real, concrete, black-box code via CBMC, confirmed
-//! against 453 discovered real `(zone, date)` witnesses. Creusot has no
-//! equivalent capability: it translates to Why3/SMT and can state an
-//! `extern_spec!` axiom about a foreign function's behavior, but cannot
-//! *execute* chrono-tz's real binary-search lookup to confirm that axiom
-//! the way CBMC can -- stating `fix() == base + dst` as an `extern_spec!`
-//! here would be circular (asserting the very fact the Kani proof had to
-//! earn through real execution), not a genuine independent check. This
-//! is an honest, asymmetric classification across backends: Kani's own
-//! mechanism (real execution) answers a question Creusot's mechanism
-//! (symbolic/SMT reasoning over translated, not executed, code)
-//! structurally cannot, for a foreign type with no public constructor.
+//! The real proof content (`extern_spec!`/`harness!`) lives in the
+//! unconditional `crate::ext_chrono::tz_offset` sibling. This file only
+//! wires its claim constant into the witness.
+//!
+//! Genuinely proven, not trusted-by-citation: `fix() ==
+//! base_utc_offset() + dst_offset()` is confirmed by Creusot's own
+//! prover against three independently-stated `extern_spec!` axioms
+//! grounded in chrono-tz's real source and its own public doctest
+//! (see `ext_chrono::tz_offset::logic`'s own doc comment).
 
-use crate::CreusotWitness;
-use crate::ext_bridge::{bridge_creusot_witness, impl_creusot_witness_trusted_ext};
-use amenable_core::{Evidence, Metadata};
-use amenable_ext::{ExtProvenance, ExtStandard};
+use crate::ext_bridge::{ExtCheckedProof, bridge_creusot_witness};
+use crate::{CreusotWitness, VERIFY_TZ_OFFSET_CONSISTENCY_SRC};
+use amenable_core::Evidence;
+use amenable_ext::ExtStandard;
 
-impl_creusot_witness_trusted_ext!(chrono_tz::TzOffset);
+impl CreusotWitness for ExtStandard<chrono_tz::TzOffset> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = ExtCheckedProof;
+
+    fn proof() -> Self::ProofArtifact {
+        ExtCheckedProof::new(
+            "verify_tz_offset_consistency".to_owned(),
+            VERIFY_TZ_OFFSET_CONSISTENCY_SRC.to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+bridge_creusot_witness!(ExtStandard<chrono_tz::TzOffset>);
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_ext::ExtStandard<chrono_tz::TzOffset>",
+        "creusot",
+        || <ExtStandard<chrono_tz::TzOffset> as CreusotWitness>::proof().to_string(),
+    )
+}
