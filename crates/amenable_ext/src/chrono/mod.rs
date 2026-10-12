@@ -22,6 +22,8 @@ mod bounded_step_walk;
 #[cfg(feature = "chrono-tz")]
 mod chrono_tz_value_types;
 mod civil;
+#[cfg(feature = "chrono-tz")]
+mod discovered_offset_table;
 mod identity;
 mod instant;
 #[cfg(feature = "chrono-tz")]
@@ -38,6 +40,8 @@ pub use bounded_step_walk::BoundedStepWalk;
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
 };
+#[cfg(feature = "chrono-tz")]
+pub use discovered_offset_table::{DISCOVERED_OFFSET_TABLE, DiscoveredOffsetTableRow};
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{ChronoInstant, ChronoOffset, ChronoOffsetDateTime};
 #[cfg(feature = "chrono-tz")]
