@@ -30,6 +30,8 @@
 //! `chrono_naive_week_stub_composition`, and `chrono_year_span_growth` (and its
 //! siblings) for the investigation that found the partition size.
 
+#[cfg(kani)]
+use amenable_core::Ensures;
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 use chrono::NaiveWeek;
@@ -65,38 +67,64 @@ mod kani_only {
         (date.weekday().num_days_from_monday() + 7 - start.num_days_from_monday()) % 7
     }
 
-    /// Piece 1's own bound, named so each harness's `assert!` points at a real,
-    /// registered contract fragment instead of a raw equation.
-    pub(super) fn first_day_starts_on_the_chosen_weekday_holds(
-        first: chrono::NaiveDate,
-        start: Weekday,
-    ) -> bool {
-        first.weekday() == start
+    /// Piece 1's own bound: a named contract type, not a bare function, so
+    /// each harness's `assert!` is a real `Ensures::ensures(..)` call cordial's
+    /// own antipattern check recognizes as pointing at a registered contract
+    /// fragment, rather than a bare function call it cannot tell apart from a
+    /// raw equation.
+    pub(super) struct FirstDayStartsOnTheChosenWeekday;
+
+    crate::rust_std::kani_local_claim!(FirstDayStartsOnTheChosenWeekday);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for FirstDayStartsOnTheChosenWeekday {
+        type Input = (chrono::NaiveDate, Weekday);
+        type Bound = bool;
+
+        fn ensures((first, start): Self::Input) -> bool {
+            first.weekday() == start
+        }
     }
 
     /// Piece 2's own bound, named for the same reason.
-    pub(super) fn first_and_last_day_bracket_the_date_holds(
-        first: chrono::NaiveDate,
-        date: chrono::NaiveDate,
-        last: chrono::NaiveDate,
-    ) -> bool {
-        first <= date && date <= last
+    pub(super) struct FirstAndLastDayBracketTheDate;
+
+    crate::rust_std::kani_local_claim!(FirstAndLastDayBracketTheDate);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for FirstAndLastDayBracketTheDate {
+        type Input = (chrono::NaiveDate, chrono::NaiveDate, chrono::NaiveDate);
+        type Bound = bool;
+
+        fn ensures((first, date, last): Self::Input) -> bool {
+            first <= date && date <= last
+        }
     }
 
     /// Piece 3's own bound, named for the same reason.
-    pub(super) fn first_day_exists_exactly_when_the_date_can_step_back_holds(
-        checked_some: bool,
-        fits: bool,
-    ) -> bool {
-        checked_some == fits
+    pub(super) struct FirstDayExistsExactlyWhenTheDateCanStepBack;
+
+    crate::rust_std::kani_local_claim!(FirstDayExistsExactlyWhenTheDateCanStepBack);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for FirstDayExistsExactlyWhenTheDateCanStepBack {
+        type Input = (bool, bool);
+        type Bound = bool;
+
+        fn ensures((checked_some, fits): Self::Input) -> bool {
+            checked_some == fits
+        }
     }
 
     /// Piece 4's own bound, named for the same reason.
-    pub(super) fn last_day_exists_exactly_when_the_date_can_step_forward_holds(
-        checked_some: bool,
-        fits: bool,
-    ) -> bool {
-        checked_some == fits
+    pub(super) struct LastDayExistsExactlyWhenTheDateCanStepForward;
+
+    crate::rust_std::kani_local_claim!(LastDayExistsExactlyWhenTheDateCanStepForward);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for LastDayExistsExactlyWhenTheDateCanStepForward {
+        type Input = (bool, bool);
+        type Bound = bool;
+
+        fn ensures((checked_some, fits): Self::Input) -> bool {
+            checked_some == fits
+        }
     }
 }
 
@@ -110,10 +138,8 @@ use chrono::Days;
 pub(super) use kani_only::weekday_of;
 #[cfg(kani)]
 use kani_only::{
-    days_back_to, first_and_last_day_bracket_the_date_holds,
-    first_day_exists_exactly_when_the_date_can_step_back_holds,
-    first_day_starts_on_the_chosen_weekday_holds,
-    last_day_exists_exactly_when_the_date_can_step_forward_holds,
+    FirstAndLastDayBracketTheDate, FirstDayExistsExactlyWhenTheDateCanStepBack,
+    FirstDayStartsOnTheChosenWeekday, LastDayExistsExactlyWhenTheDateCanStepForward, days_back_to,
 };
 
 impl crate::KaniWitness for ExtStandard<NaiveWeek> {
@@ -154,7 +180,7 @@ bridge_kani_witness!(ExtStandard<NaiveWeek>);
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::civil_naive_week::first_day_starts_on_the_chosen_weekday_holds",
+        "amenable_kani::chrono::civil_naive_week::FirstDayStartsOnTheChosenWeekday",
         "kani",
         "ensures",
         || "first.weekday() == start",
@@ -163,7 +189,7 @@ bridge_kani_witness!(ExtStandard<NaiveWeek>);
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::civil_naive_week::first_and_last_day_bracket_the_date_holds",
+        "amenable_kani::chrono::civil_naive_week::FirstAndLastDayBracketTheDate",
         "kani",
         "ensures",
         || "first <= date && date <= last",
@@ -172,7 +198,7 @@ bridge_kani_witness!(ExtStandard<NaiveWeek>);
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::civil_naive_week::first_day_exists_exactly_when_the_date_can_step_back_holds",
+        "amenable_kani::chrono::civil_naive_week::FirstDayExistsExactlyWhenTheDateCanStepBack",
         "kani",
         "ensures",
         || "date.week(start).checked_first_day().is_some() == fits",
@@ -181,7 +207,7 @@ bridge_kani_witness!(ExtStandard<NaiveWeek>);
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::civil_naive_week::last_day_exists_exactly_when_the_date_can_step_forward_holds",
+        "amenable_kani::chrono::civil_naive_week::LastDayExistsExactlyWhenTheDateCanStepForward",
         "kani",
         "ensures",
         || "date.week(start).checked_last_day().is_some() == fits",
@@ -200,7 +226,7 @@ amenable_derive::harness! {
             if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) {
                 let week = date.week(start);
                 if let (Some(first), Some(_)) = (week.checked_first_day(), week.checked_last_day()) {
-                    assert!(first_day_starts_on_the_chosen_weekday_holds(first, start));
+                    assert!(FirstDayStartsOnTheChosenWeekday::ensures((first, start)));
                 }
             }
         }
@@ -220,7 +246,7 @@ amenable_derive::harness! {
             if let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) {
                 let week = date.week(start);
                 if let (Some(first), Some(last)) = (week.checked_first_day(), week.checked_last_day()) {
-                    assert!(first_and_last_day_bracket_the_date_holds(first, date, last));
+                    assert!(FirstAndLastDayBracketTheDate::ensures((first, date, last)));
                 }
             }
         }
@@ -241,10 +267,10 @@ amenable_derive::harness! {
                 let fits = date
                     .checked_sub_days(Days::new(u64::from(days_back_to(date, start))))
                     .is_some();
-                assert!(first_day_exists_exactly_when_the_date_can_step_back_holds(
+                assert!(FirstDayExistsExactlyWhenTheDateCanStepBack::ensures((
                     date.week(start).checked_first_day().is_some(),
                     fits
-                ));
+                )));
             }
         }
     }
@@ -264,10 +290,10 @@ amenable_derive::harness! {
                 let fits = date
                     .checked_add_days(Days::new(u64::from(6 - days_back_to(date, start))))
                     .is_some();
-                assert!(last_day_exists_exactly_when_the_date_can_step_forward_holds(
+                assert!(LastDayExistsExactlyWhenTheDateCanStepForward::ensures((
                     date.week(start).checked_last_day().is_some(),
                     fits
-                ));
+                )));
             }
         }
     }

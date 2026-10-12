@@ -40,6 +40,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::naive_week::naive_week_span_holds",
+        "creusot",
+        "ensures",
+        || NAIVE_WEEK_SPAN_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, NAIVE_WEEK_SPAN_MODEL_INPUTS_VALID_SRC, {
         /// `verify_naive_week_span_model`'s own precondition: `back` is one of

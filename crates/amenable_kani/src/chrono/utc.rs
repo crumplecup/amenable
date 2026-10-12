@@ -70,19 +70,31 @@ mod kani_only {
 
     use chrono::{FixedOffset, Offset, Utc};
 
-    /// `Utc`'s own fixed-offset bound, named so the harness's second `assert!`
-    /// points at a real, registered contract fragment instead of a raw equation.
-    pub(super) fn utc_fixed_offset_is_zero_holds() -> bool {
-        Utc.fix() == FixedOffset::east_opt(0).unwrap()
+    /// Named contract type for `Utc`'s own fixed-offset bound, so the
+    /// harness's second `assert!` points at a real, registered `Ensures`
+    /// impl (a fully-qualified `<Type as Ensures<V>>::ensures(..)` call)
+    /// instead of a bare function call cordial's own antipattern check
+    /// can't recognize as pointing at a contract fragment.
+    pub(super) struct UtcFixedOffsetIsZero;
+
+    crate::rust_std::kani_local_claim!(UtcFixedOffsetIsZero);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for UtcFixedOffsetIsZero {
+        type Input = ();
+        type Bound = bool;
+
+        fn ensures((): ()) -> bool {
+            Utc.fix() == FixedOffset::east_opt(0).unwrap()
+        }
     }
 }
 
 #[cfg(kani)]
-use kani_only::utc_fixed_offset_is_zero_holds;
+use kani_only::UtcFixedOffsetIsZero;
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::utc::utc_fixed_offset_is_zero_holds",
+        "amenable_kani::chrono::utc::UtcFixedOffsetIsZero",
         "kani",
         "ensures",
         || "Utc.fix() == FixedOffset::east_opt(0).unwrap()",
@@ -101,11 +113,11 @@ amenable_derive::harness! {
             let month: u32 = kani::any();
             let day: u32 = kani::any();
             assert!(
-                ExtStandard::<Utc>::ensures((year, month, day)),
+                ExtStandard::<chrono::Utc>::ensures((year, month, day)),
                 "Utc's local offset must always be Single(Utc), for every valid date"
             );
             assert!(
-                utc_fixed_offset_is_zero_holds(),
+                UtcFixedOffsetIsZero::ensures(()),
                 "Utc's fixed offset must always be zero"
             );
         }

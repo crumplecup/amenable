@@ -75,7 +75,7 @@ amenable_derive::harness! {
             let month: u32 = kani::any();
             let day: u32 = kani::any();
             assert!(
-                ExtStandard::<IsoWeek>::ensures((year, month, day)),
+                ExtStandard::<chrono::IsoWeek>::ensures((year, month, day)),
                 "a date's ISO week, with its weekday, must rebuild that date"
             );
         }

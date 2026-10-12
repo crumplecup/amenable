@@ -120,7 +120,48 @@ macro_rules! kani_ensures {
     };
 }
 
+/// A trivial, self-rooted `Evidence` + `Witness<KaniVerifier>` pair for a
+/// zero-field marker type that exists only to carry an `Ensures`/
+/// `Requires` impl (via [`kani_ensures`]/[`kani_requires`]) -- both of
+/// which bound on `Witness<V>` as a supertrait, so a bare `Ensures`/
+/// `Requires` impl alone does not compile. Matches
+/// `amenable_verus::gallery::ensures_contract_bound::EnsuresGreen`'s own
+/// minimal shape: `Basis = Self`, `is_root() = true`, `ProofArtifact =
+/// ()` (there is no richer audit content for a purely internal helper
+/// claim like this).
+#[cfg(kani)]
+macro_rules! kani_local_claim {
+    ($ty:ty) => {
+        impl amenable_core::Evidence for $ty {
+            type Basis = Self;
+            type Audit = ();
+
+            fn basis() -> Self::Basis {
+                Self
+            }
+
+            fn audit(&self) -> Self::Audit {}
+
+            fn is_root() -> bool {
+                true
+            }
+        }
+
+        impl amenable_core::Witness<crate::KaniVerifier> for $ty {
+            type SupportingEvidence = Self;
+            type ProofArtifact = ();
+
+            fn proof() -> Self::ProofArtifact {}
+        }
+    };
+}
+
 pub(crate) use {bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires};
+// Every real call site lives inside a `#[cfg(kani)]`-gated module (unlike
+// `kani_ensures`/`kani_requires`, which also have ungated uses elsewhere) --
+// gated here too, so plain builds don't see it as dead.
+#[cfg(kani)]
+pub(crate) use kani_local_claim;
 
 /// Proof artifact for a carrier with a real, machine-checked Kani harness:
 /// names the harness, carries its verbatim source as `claim`, and still

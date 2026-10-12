@@ -34,7 +34,10 @@ amenable_derive::verus_ensures_predicate!(
         stringify!(chrono::NaiveDate),
         ">"
     ),
-    "naive_date_from_ymd_model_round_trip_holds"
+    [
+        "naive_date_from_ymd_model_round_trip_holds",
+        "gregorian_days_in_month_exec_result_matches"
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -66,7 +69,10 @@ amenable_derive::verus_ensures_predicate!(
         stringify!(chrono::NaiveDateTime),
         ">"
     ),
-    "naive_date_time_new_model_round_trip_holds"
+    [
+        "naive_date_time_new_model_round_trip_holds",
+        "naive_date_time_days_in_month_exec_result_matches"
+    ]
 );
 
 impl_verus_witness_checked_ext!(
@@ -85,6 +91,16 @@ amenable_derive::verus_ensures_predicate!(
     "naive_week_span_holds"
 );
 
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<chrono::NaiveWeek>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(chrono::NaiveWeek),
+        ">"
+    ),
+    ["naive_week_span_model_inputs_valid"]
+);
+
 impl_verus_witness_checked_ext!(
     chrono::IsoWeek,
     "verify_iso_week_round_trips_model",
@@ -98,5 +114,19 @@ amenable_derive::verus_ensures_predicate!(
         stringify!(chrono::IsoWeek),
         ">"
     ),
-    "iso_week_round_trip_holds"
+    [
+        "iso_week_round_trip_holds",
+        "iso_week_weekday_exec_result_matches",
+        "verify_iso_week_round_trips_model_returns_given_iso_year"
+    ]
+);
+
+amenable_derive::verus_requires_predicate!(
+    ExtStandard<chrono::IsoWeek>,
+    concat!(
+        "amenable_ext::ExtStandard<",
+        stringify!(chrono::IsoWeek),
+        ">"
+    ),
+    ["iso_week_round_trip_model_inputs_valid_exec"]
 );

@@ -91,12 +91,22 @@ pub open spec fn naive_date_time_new_model_round_trip_holds(
     }
 }
 
+/// The exec body's result matches the specification, named so the
+/// exec-to-spec link is a citable fact.
+pub open spec fn naive_date_time_days_in_month_exec_result_matches(
+    year: i32,
+    month: u32,
+    result: u32,
+) -> bool {
+    result as int == naive_date_time_days_in_month(year as int, month as int)
+}
+
 /// Executable days-in-month, proven equal to the specification --
 /// restated verbatim from `naive_date.rs`'s own
 /// `gregorian_days_in_month_exec`.
 fn naive_date_time_days_in_month_exec(year: i32, month: u32) -> (result: u32)
     ensures
-        result as int == naive_date_time_days_in_month(year as int, month as int),
+        naive_date_time_days_in_month_exec_result_matches(year, month, result),
 {
     let leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
     if month == 2 {

@@ -78,6 +78,8 @@ pub use cell::GetterRecoversTheStoredReference;
 pub use fmt::RenderedKindMatchesTheBuildingOperation;
 pub use iter::{IteratorMatchesReferenceStepByStep, IteratorYieldsNoneWhenExhausted};
 pub use macros::CheckedProof;
+#[cfg(kani)]
+pub(crate) use macros::kani_local_claim;
 pub(crate) use macros::{
     bridge_kani_witness, impl_kani_witness_trusted, kani_ensures, kani_requires,
 };

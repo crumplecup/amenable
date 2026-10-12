@@ -137,7 +137,10 @@ pub(super) fn chrono_tz_to_named_time_zone_descriptor(
 /// (chrono's fold case) must match either candidate, and `None` (a real
 /// gap — the local time never occurred under this zone's rules) is never
 /// consistent with any offset.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(local, tz)))]
+#[cfg_attr(
+    not(kani),
+    tracing::instrument(level = "debug", skip(local, tz, offset))
+)]
 pub(super) fn offset_is_consistent_with_named_zone(
     local: chrono::NaiveDateTime,
     tz: chrono_tz::Tz,

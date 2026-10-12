@@ -87,6 +87,13 @@ pub open spec fn iso_week_round_trip_model_inputs_valid(day_count: int, m1: int,
         && m1 >= -100_000_000 && m1 <= 100_000_000
 }
 
+/// The exec body's `i64` result matches the `int` specification, named
+/// so `ensures` points at a real spec fn instead of a raw cast
+/// equation.
+pub open spec fn iso_week_weekday_exec_result_matches(day_count: i64, result: i64) -> bool {
+    result as int == iso_week_weekday_of(day_count as int)
+}
+
 /// Euclidean weekday index, proven equal to the specification -- Rust's
 /// native `%` on `i64` truncates toward zero (a negative remainder for
 /// a negative `day_count`), unlike Verus's own `int % 7`, which is
@@ -94,10 +101,31 @@ pub open spec fn iso_week_round_trip_model_inputs_valid(day_count: int, m1: int,
 /// difference the same way `div_euclid`/`rem_euclid` would.
 fn iso_week_weekday_exec(day_count: i64) -> (result: i64)
     ensures
-        result as int == iso_week_weekday_of(day_count as int),
+        iso_week_weekday_exec_result_matches(day_count, result),
 {
     let r = day_count % 7;
     if r < 0 { r + 7 } else { r }
+}
+
+/// `verify_iso_week_round_trips_model`'s own `requires`, named with
+/// `i64`-typed parameters (casting internally) so the attribute's own
+/// call site is a bare function call, not an inline cast expression.
+pub open spec fn iso_week_round_trip_model_inputs_valid_exec(
+    day_count: i64,
+    m1: i64,
+    weeks_in_year: i64,
+) -> bool {
+    iso_week_round_trip_model_inputs_valid(day_count as int, m1 as int, weeks_in_year as int)
+}
+
+/// `verify_iso_week_round_trips_model`'s own second `ensures`: the
+/// returned ISO year is the one given. Named so the attribute's call
+/// site is a function call, not a raw tuple-field equation.
+pub open spec fn verify_iso_week_round_trips_model_returns_given_iso_year(
+    iso_year: i64,
+    result: (i64, i64, i64),
+) -> bool {
+    result.0 == iso_year
 }
 
 /// A model of `(date.iso_week().year(), date.iso_week().week(),
@@ -115,7 +143,7 @@ pub fn verify_iso_week_round_trips_model(
     iso_year: i64,
 ) -> (result: (i64, i64, i64))
     requires
-        iso_week_round_trip_model_inputs_valid(day_count as int, m1 as int, _weeks_in_year as int),
+        iso_week_round_trip_model_inputs_valid_exec(day_count, m1, _weeks_in_year),
     ensures
         iso_week_round_trip_holds(
             day_count as int,
@@ -124,7 +152,7 @@ pub fn verify_iso_week_round_trips_model(
             result.1 as int,
             result.2 as int,
         ),
-        result.0 == iso_year,
+        verify_iso_week_round_trips_model_returns_given_iso_year(iso_year, result),
 {
     let weekday = iso_week_weekday_exec(day_count);
     let monday = day_count - weekday;

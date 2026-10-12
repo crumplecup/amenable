@@ -116,10 +116,31 @@ amenable_derive::harness! {
 }
 
 amenable_derive::harness! {
+    creusot, NAIVE_DATE_DAYS_IN_MONTH_MODEL_MATCHES_SPEC_SRC, {
+        /// The exec body's result matches the specification, named so
+        /// the exec-to-spec link is a citable fact.
+        #[logic(open)]
+        pub fn days_in_month_model_matches_spec(year: i32, month: u32, result: u32) -> bool {
+            pearlite! { result == days_in_month_spec(year, month) }
+        }
+    }
+}
+
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::civil_naive_date::days_in_month_model_matches_spec",
+        "creusot",
+        "ensures",
+        || NAIVE_DATE_DAYS_IN_MONTH_MODEL_MATCHES_SPEC_SRC,
+    )
+}
+
+amenable_derive::harness! {
     creusot, NAIVE_DATE_DAYS_IN_MONTH_MODEL_SRC, {
         /// Executable days-in-month, proven equal to the specification.
         #[requires(true)]
-        #[ensures(result == days_in_month_spec(year, month))]
+        #[ensures(days_in_month_model_matches_spec(year, month, result))]
         fn days_in_month_model(year: i32, month: u32) -> u32 {
             let leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
             if month == 2u32 {

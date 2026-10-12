@@ -38,6 +38,9 @@
 //! `stub_verified` this claim, the contract bought nothing here and cost real time, so
 //! this file uses plain proofs throughout.
 
+#[cfg(kani)]
+use amenable_core::{Ensures, Requires};
+
 /// Every item here exists only for the Kani harnesses below, so the whole module is
 /// gated once, rather than scattering `#[cfg(kani)]` across each item individually
 /// (cordial's own `CFG-SCATTER-001`).
@@ -63,28 +66,56 @@ mod kani_only {
     pub(super) const PARTITION_COUNT: i32 = 100;
 
     /// Whether `year` falls inside partition `n`'s half-open range, the same formula
-    /// the 100 partition harnesses' `kani::assume` bounds use.
-    pub(super) fn in_partition(year: i32, n: i32) -> bool {
-        year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE
+    /// the 100 partition harnesses' `kani::assume` bounds use. A named contract
+    /// type, not a bare function, so each call site is a real `Ensures::
+    /// ensures(..)` call cordial's own antipattern check recognizes.
+    pub(super) struct InPartition;
+
+    crate::rust_std::kani_local_claim!(InPartition);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for InPartition {
+        type Input = (i32, i32);
+        type Bound = bool;
+
+        fn ensures((year, n): Self::Input) -> bool {
+            year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE
+        }
     }
 
-    /// `partitions_are_exhaustive_and_disjoint`'s own `kani::assume` bound, named so
-    /// it points at a real, registered contract fragment instead of a raw equation.
-    pub(super) fn year_in_supported_range_holds(year: i32) -> bool {
-        year >= MIN_YEAR && year <= MAX_YEAR
+    /// `partitions_are_exhaustive_and_disjoint`'s own `kani::assume` bound, named
+    /// for the same reason.
+    pub(super) struct YearInSupportedRange;
+
+    crate::rust_std::kani_local_claim!(YearInSupportedRange);
+
+    impl amenable_core::Requires<crate::KaniVerifier> for YearInSupportedRange {
+        type Input = i32;
+        type Bound = bool;
+
+        fn requires(year: i32) -> bool {
+            year >= MIN_YEAR && year <= MAX_YEAR
+        }
     }
 
     /// The computed partition index's own bound, named for the same reason.
-    pub(super) fn computed_partition_index_in_range_holds(computed: i32) -> bool {
-        computed >= 0 && computed < PARTITION_COUNT
+    pub(super) struct ComputedPartitionIndexInRange;
+
+    crate::rust_std::kani_local_claim!(ComputedPartitionIndexInRange);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for ComputedPartitionIndexInRange {
+        type Input = i32;
+        type Bound = bool;
+
+        fn ensures(computed: i32) -> bool {
+            computed >= 0 && computed < PARTITION_COUNT
+        }
     }
 }
 
 #[cfg(kani)]
 use kani_only::{
-    Datelike, MAX_YEAR, MIN_YEAR, NaiveDate, PARTITION_COUNT, PARTITION_SIZE, Weekday,
-    computed_partition_index_in_range_holds, in_partition, weekday_of,
-    year_in_supported_range_holds,
+    ComputedPartitionIndexInRange, Datelike, InPartition, MAX_YEAR, MIN_YEAR, NaiveDate,
+    PARTITION_COUNT, PARTITION_SIZE, Weekday, YearInSupportedRange, weekday_of,
 };
 
 amenable_derive::gallery_harness! {
@@ -131,7 +162,7 @@ seq_macro::seq!(N in 0..100 {
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::week_span_partitions::in_partition",
+        "amenable_kani::chrono::week_span_partitions::InPartition",
         "kani",
         "ensures",
         || "year >= MIN_YEAR + n * PARTITION_SIZE && year < MIN_YEAR + (n + 1) * PARTITION_SIZE",
@@ -140,7 +171,7 @@ seq_macro::seq!(N in 0..100 {
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::week_span_partitions::year_in_supported_range_holds",
+        "amenable_kani::chrono::week_span_partitions::YearInSupportedRange",
         "kani",
         "requires",
         || "year >= MIN_YEAR && year <= MAX_YEAR",
@@ -149,7 +180,7 @@ seq_macro::seq!(N in 0..100 {
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
-        "amenable_kani::chrono::week_span_partitions::computed_partition_index_in_range_holds",
+        "amenable_kani::chrono::week_span_partitions::ComputedPartitionIndexInRange",
         "kani",
         "ensures",
         || "computed >= 0 && computed < PARTITION_COUNT",
@@ -166,20 +197,29 @@ amenable_derive::harness! {
         #[kani::proof]
         fn partitions_are_exhaustive_and_disjoint() {
             let year: i32 = kani::any();
-            kani::assume(year_in_supported_range_holds(year));
+            kani::assume(YearInSupportedRange::requires(year));
 
             let computed = (year - MIN_YEAR).div_euclid(PARTITION_SIZE);
             assert!(
-                computed_partition_index_in_range_holds(computed),
+                ComputedPartitionIndexInRange::ensures(computed),
                 "computed index out of range"
             );
-            assert!(in_partition(year, computed), "computed index does not actually contain year");
+            assert!(
+                InPartition::ensures((year, computed)),
+                "computed index does not actually contain year"
+            );
 
             if computed > 0 {
-                assert!(!in_partition(year, computed - 1), "previous partition also contains year");
+                assert!(
+                    !InPartition::ensures((year, computed - 1)),
+                    "previous partition also contains year"
+                );
             }
             if computed < PARTITION_COUNT - 1 {
-                assert!(!in_partition(year, computed + 1), "next partition also contains year");
+                assert!(
+                    !InPartition::ensures((year, computed + 1)),
+                    "next partition also contains year"
+                );
             }
         }
     }

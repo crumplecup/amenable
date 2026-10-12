@@ -187,7 +187,8 @@ fn realize_offset_date_time_rejects_the_unknown_local_offset_case() -> miette::R
 fn offset_date_time_round_trips_through_real_chrono_types() -> miette::Result<()> {
     amenable_core::init_tracing();
     let backend = ChronoTimeBackend;
-    let offset = chrono::FixedOffset::east_opt(-4 * 3600).unwrap();
+    let offset = chrono::FixedOffset::east_opt(-4 * 3600)
+        .ok_or_else(|| miette::miette!("-4 hours is a valid fixed offset"))?;
     let naive = chrono::NaiveDate::from_ymd_opt(2023, 11, 5)
         .and_then(|d| d.and_hms_opt(1, 30, 0))
         .ok_or_else(|| miette::miette!("valid naive date-time"))?;

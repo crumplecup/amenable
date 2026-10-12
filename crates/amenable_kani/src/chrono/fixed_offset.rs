@@ -83,7 +83,7 @@ amenable_derive::harness! {
             let secs: i32 = kani::any();
             let east: bool = kani::any();
             assert!(
-                ExtStandard::<FixedOffset>::ensures((secs, east)),
+                ExtStandard::<chrono::FixedOffset>::ensures((secs, east)),
                 "east_opt/west_opt must succeed exactly in range, and local_minus_utc() must report back the value given"
             );
         }

@@ -49,6 +49,16 @@ amenable_derive::harness! {
     }
 }
 
+#[cfg(not(creusot))]
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_creusot::ext_chrono::iso_week::iso_week_round_trip_holds",
+        "creusot",
+        "ensures",
+        || ISO_WEEK_ROUND_TRIP_HOLDS_SRC,
+    )
+}
+
 amenable_derive::harness! {
     creusot, ISO_WEEK_ROUND_TRIP_MODEL_INPUTS_VALID_SRC, {
         /// `verify_iso_week_round_trips_model`'s own precondition: `weekday` is
