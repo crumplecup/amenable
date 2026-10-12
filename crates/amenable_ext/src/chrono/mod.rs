@@ -24,6 +24,8 @@ mod chrono_tz_value_types;
 mod civil;
 mod identity;
 mod instant;
+#[cfg(feature = "chrono-tz")]
+mod offset_discovery;
 mod trusted_witness;
 mod value_types;
 #[cfg(feature = "verus")]
@@ -38,5 +40,10 @@ pub use civil::{
 };
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{ChronoInstant, ChronoOffset, ChronoOffsetDateTime};
+#[cfg(feature = "chrono-tz")]
+pub use offset_discovery::{
+    BoundedStepWalkToken, DiscoveredOffsetEntry, DiscoveredOffsetTable, DiscoveredOffsetTableData,
+    OffsetDiscoveryParams, OffsetDiscoveryRequest,
+};
 #[cfg(feature = "chrono-tz")]
 pub use zone::{ChronoTz, ChronoZoned};

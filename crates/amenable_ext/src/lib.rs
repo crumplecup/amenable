@@ -50,7 +50,11 @@ mod provenance_vocab;
 mod temporal_fraction;
 
 #[cfg(feature = "chrono-tz")]
-pub use chrono::{BoundedStepWalk, ChronoTz, ChronoZoned};
+pub use chrono::{
+    BoundedStepWalk, BoundedStepWalkToken, ChronoTz, ChronoZoned, DiscoveredOffsetEntry,
+    DiscoveredOffsetTable, DiscoveredOffsetTableData, OffsetDiscoveryParams,
+    OffsetDiscoveryRequest,
+};
 #[cfg(feature = "chrono")]
 pub use chrono::{
     ChronoDate, ChronoDateTime, ChronoInstant, ChronoOffset, ChronoOffsetDateTime,
