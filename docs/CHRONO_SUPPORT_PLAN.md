@@ -1,7 +1,11 @@
 # Full chrono support in `amenable_ext`
 
-**Status:** Phase 2 complete and gated (7/67 rows). Phase 3 starting. Last
-revised 2026-10-11.
+**Status:** Phase 2 complete and gated. Phase 3 in progress: chrono
+8/67 rows (11.9%, unchanged -- the 8 instantiation-row registrations are
+still pending), chrono-tz 2/5 rows (40.0% -- `Tz` and `TzOffset` both
+genuinely proven/trusted-by-citation across all three backends;
+`GapInfo` and `chrono_tz::ParseError` still undecided). Last revised
+2026-10-12.
 
 This plan adds full coverage of the chrono 0.4 and chrono-tz 0.10 public
 surfaces to `amenable_ext`. It mirrors the jiff effort: each type is registered
@@ -315,9 +319,27 @@ pass on the chrono backend for every civil carrier.
      derived from `DateTime<T>`/`Date<T>`'s own rustdoc bound plus the eight
      instantiation rows above (cordial request 1).
 6. **chrono-tz rows:** `Tz` (zone bridge), `TzOffset`, `GapInfo`, and
-   `chrono_tz::ParseError`. Decide each row's claim kind from its role before writing
-   its witness. This is not settled yet, so read each type's source before Phase 3
-   starts.
+   `chrono_tz::ParseError`.
+   - **`Tz`:** done. Genuinely proven on all three backends -- Kani (10-bin
+     `seq_macro` sweep over all 597 real `TZ_VARIANTS`), Creusot (two-pillar
+     `extern_spec!`, `name()`/`from_str()` round trip), Verus (minimal
+     4-variant structural model).
+   - **`TzOffset`:** done. Genuinely proven on Kani: for all 453 rows of the
+     real, discovered `amenable_ext::DISCOVERED_OFFSET_TABLE` (generated via
+     the real `OffsetDiscoveryRequest`/`DiscoveredOffsetTable` `Exchange`,
+     `delta = 1 hour` over `1850-01-01..2100-01-01`), `fix() ==
+     base_utc_offset() + dst_offset()` for the real `TzOffset` chrono-tz's own
+     `offset_from_utc_datetime` produces at that witness. 29 bins of 16
+     (`seq_macro`), each confirmed safe with real margin -- `TzOffset`'s
+     per-item cost (real `binary_search` over a zone's timespan table)
+     doesn't collapse as fully as `Tz`'s own hashing-dominated cost once
+     concrete, so the bin size was re-measured from scratch, not assumed from
+     `Tz`'s own resolution. Creusot and Verus stay trusted-by-citation:
+     neither toolchain can execute chrono-tz's real lookup the way CBMC can
+     (Creusot has no foreign-execution capability; Verus never resolves
+     `Cargo.toml`), an honest asymmetric classification, not a shortcut.
+   - **`GapInfo`, `chrono_tz::ParseError`:** not yet decided. Read each
+     type's source before deciding its claim kind.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset
    bridge and the zone bridge, derived from the bounds. The current version
    treats `Local` as a named zone and must not be used.
