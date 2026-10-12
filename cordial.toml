@@ -115,6 +115,15 @@ generated_files = [
 [proof_patterns]
 enabled = false
 
+# Off by default already (its own default), but stated explicitly here
+# rather than left implicit: `cargo hack check --feature-powerset` is the
+# slow part of a full `cordial-gate` run (every feature combination of
+# every crate), so this stays off for the per-commit gate and is run by
+# hand (`just check-features`, or flip this to `true` for one `cordial
+# quality` pass) at real phase boundaries instead -- not every commit.
+[feature_warnings]
+enabled = false
+
 # The creusot-diagnostics etiquette shells out to `cargo creusot prove`,
 # which needs the full Creusot toolchain (nightly + why3 + z3 +
 # cargo-creusot) -- too heavy and fragile to stand up on a CI runner just
