@@ -343,10 +343,22 @@ pass on the chrono backend for every civil carrier.
      by deliberately breaking one axiom and watching the proof genuinely
      fail at exactly that goal, then revert. An earlier version of this
      doc wrongly concluded Creusot couldn't do this without attempting
-     it; the correction was to actually try. Verus stays trusted-by-
-     citation: it never resolves `Cargo.toml` at all, so it has no way
-     to even reach chrono-tz's real `TzOffset` type, a structural
-     boundary `extern_spec!`-based reasoning doesn't share.
+     it; the correction was to actually try. **Verus is also genuinely
+     proven**, via a real accommodation model (the same move that
+     resolved `Tz` itself on Verus, applied here after a second,
+     separate correction): confirmed directly that Verus cannot reach
+     `chrono_tz::TzOffset` at all (`E0433`, unresolved crate -- a real,
+     immediate wall, unlike Creusot's), but that only rules out
+     referencing the *real* type, not modeling its structure. Four
+     abstract variants stand in for four real, discovered `(base, dst)`
+     pairs (`Utc`, `Est`, `Edt`, `Europe/London`'s WWII double summer
+     time), each with its `base`/`dst` written independently of its
+     `fix` value (a separate literal, not their mechanical sum) --
+     mirroring `Tz`'s own "name assignment vs. lookup" duality, so the
+     proof is a real consistency check, not a tautology by
+     construction. Confirmed non-vacuous the same way: a deliberately
+     broken literal fails the exact right postcondition, then reverts
+     clean.
    - **`GapInfo`, `chrono_tz::ParseError`:** not yet decided. Read each
      type's source before deciding its claim kind.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset

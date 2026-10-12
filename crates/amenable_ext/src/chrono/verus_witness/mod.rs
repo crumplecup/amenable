@@ -15,5 +15,3 @@ mod checked_bounded_step_walk;
 mod checked_chrono_tz;
 mod checked_civil;
 mod trusted;
-#[cfg(feature = "chrono-tz")]
-mod trusted_chrono_tz;

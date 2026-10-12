@@ -9,6 +9,7 @@ mod naive_date_time;
 mod naive_time;
 mod naive_week;
 mod tz;
+mod tz_offset;
 
 pub use bounded_step_walk::verify_bounded_step_walk;
 pub use fixed_offset::verify_fixed_offset_east_and_west_round_trips_model;
@@ -18,3 +19,4 @@ pub use naive_date_time::verify_naive_date_time_new_round_trips_model;
 pub use naive_time::verify_naive_time_from_hms_nano_round_trips_model;
 pub use naive_week::verify_naive_week_span_model;
 pub use tz::verify_tz_name_round_trips_model;
+pub use tz_offset::verify_tz_offset_consistency_model;
