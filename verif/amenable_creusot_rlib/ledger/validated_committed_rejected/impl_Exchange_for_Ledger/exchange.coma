@@ -2,8 +2,8 @@
 
 (* <ledger::ledger_validate::mirror::Ledger as amenable_core::Exchange<ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Pending, amenable_gaap::PendingToken>, ledger::transfer_and_types::mirror::Transfer<amenable_gaap::Validated, amenable_gaap::ValidatedToken>, witness::CreusotVerifier>> *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
-let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 22 8 22 20
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
 let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
 let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 253 24 253 48
@@ -60,8 +60,8 @@ predicate inv__private (x: t_Transfer__private)
 predicate inv_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
 
 axiom inv_axiom [@rewrite]:
-  forall x: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken x]. inv_Transfer_Pending_PendingToken x
-    = (inv_PendingToken x.token /\ inv__private x.t_Transfer__private)
+  forall _1: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken _1]. inv_Transfer_Pending_PendingToken _1
+    = (inv_PendingToken _1.token /\ inv__private _1.t_Transfer__private)
 
 predicate inv_ValidatedToken (_1: t_ValidatedToken)
 
@@ -70,14 +70,14 @@ predicate inv__private'0 (x: t_Transfer__private'0)
 predicate inv_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
 
 axiom inv_axiom'0 [@rewrite]:
-  forall x: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken x]. inv_Transfer_Validated_ValidatedToken x
-    = (inv_ValidatedToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
+  forall _1: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken _1]. inv_Transfer_Validated_ValidatedToken _1
+    = (inv_ValidatedToken _1.token'0 /\ inv__private'0 _1.t_Transfer__private'0)
 
 predicate inv_Result_Transfer_Validated_ValidatedToken_TransferError (_1: t_Result_Transfer_Validated_ValidatedToken_TransferError)
 
 axiom inv_axiom'1 [@rewrite]:
-  forall x: t_Result_Transfer_Validated_ValidatedToken_TransferError [inv_Result_Transfer_Validated_ValidatedToken_TransferError x]. inv_Result_Transfer_Validated_ValidatedToken_TransferError x
-    = match x with
+  forall _1: t_Result_Transfer_Validated_ValidatedToken_TransferError [inv_Result_Transfer_Validated_ValidatedToken_TransferError _1]. inv_Result_Transfer_Validated_ValidatedToken_TransferError _1
+    = match _1 with
       | Ok f0'0 -> inv_Transfer_Validated_ValidatedToken f0'0
       | Err f0'0 -> true
       end

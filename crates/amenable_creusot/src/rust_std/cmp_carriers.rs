@@ -2,8 +2,6 @@
 use creusot_std::macros::{check, ensures, extern_spec, logic, requires, trusted};
 #[cfg(creusot)]
 use std::cmp::{Ordering, Reverse};
-#[cfg(creusot)]
-use std::num::Wrapping;
 // `Ordering::reverse` is uncontracted (creusot-std has no coverage for
 // `core::cmp::Ordering` at all) — and unlike `String::len`/`Duration::
 // as_secs`, matching the `(o, result)` pair structurally in `#[ensures]`
@@ -77,27 +75,17 @@ amenable_derive::harness! {
     }
 }
 
-// Unlike `NonZero<T>`, `Wrapping<T>`'s arithmetic impls aren't one
-// generic `impl<T: Sealed> Add for Wrapping<T>` — std generates a
-// separate, concrete `impl Add for Wrapping<i32>` (and one per other
-// width) via a `macro_rules!` (`library/core/src/num/wrapping.rs`,
-// confirmed by reading the real source, not assumed), so an
-// `extern_spec!` targeting this one concrete instantiation matches the
-// real signature exactly, the same way `Ordering::reverse`'s did.
-// `.0` is a public tuple-field projection, not a method call, so it's
-// fine inside `#[ensures]` without a trusted wrapper; the plain
-// (non-`@`) `+` between the two `i32` fields relies on Pearlite's native
-// machine-integer semantics matching real wraparound, the same
-// convention `creusot-std`'s own `spec_op_common!` macro uses for
-// `i32::wrapping_add`'s postcondition.
-#[cfg(creusot)]
-extern_spec! {
-    impl std::ops::Add for Wrapping<i32> {
-        #[check(ghost)]
-        #[ensures(result.0 == self.0 + rhs.0)]
-        fn add(self, rhs: Wrapping<i32>) -> Wrapping<i32>;
-    }
-}
+// No local `extern_spec! { impl Add for Wrapping<i32> }` any more:
+// `creusot-std` 0.14.0 added its own native coverage (`spec_wrapping!`
+// in `creusot_std::std::num`, instantiated for every integer width
+// including `i32`) with the identical postcondition
+// (`result.0 == self.0 + rhs.0`) this crate used to hand-roll here —
+// confirmed by real `cargo creusot` output ("duplicate extern
+// specification for <Wrapping<i32> as Add>::add") after bumping to
+// 0.14.0, and by reading `creusot-std` 0.14.0's own source directly.
+// `rust_std::num::wrapping_saturating`'s real harness (`verify_wrapping_
+// i32_add_wraps`) still exercises `Wrapping<i32>`'s `+` operator; it now
+// rests on `creusot-std`'s own axiom instead of this crate's.
 
 // No local `extern_spec! { impl Ord for Reverse<T> }` any more: it worked
 // under creusot-std 0.11 (a generic `T: Ord + OrdLogic` axiom on `cmp`),

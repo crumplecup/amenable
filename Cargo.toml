@@ -13,6 +13,23 @@ members = [
 ]
 resolver = "2"
 
+# Scopes `cargo creusot`'s own default package selection to just the one
+# crate with real creusot content, instead of its built-in fallback (every
+# workspace member -- confirmed by reading cargo-creusot's own source,
+# `creusot_default_members` in main.rs). Without this, `cargo creusot --
+# -p amenable_creusot` still built every sibling crate too (amenable_kani,
+# amenable_verus, ...) on every single invocation: that extra `-p` just got
+# appended alongside cargo-creusot's own full-workspace default, never
+# replacing it. Harmless on a warm cache, but a cold rebuild under a new
+# toolchain compiled `amenable_verus` (pulls in Verus's `vstd`) to 24GB+
+# RSS for no reason -- `amenable_verus` is never a real dependency of
+# `amenable_creusot` (confirmed via `amenable_creusot/Cargo.toml`: its only
+# workspace deps are amenable_core/derive/ext/gaap/std/time) or of anything
+# else in this workspace, so building it under the creusot toolchain was
+# always pure waste.
+[workspace.metadata.creusot]
+default-members = ["amenable_creusot"]
+
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
@@ -37,7 +54,7 @@ amenable_verus = { path = "crates/amenable_verus", version = "0.1.0" }
 chrono = "0.4"
 chrono-tz = "0.10"
 clap = { version = "4", features = ["derive"] }
-creusot-std = { version = "0.13.0", features = ["sc-drf"] }
+creusot-std = { version = "0.14.0", features = ["sc-drf"] }
 derive-getters = "0.5"
 derive-new = "0.7"
 derive_builder = "0.20"

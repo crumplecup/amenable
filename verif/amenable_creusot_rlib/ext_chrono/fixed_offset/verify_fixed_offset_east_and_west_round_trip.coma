@@ -1,6 +1,6 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 61 8 61 97 *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
 let%span sfixed_offset = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 63 16 63 51
 let%span sfixed_offset'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 65 16 65 51
 let%span sfixed_offset'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 68 35 68 59
@@ -9,11 +9,11 @@ let%span sfixed_offset'3 = "/home/erik/repos/amenable/crates/amenable_creusot/sr
 let%span sfixed_offset'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset.rs" 31 16 34 17
 let%span sfixed = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 62 4 62 59
 let%span sfixed'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 97 4 97 59
+let%span sfixed'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 107 34 107 38
 let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 16 18 19 9
 let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 23 18 26 9
-let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 31 28 31 32
-let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 30 18 30 68
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 30 18 30 68
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -26,8 +26,8 @@ predicate inv_FixedOffset (_1: t_FixedOffset)
 
 predicate inv_Option_FixedOffset (_1: t_Option_FixedOffset)
 
-axiom inv_axiom [@rewrite]: forall x: t_Option_FixedOffset [inv_Option_FixedOffset x]. inv_Option_FixedOffset x
-    = match x with
+axiom inv_axiom [@rewrite]: forall _1: t_Option_FixedOffset [inv_Option_FixedOffset _1]. inv_Option_FixedOffset _1
+    = match _1 with
       | None -> true
       | Some f0 -> inv_FixedOffset f0
       end
@@ -72,11 +72,11 @@ predicate inv_ref_FixedOffset [@inline:trivial] (_1: t_FixedOffset) = invariant_
 
 meta "rewrite_def" predicate inv_ref_FixedOffset
 
-let local_minus_utc (self_: t_FixedOffset) (return (x: Int32.t)) =
-{[@stop_split] [@expl:local_minus_utc 'self_' type invariant] [%#slogic'1] inv_ref_FixedOffset self_}
+let local_minus_utc (self: t_FixedOffset) (return (x: Int32.t)) =
+{[@stop_split] [@expl:local_minus_utc 'self' type invariant] [%#sfixed'1] inv_ref_FixedOffset self}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:local_minus_utc ensures] [%#slogic'2] result
-    = fixed_offset_local_minus_utc_value self_}
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:local_minus_utc ensures] [%#slogic'1] result
+    = fixed_offset_local_minus_utc_value self}
     (! return {result}) ]
 
 type t_Result_i32_unit = Ok Int32.t | Err ()

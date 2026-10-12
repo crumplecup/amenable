@@ -2,11 +2,10 @@
 
 (* ledger::ledger_validate::mirror::Ledger *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
-let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 122 25 122 35
-let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 121 22 121 26
-let%span stransfer_and_types'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
+let%span stransfer_and_types'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 121 22 121 26
+let%span stransfer_and_types'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 110 0 110 93
 let%span sreject = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 45
 let%span sreject'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/reject.rs" 18 30 18 53
@@ -42,8 +41,8 @@ predicate inv__private (x: t_Transfer__private)
 predicate inv_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
 
 axiom inv_axiom [@rewrite]:
-  forall x: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken x]. inv_Transfer_Pending_PendingToken x
-    = (inv_PendingToken x.token /\ inv__private x.t_Transfer__private)
+  forall _1: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken _1]. inv_Transfer_Pending_PendingToken _1
+    = (inv_PendingToken _1.token /\ inv__private _1.t_Transfer__private)
 
 predicate invariant_ref_Transfer_Pending_PendingToken [@inline:trivial] (self: t_Transfer_Pending_PendingToken) =
   [%#sinvariant] inv_Transfer_Pending_PendingToken self
@@ -72,8 +71,8 @@ predicate resolve__private (x: t_Transfer__private)
 predicate resolve_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
 
 axiom resolve_axiom [@rewrite]:
-  forall x: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken x]. resolve_Transfer_Pending_PendingToken x
-    = (resolve_PendingToken x.token /\ resolve__private x.t_Transfer__private)
+  forall _1: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken _1]. resolve_Transfer_Pending_PendingToken _1
+    = (resolve_PendingToken _1.token /\ resolve__private _1.t_Transfer__private)
 
 let sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken) (return (x: t_PendingToken)) =
 {[@stop_split] [@expl:sidecar 'self' type invariant] [%#stransfer_and_types] inv_ref_Transfer_Pending_PendingToken self}
@@ -86,8 +85,8 @@ type t_RejectedFromPendingToken
 
 predicate inv_RejectedFromPendingToken (_1: t_RejectedFromPendingToken)
 
-let establish_Rejected_Pending (credential: t_PendingToken) (return (x: t_RejectedFromPendingToken)) =
-{[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'0] inv_PendingToken credential}
+let establish_Rejected_Pending (_credential: t_PendingToken) (return (x: t_RejectedFromPendingToken)) =
+{[@stop_split] [@expl:establish '_credential' type invariant] [%#stokens] inv_PendingToken _credential}
   any
   [ return (result: t_RejectedFromPendingToken) ->
   {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_RejectedFromPendingToken result}
@@ -105,12 +104,12 @@ predicate inv__private'0 (x: t_Transfer__private'0)
 predicate inv_Transfer_Rejected_Pending_RejectedFromPendingToken (_1: t_Transfer_Rejected_Pending_RejectedFromPendingToken)
 
 axiom inv_axiom'0 [@rewrite]:
-  forall x: t_Transfer_Rejected_Pending_RejectedFromPendingToken [inv_Transfer_Rejected_Pending_RejectedFromPendingToken x]. inv_Transfer_Rejected_Pending_RejectedFromPendingToken x
-    = (inv_RejectedFromPendingToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
+  forall _1: t_Transfer_Rejected_Pending_RejectedFromPendingToken [inv_Transfer_Rejected_Pending_RejectedFromPendingToken _1]. inv_Transfer_Rejected_Pending_RejectedFromPendingToken _1
+    = (inv_RejectedFromPendingToken _1.token'0 /\ inv__private'0 _1.t_Transfer__private'0)
 
 let new_Rejected_Pending (payload'1: t_TransferPayload) (token'1: t_RejectedFromPendingToken)
   (return (x: t_Transfer_Rejected_Pending_RejectedFromPendingToken)) =
-{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'2] inv_RejectedFromPendingToken token'1}
+{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'1] inv_RejectedFromPendingToken token'1}
   any
   [ return (result: t_Transfer_Rejected_Pending_RejectedFromPendingToken) ->
   {[@stop_split] [@expl:new_Rejected_Pending ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types] inv_Transfer_Rejected_Pending_RejectedFromPendingToken result)
@@ -128,8 +127,8 @@ type t_Ledger = { balance: Int64.t }
 predicate inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError (_1: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError)
 
 axiom inv_axiom'1 [@rewrite]:
-  forall x: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError [inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError x]. inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError x
-    = match x with
+  forall _1: t_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError [inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError _1]. inv_Result_Transfer_Rejected_Pending_RejectedFromPendingToken_TransferError _1
+    = match _1 with
       | Ok f0'0 -> inv_Transfer_Rejected_Pending_RejectedFromPendingToken f0'0
       | Err f0'0 -> true
       end

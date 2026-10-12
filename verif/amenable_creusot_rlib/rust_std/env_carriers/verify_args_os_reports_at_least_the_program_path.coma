@@ -1,6 +1,7 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 62 8 62 91 *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
+let%span suint_macros = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/num/uint_macros.rs" 51 8 51 27
 let%span senv_carriers = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 63 29 63 30
 let%span senv_carriers'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 63 29 63 38
 let%span senv_carriers'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 60 19 60 51
@@ -14,7 +15,7 @@ use int.Int
 
 type tup2_usize_usize = { f0: UInt64.t; f1: UInt64.t }
 
-constant const_MAX: UInt64.t = (18446744073709551615: UInt64.t)
+constant const_MAX: UInt64.t = [%#suint_macros] (18446744073709551615: UInt64.t)
 
 predicate argv_extra_headroom_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/env_carriers.rs" 10 8 10 58] (extra: UInt64.t) =
   [%#senv_carriers'3] UInt64.t'int extra < UInt64.t'int const_MAX

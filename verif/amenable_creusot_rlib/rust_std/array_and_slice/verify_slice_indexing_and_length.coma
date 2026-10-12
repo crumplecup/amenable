@@ -10,7 +10,7 @@ let%span sarray_and_slice'5 = "/home/erik/repos/amenable/crates/amenable_creusot
 let%span sarray_and_slice'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 44 19 44 23
 let%span sarray_and_slice'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 45 18 45 60
 let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 18 16 21 46
-let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 331 18 331 22
+let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 335 18 335 22
 
 use creusot.slice.Slice64
 use creusot.int.Int32
@@ -18,8 +18,8 @@ use creusot.int.UInt64
 use seq.Seq
 use creusot.prelude.Any
 
-let len_i32 (self_: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
-  [ return (result: UInt64.t) -> {[@stop_split] [@expl:len ensures] [%#sslice] Seq.length (Slice64.view self_)
+let len_i32 (self: Slice64.slice Int32.t) (return (x: UInt64.t)) = any
+  [ return (result: UInt64.t) -> {[@stop_split] [@expl:len ensures] [%#sslice] Seq.length (Slice64.view self)
     = UInt64.t'int result}
     (! return {result}) ]
 

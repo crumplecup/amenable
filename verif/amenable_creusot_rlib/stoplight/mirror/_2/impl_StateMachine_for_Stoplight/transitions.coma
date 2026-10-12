@@ -2,10 +2,10 @@
 
 (* <stoplight::mirror::Stoplight as amenable_core::StateMachine<witness::CreusotVerifier>> *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
-let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 20 20 20 30
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
+let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 20 20 20 30
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 287 13 287 42
-let%span sseq = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/seq.rs" 993 20 993 91
+let%span sseq = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/seq.rs" 994 20 994 20
 
 use creusot.slice.Slice64
 use seq.Seq

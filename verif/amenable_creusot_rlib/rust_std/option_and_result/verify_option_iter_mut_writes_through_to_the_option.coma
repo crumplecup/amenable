@@ -1,21 +1,22 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 171 8 174 52 *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
-let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 124 29 124 33
-let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 120 26 123 17
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 98 20 98 44
 let%span soption_and_result = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 177 29 177 43
 let%span soption_and_result'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 178 39 178 48
 let%span soption_and_result'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 186 40 186 49
 let%span soption_and_result'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 169 19 169 23
 let%span soption_and_result'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 170 18 170 74
 let%span soption_and_result'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/option_and_result.rs" 108 16 110 57
-let%span soption = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 313 18 319 9
-let%span soption'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 795 20 795 53
-let%span soption'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 801 12 802 96
-let%span soption'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 807 14 807 47
-let%span soption'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 811 15 811 32
-let%span soption'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 812 15 812 32
-let%span soption'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/option.rs" 813 14 813 42
+let%span soption = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/option.rs" 1455 4 1455 48
+let%span soption'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 313 18 319 9
+let%span soption'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 796 20 796 53
+let%span soption'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 802 12 803 96
+let%span soption'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 808 14 808 47
+let%span soption'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 812 15 812 32
+let%span soption'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 813 15 813 32
+let%span soption'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/option.rs" 814 14 814 42
+let%span siterator = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/iter/traits/iterator.rs" 78 17 78 21
+let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/iter.rs" 120 26 123 17
 
 use creusot.int.Int32
 use creusot.prelude.MutBorrow
@@ -34,33 +35,35 @@ type t_Option_refmut_i32 = None'0 | Some'0 (MutBorrow.t Int32.t)
 
 function view_IterMut_i32 (self: t_IterMut_i32) : t_Option_refmut_i32
 
-predicate produces_IterMut_i32 (self: t_IterMut_i32) (visited: Seq.seq (MutBorrow.t Int32.t)) (o: t_IterMut_i32) =
-  [%#soption'1] visited = (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) /\ self = o
+predicate produces_IterMut_i32 [@inline:trivial] (self: t_IterMut_i32) (visited: Seq.seq (MutBorrow.t Int32.t)) (o: t_IterMut_i32) =
+  [%#soption'2] visited = (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) /\ self = o
   \/ (exists e: MutBorrow.t Int32.t. view_IterMut_i32 self = Some'0 e
     /\ visited = Seq.singleton e /\ view_IterMut_i32 o = None'0)
+
+meta "rewrite_def" predicate produces_IterMut_i32
 
 function produces_trans_IterMut_i32 (a: t_IterMut_i32) (ab: Seq.seq (MutBorrow.t Int32.t)) (b: t_IterMut_i32) (bc: Seq.seq (MutBorrow.t Int32.t)) (c: t_IterMut_i32) : ()
 
 axiom produces_trans_IterMut_i32_spec:
-  forall a: t_IterMut_i32, ab: Seq.seq (MutBorrow.t Int32.t), b: t_IterMut_i32, bc: Seq.seq (MutBorrow.t Int32.t), c: t_IterMut_i32. ([%#soption'3] produces_IterMut_i32 a ab b)
-    -> ([%#soption'4] produces_IterMut_i32 b bc c) -> ([%#soption'5] produces_IterMut_i32 a (Seq.(++) ab bc) c)
+  forall a: t_IterMut_i32, ab: Seq.seq (MutBorrow.t Int32.t), b: t_IterMut_i32, bc: Seq.seq (MutBorrow.t Int32.t), c: t_IterMut_i32. ([%#soption'4] produces_IterMut_i32 a ab b)
+    -> ([%#soption'5] produces_IterMut_i32 b bc c) -> ([%#soption'6] produces_IterMut_i32 a (Seq.(++) ab bc) c)
 
 function produces_refl_IterMut_i32 (self: t_IterMut_i32) : ()
 
 axiom produces_refl_IterMut_i32_spec:
-  forall self: t_IterMut_i32. [%#soption'2] produces_IterMut_i32 self (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) self
+  forall self: t_IterMut_i32. [%#soption'3] produces_IterMut_i32 self (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) self
 
 predicate resolve_refmut_IterMut_i32 [@inline:trivial] (_1: MutBorrow.t t_IterMut_i32) = _1.final = _1.current
 
 meta "rewrite_def" predicate resolve_refmut_IterMut_i32
 
 predicate completed_IterMut_i32 (self: MutBorrow.t t_IterMut_i32) =
-  [%#soption'0] view_IterMut_i32 self.current = None'0 /\ resolve_refmut_IterMut_i32 self
+  [%#soption'1] view_IterMut_i32 self.current = None'0 /\ resolve_refmut_IterMut_i32 self
 
-let iter_mut_i32 (self_: MutBorrow.t t_Option_i32) (return (x: t_IterMut_i32)) = any
+let iter_mut_i32 (self: MutBorrow.t t_Option_i32) (return (x: t_IterMut_i32)) = any
   [ return (result: t_IterMut_i32) ->
-  {[@stop_split] [@expl:iter_mut_i32 ensures] ([@stop_split] [@expl:iter_mut result type invariant] inv_IterMut_i32 result)
-    /\ ([@stop_split] [@expl:iter_mut ensures] [%#soption] match { f0 = self_.current; f1 = self_.final } with
+  {[@stop_split] [@expl:iter_mut_i32 ensures] ([@stop_split] [@expl:iter_mut result type invariant] [%#soption] inv_IterMut_i32 result)
+    /\ ([@stop_split] [@expl:iter_mut ensures] [%#soption'0] match { f0 = self.current; f1 = self.final } with
       | {f0 = None; f1 = None} -> exists it: MutBorrow.t t_IterMut_i32. completed_IterMut_i32 it /\ it.current = result
       | {f0 = Some cur; f1 = Some fin} -> exists s: Seq.seq (MutBorrow.t Int32.t), it: MutBorrow.t t_IterMut_i32. completed_IterMut_i32 it
         /\ Seq.length s = 1
@@ -78,12 +81,12 @@ predicate inv_refmut_IterMut_i32 [@inline:trivial] (_1: MutBorrow.t t_IterMut_i3
 
 meta "rewrite_def" predicate inv_refmut_IterMut_i32
 
-let next_IterMut_i32 (self_: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
-{[@stop_split] [@expl:next 'self_' type invariant] [%#siter] inv_refmut_IterMut_i32 self_}
+let next_IterMut_i32 (self: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
+{[@stop_split] [@expl:next 'self' type invariant] [%#siterator] inv_refmut_IterMut_i32 self}
   any
-  [ return (result: t_Option_refmut_i32) -> {[@stop_split] [@expl:next ensures] [%#siter'0] match result with
-      | None'0 -> completed_IterMut_i32 self_
-      | Some'0 v -> produces_IterMut_i32 self_.current (Seq.singleton v) self_.final
+  [ return (result: t_Option_refmut_i32) -> {[@stop_split] [@expl:next ensures] [%#siter] match result with
+      | None'0 -> completed_IterMut_i32 self
+      | Some'0 v -> produces_IterMut_i32 self.current (Seq.singleton v) self.final
       end}
     (! return {result}) ]
 

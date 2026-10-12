@@ -1,6 +1,6 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 95 8 100 39 *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
 let%span snaive_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 101 26 101 30
 let%span snaive_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 101 26 101 37
 let%span snaive_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_week.rs" 102 27 102 43

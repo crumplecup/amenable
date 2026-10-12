@@ -2,10 +2,11 @@
 
 (* ledger::ledger_validate::mirror::Ledger *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 22 8 22 20
-let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
-let%span sconvert = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/convert.rs" 94 28 94 32
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 22 8 22 20
+let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
+let%span smod = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/convert/mod.rs" 790 4 790 22
+let%span sconvert = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/convert.rs" 94 28 94 32
 let%span scontract_bounds = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 153 24 153 47
 let%span scontract_bounds'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/contract_bounds.rs" 118 24 118 56
 let%span sledger_validate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/ledger_validate.rs" 74 19 74 23
@@ -34,11 +35,10 @@ let%span stransfer_and_types'6 = "/home/erik/repos/amenable/crates/amenable_creu
 let%span stransfer_and_types'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 253 18 253 67
 let%span stransfer_and_types'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 258 19 258 23
 let%span stransfer_and_types'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 259 18 259 65
-let%span stransfer_and_types'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 101 25 101 35
-let%span stransfer_and_types'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 100 22 100 26
-let%span stransfer_and_types'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
-let%span stransfer_and_types'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 332 24 332 41
-let%span stransfer_and_types'14 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 356 24 356 41
+let%span stransfer_and_types'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 100 22 100 26
+let%span stransfer_and_types'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 180 12 180 17
+let%span stransfer_and_types'12 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 332 24 332 41
+let%span stransfer_and_types'13 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 356 24 356 41
 let%span svalidated_committed_rejected = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/validated_committed_rejected.rs" 281 16 291 17
 let%span svalidate = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 45
 let%span svalidate'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 18 30 18 53
@@ -61,9 +61,11 @@ let%span svalidate'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/l
 let%span svalidate'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 15 23 15 27
 let%span svalidate'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 17 77 17 135
 let%span svalidate'19 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/../generated/validate.rs" 16 22 16 52
-let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/ops.rs" 715 18 718 9
-let%span sops'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/ops.rs" 732 25 732 33
-let%span sops'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/ops.rs" 728 18 731 9
+let%span sresult = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/result.rs" 2176 4 2176 64
+let%span sresult'0 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/result.rs" 2191 21 2191 29
+let%span sresult'1 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/result.rs" 2191 4 2191 70
+let%span sops = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/ops.rs" 715 18 718 9
+let%span sops'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/ops.rs" 728 18 731 9
 let%span stokens = "/home/erik/repos/amenable/crates/amenable_gaap/src/tokens.rs" 64 0 64 85
 
 use creusot.int.UInt64
@@ -91,8 +93,8 @@ predicate inv__private (x: t_Transfer__private)
 predicate inv_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
 
 axiom inv_axiom [@rewrite]:
-  forall x: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken x]. inv_Transfer_Pending_PendingToken x
-    = (inv_PendingToken x.token /\ inv__private x.t_Transfer__private)
+  forall _1: t_Transfer_Pending_PendingToken [inv_Transfer_Pending_PendingToken _1]. inv_Transfer_Pending_PendingToken _1
+    = (inv_PendingToken _1.token /\ inv__private _1.t_Transfer__private)
 
 predicate invariant_ref_Transfer_Pending_PendingToken [@inline:trivial] (self: t_Transfer_Pending_PendingToken) =
   [%#sinvariant] inv_Transfer_Pending_PendingToken self
@@ -115,7 +117,7 @@ let clone_TransferPayload (self: t_TransferPayload) (return (x: t_TransferPayloa
   [ return (result: t_TransferPayload) -> (! return {result}) ]
 
 predicate amount_value_matches_field [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 331 8 331 76] (observed: Int64.t) (field: Int64.t) =
-  [%#stransfer_and_types'13] observed = field
+  [%#stransfer_and_types'12] observed = field
 
 let amount'0 (self: t_TransferPayload) (return (x: t_Amount)) = any
   [ return (result: t_Amount) ->
@@ -176,14 +178,14 @@ predicate postcondition_once_negative_amount (self: ()) (args: Int64.t) (result:
 
 meta "rewrite_def" predicate postcondition_once_negative_amount
 
-let map_err_unit (self_: t_Result_unit_i64) (op: ()) (return (x: t_Result_unit_TransferError)) =
-{[@stop_split] [@expl:map_err requires] [%#stransfer_and_types'4] match self_ with
+let map_err_unit (self: t_Result_unit_i64) (op: ()) (return (x: t_Result_unit_TransferError)) =
+{[@stop_split] [@expl:map_err requires] [%#stransfer_and_types'4] match self with
     | Ok _ -> true
     | Err e -> precondition_negative_amount op e
     end}
   any
   [ return (result: t_Result_unit_TransferError) ->
-  {[@stop_split] [@expl:map_err ensures] [%#stransfer_and_types'5] match self_ with
+  {[@stop_split] [@expl:map_err ensures] [%#stransfer_and_types'5] match self with
       | Ok t -> result = Ok'0 t
       | Err e -> exists r: t_TransferError. result = Err'0 r /\ postcondition_once_negative_amount op e r
       end}
@@ -200,8 +202,8 @@ meta "rewrite_def" predicate inv_Infallible
 predicate inv_Result_Infallible_TransferError (_1: t_Result_Infallible_TransferError)
 
 axiom inv_axiom'0 [@rewrite]:
-  forall x: t_Result_Infallible_TransferError [inv_Result_Infallible_TransferError x]. inv_Result_Infallible_TransferError x
-    = match x with
+  forall _1: t_Result_Infallible_TransferError [inv_Result_Infallible_TransferError _1]. inv_Result_Infallible_TransferError _1
+    = match _1 with
       | Ok'1 f0'0 -> inv_Infallible f0'0
       | Err'1 f0'0 -> true
       end
@@ -209,17 +211,17 @@ axiom inv_axiom'0 [@rewrite]:
 predicate inv_ControlFlow_Result_Infallible_TransferError_unit (_1: t_ControlFlow_Result_Infallible_TransferError_unit)
 
 axiom inv_axiom'1 [@rewrite]:
-  forall x: t_ControlFlow_Result_Infallible_TransferError_unit [inv_ControlFlow_Result_Infallible_TransferError_unit x]. inv_ControlFlow_Result_Infallible_TransferError_unit x
-    = match x with
+  forall _1: t_ControlFlow_Result_Infallible_TransferError_unit [inv_ControlFlow_Result_Infallible_TransferError_unit _1]. inv_ControlFlow_Result_Infallible_TransferError_unit _1
+    = match _1 with
       | Continue f0'0 -> true
       | Break f0'0 -> inv_Result_Infallible_TransferError f0'0
       end
 
-let branch_Result_unit_TransferError (self_: t_Result_unit_TransferError)
+let branch_Result_unit_TransferError (self: t_Result_unit_TransferError)
   (return (x: t_ControlFlow_Result_Infallible_TransferError_unit)) = any
   [ return (result: t_ControlFlow_Result_Infallible_TransferError_unit) ->
-  {[@stop_split] [@expl:branch_Result_unit_TransferError ensures] ([@stop_split] [@expl:branch result type invariant] inv_ControlFlow_Result_Infallible_TransferError_unit result)
-    /\ ([@stop_split] [@expl:branch ensures] [%#sops] match self_ with
+  {[@stop_split] [@expl:branch_Result_unit_TransferError ensures] ([@stop_split] [@expl:branch result type invariant] [%#sresult] inv_ControlFlow_Result_Infallible_TransferError_unit result)
+    /\ ([@stop_split] [@expl:branch ensures] [%#sops] match self with
       | Ok'0 v -> result = Continue v
       | Err'0 e -> result = Break (Err'1 e)
       end)}
@@ -232,8 +234,8 @@ predicate resolve__private (x: t_Transfer__private)
 predicate resolve_Transfer_Pending_PendingToken (_1: t_Transfer_Pending_PendingToken)
 
 axiom resolve_axiom [@rewrite]:
-  forall x: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken x]. resolve_Transfer_Pending_PendingToken x
-    = (resolve_PendingToken x.token /\ resolve__private x.t_Transfer__private)
+  forall _1: t_Transfer_Pending_PendingToken [resolve_Transfer_Pending_PendingToken _1]. resolve_Transfer_Pending_PendingToken _1
+    = (resolve_PendingToken _1.token /\ resolve__private _1.t_Transfer__private)
 
 let elim_Break (_x: t_ControlFlow_Result_Infallible_TransferError_unit)
   (return (f0'0: t_Result_Infallible_TransferError)) = any
@@ -264,14 +266,14 @@ predicate inv__private'0 (x: t_Transfer__private'0)
 predicate inv_Transfer_Validated_ValidatedToken (_1: t_Transfer_Validated_ValidatedToken)
 
 axiom inv_axiom'2 [@rewrite]:
-  forall x: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken x]. inv_Transfer_Validated_ValidatedToken x
-    = (inv_ValidatedToken x.token'0 /\ inv__private'0 x.t_Transfer__private'0)
+  forall _1: t_Transfer_Validated_ValidatedToken [inv_Transfer_Validated_ValidatedToken _1]. inv_Transfer_Validated_ValidatedToken _1
+    = (inv_ValidatedToken _1.token'0 /\ inv__private'0 _1.t_Transfer__private'0)
 
 predicate inv_Result_Transfer_Validated_ValidatedToken_TransferError (_1: t_Result_Transfer_Validated_ValidatedToken_TransferError)
 
 axiom inv_axiom'3 [@rewrite]:
-  forall x: t_Result_Transfer_Validated_ValidatedToken_TransferError [inv_Result_Transfer_Validated_ValidatedToken_TransferError x]. inv_Result_Transfer_Validated_ValidatedToken_TransferError x
-    = match x with
+  forall _1: t_Result_Transfer_Validated_ValidatedToken_TransferError [inv_Result_Transfer_Validated_ValidatedToken_TransferError _1]. inv_Result_Transfer_Validated_ValidatedToken_TransferError _1
+    = match _1 with
       | Ok'2 f0'0 -> inv_Transfer_Validated_ValidatedToken f0'0
       | Err'2 f0'0 -> true
       end
@@ -281,21 +283,21 @@ type tup2_Result_Transfer_Validated_ValidatedToken_TransferError_Result_Infallib
   f1'0: t_Result_Infallible_TransferError }
 
 predicate postcondition_from (self: ()) (args: t_TransferError) (result: t_TransferError) =
-  let self_ = args in [%#sconvert] result = self_
+  [%#smod] let t = args in [%#sconvert] result = t
 
 meta "rewrite_def" predicate postcondition_from
 
-let from_TransferError (self_: t_TransferError) (return (x: t_TransferError)) = any
-  [ return (result: t_TransferError) -> {[@stop_split] [@expl:from ensures] [%#sconvert] result = self_}
+let from_TransferError (t: t_TransferError) (return (x: t_TransferError)) = any
+  [ return (result: t_TransferError) -> {[@stop_split] [@expl:from ensures] [%#sconvert] result = t}
     (! return {result}) ]
 
 let from_residual_Result_Transfer_Validated_ValidatedToken_TransferError (residual: t_Result_Infallible_TransferError)
   (return (x: t_Result_Transfer_Validated_ValidatedToken_TransferError)) =
-{[@stop_split] [@expl:from_residual 'residual' type invariant] [%#sops'0] inv_Result_Infallible_TransferError residual}
+{[@stop_split] [@expl:from_residual 'residual' type invariant] [%#sresult'0] inv_Result_Infallible_TransferError residual}
   any
   [ return (result: t_Result_Transfer_Validated_ValidatedToken_TransferError) ->
-  {[@stop_split] [@expl:from_residual_Result_Transfer_Validated_ValidatedToken_TransferError ensures] ([@stop_split] [@expl:from_residual result type invariant] inv_Result_Transfer_Validated_ValidatedToken_TransferError result)
-    /\ ([@stop_split] [@expl:from_residual ensures] [%#sops'1] match { f0'0 = result; f1'0 = residual } with
+  {[@stop_split] [@expl:from_residual_Result_Transfer_Validated_ValidatedToken_TransferError ensures] ([@stop_split] [@expl:from_residual result type invariant] [%#sresult'1] inv_Result_Transfer_Validated_ValidatedToken_TransferError result)
+    /\ ([@stop_split] [@expl:from_residual ensures] [%#sops'0] match { f0'0 = result; f1'0 = residual } with
       | {f0'0 = Err'2 result'0; f1'0 = Err'1 residual'0} -> postcondition_from () residual'0 result'0
       | _ -> false
       end)}
@@ -352,21 +354,21 @@ predicate postcondition_once_insufficient_funds (self: ()) (args: tup2_i64_i64) 
 
 meta "rewrite_def" predicate postcondition_once_insufficient_funds
 
-let map_err_unit'0 (self_: t_Result_unit_tup2_i64_i64) (op: ()) (return (x: t_Result_unit_TransferError)) =
-{[@stop_split] [@expl:map_err requires] [%#stransfer_and_types'4] match self_ with
+let map_err_unit'0 (self: t_Result_unit_tup2_i64_i64) (op: ()) (return (x: t_Result_unit_TransferError)) =
+{[@stop_split] [@expl:map_err requires] [%#stransfer_and_types'4] match self with
     | Ok'3 _ -> true
     | Err'3 e -> precondition_insufficient_funds op e
     end}
   any
   [ return (result: t_Result_unit_TransferError) ->
-  {[@stop_split] [@expl:map_err ensures] [%#stransfer_and_types'5] match self_ with
+  {[@stop_split] [@expl:map_err ensures] [%#stransfer_and_types'5] match self with
       | Ok'3 t -> result = Ok'0 t
       | Err'3 e -> exists r: t_TransferError. result = Err'0 r /\ postcondition_once_insufficient_funds op e r
       end}
     (! return {result}) ]
 
 predicate transfer_payload_field_matches [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 355 8 355 80] (observed: UInt64.t) (field: UInt64.t) =
-  [%#stransfer_and_types'14] observed = field
+  [%#stransfer_and_types'13] observed = field
 
 let from'0 (self: t_TransferPayload) (return (x: UInt64.t)) = any
   [ return (result: UInt64.t) ->
@@ -385,8 +387,8 @@ let sidecar_Transfer_Pending_PendingToken (self: t_Transfer_Pending_PendingToken
   {[@stop_split] [@expl:sidecar result type invariant] [%#stransfer_and_types] inv_PendingToken result}
     (! return {result}) ]
 
-let establish_Validated (credential: t_PendingToken) (return (x: t_ValidatedToken)) =
-{[@stop_split] [@expl:establish 'credential' type invariant] [%#stransfer_and_types'10] inv_PendingToken credential}
+let establish_Validated (_credential: t_PendingToken) (return (x: t_ValidatedToken)) =
+{[@stop_split] [@expl:establish '_credential' type invariant] [%#stokens] inv_PendingToken _credential}
   any
   [ return (result: t_ValidatedToken) ->
   {[@stop_split] [@expl:establish result type invariant] [%#stokens] inv_ValidatedToken result}
@@ -394,7 +396,7 @@ let establish_Validated (credential: t_PendingToken) (return (x: t_ValidatedToke
 
 let new_Validated (payload'1: t_TransferPayload) (token'1: t_ValidatedToken)
   (return (x: t_Transfer_Validated_ValidatedToken)) =
-{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'12] inv_ValidatedToken token'1}
+{[@stop_split] [@expl:new 'token' type invariant] [%#stransfer_and_types'11] inv_ValidatedToken token'1}
   any
   [ return (result: t_Transfer_Validated_ValidatedToken) ->
   {[@stop_split] [@expl:new_Validated ensures] ([@stop_split] [@expl:new result type invariant] [%#stransfer_and_types] inv_Transfer_Validated_ValidatedToken result)

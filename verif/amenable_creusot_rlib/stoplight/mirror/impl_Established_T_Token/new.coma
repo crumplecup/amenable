@@ -20,8 +20,8 @@ predicate inv_Token (_1: t_Token)
 
 predicate inv_Established_T_Token (_1: t_Established_T_Token)
 
-axiom inv_axiom [@rewrite]: forall x: t_Established_T_Token [inv_Established_T_Token x]. inv_Established_T_Token x
-    = (inv_T x.primary /\ inv_Token x.token)
+axiom inv_axiom [@rewrite]: forall _1: t_Established_T_Token [inv_Established_T_Token _1]. inv_Established_T_Token _1
+    = (inv_T _1.primary /\ inv_Token _1.token)
 
 meta "compute_max_steps" 1000000
 

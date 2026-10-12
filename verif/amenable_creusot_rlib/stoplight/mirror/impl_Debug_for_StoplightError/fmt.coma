@@ -2,9 +2,9 @@
 
 (* <stoplight::mirror::StoplightError as std::fmt::Debug> *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 98 20 98 44
+let%span smod = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/fmt/mod.rs" 2099 26 2099 30
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 313 13 313 18
-let%span sfmt = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/fmt.rs" 7 26 7 30
 
 use creusot.prelude.MutBorrow
 use creusot.prelude.Any
@@ -24,8 +24,8 @@ predicate inv_refmut_Formatter [@inline:trivial] (_1: MutBorrow.t t_Formatter) =
 
 meta "rewrite_def" predicate inv_refmut_Formatter
 
-let write_str (self_: MutBorrow.t t_Formatter) (data: string) (return (x: t_Result_unit_Error)) =
-{[@stop_split] [@expl:write_str 'self_' type invariant] [%#sfmt] inv_refmut_Formatter self_}
+let write_str (self: MutBorrow.t t_Formatter) (data: string) (return (x: t_Result_unit_Error)) =
+{[@stop_split] [@expl:write_str 'self' type invariant] [%#smod] inv_refmut_Formatter self}
   any [ return (result: t_Result_unit_Error) -> (! return {result}) ]
 
 predicate resolve_refmut_Formatter [@inline:trivial] (_1: MutBorrow.t t_Formatter) = _1.final = _1.current

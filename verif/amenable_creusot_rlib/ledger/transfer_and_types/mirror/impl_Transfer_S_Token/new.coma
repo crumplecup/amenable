@@ -21,8 +21,8 @@ predicate inv_Token (_1: t_Token)
 
 predicate inv_Transfer_S_Token (_1: t_Transfer_S_Token)
 
-axiom inv_axiom [@rewrite]: forall x: t_Transfer_S_Token [inv_Transfer_S_Token x]. inv_Transfer_S_Token x
-    = inv_Token x.token
+axiom inv_axiom [@rewrite]: forall _1: t_Transfer_S_Token [inv_Transfer_S_Token _1]. inv_Transfer_S_Token _1
+    = inv_Token _1.token
 
 meta "compute_max_steps" 1000000
 

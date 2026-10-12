@@ -1,17 +1,18 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 91 8 91 90 *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 let%span smem_carrier = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 92 26 92 50
 let%span smem_carrier'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 93 30 93 38
 let%span smem_carrier'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 94 26 94 59
 let%span smem_carrier'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 89 19 89 23
 let%span smem_carrier'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 90 18 90 85
 let%span smem_carrier'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 50 18 50 55
-let%span smem_carrier'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 61 18 61 22
-let%span smem_carrier'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 60 18 60 54
-let%span smem_carrier'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 55 22 55 26
-let%span smem_carrier'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 54 18 54 54
-let%span smem_carrier'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 75 24 75 90
+let%span smem_carrier'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 60 18 60 54
+let%span smem_carrier'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 54 18 54 54
+let%span smem_carrier'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 75 24 75 90
+let%span smanually_drop = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/mem/manually_drop.rs" 182 4 182 49
+let%span smanually_drop'0 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/mem/manually_drop.rs" 274 14 274 18
+let%span smanually_drop'1 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/mem/manually_drop.rs" 200 28 200 32
 
 use creusot.int.Int32
 use creusot.prelude.Any
@@ -24,7 +25,7 @@ function manually_drop_value_i32 [#"/home/erik/repos/amenable/crates/amenable_cr
 
 let new_i32 (value: Int32.t) (return (x: t_ManuallyDrop_i32)) = any
   [ return (result: t_ManuallyDrop_i32) ->
-  {[@stop_split] [@expl:new_i32 ensures] ([@stop_split] [@expl:new result type invariant] inv_ManuallyDrop_i32 result)
+  {[@stop_split] [@expl:new_i32 ensures] ([@stop_split] [@expl:new result type invariant] [%#smanually_drop] inv_ManuallyDrop_i32 result)
     /\ ([@stop_split] [@expl:new ensures] [%#smem_carrier'4] manually_drop_value_i32 result = value)}
     (! return {result}) ]
 
@@ -37,24 +38,24 @@ predicate inv_ref_ManuallyDrop_i32 [@inline:trivial] (_1: t_ManuallyDrop_i32) = 
 
 meta "rewrite_def" predicate inv_ref_ManuallyDrop_i32
 
-let deref_ManuallyDrop_i32 (self_: t_ManuallyDrop_i32) (return (x: Int32.t)) =
-{[@stop_split] [@expl:deref 'self_' type invariant] [%#smem_carrier'5] inv_ref_ManuallyDrop_i32 self_}
+let deref_ManuallyDrop_i32 (self: t_ManuallyDrop_i32) (return (x: Int32.t)) =
+{[@stop_split] [@expl:deref 'self' type invariant] [%#smanually_drop'0] inv_ref_ManuallyDrop_i32 self}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:deref ensures] [%#smem_carrier'6] result
-    = manually_drop_value_i32 self_}
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:deref ensures] [%#smem_carrier'5] result
+    = manually_drop_value_i32 self}
     (! return {result}) ]
 
 let into_inner_i32 (slot: t_ManuallyDrop_i32) (return (x: Int32.t)) =
-{[@stop_split] [@expl:into_inner 'slot' type invariant] [%#smem_carrier'7] inv_ManuallyDrop_i32 slot}
+{[@stop_split] [@expl:into_inner 'slot' type invariant] [%#smanually_drop'1] inv_ManuallyDrop_i32 slot}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:into_inner ensures] [%#smem_carrier'8] result
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:into_inner ensures] [%#smem_carrier'6] result
     = manually_drop_value_i32 slot}
     (! return {result}) ]
 
 type tup2_i32_i32 = { f0: Int32.t; f1: Int32.t }
 
 predicate manually_drop_derefs_and_into_inner_round_trip_holds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/mem_carrier.rs" 71 8 74 17] (value: Int32.t) (manually_drop_result: tup2_i32_i32) =
-  [%#smem_carrier'9] manually_drop_result.f0 = value /\ manually_drop_result.f1 = value
+  [%#smem_carrier'7] manually_drop_result.f0 = value /\ manually_drop_result.f1 = value
 
 meta "compute_max_steps" 1000000
 

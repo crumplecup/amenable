@@ -1,6 +1,7 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 156 8 161 55 *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 93 20 93 44
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 98 20 98 44
+let%span smod = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/slice/mod.rs" 1059 4 1059 54
 let%span sarray_and_slice = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 164 29 164 44
 let%span sarray_and_slice'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 165 39 165 48
 let%span sarray_and_slice'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 173 40 173 49
@@ -14,21 +15,21 @@ let%span sarray_and_slice'8 = "/home/erik/repos/amenable/crates/amenable_creusot
 let%span sarray_and_slice'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 154 19 154 23
 let%span sarray_and_slice'10 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 155 18 155 113
 let%span sarray_and_slice'11 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/array_and_slice.rs" 137 16 144 17
-let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 409 29 409 33
-let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 636 14 636 50
-let%span sslice'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 658 20 658 62
-let%span sslice'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 664 12 664 66
-let%span sslice'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 669 14 669 47
-let%span sslice'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 675 15 675 32
-let%span sslice'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 676 15 676 32
-let%span sslice'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 677 14 677 42
-let%span sslice'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 97 14 97 41
-let%span sslice'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 98 14 98 80
-let%span sslice'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 645 20 645 36
-let%span sslice'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/slice.rs" 67 20 67 29
-let%span siter = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 124 29 124 33
-let%span siter'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/iter.rs" 120 26 123 17
-let%span sarray = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/array.rs" 9 20 9 51
+let%span sslice = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 423 29 423 33
+let%span sslice'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 794 18 797 9
+let%span sslice'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 665 14 665 50
+let%span sslice'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 687 20 687 62
+let%span sslice'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 693 12 693 66
+let%span sslice'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 698 14 698 47
+let%span sslice'5 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 704 15 704 32
+let%span sslice'6 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 705 15 705 32
+let%span sslice'7 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 706 14 706 42
+let%span sslice'8 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 99 14 99 41
+let%span sslice'9 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 100 14 100 14
+let%span sslice'10 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 674 20 674 36
+let%span sslice'11 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/slice.rs" 67 20 67 29
+let%span smacros = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/slice/iter/macros.rs" 157 25 157 29
+let%span sarray = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/array.rs" 9 20 9 51
 
 use creusot.slice.Slice64
 use creusot.int.Int32
@@ -56,13 +57,13 @@ predicate inv_IterMut_i32 (_1: t_IterMut_i32)
 function view_IterMut_i32 (self: t_IterMut_i32) : MutBorrow.t (Slice64.slice Int32.t)
 
 axiom view_IterMut_i32_spec:
-  forall self: t_IterMut_i32 [view_IterMut_i32 self]. [%#sslice'0] Seq.length (Slice64.view (view_IterMut_i32 self).final)
+  forall self: t_IterMut_i32 [view_IterMut_i32 self]. [%#sslice'1] Seq.length (Slice64.view (view_IterMut_i32 self).final)
     = Seq.length (Slice64.view (view_IterMut_i32 self).current)
 
-let iter_mut_i32 (self_: MutBorrow.t (Slice64.slice Int32.t)) (return (x: t_IterMut_i32)) = any
+let iter_mut_i32 (self: MutBorrow.t (Slice64.slice Int32.t)) (return (x: t_IterMut_i32)) = any
   [ return (result: t_IterMut_i32) ->
-  {[@stop_split] [@expl:iter_mut_i32 ensures] ([@stop_split] [@expl:iter_mut result type invariant] inv_IterMut_i32 result)
-    /\ ([@stop_split] [@expl:iter_mut ensures] [%#sslice] view_IterMut_i32 result = self_)}
+  {[@stop_split] [@expl:iter_mut_i32 ensures] ([@stop_split] [@expl:iter_mut result type invariant] [%#smod] inv_IterMut_i32 result)
+    /\ ([@stop_split] [@expl:iter_mut ensures] [%#sslice] view_IterMut_i32 result = self)}
     (! return {result}) ]
 
 type t_Option_refmut_i32 = None | Some (MutBorrow.t Int32.t)
@@ -77,51 +78,51 @@ predicate inv_refmut_IterMut_i32 [@inline:trivial] (_1: MutBorrow.t t_IterMut_i3
 meta "rewrite_def" predicate inv_refmut_IterMut_i32
 
 function index_slice_i32 [@inline:trivial] (self: Slice64.slice Int32.t) (ix: int) : Int32.t =
-  [%#sslice'10] Seq.get (Slice64.view self) ix
+  [%#sslice'11] Seq.get (Slice64.view self) ix
 
 meta "rewrite_def" function index_slice_i32
 
 function to_mut_seq_slice_i32 (self: MutBorrow.t (Slice64.slice Int32.t)) : Seq.seq (MutBorrow.t Int32.t)
 
 axiom to_mut_seq_slice_i32_spec:
-  forall self: MutBorrow.t (Slice64.slice Int32.t) [to_mut_seq_slice_i32 self]. [%#sslice'7] Seq.length (to_mut_seq_slice_i32 self)
+  forall self: MutBorrow.t (Slice64.slice Int32.t) [to_mut_seq_slice_i32 self]. [%#sslice'8] Seq.length (to_mut_seq_slice_i32 self)
     = Seq.length (Slice64.view self.current)
 
 axiom to_mut_seq_slice_i32_spec'0:
-  forall self: MutBorrow.t (Slice64.slice Int32.t) [to_mut_seq_slice_i32 self]. [%#sslice'8] forall i: int. 0 <= i
+  forall self: MutBorrow.t (Slice64.slice Int32.t) [to_mut_seq_slice_i32 self]. [%#sslice'9] forall i: int. 0 <= i
         /\ i < Seq.length (to_mut_seq_slice_i32 self)
       -> Seq.get (to_mut_seq_slice_i32 self) i
       = MutBorrow.borrow_logic (index_slice_i32 self.current i) (index_slice_i32 self.final i) (MutBorrow.inherit_id (MutBorrow.get_id self) i)
 
 predicate produces_IterMut_i32 (self: t_IterMut_i32) (visited: Seq.seq (MutBorrow.t Int32.t)) (tl: t_IterMut_i32) =
-  [%#sslice'2] to_mut_seq_slice_i32 (view_IterMut_i32 self)
+  [%#sslice'3] to_mut_seq_slice_i32 (view_IterMut_i32 self)
   = Seq.(++) visited (to_mut_seq_slice_i32 (view_IterMut_i32 tl))
 
 function produces_trans_IterMut_i32 (a: t_IterMut_i32) (ab: Seq.seq (MutBorrow.t Int32.t)) (b: t_IterMut_i32) (bc: Seq.seq (MutBorrow.t Int32.t)) (c: t_IterMut_i32) : ()
 
 axiom produces_trans_IterMut_i32_spec:
-  forall a: t_IterMut_i32, ab: Seq.seq (MutBorrow.t Int32.t), b: t_IterMut_i32, bc: Seq.seq (MutBorrow.t Int32.t), c: t_IterMut_i32. ([%#sslice'4] produces_IterMut_i32 a ab b)
-    -> ([%#sslice'5] produces_IterMut_i32 b bc c) -> ([%#sslice'6] produces_IterMut_i32 a (Seq.(++) ab bc) c)
+  forall a: t_IterMut_i32, ab: Seq.seq (MutBorrow.t Int32.t), b: t_IterMut_i32, bc: Seq.seq (MutBorrow.t Int32.t), c: t_IterMut_i32. ([%#sslice'5] produces_IterMut_i32 a ab b)
+    -> ([%#sslice'6] produces_IterMut_i32 b bc c) -> ([%#sslice'7] produces_IterMut_i32 a (Seq.(++) ab bc) c)
 
 function produces_refl_IterMut_i32 (self: t_IterMut_i32) : ()
 
 axiom produces_refl_IterMut_i32_spec:
-  forall self: t_IterMut_i32. [%#sslice'3] produces_IterMut_i32 self (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) self
+  forall self: t_IterMut_i32. [%#sslice'4] produces_IterMut_i32 self (Seq.empty: Seq.seq (MutBorrow.t Int32.t)) self
 
 predicate resolve_refmut_IterMut_i32 [@inline:trivial] (_1: MutBorrow.t t_IterMut_i32) = _1.final = _1.current
 
 meta "rewrite_def" predicate resolve_refmut_IterMut_i32
 
 predicate completed_IterMut_i32 (self: MutBorrow.t t_IterMut_i32) =
-  [%#sslice'1] resolve_refmut_IterMut_i32 self
+  [%#sslice'2] resolve_refmut_IterMut_i32 self
   /\ Slice64.view (view_IterMut_i32 self.current).current = (Seq.empty: Seq.seq Int32.t)
 
-let next_IterMut_i32 (self_: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
-{[@stop_split] [@expl:next 'self_' type invariant] [%#siter] inv_refmut_IterMut_i32 self_}
+let next_IterMut_i32 (self: MutBorrow.t t_IterMut_i32) (return (x: t_Option_refmut_i32)) =
+{[@stop_split] [@expl:next 'self' type invariant] [%#smacros] inv_refmut_IterMut_i32 self}
   any
-  [ return (result: t_Option_refmut_i32) -> {[@stop_split] [@expl:next ensures] [%#siter'0] match result with
-      | None -> completed_IterMut_i32 self_
-      | Some v -> produces_IterMut_i32 self_.current (Seq.singleton v) self_.final
+  [ return (result: t_Option_refmut_i32) -> {[@stop_split] [@expl:next ensures] [%#sslice'0] match result with
+      | None -> completed_IterMut_i32 self
+      | Some v -> produces_IterMut_i32 self.current (Seq.singleton v) self.final
       end}
     (! return {result}) ]
 
@@ -140,19 +141,20 @@ meta "rewrite_def" predicate resolve_refmut_i32
 type t_Option_i32 = None'0 | Some'0 Int32.t
 
 predicate resolve_IterMut_i32 [@inline:trivial] (self: t_IterMut_i32) =
-  [%#sslice'9] (view_IterMut_i32 self).current = (view_IterMut_i32 self).final
+  [%#sslice'10] (view_IterMut_i32 self).current = (view_IterMut_i32 self).final
 
 meta "rewrite_def" predicate resolve_IterMut_i32
 
 predicate resolve_IterMut_i32'0 (_1: t_IterMut_i32)
 
-axiom resolve_axiom: forall x: t_IterMut_i32 [resolve_IterMut_i32'0 x]. resolve_IterMut_i32'0 x -> resolve_IterMut_i32 x
+axiom resolve_axiom: forall _1: t_IterMut_i32 [resolve_IterMut_i32'0 _1]. resolve_IterMut_i32'0 _1
+    -> resolve_IterMut_i32 _1
 
 predicate resolve_Option_refmut_i32 (_1: t_Option_refmut_i32)
 
 axiom resolve_axiom'0 [@rewrite]:
-  forall x: t_Option_refmut_i32 [resolve_Option_refmut_i32 x]. resolve_Option_refmut_i32 x
-    = match x with
+  forall _1: t_Option_refmut_i32 [resolve_Option_refmut_i32 _1]. resolve_Option_refmut_i32 _1
+    = match _1 with
       | None -> true
       | Some x0 -> resolve_refmut_i32 x0
       end

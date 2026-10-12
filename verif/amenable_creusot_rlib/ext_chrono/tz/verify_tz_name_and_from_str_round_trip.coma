@@ -2,6 +2,8 @@
 
 let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz/logic.rs" 14 18 14 48
 let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz/logic.rs" 20 18 23 9
+let%span scmp = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/cmp.rs" 14 26 14 75
+let%span smodel = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/model.rs" 37 8 37 28
 let%span stz = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 32 42 32 51
 let%span stz'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 32 18 32 52
 let%span stz'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 34 26 34 31
@@ -10,9 +12,7 @@ let%span stz'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chro
 let%span stz'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 33 25 33 46
 let%span stz'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 28 19 28 23
 let%span stz'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz.rs" 29 18 29 24
-let%span stimezones = "/home/erik/repos/amenable/target/creusot/debug/build/chrono-tz-1bdb5630c563bedd/out/timezones.rs" 2675 4 2675 51
-let%span scmp = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/cmp.rs" 14 26 14 75
-let%span smodel = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/model.rs" 37 8 37 28
+let%span stimezones = "/home/erik/repos/amenable/target/creusot/debug/build/chrono-tz/1bdb5630c563bedd/out/timezones.rs" 2675 4 2675 51
 
 use creusot.prelude.Char
 use seq.Seq
@@ -617,10 +617,10 @@ type t_Tz =
   | WET
   | Zulu
 
-function tz_name [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 116 0 116 63] (_t: t_Tz) : string
+function tz_name [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 125 0 125 63] (_t: t_Tz) : string
 
-let name (self_: t_Tz) (return (x: string)) = any
-  [ return (result: string) -> {[@stop_split] [@expl:name ensures] [%#slogic] result = tz_name self_}
+let name (self: t_Tz) (return (x: string)) = any
+  [ return (result: string) -> {[@stop_split] [@expl:name ensures] [%#slogic] result = tz_name self}
     (! return {result}) ]
 
 type t_ParseError
@@ -631,8 +631,8 @@ predicate inv_ParseError (_1: t_ParseError)
 
 predicate inv_Result_Tz_ParseError (_1: t_Result_Tz_ParseError)
 
-axiom inv_axiom [@rewrite]: forall x: t_Result_Tz_ParseError [inv_Result_Tz_ParseError x]. inv_Result_Tz_ParseError x
-    = match x with
+axiom inv_axiom [@rewrite]: forall _1: t_Result_Tz_ParseError [inv_Result_Tz_ParseError _1]. inv_Result_Tz_ParseError _1
+    = match _1 with
       | Ok f0 -> true
       | Err f0 -> inv_ParseError f0
       end
@@ -664,9 +664,9 @@ function deep_model_ref_ref_str [@inline:trivial] (self: string) : Seq.seq Char.
 
 meta "rewrite_def" function deep_model_ref_ref_str
 
-let eq_ref_str (self_: string) (rhs: string) (return (x: bool)) = any
+let eq_ref_str (self: string) (other: string) (return (x: bool)) = any
   [ return (result: bool) -> {[@stop_split] [@expl:eq ensures] [%#scmp] result
-    = (deep_model_ref_ref_str self_ = deep_model_ref_ref_str rhs)}
+    = (deep_model_ref_ref_str self = deep_model_ref_ref_str other)}
     (! return {result}) ]
 
 meta "compute_max_steps" 1000000

@@ -1,16 +1,16 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 67 8 72 45 *)
 
 let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 23 18 32 9
-let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 39 17 39 21
-let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 38 18 38 55
-let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 43 19 43 23
-let%span slogic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 42 18 42 57
-let%span slogic'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 47 19 47 23
-let%span slogic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 46 18 46 57
-let%span slogic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 51 23 51 27
-let%span slogic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 50 18 50 61
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 38 18 38 55
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 42 18 42 57
+let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 46 18 46 57
+let%span slogic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time/logic.rs" 50 18 50 61
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 let%span smod = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 428 4 428 97
+let%span smod'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 914 13 914 17
+let%span smod'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 929 15 929 19
+let%span smod'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 957 15 957 19
+let%span smod'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/naive/time/mod.rs" 990 19 990 23
 let%span snaive_time = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 73 18 73 82
 let%span snaive_time'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 74 31 74 39
 let%span snaive_time'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/naive_time.rs" 74 41 74 51
@@ -31,8 +31,8 @@ predicate inv_NaiveTime (_1: t_NaiveTime)
 
 predicate inv_Option_NaiveTime (_1: t_Option_NaiveTime)
 
-axiom inv_axiom [@rewrite]: forall x: t_Option_NaiveTime [inv_Option_NaiveTime x]. inv_Option_NaiveTime x
-    = match x with
+axiom inv_axiom [@rewrite]: forall _1: t_Option_NaiveTime [inv_Option_NaiveTime _1]. inv_Option_NaiveTime _1
+    = match _1 with
       | None -> true
       | Some f0 -> inv_NaiveTime f0
       end
@@ -45,23 +45,22 @@ function naive_time_second_value [#"/home/erik/repos/amenable/crates/amenable_cr
 
 function naive_time_nanosecond_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 44 0 44 72] (_t: t_NaiveTime) : UInt32.t
 
-let from_hms_nano_opt (hour: UInt32.t) (minute: UInt32.t) (second: UInt32.t) (nano: UInt32.t)
+let from_hms_nano_opt (hour: UInt32.t) (min: UInt32.t) (sec: UInt32.t) (nano: UInt32.t)
   (return (x: t_Option_NaiveTime)) = any
   [ return (result: t_Option_NaiveTime) ->
   {[@stop_split] [@expl:from_hms_nano_opt ensures] ([@stop_split] [@expl:from_hms_nano_opt result type invariant] [%#smod] inv_Option_NaiveTime result)
     /\ ([@stop_split] [@expl:from_hms_nano_opt ensures] [%#slogic] match result with
       | Some t -> UInt32.lt hour (24: UInt32.t)
-      /\ UInt32.lt minute (60: UInt32.t)
-      /\ UInt32.lt second (60: UInt32.t)
+      /\ UInt32.lt min (60: UInt32.t)
+      /\ UInt32.lt sec (60: UInt32.t)
       /\ UInt32.lt nano (2000000000: UInt32.t)
-      /\ (UInt32.lt nano (1000000000: UInt32.t) \/ second = (59: UInt32.t))
+      /\ (UInt32.lt nano (1000000000: UInt32.t) \/ sec = (59: UInt32.t))
       /\ naive_time_hour_value t = hour
-      /\ naive_time_minute_value t = minute
-      /\ naive_time_second_value t = second /\ naive_time_nanosecond_value t = nano
+      /\ naive_time_minute_value t = min /\ naive_time_second_value t = sec /\ naive_time_nanosecond_value t = nano
       | None -> not (UInt32.lt hour (24: UInt32.t)
-      /\ UInt32.lt minute (60: UInt32.t)
-      /\ UInt32.lt second (60: UInt32.t)
-      /\ UInt32.lt nano (2000000000: UInt32.t) /\ (UInt32.lt nano (1000000000: UInt32.t) \/ second = (59: UInt32.t)))
+      /\ UInt32.lt min (60: UInt32.t)
+      /\ UInt32.lt sec (60: UInt32.t)
+      /\ UInt32.lt nano (2000000000: UInt32.t) /\ (UInt32.lt nano (1000000000: UInt32.t) \/ sec = (59: UInt32.t)))
       end)}
     (! return {result}) ]
 
@@ -81,31 +80,31 @@ predicate inv_ref_NaiveTime [@inline:trivial] (_1: t_NaiveTime) = invariant_ref_
 
 meta "rewrite_def" predicate inv_ref_NaiveTime
 
-let hour_NaiveTime (self_: t_NaiveTime) (return (x: UInt32.t)) =
-{[@stop_split] [@expl:hour 'self_' type invariant] [%#slogic'0] inv_ref_NaiveTime self_}
+let hour_NaiveTime (self: t_NaiveTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:hour 'self' type invariant] [%#smod'0] inv_ref_NaiveTime self}
   any
-  [ return (result: UInt32.t) -> {[@stop_split] [@expl:hour ensures] [%#slogic'1] result = naive_time_hour_value self_}
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:hour ensures] [%#slogic'0] result = naive_time_hour_value self}
     (! return {result}) ]
 
-let minute_NaiveTime (self_: t_NaiveTime) (return (x: UInt32.t)) =
-{[@stop_split] [@expl:minute 'self_' type invariant] [%#slogic'2] inv_ref_NaiveTime self_}
+let minute_NaiveTime (self: t_NaiveTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:minute 'self' type invariant] [%#smod'1] inv_ref_NaiveTime self}
   any
-  [ return (result: UInt32.t) -> {[@stop_split] [@expl:minute ensures] [%#slogic'3] result
-    = naive_time_minute_value self_}
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:minute ensures] [%#slogic'1] result
+    = naive_time_minute_value self}
     (! return {result}) ]
 
-let second_NaiveTime (self_: t_NaiveTime) (return (x: UInt32.t)) =
-{[@stop_split] [@expl:second 'self_' type invariant] [%#slogic'4] inv_ref_NaiveTime self_}
+let second_NaiveTime (self: t_NaiveTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:second 'self' type invariant] [%#smod'2] inv_ref_NaiveTime self}
   any
-  [ return (result: UInt32.t) -> {[@stop_split] [@expl:second ensures] [%#slogic'5] result
-    = naive_time_second_value self_}
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:second ensures] [%#slogic'2] result
+    = naive_time_second_value self}
     (! return {result}) ]
 
-let nanosecond_NaiveTime (self_: t_NaiveTime) (return (x: UInt32.t)) =
-{[@stop_split] [@expl:nanosecond 'self_' type invariant] [%#slogic'6] inv_ref_NaiveTime self_}
+let nanosecond_NaiveTime (self: t_NaiveTime) (return (x: UInt32.t)) =
+{[@stop_split] [@expl:nanosecond 'self' type invariant] [%#smod'3] inv_ref_NaiveTime self}
   any
-  [ return (result: UInt32.t) -> {[@stop_split] [@expl:nanosecond ensures] [%#slogic'7] result
-    = naive_time_nanosecond_value self_}
+  [ return (result: UInt32.t) -> {[@stop_split] [@expl:nanosecond ensures] [%#slogic'3] result
+    = naive_time_nanosecond_value self}
     (! return {result}) ]
 
 type tup4_u32_u32_u32_u32 = { f0: UInt32.t; f1: UInt32.t; f2: UInt32.t; f3: UInt32.t }

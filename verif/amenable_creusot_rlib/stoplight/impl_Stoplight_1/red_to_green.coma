@@ -2,7 +2,7 @@
 
 (* stoplight::mirror::Stoplight *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 let%span sstoplight = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 226 13 226 37
 let%span sstoplight'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 261 21 261 32
 let%span sstoplight'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/stoplight.rs" 261 47 261 58
@@ -26,16 +26,16 @@ type t_Established_Red_RedToken = { primary: (); t_Established__private: t_Estab
 predicate inv_Established_Red_RedToken (_1: t_Established_Red_RedToken)
 
 axiom inv_axiom [@rewrite]:
-  forall x: t_Established_Red_RedToken [inv_Established_Red_RedToken x]. inv_Established_Red_RedToken x
-    = inv__private x.t_Established__private
+  forall _1: t_Established_Red_RedToken [inv_Established_Red_RedToken _1]. inv_Established_Red_RedToken _1
+    = inv__private _1.t_Established__private
 
 predicate resolve__private (x: t_Established__private)
 
 predicate resolve_Established_Red_RedToken (_1: t_Established_Red_RedToken)
 
 axiom resolve_axiom [@rewrite]:
-  forall x: t_Established_Red_RedToken [resolve_Established_Red_RedToken x]. resolve_Established_Red_RedToken x
-    = resolve__private x.t_Established__private
+  forall _1: t_Established_Red_RedToken [resolve_Established_Red_RedToken _1]. resolve_Established_Red_RedToken _1
+    = resolve__private _1.t_Established__private
 
 type t_RedToken
 
@@ -78,8 +78,8 @@ predicate inv__private'0 (x: t_Established__private'0)
 predicate inv_Established_Green_GreenToken (_1: t_Established_Green_GreenToken)
 
 axiom inv_axiom'0 [@rewrite]:
-  forall x: t_Established_Green_GreenToken [inv_Established_Green_GreenToken x]. inv_Established_Green_GreenToken x
-    = inv__private'0 x.t_Established__private'0
+  forall _1: t_Established_Green_GreenToken [inv_Established_Green_GreenToken _1]. inv_Established_Green_GreenToken _1
+    = inv__private'0 _1.t_Established__private'0
 
 let new_Green (primary'1: ()) (token: t_GreenToken) (return (x: t_Established_Green_GreenToken)) =
 {[@stop_split] [@expl:new 'token' type invariant] [%#sstoplight'2] inv_GreenToken token}
@@ -96,8 +96,8 @@ type t_Result_Established_Green_GreenToken_StoplightError = Ok t_Established_Gre
 predicate inv_Result_Established_Green_GreenToken_StoplightError (_1: t_Result_Established_Green_GreenToken_StoplightError)
 
 axiom inv_axiom'1 [@rewrite]:
-  forall x: t_Result_Established_Green_GreenToken_StoplightError [inv_Result_Established_Green_GreenToken_StoplightError x]. inv_Result_Established_Green_GreenToken_StoplightError x
-    = match x with
+  forall _1: t_Result_Established_Green_GreenToken_StoplightError [inv_Result_Established_Green_GreenToken_StoplightError _1]. inv_Result_Established_Green_GreenToken_StoplightError _1
+    = match _1 with
       | Ok f0 -> inv_Established_Green_GreenToken f0
       | Err f0 -> true
       end

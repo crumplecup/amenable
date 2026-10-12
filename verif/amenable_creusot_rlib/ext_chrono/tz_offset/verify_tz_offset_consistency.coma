@@ -1,16 +1,18 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 29 8 29 76 *)
 
-let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 48 16 48 20
-let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 45 12 46 106
-let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 31 28 31 32
-let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 30 18 30 68
-let%span slogic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 35 28 35 32
-let%span slogic'4 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 34 18 34 100
-let%span slogic'5 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 29 24 29 28
-let%span slogic'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 28 18 28 61
-let%span slogic'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 39 23 39 27
-let%span slogic'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 38 18 38 100
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sfixed = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/offset/fixed.rs" 107 34 107 38
+let%span slogic = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 45 12 46 106
+let%span slogic'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/fixed_offset/logic.rs" 30 18 30 68
+let%span slogic'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 34 18 34 100
+let%span slogic'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 28 18 28 61
+let%span slogic'3 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset/logic.rs" 38 18 38 100
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
+let%span stimezone_impl = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 190 12 190 16
+let%span stimezone_impl'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 190 4 190 32
+let%span stimezone_impl'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 170 24 170 28
+let%span stimezone_impl'2 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 170 4 170 41
+let%span stimezone_impl'3 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 174 19 174 23
+let%span stimezone_impl'4 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 174 4 174 36
 let%span stz_offset = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 33 37 33 49
 let%span stz_offset'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 33 37 33 67
 let%span stz_offset'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 33 27 33 68
@@ -22,10 +24,8 @@ let%span stz_offset'6 = "/home/erik/repos/amenable/crates/amenable_creusot/src/e
 let%span stz_offset'7 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 29 40 29 46
 let%span stz_offset'8 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 27 19 27 23
 let%span stz_offset'9 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/tz_offset.rs" 28 18 28 24
-let%span stimezone_impl = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 190 4 190 32
-let%span stimezone_impl'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 170 4 170 41
-let%span stimezone_impl'1 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-tz-0.10.4/src/timezone_impl.rs" 174 4 174 36
-let%span sconvert = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/convert.rs" 274 26 274 51
+let%span sconvert = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/convert.rs" 282 26 282 51
+let%span stime_delta = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/time_delta.rs" 311 30 311 34
 
 use creusot.int.Int32
 use creusot.int.Int64
@@ -50,17 +50,17 @@ predicate inv_FixedOffset (_1: t_FixedOffset)
 
 function fixed_offset_local_minus_utc_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 18 0 18 81] (_o: t_FixedOffset) : Int32.t
 
-function tz_offset_utc_offset_seconds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 132 0 132 81] (_o: t_TzOffset) : Int64.t
+function tz_offset_utc_offset_seconds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 141 0 141 81] (_o: t_TzOffset) : Int64.t
 
-function tz_offset_dst_offset_seconds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 138 0 138 81] (_o: t_TzOffset) : Int64.t
+function tz_offset_dst_offset_seconds [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 147 0 147 81] (_o: t_TzOffset) : Int64.t
 
-let fix_TzOffset (self_: t_TzOffset) (return (x: t_FixedOffset)) =
-{[@stop_split] [@expl:fix 'self_' type invariant] [%#slogic] inv_ref_TzOffset self_}
+let fix_TzOffset (self: t_TzOffset) (return (x: t_FixedOffset)) =
+{[@stop_split] [@expl:fix 'self' type invariant] [%#stimezone_impl] inv_ref_TzOffset self}
   any
   [ return (result: t_FixedOffset) ->
-  {[@stop_split] [@expl:fix_TzOffset ensures] ([@stop_split] [@expl:fix result type invariant] [%#stimezone_impl] inv_FixedOffset result)
-    /\ ([@stop_split] [@expl:fix ensures] [%#slogic'0] Int32.to_int (fixed_offset_local_minus_utc_value result)
-    = Int64.to_int (tz_offset_utc_offset_seconds self_) + Int64.to_int (tz_offset_dst_offset_seconds self_))}
+  {[@stop_split] [@expl:fix_TzOffset ensures] ([@stop_split] [@expl:fix result type invariant] [%#stimezone_impl'0] inv_FixedOffset result)
+    /\ ([@stop_split] [@expl:fix ensures] [%#slogic] Int32.to_int (fixed_offset_local_minus_utc_value result)
+    = Int64.to_int (tz_offset_utc_offset_seconds self) + Int64.to_int (tz_offset_dst_offset_seconds self))}
     (! return {result}) ]
 
 predicate invariant_ref_FixedOffset [@inline:trivial] (self: t_FixedOffset) = [%#sinvariant] inv_FixedOffset self
@@ -71,11 +71,11 @@ predicate inv_ref_FixedOffset [@inline:trivial] (_1: t_FixedOffset) = invariant_
 
 meta "rewrite_def" predicate inv_ref_FixedOffset
 
-let local_minus_utc (self_: t_FixedOffset) (return (x: Int32.t)) =
-{[@stop_split] [@expl:local_minus_utc 'self_' type invariant] [%#slogic'1] inv_ref_FixedOffset self_}
+let local_minus_utc (self: t_FixedOffset) (return (x: Int32.t)) =
+{[@stop_split] [@expl:local_minus_utc 'self' type invariant] [%#sfixed] inv_ref_FixedOffset self}
   any
-  [ return (result: Int32.t) -> {[@stop_split] [@expl:local_minus_utc ensures] [%#slogic'2] result
-    = fixed_offset_local_minus_utc_value self_}
+  [ return (result: Int32.t) -> {[@stop_split] [@expl:local_minus_utc ensures] [%#slogic'0] result
+    = fixed_offset_local_minus_utc_value self}
     (! return {result}) ]
 
 let from_i64 (small: Int32.t) (return (x: Int64.t)) = any
@@ -87,15 +87,15 @@ type t_TimeDelta
 
 predicate inv_TimeDelta (_1: t_TimeDelta)
 
-function duration_num_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 147 0 147 70] (_d: t_TimeDelta) : Int64.t
+function duration_num_seconds_value [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/shared_trusted_accessors.rs" 156 0 156 70] (_d: t_TimeDelta) : Int64.t
 
-let base_utc_offset_TzOffset (self_: t_TzOffset) (return (x: t_TimeDelta)) =
-{[@stop_split] [@expl:base_utc_offset 'self_' type invariant] [%#slogic'3] inv_ref_TzOffset self_}
+let base_utc_offset_TzOffset (self: t_TzOffset) (return (x: t_TimeDelta)) =
+{[@stop_split] [@expl:base_utc_offset 'self' type invariant] [%#stimezone_impl'1] inv_ref_TzOffset self}
   any
   [ return (result: t_TimeDelta) ->
-  {[@stop_split] [@expl:base_utc_offset_TzOffset ensures] ([@stop_split] [@expl:base_utc_offset result type invariant] [%#stimezone_impl'0] inv_TimeDelta result)
-    /\ ([@stop_split] [@expl:base_utc_offset ensures] [%#slogic'4] Int64.to_int (duration_num_seconds_value result)
-    = Int64.to_int (tz_offset_utc_offset_seconds self_))}
+  {[@stop_split] [@expl:base_utc_offset_TzOffset ensures] ([@stop_split] [@expl:base_utc_offset result type invariant] [%#stimezone_impl'2] inv_TimeDelta result)
+    /\ ([@stop_split] [@expl:base_utc_offset ensures] [%#slogic'1] Int64.to_int (duration_num_seconds_value result)
+    = Int64.to_int (tz_offset_utc_offset_seconds self))}
     (! return {result}) ]
 
 predicate invariant_ref_TimeDelta [@inline:trivial] (self: t_TimeDelta) = [%#sinvariant] inv_TimeDelta self
@@ -106,20 +106,20 @@ predicate inv_ref_TimeDelta [@inline:trivial] (_1: t_TimeDelta) = invariant_ref_
 
 meta "rewrite_def" predicate inv_ref_TimeDelta
 
-let num_seconds (self_: t_TimeDelta) (return (x: Int64.t)) =
-{[@stop_split] [@expl:num_seconds 'self_' type invariant] [%#slogic'5] inv_ref_TimeDelta self_}
+let num_seconds (self: t_TimeDelta) (return (x: Int64.t)) =
+{[@stop_split] [@expl:num_seconds 'self' type invariant] [%#stime_delta] inv_ref_TimeDelta self}
   any
-  [ return (result: Int64.t) -> {[@stop_split] [@expl:num_seconds ensures] [%#slogic'6] result
-    = duration_num_seconds_value self_}
+  [ return (result: Int64.t) -> {[@stop_split] [@expl:num_seconds ensures] [%#slogic'2] result
+    = duration_num_seconds_value self}
     (! return {result}) ]
 
-let dst_offset_TzOffset (self_: t_TzOffset) (return (x: t_TimeDelta)) =
-{[@stop_split] [@expl:dst_offset 'self_' type invariant] [%#slogic'7] inv_ref_TzOffset self_}
+let dst_offset_TzOffset (self: t_TzOffset) (return (x: t_TimeDelta)) =
+{[@stop_split] [@expl:dst_offset 'self' type invariant] [%#stimezone_impl'3] inv_ref_TzOffset self}
   any
   [ return (result: t_TimeDelta) ->
-  {[@stop_split] [@expl:dst_offset_TzOffset ensures] ([@stop_split] [@expl:dst_offset result type invariant] [%#stimezone_impl'1] inv_TimeDelta result)
-    /\ ([@stop_split] [@expl:dst_offset ensures] [%#slogic'8] Int64.to_int (duration_num_seconds_value result)
-    = Int64.to_int (tz_offset_dst_offset_seconds self_))}
+  {[@stop_split] [@expl:dst_offset_TzOffset ensures] ([@stop_split] [@expl:dst_offset result type invariant] [%#stimezone_impl'4] inv_TimeDelta result)
+    /\ ([@stop_split] [@expl:dst_offset ensures] [%#slogic'3] Int64.to_int (duration_num_seconds_value result)
+    = Int64.to_int (tz_offset_dst_offset_seconds self))}
     (! return {result}) ]
 
 meta "compute_max_steps" 1000000

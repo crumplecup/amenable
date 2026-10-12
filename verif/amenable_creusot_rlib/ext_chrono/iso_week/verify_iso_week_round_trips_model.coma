@@ -1,6 +1,6 @@
 (* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 110 8 116 23 *)
 
-let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/logic/ord.rs" 34 8 34 21
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
 let%span siso_week = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 117 43 117 47
 let%span siso_week'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 117 30 117 47
 let%span siso_week'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/iso_week.rs" 118 44 118 48

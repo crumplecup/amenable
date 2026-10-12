@@ -2,9 +2,10 @@
 
 (* <ledger::transfer_and_types::mirror::Transfer<S, Token> as amenable_core::Sidecar<witness::CreusotVerifier>> *)
 
-let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/invariant.rs" 85 8 85 18
+let%span sinvariant = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/invariant.rs" 90 8 90 18
 let%span stransfer_and_types = "/home/erik/repos/amenable/crates/amenable_creusot/src/ledger/transfer_and_types.rs" 155 13 155 37
-let%span sclone = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.13.0/src/std/clone.rs" 13 26 13 30
+let%span sclone = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/clone.rs" 236 14 236 18
+let%span sclone'0 = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/clone.rs" 236 4 236 28
 
 use creusot.int.UInt64
 use creusot.int.Int64
@@ -31,29 +32,29 @@ meta "rewrite_def" predicate inv_ref_Token
 predicate precondition_clone (self: ()) (args: t_Token)
 
 axiom precondition_fndef:
-  forall args: t_Token [precondition_clone () args]. (let self_ = args in [%#sclone] inv_ref_Token self_)
+  forall args: t_Token [precondition_clone () args]. (let self = args in [%#sclone] inv_ref_Token self)
     -> precondition_clone () args
 
 predicate postcondition_clone (self: ()) (args: t_Token) (result: t_Token)
 
 axiom postcondition_fndef:
-  forall args: t_Token, res: t_Token [postcondition_clone () args res]. postcondition_clone () args res
-    -> (let self_ = args in inv_Token res)
+  forall args: t_Token, result: t_Token [postcondition_clone () args result]. postcondition_clone () args result
+    -> (let self = args in [%#sclone'0] inv_Token result)
 
 predicate postcondition_once_clone (self: ()) (args: t_Token) (result: t_Token) = postcondition_clone self args result
 
 meta "rewrite_def" predicate postcondition_once_clone
 
-let clone_Token (self_: t_Token) (return (x: t_Token)) =
-{[@stop_split] [@expl:clone requires] precondition_clone () self_}
+let clone_Token (self: t_Token) (return (x: t_Token)) =
+{[@stop_split] [@expl:clone requires] precondition_clone () self}
   any
-  [ return (result: t_Token) -> {[@stop_split] [@expl:clone ensures] postcondition_once_clone () self_ result}
+  [ return (result: t_Token) -> {[@stop_split] [@expl:clone ensures] postcondition_once_clone () self result}
     (! return {result}) ]
 
 predicate inv_Transfer_S_Token (_1: t_Transfer_S_Token)
 
-axiom inv_axiom [@rewrite]: forall x: t_Transfer_S_Token [inv_Transfer_S_Token x]. inv_Transfer_S_Token x
-    = inv_Token x.token
+axiom inv_axiom [@rewrite]: forall _1: t_Transfer_S_Token [inv_Transfer_S_Token _1]. inv_Transfer_S_Token _1
+    = inv_Token _1.token
 
 predicate invariant_ref_Transfer_S_Token [@inline:trivial] (self: t_Transfer_S_Token) =
   [%#sinvariant] inv_Transfer_S_Token self
