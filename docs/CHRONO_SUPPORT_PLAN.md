@@ -9,8 +9,8 @@ Creusot (`ParseError` via an accommodation model -- `creusot-std`'s
 string model has no grounding for any literal, so the real "no name
 is empty" fact is restated over a small enum of real names by their
 lengths instead, mechanically discharged, no `#[trusted]`);
-`TzOffset`/`Tz` also trusted-by-citation/proven on Verus). Last
-revised 2026-10-12.
+`Tz`/`TzOffset`/`GapInfo`/`ParseError` all also genuinely proven on
+Verus). Last revised 2026-10-12.
 
 This plan adds full coverage of the chrono 0.4 and chrono-tz 0.10 public
 surfaces to `amenable_ext`. It mirrors the jiff effort: each type is registered
@@ -364,7 +364,7 @@ pass on the chrono backend for every civil carrier.
      construction. Confirmed non-vacuous the same way: a deliberately
      broken literal fails the exact right postcondition, then reverts
      clean.
-   - **`GapInfo`: genuinely proven on Kani and Creusot.** Kani checks
+   - **`GapInfo`: genuinely proven on Kani, Creusot, and Verus.** Kani checks
      the whole claim (gap detection *and* bracketing together) against
      94 concrete, discovered real-world transition witnesses -- the
      same discovery-to-collapse move `TzOffset` used, confirmed by a
@@ -397,8 +397,22 @@ pass on the chrono backend for every civil carrier.
      that half, same epistemic shape as `TzOffset::fix()`'s own axiom).
      Recorded as `amenable_std::creusot_gallery`'s
      `public_field_foreign_struct_forces_full_record_translation` case.
-   - **`chrono_tz::ParseError`: genuinely proven on both Kani and
-     Creusot.** Its real source (`pub struct ParseError(());`) carries
+     **Verus is also genuinely proven**, via a real accommodation
+     model (the same move `TzOffset`'s own Verus model uses, since
+     Verus cannot reach `chrono_tz::GapInfo` at all either): three
+     abstract variants stand in for three real, discovered gap
+     transitions from `amenable_ext::DISCOVERED_GAP_TABLE` (an
+     ordinary one-hour DST spring-forward, a rarer two-hour double-DST
+     jump, and a real International Date Line transition -- one of
+     four real rows tied for `86400` seconds, the largest width any
+     real zone produces), each with its own pre-/post-transition total
+     offset written independently of its gap width (a separate
+     literal, not their mechanical difference). Confirmed non-vacuous:
+     a deliberately broken literal fails the exact right postcondition
+     (`604 verified, 1 errors`), then reverts clean (`605 verified, 0
+     errors`).
+   - **`chrono_tz::ParseError`: genuinely proven on Kani, Creusot, and
+     Verus.** Its real source (`pub struct ParseError(());`) carries
      zero information -- the only possible claim is *when* it occurs,
      the negative direction of `Tz`'s own name/`FromStr` round trip
      (`Tz`'s own witnesses only exercise the positive direction: every
@@ -432,6 +446,12 @@ pass on the chrono backend for every civil carrier.
      creusot_gallery`'s
      `creusot_std_string_view_is_opaque_for_every_string` case; the
      abstract model sidesteps it entirely rather than resolving it.
+     **Verus is also genuinely proven**, via the identical model
+     restated in Verus syntax (Verus cannot reach `chrono_tz::
+     ParseError` at all either, so the same string-sidestep applies
+     unconditionally, not as a second-choice fallback). Confirmed
+     non-vacuous: a deliberately broken literal fails the exact right
+     postcondition, then reverts clean.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset
    bridge and the zone bridge, derived from the bounds. The current version
    treats `Local` as a named zone and must not be used.
