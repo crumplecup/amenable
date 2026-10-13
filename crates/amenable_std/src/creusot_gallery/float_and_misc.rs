@@ -337,3 +337,102 @@ let observed_next = atomic.load(ghost!(
         ),
     )
 }
+
+::inventory::submit! {
+    CreusotGalleryRegistration::new(
+        || CreusotGalleryCase::new(
+            "amenable_std::creusot_gallery::creusot_std_string_view_is_opaque_for_every_string".to_owned(),
+            "creusot-std's str::view() is #[logic(opaque)] with body `dead` for every string, including a literal -- no claim about a literal's length or content can be mechanically discharged".to_owned(),
+            CreusotGalleryDisposition::FalseTrail,
+            CreusotGalleryExpectation::Unproved,
+            r#"
+// Attempted while building a Creusot witness for chrono_tz::ParseError
+// (amenable_creusot::ext_chrono::parse_error): prove that a string
+// naming no real IANA zone makes Tz::from_str return Err, using ""
+// as the witness (chrono-tz's own real name table has no empty
+// entries -- confirmed by reading it, all 597 checked, shortest
+// "GB"/"NZ" at 2 characters):
+
+// Attempt 1 -- an arbitrary literal, no length reasoning at all:
+#[ensures(result)]
+fn verify_tz_from_str_rejects_unknown_name() -> bool {
+    matches!(chrono_tz::Tz::from_str("Definitely/Not/A/Real/Zone"), Err(_))
+}
+// Observed under `cargo creusot -- -p amenable_creusot`: translates
+// clean, but `why3find prove -X` leaves `goal
+// vc_verify_tz_from_str_rejects_unknown_name: not result = Ok x0`
+// genuinely unproved -- Tz::from_str's own extern_spec ties its Err
+// arm to `forall<t: Tz> s != tz_name_logic(&t)`, and `tz_name_logic`
+// is itself opaque with zero per-variant facts, so nothing rules out
+// an arbitrary literal matching some unknown variant.
+
+// Attempt 2 -- add a new axiom pinning every real name's length > 0,
+// attached to name()'s own #[ensures]:
+#[ensures(tz_name_logic(&self)@.len() > 0)]
+fn name(self) -> &'static str;
+// Observed: the wrapper never calls name(), only from_str, so this
+// per-call postcondition is never instantiated -- still unproved,
+// confirmed via -X showing the fact simply absent from the goal's
+// context.
+
+// Attempt 3 -- the same fact, moved to from_str's own #[ensures] as a
+// standalone `forall`:
+#[ensures(forall<t: chrono_tz::Tz> tz_name_logic(&t)@.len() > 0)]
+fn from_str(s: &str) -> Result<chrono_tz::Tz, chrono_tz::ParseError>;
+// Observed via -X: the axiom now appears in context (`axiom H2 :
+// forall t:t_Tz. 0 < length (view_str (tz_name t))`) but the goal is
+// still unproved -- an E-matching/trigger gap (nothing in the goal's
+// own shape cues the automatic solver to instantiate a `forall` over
+// an unrelated function), not a mathematical one.
+
+// Attempt 4 -- phrase it directly against `s`, no quantifier at all:
+#[ensures(s@.len() == 0 ==> match result { Err(_) => true, Ok(_) => false })]
+fn from_str(s: &str) -> Result<chrono_tz::Tz, chrono_tz::ParseError>;
+// Observed via -X: still unproved. `axiom H2 : length (view_str
+// ("":string)) = 0 -> ...` now appears, but its own premise --
+// `length (view_str (""))`, the view of a bare string *literal* --
+// is itself never resolved to a concrete value.
+
+// Attempt 5 -- read creusot-std 0.14.0's real source directly rather
+// than guess at a sixth formulation:
+impl View for str {
+    type ViewTy = Seq<char>;
+    #[logic(opaque)]
+    fn view(self) -> Self::ViewTy { dead }
+}
+// `str::len()`/`String::len()` both extern_spec through this same
+// `self@` (`result@ == self@.to_bytes().len()`). Confirmed root cause:
+// `str::view()` is fully opaque for *every* string, including a
+// literal -- there is no axiom anywhere, for any input, pinning its
+// result to a concrete `Seq`. No placement of a length- or content-
+// based fact can route around this; it is a real gap in Creusot's own
+// string model, the same shape as this gallery's own
+// `f64_has_no_view_impl_at_all` case for floats.
+
+// Working form (this is the real content, in amenable_creusot::
+// ext_chrono::parse_error today): an accommodation model, not a
+// mechanically-discharged proof -- `#[trusted]` on the wrapper, with
+// the bound named explicitly and tied to its evidence type via
+// `Ensures<CreusotVerifier>` (not a bare, unnamed `#[trusted]`
+// floating on the harness alone):
+#[trusted]
+#[ensures(result)]
+fn verify_tz_from_str_rejects_unknown_name() -> bool {
+    use std::str::FromStr;
+    matches!(chrono_tz::Tz::from_str(""), Err(_))
+}
+impl Ensures<CreusotVerifier> for ExtStandard<chrono_tz::ParseError> {
+    type Input = ();
+    type Bound = &'static str;
+    fn ensures(_: ()) -> &'static str {
+        VERIFY_TZ_FROM_STR_REJECTS_UNKNOWN_NAME_SRC
+    }
+}
+// Kani's own witness (amenable_kani::chrono::parse_error::
+// check_tz_parse_error_occurs_for_unknown_names) stays the real,
+// mechanically-checked proof for this claim, over three concrete
+// witness strings.
+"#.to_owned(),
+        ),
+    )
+}

@@ -12,6 +12,8 @@ mod naive_date_time;
 mod naive_time;
 mod naive_week;
 #[cfg(feature = "chrono-tz")]
+mod parse_error;
+#[cfg(feature = "chrono-tz")]
 mod tz;
 #[cfg(feature = "chrono-tz")]
 mod tz_offset;

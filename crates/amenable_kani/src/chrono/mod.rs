@@ -17,6 +17,8 @@ mod gap_info;
 mod gregorian;
 mod local;
 #[cfg(feature = "chrono-tz")]
+mod parse_error;
+#[cfg(feature = "chrono-tz")]
 mod tz;
 #[cfg(feature = "chrono-tz")]
 mod tz_offset;

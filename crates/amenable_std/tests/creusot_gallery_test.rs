@@ -1,7 +1,7 @@
 use amenable_std::{CreusotGalleryExpectation, CreusotGalleryRegistration};
 
 #[test]
-fn all_twenty_nine_gallery_findings_are_registered_and_distinct() {
+fn all_thirty_gallery_findings_are_registered_and_distinct() {
     amenable_core::init_tracing();
     let cases: Vec<_> = inventory::iter::<CreusotGalleryRegistration>()
         .map(|registration| (registration.case())())
@@ -9,14 +9,14 @@ fn all_twenty_nine_gallery_findings_are_registered_and_distinct() {
 
     assert_eq!(
         cases.len(),
-        29,
-        "expected exactly the 29 findings from this session's real pipeline work: {cases:#?}"
+        30,
+        "expected exactly the 30 findings from this session's real pipeline work: {cases:#?}"
     );
 
     let mut ids: Vec<&str> = cases.iter().map(|case| case.id().as_str()).collect();
     ids.sort_unstable();
     ids.dedup();
-    assert_eq!(ids.len(), 29, "gallery case ids must be unique");
+    assert_eq!(ids.len(), 30, "gallery case ids must be unique");
 
     let ice_count = cases
         .iter()
@@ -41,8 +41,9 @@ fn all_twenty_nine_gallery_findings_are_registered_and_distinct() {
         .filter(|case| case.expected() == CreusotGalleryExpectation::Unproved)
         .count();
     assert_eq!(
-        unproved_count, 3,
-        "three findings (Ordering::reverse, f64 FromStr, empty atomic_sc callbacks) translated clean but failed at the SMT stage"
+        unproved_count, 4,
+        "four findings (Ordering::reverse, f64 FromStr, empty atomic_sc callbacks, \
+         str::view's opacity for every string) translated clean but failed at the SMT stage"
     );
 
     let proved_count = cases
