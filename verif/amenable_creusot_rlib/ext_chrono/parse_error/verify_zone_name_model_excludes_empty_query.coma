@@ -1,0 +1,36 @@
+(* #"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 99 8 99 79 *)
+
+let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 22 8 22 20
+let%span sparse_error = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 97 19 97 23
+let%span sparse_error'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 98 18 98 57
+let%span sparse_error'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 73 24 73 53
+let%span sparse_error'2 = "/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 55 16 58 17
+
+use creusot.prelude.Any
+use int.Int
+
+type t_ZoneNameModelVariant = Gb | Nz
+
+predicate gt_log_Int [@inline:trivial] (self: int) (other: int) = [%#sord] other < self
+
+meta "rewrite_def" predicate gt_log_Int
+
+function zone_name_model_length [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 53 8 53 69] (v: t_ZoneNameModelVariant) : int
+ = [%#sparse_error'2] match v with
+    | Gb -> 2
+    | Nz -> 2
+    end
+
+predicate zone_name_model_excludes_empty_query [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 72 8 72 80] (v: t_ZoneNameModelVariant) =
+  [%#sparse_error'1] gt_log_Int (zone_name_model_length v) 0
+
+meta "compute_max_steps" 1000000
+
+meta "select_lsinst" "all"
+
+let verify_zone_name_model_excludes_empty_query [#"/home/erik/repos/amenable/crates/amenable_creusot/src/ext_chrono/parse_error.rs" 99 8 99 79]
+  (v: t_ZoneNameModelVariant) (return (x: ())) = (! bb0
+  [ bb0 = return {_ret} ] [ & _ret: () = Any.any_l () ])
+  [ return (result: ()) ->
+  {[@stop_split] [@expl:verify_zone_name_model_excludes_empty_query ensures] [%#sparse_error'0] zone_name_model_excludes_empty_query v}
+    (! return {result}) ]

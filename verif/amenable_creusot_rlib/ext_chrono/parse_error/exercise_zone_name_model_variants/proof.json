@@ -1,0 +1,15 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_exercise_zone_name_model_variants": {
+        "prover": "alt-ergo",
+        "time": 0.025
+      },
+      "vc_verify_zone_name_model_excludes_empty_query": {
+        "prover": "alt-ergo",
+        "time": 0.02
+      }
+    }
+  }
+}

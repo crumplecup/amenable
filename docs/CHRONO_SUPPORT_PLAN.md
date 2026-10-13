@@ -4,10 +4,13 @@
 8/67 rows (11.9%, unchanged -- the 8 instantiation-row registrations are
 still pending), chrono-tz 4/5 rows (80.0% -- `Tz`, `TzOffset`,
 `GapInfo`, and `chrono_tz::ParseError` all genuinely proven on Kani;
-`Tz`/`TzOffset`/`GapInfo` also proven on Creusot, `ParseError` an
-accommodation model there (`creusot-std`'s string model has no
-grounding for any literal); `TzOffset`/`Tz` also trusted-by-citation/
-proven on Verus). Last revised 2026-10-12.
+`Tz`/`TzOffset`/`GapInfo`/`ParseError` all also genuinely proven on
+Creusot (`ParseError` via an accommodation model -- `creusot-std`'s
+string model has no grounding for any literal, so the real "no name
+is empty" fact is restated over a small enum of real names by their
+lengths instead, mechanically discharged, no `#[trusted]`);
+`TzOffset`/`Tz` also trusted-by-citation/proven on Verus). Last
+revised 2026-10-12.
 
 This plan adds full coverage of the chrono 0.4 and chrono-tz 0.10 public
 surfaces to `amenable_ext`. It mirrors the jiff effort: each type is registered
@@ -394,34 +397,41 @@ pass on the chrono backend for every civil carrier.
      that half, same epistemic shape as `TzOffset::fix()`'s own axiom).
      Recorded as `amenable_std::creusot_gallery`'s
      `public_field_foreign_struct_forces_full_record_translation` case.
-   - **`chrono_tz::ParseError`: genuinely proven on Kani, an
-     accommodation model on Creusot.** Its real source (`pub struct
-     ParseError(());`) carries zero information -- the only possible
-     claim is *when* it occurs, the negative direction of `Tz`'s own
-     name/`FromStr` round trip (`Tz`'s own witnesses only exercise the
-     positive direction: every real variant's own name round-trips).
-     Kani checks this for real over three concrete witness strings
-     (none naming a real zone, confirmed against chrono-tz's own
-     `TIMEZONES` table), binned via an indexed loop over a `const`
-     array -- the first attempt (three separate hand-written `assert!`
-     calls, then a `for name in` iterator loop) regressed cordial's
-     unnamed-contract-bound check and CBMC's own performance in turn;
-     the fix for both was the same shape `Tz`'s own binned harnesses
-     already use. **Creusot cannot mechanically discharge this claim**:
+   - **`chrono_tz::ParseError`: genuinely proven on both Kani and
+     Creusot.** Its real source (`pub struct ParseError(());`) carries
+     zero information -- the only possible claim is *when* it occurs,
+     the negative direction of `Tz`'s own name/`FromStr` round trip
+     (`Tz`'s own witnesses only exercise the positive direction: every
+     real variant's own name round-trips). Kani checks this for real
+     over three concrete witness strings (none naming a real zone,
+     confirmed against chrono-tz's own `TIMEZONES` table), binned via
+     an indexed loop over a `const` array -- the first attempt (three
+     separate hand-written `assert!` calls, then a `for name in`
+     iterator loop) regressed cordial's unnamed-contract-bound check
+     and CBMC's own performance in turn; the fix for both was the same
+     shape `Tz`'s own binned harnesses already use. **Creusot cannot
+     mechanically discharge this claim over the real `str` type**:
      five genuine attempts (an arbitrary literal, a per-call axiom, a
      standalone `forall`, a direct `s@.len()` implication, then reading
      `creusot-std`'s own source directly) root-caused this to
      `creusot-std`'s `str::view()` being `#[logic(opaque)]` with body
      `dead` for *every* string, including a literal -- a real gap in
      Creusot's own string model, not this claim's own formulation (the
-     same shape as `f64_has_no_view_impl_at_all`). The accommodation:
-     `#[trusted]` on the wrapper, with the bound named explicitly and
-     tied to its evidence type via `Ensures<CreusotVerifier>` (not a
-     bare, unnamed `#[trusted]`) -- the same shape `amenable_std::
-     rust_std_witness::string_carrier`'s own `Ensures` impl uses for a
-     bound with no exec representation. Recorded as
-     `amenable_std::creusot_gallery`'s
-     `creusot_std_string_view_is_opaque_for_every_string` case.
+     same shape as `f64_has_no_view_impl_at_all`). The real fact behind
+     the claim isn't content-free, though: chrono-tz's real prebuilt
+     table has no empty name (confirmed, all 597 entries checked,
+     shortest "GB"/"NZ" at 2 characters), so a length-0 query can't
+     equal any of them -- a claim that doesn't need `str::view()` at
+     all once restated over plain integers. `ZoneNameModelVariant`
+     models the two shortest real names by their real lengths (the
+     same move `TzOffsetModelVariant`'s own Verus model uses for
+     `base`/`dst`/`fix`), with the one law that matters --
+     `zone_name_model_excludes_empty_query` -- genuinely discharged by
+     Creusot's own prover, no `#[trusted]` anywhere. The string-based
+     wall is still real and recorded as `amenable_std::
+     creusot_gallery`'s
+     `creusot_std_string_view_is_opaque_for_every_string` case; the
+     abstract model sidesteps it entirely rather than resolving it.
 7. **Contract table:** rebuild `scratchpad/zone-contract-table.md` for the offset
    bridge and the zone bridge, derived from the bounds. The current version
    treats `Local` as a named zone and must not be used.

@@ -1,9 +1,0 @@
-{
-  "profile": [],
-  "proofs": {
-    "Coma": {
-      "vc_from_str_Tz": { "prover": "z3", "time": 0.006 },
-      "vc_verify_tz_from_str_rejects_unknown_name": null
-    }
-  }
-}

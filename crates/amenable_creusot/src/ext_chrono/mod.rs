@@ -29,7 +29,7 @@ pub use naive_date_time::VERIFY_NAIVE_DATE_TIME_ROUND_TRIPS_SRC;
 pub use naive_time::VERIFY_NAIVE_TIME_FROM_HMS_NANO_ROUND_TRIPS_SRC;
 pub use naive_week::VERIFY_NAIVE_WEEK_SPAN_MODEL_SRC;
 #[cfg(feature = "chrono-tz")]
-pub use parse_error::VERIFY_TZ_FROM_STR_REJECTS_UNKNOWN_NAME_SRC;
+pub use parse_error::VERIFY_ZONE_NAME_MODEL_EXCLUDES_EMPTY_QUERY_SRC;
 #[cfg(feature = "chrono-tz")]
 pub use tz::VERIFY_TZ_NAME_AND_FROM_STR_ROUND_TRIP_SRC;
 #[cfg(feature = "chrono-tz")]

@@ -1,0 +1,11 @@
+{
+  "profile": [],
+  "proofs": {
+    "Coma": {
+      "vc_verify_zone_name_model_excludes_empty_query": {
+        "prover": "alt-ergo",
+        "time": 0.023
+      }
+    }
+  }
+}
