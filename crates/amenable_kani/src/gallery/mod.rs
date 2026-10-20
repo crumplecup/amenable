@@ -31,6 +31,8 @@ mod chrono_naive_week_span_partition_test;
 #[cfg(feature = "chrono")]
 mod chrono_naive_week_stub_composition;
 #[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip;
+#[cfg(feature = "chrono")]
 mod chrono_year_partition_exhaustiveness_test;
 #[cfg(feature = "chrono")]
 mod chrono_year_partition_sweep;

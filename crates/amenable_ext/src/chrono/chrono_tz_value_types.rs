@@ -67,9 +67,19 @@ impl_ext_type!(
     "The error returned when a string does not name any real IANA time zone recognized by Tz's FromStr."
 );
 
+impl_ext_type!(
+    chrono::DateTime<chrono_tz::Tz>,
+    "chrono contributors",
+    "chrono",
+    "chrono",
+    "https://docs.rs/chrono/latest/chrono/struct.DateTime.html",
+    "An offset-aware fixed instant, paired with a named IANA time zone."
+);
+
 register_ext_standard_evidence!(
     chrono_tz::Tz,
     chrono_tz::TzOffset,
     chrono_tz::GapInfo,
-    chrono_tz::ParseError
+    chrono_tz::ParseError,
+    chrono::DateTime<chrono_tz::Tz>,
 );

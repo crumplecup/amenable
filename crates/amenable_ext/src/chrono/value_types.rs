@@ -5,6 +5,15 @@
 //! added as their witnesses land. Phase 3 adds `Local`: it shares the instant
 //! bridge with `Utc`/`FixedOffset` (decision 12), but needs its own value
 //! registration and witnesses, the same as any other type.
+//!
+//! `DateTime<T>` is registered below for `T` in {`Utc`, `FixedOffset`,
+//! `Local`} (`chrono_tz::Tz`'s own instantiation lives in
+//! `chrono_tz_value_types.rs`, gated on the `chrono-tz` feature).
+//! `Date<T>` is deliberately NOT registered for any `T`: it has been
+//! `#[deprecated]` since chrono 0.4.23, and rather than suppress that
+//! lint at every call site (or crate-wide) just to force coverage of
+//! a type chrono itself is steering users away from, it's excluded by
+//! exception instead -- the user's direct call.
 
 use crate::macros::{impl_ext_type, register_ext_standard_evidence};
 
@@ -80,6 +89,33 @@ impl_ext_type!(
     "The local time zone: takes its offset rules from the host's timezone database."
 );
 
+impl_ext_type!(
+    chrono::DateTime<chrono::Utc>,
+    "chrono contributors",
+    "chrono",
+    "chrono",
+    "https://docs.rs/chrono/latest/chrono/struct.DateTime.html",
+    "An offset-aware fixed instant, here always at the zero UTC offset."
+);
+
+impl_ext_type!(
+    chrono::DateTime<chrono::FixedOffset>,
+    "chrono contributors",
+    "chrono",
+    "chrono",
+    "https://docs.rs/chrono/latest/chrono/struct.DateTime.html",
+    "An offset-aware fixed instant, paired with the fixed offset it was recorded at."
+);
+
+impl_ext_type!(
+    chrono::DateTime<chrono::Local>,
+    "chrono contributors",
+    "chrono",
+    "chrono",
+    "https://docs.rs/chrono/latest/chrono/struct.DateTime.html",
+    "An offset-aware fixed instant, paired with the host's local offset at the time it was recorded."
+);
+
 register_ext_standard_evidence!(
     chrono::NaiveDate,
     chrono::NaiveTime,
@@ -89,4 +125,7 @@ register_ext_standard_evidence!(
     chrono::Utc,
     chrono::FixedOffset,
     chrono::Local,
+    chrono::DateTime<chrono::Utc>,
+    chrono::DateTime<chrono::FixedOffset>,
+    chrono::DateTime<chrono::Local>,
 );

@@ -60,7 +60,8 @@ pub use chrono::{
 pub use chrono::{
     ChronoDate, ChronoDateTime, ChronoInstant, ChronoOffset, ChronoOffsetDateTime,
     ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime, ChronoTimeBackend,
-    ChronoVerifier, ChronoVerifierMetadata,
+    ChronoVerifier, ChronoVerifierMetadata, chrono_to_offset_date_time_descriptor,
+    naive_date_time_to_local_date_time_descriptor,
 };
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]
@@ -71,3 +72,8 @@ pub use jiff::{
     JiffTimestamp, JiffVerifier, JiffVerifierMetadata, JiffZoned,
 };
 pub use provenance_vocab::{Authority, AuthorityKind, SourceCrate, SourceModule, TypeName};
+#[cfg(any(feature = "jiff", feature = "chrono"))]
+pub use temporal_fraction::{
+    fractional_digit_bytes_to_nanos, fractional_seconds_digits_to_nanos,
+    nanos_to_fractional_digit_bytes, nanos_to_fractional_seconds_digits,
+};

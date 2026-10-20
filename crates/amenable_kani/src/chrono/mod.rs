@@ -16,6 +16,7 @@ mod fixed_offset;
 mod gap_info;
 mod gregorian;
 mod local;
+mod offset_date_time;
 #[cfg(feature = "chrono-tz")]
 mod parse_error;
 #[cfg(feature = "chrono-tz")]

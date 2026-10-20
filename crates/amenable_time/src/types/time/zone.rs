@@ -87,6 +87,33 @@ pub struct UtcOffsetDescriptor {
     #[builder(default)]
     #[getter(copy)]
     minutes: Option<u8>,
+    /// Absolute seconds-within-the-minute component, present only
+    /// for real backend values with sub-minute precision -- `None`
+    /// for the ordinary, spec-shaped case.
+    ///
+    /// ISO/WD 8601-1:2016(E) section 4.2.5.1 states a UTC offset
+    /// "carries a sign, an hour component, and optionally a minute
+    /// component" -- a floor on the required shape, not a ceiling on
+    /// what the type may also carry. A real backend offset (e.g.
+    /// `chrono::FixedOffset`) can have sub-minute precision -- real,
+    /// not hypothetical: chrono-tz's own historical zone data has
+    /// 1952 real `(zone, year)` combinations with a genuine non-zero
+    /// seconds remainder, pre-dating timezone standardization (e.g.
+    /// `Africa/Abidjan`, 1800: a real Local Mean Time offset of
+    /// `-968s` = `-0:16:08`). This field exists so those real values
+    /// round-trip losslessly rather than being silently truncated or
+    /// rejected, the same way `minutes` already exists for
+    /// hour-only vs. hour-minute precision.
+    ///
+    /// No ISO 8601 (or RFC 3339/9557) textual form defines how to
+    /// render a seconds-bearing UTC offset -- a real, open gap in
+    /// this crate's own parse/format paths, not yet addressed. A
+    /// descriptor built directly (as the chrono instant bridge
+    /// does) is unaffected; only serialization of a `Some` value
+    /// would need to resolve this.
+    #[builder(default)]
+    #[getter(copy)]
+    seconds: Option<u8>,
     /// Whether the relationship is a known local offset or the RFC
     /// 9557-updated unknown-offset case.
     #[builder(default)]

@@ -74,6 +74,48 @@ impl InvalidDescriptorSource {
     }
 }
 
+/// A local date-time's sub-second precision represents a leap second
+/// (`nanosecond` in `1_000_000_000..2_000_000_000`), which the
+/// descriptor form has no representation for.
+///
+/// Holds the raw `nanosecond` count rather than a pre-formatted
+/// `detail: String`: the backend value this wraps (e.g. a
+/// `chrono::NaiveDateTime`) is often still fully symbolic at the call
+/// site (a Kani proof exercising the surrounding `Exchange`), and
+/// `Display`-formatting it eagerly at construction time -- rather
+/// than lazily, only if something later actually displays this error
+/// -- was confirmed to be the real cost behind a CBMC timeout
+/// (`format!("{datetime}")`'s variable-width signed-year formatting
+/// goes through `Formatter::padding`, expensive for a symbolic
+/// value, even on a branch CBMC cannot cheaply prove dead).
+#[derive(Debug, Display, Error, Getters)]
+#[display("leap-second nanosecond value {nanosecond} is not representable by the descriptor form")]
+pub struct LeapSecondNotRepresentableSource {
+    /// The sub-second nanosecond count that marked this as a leap
+    /// second.
+    #[error(ignore)]
+    nanosecond: u32,
+    /// Source line of the call site that produced this error.
+    line: u32,
+    /// Source file of the call site that produced this error.
+    file: String,
+}
+
+impl LeapSecondNotRepresentableSource {
+    /// Record an unrepresentable leap second, capturing the caller's
+    /// location.
+    #[track_caller]
+    #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
+    pub fn new(nanosecond: u32) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            nanosecond,
+            line: loc.line(),
+            file: loc.file().to_string(),
+        }
+    }
+}
+
 /// The requested operation is unsupported by this backend.
 #[derive(Debug, Display, Error, Getters)]
 #[display("unsupported temporal operation: {detail}")]
@@ -203,6 +245,10 @@ pub enum TemporalErrorKind {
     /// A neutral descriptor violates the required contract shape.
     #[display("{_0}")]
     InvalidDescriptor(InvalidDescriptorSource),
+    /// A local date-time's sub-second precision represents a leap
+    /// second, which the descriptor form cannot represent.
+    #[display("{_0}")]
+    LeapSecondNotRepresentable(LeapSecondNotRepresentableSource),
     /// The requested operation is unsupported by this backend.
     #[display("{_0}")]
     Unsupported(UnsupportedSource),

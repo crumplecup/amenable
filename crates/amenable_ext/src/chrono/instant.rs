@@ -129,17 +129,21 @@ pub(super) fn utc_offset_descriptor_to_fixed_offset(
         )));
     }
 
-    let magnitude =
-        i32::from(descriptor.hours()) * 3600 + i32::from(descriptor.minutes().unwrap_or(0)) * 60;
+    let magnitude = i32::from(descriptor.hours()) * 3600
+        + i32::from(descriptor.minutes().unwrap_or(0)) * 60
+        + i32::from(descriptor.seconds().unwrap_or(0));
     let seconds = match descriptor.sign() {
         UtcOffsetSign::Positive => magnitude,
         UtcOffsetSign::Negative => -magnitude,
     };
 
+    // A static message, not `format!("...{seconds}")`: interpolating a
+    // symbolic signed value here was confirmed to be Kani-expensive
+    // elsewhere in this file for the same reason (`Formatter::padding`
+    // on a variable-width value), and the magnitude itself adds no
+    // diagnostic value a static description doesn't already carry.
     chrono::FixedOffset::east_opt(seconds).ok_or_else(|| {
-        invalid(format!(
-            "offset out of chrono::FixedOffset's representable range (seconds: {seconds})"
-        ))
+        invalid("offset out of chrono::FixedOffset's representable range".to_owned())
     })
 }
 
@@ -150,6 +154,17 @@ pub(super) fn utc_offset_descriptor_to_fixed_offset(
 /// offset is an exact whole number of hours, the same convention
 /// `UtcOffsetDescriptor`'s own doc comment states. Mirrors the jiff
 /// backend's `jiff_offset_to_utc_offset_descriptor`.
+///
+/// Captures a sub-minute remainder losslessly via `UtcOffsetDescriptor`'s
+/// own `seconds` field, rather than truncating it: a real
+/// `chrono::FixedOffset` can carry sub-minute precision, confirmed by
+/// scanning chrono-tz's own real historical data, not assumed -- 1952
+/// real `(zone, year)` combinations before timezone standardization
+/// have a genuine non-zero seconds remainder (e.g. `Africa/Abidjan`,
+/// 1800: `-968s` = `-0:16:08`, a real Local Mean Time offset). See
+/// `UtcOffsetDescriptor::seconds`'s own doc comment for why this is
+/// still ISO-8601-compliant (the spec states a floor on the required
+/// shape, not a ceiling on what the type may also carry).
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(offset)))]
 pub(super) fn fixed_offset_to_utc_offset_descriptor(
     offset: chrono::FixedOffset,
@@ -161,22 +176,40 @@ pub(super) fn fixed_offset_to_utc_offset_descriptor(
         UtcOffsetSign::Positive
     };
     let magnitude = seconds.unsigned_abs();
+    // `chrono::FixedOffset` is always within +/-23:59:59 (confirmed in its
+    // own source), so `magnitude / 3600 <= 23` and the two `% 60` remainders
+    // below always fit `u8`, and the builder's two required fields are
+    // always set -- every `map_err` below is genuinely unreachable
+    // defensive code for a real offset. Static messages, not
+    // `format!("...{err}")`: `TryFromIntError`/the builder error carry no
+    // runtime-varying information beyond a fixed description (confirmed
+    // by reading their own `Display` impls), so interpolating them adds
+    // nothing a static string doesn't already say -- and doing so was the
+    // real, confirmed cost behind a CBMC timeout (a `Debug`-driven
+    // `PadAdapter` recursion), unlike the leap-second case elsewhere in
+    // this module, where the `nanosecond` value is genuinely informative.
     let hours = u8::try_from(magnitude / 3600)
-        .map_err(|err| invalid(format!("offset's hour component does not fit: {err}")))?;
+        .map_err(|_| invalid("offset's hour component does not fit a u8".to_owned()))?;
     let remainder_minutes = (magnitude % 3600) / 60;
+    let remainder_seconds = magnitude % 60;
 
     let mut builder = UtcOffsetDescriptorBuilder::default()
         .sign(sign)
         .hours(hours);
     if remainder_minutes != 0 {
         let minutes = u8::try_from(remainder_minutes)
-            .map_err(|err| invalid(format!("offset's minute component does not fit: {err}")))?;
+            .map_err(|_| invalid("offset's minute component does not fit a u8".to_owned()))?;
         builder = builder.minutes(minutes);
+    }
+    if remainder_seconds != 0 {
+        let seconds = u8::try_from(remainder_seconds)
+            .map_err(|_| invalid("offset's second component does not fit a u8".to_owned()))?;
+        builder = builder.seconds(seconds);
     }
 
     builder
         .build()
-        .map_err(|err| invalid(format!("could not build a UTC offset descriptor: {err}")))
+        .map_err(|_| invalid("could not build a UTC offset descriptor".to_owned()))
 }
 
 /// Resolve a full offset date-time descriptor to a real
@@ -196,29 +229,32 @@ pub(super) fn offset_date_time_descriptor_to_chrono(
 ) -> Result<chrono::DateTime<chrono::FixedOffset>, TemporalError> {
     let local = local_date_time_descriptor_to_naive(descriptor.local())?;
     let offset = utc_offset_descriptor_to_fixed_offset(descriptor.offset())?;
+    // A static message, not `format!("{local} ... {offset:?}")`: this
+    // branch is genuinely unreachable for `FixedOffset` (confirmed
+    // above: a fixed offset has no ambiguity or gap to report), and
+    // interpolating either symbolic value was confirmed Kani-expensive
+    // elsewhere in this file for the same `Formatter::padding` reason.
     local.and_local_timezone(offset).single().ok_or_else(|| {
-        invalid(format!(
-            "{local} has no unique mapping under offset {offset:?}"
-        ))
+        invalid("local date-time has no unique mapping under this offset".to_owned())
     })
 }
 
 /// The inverse of [`offset_date_time_descriptor_to_chrono`].
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(datetime)))]
-pub(super) fn chrono_to_offset_date_time_descriptor(
+pub fn chrono_to_offset_date_time_descriptor(
     datetime: chrono::DateTime<chrono::FixedOffset>,
 ) -> Result<OffsetDateTimeDescriptor, TemporalError> {
     let local = naive_date_time_to_local_date_time_descriptor(datetime.naive_local())?;
     let offset = fixed_offset_to_utc_offset_descriptor(*datetime.offset())?;
+    // Both required fields (`local`/`offset`) are always set above, so
+    // this can't genuinely fail -- a static message, not
+    // `format!("...{err}")`, for the same reason given in
+    // `fixed_offset_to_utc_offset_descriptor`.
     OffsetDateTimeDescriptorBuilder::default()
         .local(local)
         .offset(offset)
         .build()
-        .map_err(|err| {
-            invalid(format!(
-                "could not build an offset date-time descriptor: {err}"
-            ))
-        })
+        .map_err(|_| invalid("could not build an offset date-time descriptor".to_owned()))
 }
 
 // ── Instant native bridge ────────────────────────────────────────────

@@ -5,9 +5,9 @@ use crate::temporal_fraction::{
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
     CalendarDateDescriptor, CompleteDateDescriptor, FractionalSecondDescriptor,
-    InvalidDescriptorSource, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
-    LocalTimeDescriptorBuilder, ProvenLocalDateTimeCarrier, ReflectedLocalDateTime,
-    TemporalCivilProps, TemporalError, TemporalErrorKind,
+    InvalidDescriptorSource, LeapSecondNotRepresentableSource, LocalDateTimeDescriptor,
+    LocalDateTimeDescriptorBuilder, LocalTimeDescriptorBuilder, ProvenLocalDateTimeCarrier,
+    ReflectedLocalDateTime, TemporalCivilProps, TemporalError, TemporalErrorKind,
 };
 
 // ── Carriers ─────────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ fn iso_weekday(number: u8) -> Result<chrono::Weekday, TemporalError> {
         5 => Ok(chrono::Weekday::Fri),
         6 => Ok(chrono::Weekday::Sat),
         7 => Ok(chrono::Weekday::Sun),
-        other => Err(invalid(format!("weekday {other} is not in 1..=7"))),
+        _ => Err(invalid("ISO weekday number is not in 1..=7".to_owned())),
     }
 }
 
@@ -179,23 +179,28 @@ fn iso_weekday(number: u8) -> Result<chrono::Weekday, TemporalError> {
 pub(super) fn complete_date_descriptor_to_naive_date(
     date: CompleteDateDescriptor,
 ) -> Result<chrono::NaiveDate, TemporalError> {
+    // Static messages, not `format!("{cal:?}/{ord:?}/{week:?} ...")`: a
+    // `Debug` of these descriptors formats a signed, variable-width
+    // `year` field, the same `Formatter::padding` cost confirmed
+    // expensive elsewhere in this module for a symbolic value.
     match date {
         CompleteDateDescriptor::Calendar(cal) => chrono::NaiveDate::from_ymd_opt(
             cal.year(),
             u32::from(cal.month()),
             u32::from(cal.day()),
         )
-        .ok_or_else(|| invalid(format!("{cal:?} is not a real calendar date"))),
+        .ok_or_else(|| invalid("calendar date descriptor is not a real calendar date".to_owned())),
         CompleteDateDescriptor::Ordinal(ord) => {
-            chrono::NaiveDate::from_yo_opt(ord.year(), u32::from(ord.day_of_year()))
-                .ok_or_else(|| invalid(format!("{ord:?} is not a real ordinal date")))
+            chrono::NaiveDate::from_yo_opt(ord.year(), u32::from(ord.day_of_year())).ok_or_else(
+                || invalid("ordinal date descriptor is not a real ordinal date".to_owned()),
+            )
         }
         CompleteDateDescriptor::Week(week) => chrono::NaiveDate::from_isoywd_opt(
             week.week_year(),
             u32::from(week.week()),
             iso_weekday(week.weekday())?,
         )
-        .ok_or_else(|| invalid(format!("{week:?} is not a real ISO week date"))),
+        .ok_or_else(|| invalid("week date descriptor is not a real ISO week date".to_owned())),
     }
 }
 
@@ -214,15 +219,19 @@ pub(super) fn local_date_time_descriptor_to_naive(
     let nanos = match time.fractional_second() {
         None => 0,
         Some(fraction) => u32::try_from(fractional_seconds_digits_to_nanos(fraction.digits())?)
-            .map_err(|err| invalid(format!("fractional second does not fit chrono: {err}")))?,
+            .map_err(|_| invalid("fractional second does not fit chrono".to_owned()))?,
     };
+    // Static messages, not `format!("...{err}/{time:?}...")`, for the
+    // same reason as `complete_date_descriptor_to_naive_date` above.
     let naive_time = chrono::NaiveTime::from_hms_nano_opt(
         u32::from(time.hour()),
         u32::from(time.minute()),
         u32::from(time.second()),
         nanos,
     )
-    .ok_or_else(|| invalid(format!("{time:?} is not a real local time for chrono")))?;
+    .ok_or_else(|| {
+        invalid("local time descriptor is not a real local time for chrono".to_owned())
+    })?;
 
     Ok(chrono::NaiveDateTime::new(date, naive_time))
 }
@@ -233,31 +242,49 @@ pub(super) fn local_date_time_descriptor_to_naive(
 /// Leap seconds (chrono's nanoseconds past `999_999_999`) are rejected for the
 /// same reason as the inverse direction.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(datetime)))]
-pub(super) fn naive_date_time_to_local_date_time_descriptor(
+pub fn naive_date_time_to_local_date_time_descriptor(
     datetime: chrono::NaiveDateTime,
 ) -> Result<LocalDateTimeDescriptor, TemporalError> {
     use chrono::{Datelike, Timelike};
 
     let nanos = datetime.nanosecond();
     if nanos >= 1_000_000_000 {
-        return Err(invalid(format!(
-            "{datetime} is a leap second, which the descriptor form does not represent"
-        )));
+        return Err(TemporalError::new(
+            TemporalErrorKind::LeapSecondNotRepresentable(LeapSecondNotRepresentableSource::new(
+                nanos,
+            )),
+        ));
     }
 
     let date = datetime.date();
+    // chrono's month/day/hour/minute/second are `u32`, always
+    // 1..=12/1..=31/0..=23/0..=59/0..=59, so none of the narrowings or
+    // builder calls below can genuinely fail for a real chrono value --
+    // every `map_err` here is unreachable defensive code. Static
+    // messages, not `format!("...{err}")`: `TryFromIntError`/the builder
+    // errors carry no runtime-varying information beyond a fixed
+    // description, so interpolating them was the real, confirmed cost
+    // behind a CBMC timeout (a `Debug`-driven format recursion) while
+    // adding nothing a static string doesn't already say.
     let calendar = CalendarDateDescriptor::new(
         date.year(),
-        // chrono's month and day are `u32`, always 1..=12 and 1..=31, so the
-        // narrowing cannot truncate.
-        u8::try_from(date.month()).map_err(|err| invalid(format!("month: {err}")))?,
-        u8::try_from(date.day()).map_err(|err| invalid(format!("day: {err}")))?,
+        u8::try_from(date.month()).map_err(|_| invalid("month does not fit a u8".to_owned()))?,
+        u8::try_from(date.day()).map_err(|_| invalid("day does not fit a u8".to_owned()))?,
     );
 
     let mut time_builder = LocalTimeDescriptorBuilder::default()
-        .hour(u8::try_from(datetime.hour()).map_err(|err| invalid(format!("hour: {err}")))?)
-        .minute(u8::try_from(datetime.minute()).map_err(|err| invalid(format!("minute: {err}")))?)
-        .second(u8::try_from(datetime.second()).map_err(|err| invalid(format!("second: {err}")))?);
+        .hour(
+            u8::try_from(datetime.hour())
+                .map_err(|_| invalid("hour does not fit a u8".to_owned()))?,
+        )
+        .minute(
+            u8::try_from(datetime.minute())
+                .map_err(|_| invalid("minute does not fit a u8".to_owned()))?,
+        )
+        .second(
+            u8::try_from(datetime.second())
+                .map_err(|_| invalid("second does not fit a u8".to_owned()))?,
+        );
     if nanos != 0 {
         time_builder = time_builder.fractional_second(FractionalSecondDescriptor::new(
             nanos_to_fractional_seconds_digits(i64::from(nanos)),
@@ -265,17 +292,13 @@ pub(super) fn naive_date_time_to_local_date_time_descriptor(
     }
     let time = time_builder
         .build()
-        .map_err(|err| invalid(format!("could not build a local time descriptor: {err}")))?;
+        .map_err(|_| invalid("could not build a local time descriptor".to_owned()))?;
 
     LocalDateTimeDescriptorBuilder::default()
         .date(CompleteDateDescriptor::Calendar(calendar))
         .time(time)
         .build()
-        .map_err(|err| {
-            invalid(format!(
-                "could not build a local date-time descriptor: {err}"
-            ))
-        })
+        .map_err(|_| invalid("could not build a local date-time descriptor".to_owned()))
 }
 
 // ── Civil native bridge ──────────────────────────────────────────────

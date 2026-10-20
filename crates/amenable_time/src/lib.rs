@@ -302,9 +302,9 @@ pub use contracts::{
 };
 pub use coverage::{TemporalCoverage, TemporalCoverageRow};
 pub use error::{
-    AmbiguousLocalTimestampSource, InvalidDescriptorSource, LossyConversionRequiresAuthoritySource,
-    NamedZoneInconsistencySource, ParseRejectedSource, TemporalError, TemporalErrorKind,
-    TemporalResult, UnsupportedSource,
+    AmbiguousLocalTimestampSource, InvalidDescriptorSource, LeapSecondNotRepresentableSource,
+    LossyConversionRequiresAuthoritySource, NamedZoneInconsistencySource, ParseRejectedSource,
+    TemporalError, TemporalErrorKind, TemporalResult, UnsupportedSource,
 };
 pub use exchange::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyEstablishedToken,
