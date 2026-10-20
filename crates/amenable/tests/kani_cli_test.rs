@@ -6,7 +6,8 @@
 //! serialized operation, not something a fast unit test should trigger.
 
 use amenable::{
-    KaniProof, Ledger, ProofStatus, first_diagnostic_line, is_kani_timeout, kani_command,
+    KaniProgressTracker, KaniProof, KaniStage, Ledger, ProofStatus, first_diagnostic_line,
+    is_kani_timeout, kani_command,
 };
 use miette::{IntoDiagnostic, WrapErr};
 
@@ -107,4 +108,96 @@ fn diagnostics_prefer_the_first_error_over_kani_startup_output() {
         first_diagnostic_line(diagnostics).as_deref(),
         Some("error[E0433]: missing type")
     );
+}
+
+#[test]
+fn tracks_the_known_total_from_generated_vcc_line() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("Generated 662 VCC(s), 99 remaining after simplification");
+    assert_eq!(tracker.stage(), KaniStage::GeneratingVccs { total: 99 });
+}
+
+#[test]
+fn counts_one_property_per_decision_procedure_line_after_vcc_total_known() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("Generated 662 VCC(s), 99 remaining after simplification");
+    tracker.observe_line("Runtime decision procedure: 0.111205s");
+    assert_eq!(
+        tracker.stage(),
+        KaniStage::Solving {
+            completed: 1,
+            total: Some(99)
+        }
+    );
+    tracker.observe_line("Runtime decision procedure: 0.00734341s");
+    assert_eq!(
+        tracker.stage(),
+        KaniStage::Solving {
+            completed: 2,
+            total: Some(99)
+        }
+    );
+}
+
+#[test]
+fn counts_properties_even_without_a_known_total() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("Runtime decision procedure: 0.1s");
+    assert_eq!(
+        tracker.stage(),
+        KaniStage::Solving {
+            completed: 1,
+            total: None
+        }
+    );
+}
+
+#[test]
+fn tracks_unwinding_iterations() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line(
+        "Unwinding loop _RNvNt...fractional_digit_bytes_to_nanos.0 iteration 8 \
+         file crates/amenable_ext/src/temporal_fraction.rs line 23 column 5 \
+         function amenable_ext::fractional_digit_bytes_to_nanos thread 0",
+    );
+    assert_eq!(tracker.stage(), KaniStage::Unwinding { iteration: 8 });
+}
+
+#[test]
+fn recognizes_successful_and_failed_verdicts() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("VERIFICATION:- SUCCESSFUL");
+    assert_eq!(tracker.stage(), KaniStage::Done { successful: true });
+
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("VERIFICATION:- FAILED");
+    assert_eq!(tracker.stage(), KaniStage::Done { successful: false });
+}
+
+#[test]
+fn unrecognized_lines_leave_the_stage_unchanged() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("Generated 662 VCC(s), 99 remaining after simplification");
+    tracker.observe_line("     --> crates/amenable_kani/src/chrono/civil_naive_week.rs:47:28");
+    assert_eq!(tracker.stage(), KaniStage::GeneratingVccs { total: 99 });
+}
+
+#[test]
+fn kani_banner_and_warnings_stream_live_during_compilation() {
+    amenable::init_tracing();
+    let mut tracker = KaniProgressTracker::new();
+    tracker.observe_line("Kani Rust Verifier 0.67.0 (cargo plugin)");
+    assert_eq!(tracker.stage(), KaniStage::Compiling { warnings_seen: 0 });
+
+    tracker.observe_line("warning: unused import: `Days`");
+    assert_eq!(tracker.stage(), KaniStage::Compiling { warnings_seen: 1 });
+
+    tracker.observe_line("warning: unused imports: `Datelike` and `MAX_YEAR`");
+    assert_eq!(tracker.stage(), KaniStage::Compiling { warnings_seen: 2 });
 }

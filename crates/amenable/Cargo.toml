@@ -18,6 +18,11 @@ name = "amenable"
 path = "src/main.rs"
 required-features = ["cli"]
 
+[[test]]
+name = "kani_cli_test"
+path = "tests/kani_cli_test.rs"
+required-features = ["cli"]
+
 [dependencies]
 amenable_core = { workspace = true }
 amenable_std = { workspace = true }
@@ -43,12 +48,20 @@ tracing = { workspace = true }
 workspace = true
 optional = true
 
+[dependencies.indicatif]
+workspace = true
+optional = true
+
+[dependencies.regex]
+workspace = true
+optional = true
+
 [dev-dependencies.miette]
 workspace = true
 
 [features]
 default = ["cli"]
-cli = ["dep:miette"]
+cli = ["dep:miette", "dep:indicatif", "dep:regex"]
 # Creusot is at feature parity with Kani and Verus across the standard
 # library; this feature is opt-in only to keep the default build's
 # dependency tree light (it pulls in `amenable_creusot` -> `creusot-std`),

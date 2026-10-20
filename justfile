@@ -31,6 +31,15 @@ check-all-package package:
     cargo clippy -p {{package}} --all-targets --all-features -- -D warnings
     cargo test -p {{package}}
 
+# Installs the `amenable` binary itself onto PATH, matching the same
+# `just install` convention cordial already uses (see `cordial-gate`'s
+# own comment). `--all-features` so the installed binary carries every
+# backend (creusot/verus) and the `cli` feature it needs to run at all
+# (the `[[bin]]`'s own `required-features`), not whatever subset
+# happened to be on by default.
+install:
+    cargo install --path crates/amenable --all-features
+
 # ~22 `cargo check` runs -- the feature surface (cli/creusot/verus) is
 # small, so the full powerset needs no `--depth` cap. `--no-dev-deps`
 # temporarily edits Cargo.toml (restored on exit). Needs cargo-hack

@@ -1,19 +1,17 @@
 //! Kani harness discovery, execution, and result-ledger support for the CLI.
 
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs,
-    path::Path,
-    process::{Command, Stdio},
-    time::{SystemTime, UNIX_EPOCH},
-};
+use std::{collections::BTreeSet, process::Command};
 
 use crate::{AmenableError, AmenableResult, KaniProof, KaniProofRegistration};
 use clap::{Args, ValueEnum};
 use serde::Serialize;
-
 use tracing::instrument;
-const LEDGER_HEADER: &str = "proof_id,timestamp,status";
+
+mod ledger;
+mod run;
+pub use ledger::Ledger;
+pub(crate) use ledger::{default_results_path, load_results};
+use run::run_proof;
 
 /// Selection and execution options for `amenable verify kani`.
 #[derive(Debug, Args)]
@@ -36,16 +34,6 @@ pub struct VerifyKaniArgs {
     /// Kani-native timeout applied to each harness, for example `3m`.
     #[arg(long, default_value = "3m")]
     harness_timeout: String,
-}
-
-#[instrument(level = "debug")]
-pub(super) fn default_results_path() -> std::path::PathBuf {
-    crate::paths::artifacts_directory().join("kani-verification-results.csv")
-}
-
-#[instrument(level = "info", skip(path))]
-pub(super) fn load_results(path: &Path) -> AmenableResult<Vec<VerificationResult>> {
-    Ok(Ledger::load(path)?.into_results())
 }
 
 /// List or run the selected Kani harnesses.
@@ -79,11 +67,11 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
             record.id()
         ))?;
         let result = run_proof(record, &args.harness_timeout);
-        if let Some(message) = &result.message {
+        if let Some(message) = result.message() {
             crate::write_stderr_line(format!("    {message}"))?;
         }
 
-        match result.status {
+        match result.status() {
             ProofStatus::Passed => crate::write_stdout_line("    passed")?,
             ProofStatus::Failed => {
                 crate::write_stdout_line("    failed")?;
@@ -95,7 +83,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
             }
         }
 
-        ledger.upsert(record.id(), result.status)?;
+        ledger.upsert(record.id(), result.status())?;
         ledger.persist(&args.results)?;
     }
 
@@ -135,15 +123,7 @@ fn select_records<'a>(
         return Ok(records.iter().collect());
     }
 
-    let retry_ids: BTreeSet<_> = ledger
-        .rows
-        .iter()
-        .filter(|(_, row)| {
-            (args.retry_failed && row.status == ProofStatus::Failed)
-                || (args.retry_timeout && row.status == ProofStatus::Timeout)
-        })
-        .map(|(id, _)| id.as_str())
-        .collect();
+    let retry_ids = ledger.ids_with_status(args.retry_failed, args.retry_timeout);
     let registered_ids: BTreeSet<_> = records.iter().map(|record| record.id().as_str()).collect();
 
     for id in retry_ids.difference(&registered_ids) {
@@ -156,38 +136,6 @@ fn select_records<'a>(
         .iter()
         .filter(|record| retry_ids.contains(record.id().as_str()))
         .collect())
-}
-
-#[instrument(level = "info", skip(record))]
-fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
-    let output = kani_command(record, harness_timeout)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output();
-
-    match output {
-        Ok(output) if output.status.success() => ProofRun::passed(),
-        Ok(output) => {
-            let diagnostics = format!(
-                "{}{}",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr)
-            );
-            let status = if is_kani_timeout(&diagnostics) {
-                ProofStatus::Timeout
-            } else {
-                ProofStatus::Failed
-            };
-            ProofRun {
-                status,
-                message: first_diagnostic_line(&diagnostics),
-            }
-        }
-        Err(error) => ProofRun {
-            status: ProofStatus::Failed,
-            message: Some(format!("could not start cargo kani: {error}")),
-        },
-    }
 }
 
 /// Build the `cargo kani` invocation for one registered proof, applying
@@ -280,150 +228,5 @@ impl ProofStatus {
             "timeout" => Some(Self::Timeout),
             _ => None,
         }
-    }
-}
-
-struct ProofRun {
-    status: ProofStatus,
-    message: Option<String>,
-}
-
-impl ProofRun {
-    #[instrument(level = "debug")]
-    fn passed() -> Self {
-        Self {
-            status: ProofStatus::Passed,
-            message: None,
-        }
-    }
-}
-
-struct LedgerRow {
-    timestamp: u64,
-    status: ProofStatus,
-}
-
-/// Persisted CSV record of the latest verification result per proof ID.
-pub struct Ledger {
-    rows: BTreeMap<String, LedgerRow>,
-}
-
-#[derive(Debug, Clone, Serialize, derive_getters::Getters, derive_getters::Dissolve)]
-pub(super) struct VerificationResult {
-    proof_id: String,
-    #[getter(copy)]
-    timestamp: u64,
-    #[getter(copy)]
-    status: ProofStatus,
-}
-
-impl Ledger {
-    /// Number of proofs with a recorded result.
-    #[instrument(level = "trace", skip(self))]
-    pub fn len(&self) -> usize {
-        self.rows.len()
-    }
-
-    /// Whether the ledger has no recorded results.
-    #[instrument(level = "trace", skip(self))]
-    pub fn is_empty(&self) -> bool {
-        self.rows.is_empty()
-    }
-
-    /// The latest recorded status for `proof_id`, if any.
-    #[instrument(level = "trace", skip(self))]
-    pub fn status_for(&self, proof_id: &str) -> Option<ProofStatus> {
-        self.rows.get(proof_id).map(|row| row.status)
-    }
-
-    /// Load the ledger from `path`, or an empty ledger if it doesn't
-    /// exist yet.
-    #[instrument(level = "debug", skip(path))]
-    pub fn load(path: &Path) -> AmenableResult<Self> {
-        if !path.exists() {
-            return Ok(Self {
-                rows: BTreeMap::new(),
-            });
-        }
-
-        let contents = fs::read_to_string(path).map_err(|error| AmenableError::io(path, error))?;
-        let mut lines = contents.lines();
-        match lines.next() {
-            Some(LEDGER_HEADER) => {}
-            _ => {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani result ledger header in {}",
-                    path.display()
-                )));
-            }
-        }
-
-        let mut rows = BTreeMap::new();
-        for (line_number, line) in lines.enumerate() {
-            if line.is_empty() {
-                continue;
-            }
-            let mut fields = line.split(',');
-            let proof_id = fields.next().unwrap_or_default();
-            let timestamp = fields.next().unwrap_or_default().parse::<u64>().ok();
-            let status = fields.next().and_then(ProofStatus::parse);
-            let row_is_malformed = fields.next().is_some() || proof_id.is_empty();
-
-            let (false, Some(timestamp), Some(status)) = (row_is_malformed, timestamp, status)
-            else {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani result ledger row {} in {}",
-                    line_number + 2,
-                    path.display()
-                )));
-            };
-            rows.insert(proof_id.to_owned(), LedgerRow { timestamp, status });
-        }
-
-        Ok(Self { rows })
-    }
-
-    /// Record `status` as the latest result for `proof_id`, timestamped
-    /// now, replacing any previous entry.
-    #[instrument(level = "debug", skip(self, status))]
-    pub fn upsert(&mut self, proof_id: &str, status: ProofStatus) -> AmenableResult<()> {
-        let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-        self.rows
-            .insert(proof_id.to_owned(), LedgerRow { timestamp, status });
-        Ok(())
-    }
-
-    /// Write the ledger to `path` atomically (write, then rename).
-    #[instrument(level = "debug", skip(self, path))]
-    pub fn persist(&self, path: &Path) -> AmenableResult<()> {
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
-        }
-
-        let mut contents = format!("{LEDGER_HEADER}\n");
-        for (proof_id, row) in &self.rows {
-            contents.push_str(proof_id);
-            contents.push(',');
-            contents.push_str(&row.timestamp.to_string());
-            contents.push(',');
-            contents.push_str(row.status.as_str());
-            contents.push('\n');
-        }
-
-        let temporary = path.with_extension(format!("{}.tmp", std::process::id()));
-        fs::write(&temporary, contents).map_err(|error| AmenableError::io(&temporary, error))?;
-        fs::rename(&temporary, path).map_err(|error| AmenableError::io(path, error))
-    }
-
-    #[instrument(level = "debug", skip(self))]
-    fn into_results(self) -> Vec<VerificationResult> {
-        self.rows
-            .into_iter()
-            .map(|(proof_id, row)| VerificationResult {
-                proof_id,
-                timestamp: row.timestamp,
-                status: row.status,
-            })
-            .collect()
     }
 }

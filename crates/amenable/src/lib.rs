@@ -22,15 +22,35 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+// `assessment`, `cli`, `cli_output`, `gallery`, `kani`, `kani_progress`,
+// `paths`, and `registry_dump` are, in their entirety, CLI tooling --
+// argument-parsing types, process orchestration, ledgers, and the
+// path/output helpers only that tooling calls (confirmed by checking
+// each one's real cross-module consumers: every caller of every item
+// any of them export lives inside this same cluster). None of it is
+// part of the facade this crate otherwise is (see the module doc
+// comment above) -- gating the whole cluster behind `cli` here, once,
+// is `amenable`'s own version of the "cli" feature doing what it's
+// named for, rather than scattering `#[cfg(feature = "cli")]` through
+// each file's internals to approximate the same boundary piecemeal.
+#[cfg(feature = "cli")]
 mod assessment;
+#[cfg(feature = "cli")]
 mod cli;
+#[cfg(feature = "cli")]
 mod cli_output;
 #[cfg(feature = "creusot")]
 mod creusot_export;
 mod error;
+#[cfg(feature = "cli")]
 mod gallery;
+#[cfg(feature = "cli")]
 mod kani;
+#[cfg(feature = "cli")]
+mod kani_progress;
+#[cfg(feature = "cli")]
 mod paths;
+#[cfg(feature = "cli")]
 mod registry_dump;
 #[cfg(feature = "verus")]
 mod verus_exchange_export;
@@ -84,25 +104,35 @@ pub use amenable_time::{
     TemporalCapabilities, TemporalCoverage, TemporalCoverageRow, TemporalError, TemporalErrorKind,
     TemporalReporter,
 };
-pub use assessment::{AssessArgs, load};
-pub use cli::Cli;
 #[cfg(feature = "cli")]
-pub use cli::install_hook;
+mod cli_surface {
+    pub use crate::assessment::{AssessArgs, load};
+    pub use crate::cli::{Cli, install_hook};
+    pub use crate::gallery::GalleryArgs;
+    pub use crate::kani::{
+        Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
+        verify,
+    };
+    pub use crate::kani_progress::{KaniProgressTracker, KaniStage};
+    pub use crate::paths::{
+        artifacts_directory, creusot_generated_directory, verus_exchange_generated_directory,
+        verus_gaap_ledger_tokens_path, verus_source_directory,
+    };
+}
+#[cfg(feature = "cli")]
 pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
+#[cfg(feature = "cli")]
+pub use cli_surface::{
+    AssessArgs, Cli, GalleryArgs, KaniProgressTracker, KaniStage, Ledger, ProofStatus,
+    VerifyKaniArgs, artifacts_directory, creusot_generated_directory, first_diagnostic_line,
+    install_hook, is_kani_timeout, kani_command, load, verify, verus_exchange_generated_directory,
+    verus_gaap_ledger_tokens_path, verus_source_directory,
+};
 #[cfg(feature = "creusot")]
 pub use creusot_export::write_creusot_exchange_companions;
 pub use error::{
     AmenableError, AmenableErrorKind, AmenableResult, IoSource, SerdeSource, SystemTimeSource,
     TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
-};
-pub use gallery::GalleryArgs;
-pub use kani::{
-    Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
-    verify,
-};
-pub use paths::{
-    artifacts_directory, creusot_generated_directory, verus_exchange_generated_directory,
-    verus_gaap_ledger_tokens_path, verus_source_directory,
 };
 #[cfg(feature = "verus")]
 pub use verus_facade::{
