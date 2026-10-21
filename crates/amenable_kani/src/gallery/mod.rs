@@ -16,6 +16,7 @@
 //! the behavior we needed to confirm.
 
 mod atomic_ptr_compare_exchange;
+mod boxed_error_variant_count;
 #[cfg(feature = "chrono")]
 mod chrono_day_count_staging;
 #[cfg(feature = "chrono")]
