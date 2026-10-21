@@ -106,6 +106,34 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
         self.len += 1;
         Ok(self)
     }
+
+    /// Append one `char`'s UTF-8 encoding (1-4 bytes), growing the
+    /// modeled length accordingly.
+    ///
+    /// Loops a fixed 4 times (`char::encode_utf8`'s own maximum
+    /// width), not `char_len` times -- a loop bounded by the
+    /// `char`'s own symbolic encoded length, rather than a
+    /// compile-time constant, is exactly the shape confirmed
+    /// expensive elsewhere in this crate's Kani gallery
+    /// (`gallery::string_depth_induction`'s own doc comment), even
+    /// though 4 is already tiny.
+    ///
+    /// # Errors
+    ///
+    /// Returns `KaniUtf8BufferError::TooLong` if the encoding would
+    /// not fit within `MAX_LEN` capacity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    pub fn push_char(self, c: char) -> Result<Self, KaniUtf8BufferError> {
+        let mut encode_buf = [0u8; 4];
+        let char_len = c.encode_utf8(&mut encode_buf).len();
+        let mut result = self;
+        for (i, &byte) in encode_buf.iter().enumerate() {
+            if i < char_len {
+                result = result.push_byte(byte)?;
+            }
+        }
+        Ok(result)
+    }
 }
 
 /// Every field (`[u8; MAX_LEN]`, `usize`) already implements

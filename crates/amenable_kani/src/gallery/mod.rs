@@ -58,5 +58,7 @@ mod string_depth_induction;
 mod string_drain;
 mod string_drop_vacuity;
 mod udp_inbox_removal_cost;
+mod utf8_buffer_validity_induction;
+mod utf8_seam_concatenation;
 mod utf8_validation_algorithm_cost;
 mod vacuity;
