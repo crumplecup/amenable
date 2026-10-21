@@ -5,7 +5,7 @@
 //! file instead of scattering gates per item. `impl_kani_compose_symbolic!`'s
 //! generated impls reference `KaniCompose` from outside this file, so
 //! `compose::mod` re-exports `KaniCompose` publicly and the internal helpers
-//! with crate visibility. `symbolic_ascii_char` stays private: only `String`'s
+//! with crate visibility. `symbolic_char` stays private: only `String`'s
 //! own impl calls it.
 
 /// Build verifier-friendly bounded values for Kani harnesses.
@@ -67,11 +67,17 @@ pub(crate) fn kani_assume(condition: bool) {
     kani::assume(condition);
 }
 
+/// A genuinely arbitrary `char` over Kani's own `Arbitrary` impl --
+/// the full Unicode scalar-value domain (no surrogates, nothing above
+/// U+10FFFF, per `char`'s own validity invariant), not an ASCII-only
+/// subset. Confirmed directly (`amenable_kani::gallery::
+/// string_compose_ascii_restriction`) to cost essentially the same as
+/// the ASCII-restricted construction this replaced (0.95s/338 checks
+/// vs. 0.83s/275), so the earlier restriction bought nothing and only
+/// narrowed what every `String` depth/any proof actually covers.
 #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
-fn symbolic_ascii_char() -> char {
-    let byte: u8 = symbolic_any();
-    kani_assume(byte < 128);
-    byte as char
+fn symbolic_char() -> char {
+    symbolic_any()
 }
 
 impl KaniCompose for () {
@@ -124,13 +130,13 @@ impl KaniCompose for String {
     }
 
     fn kani_depth1() -> Self {
-        symbolic_ascii_char().to_string()
+        symbolic_char().to_string()
     }
 
     fn kani_depth2() -> Self {
         let mut s = String::new();
-        s.push(symbolic_ascii_char());
-        s.push(symbolic_ascii_char());
+        s.push(symbolic_char());
+        s.push(symbolic_char());
         s
     }
 
@@ -140,7 +146,7 @@ impl KaniCompose for String {
         kani_assume(len <= 4);
         let mut s = String::new();
         for _ in 0..len {
-            s.push(symbolic_ascii_char());
+            s.push(symbolic_char());
         }
         s
     }

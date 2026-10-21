@@ -95,7 +95,31 @@
 //! wrapping a type that is *itself* already heap-allocating
 //! (`Box<String>`, confirmed sufficient entirely on its own, no enum
 //! or wrapper struct required) -- a doubled heap indirection, not
-//! heap allocation per se. This still fully explains the real crash:
+//! heap allocation per se. Two further rungs sharpen this precisely:
+//! a bare `&'static str` (a fat pointer into static data, no
+//! allocation, no `Drop` impl) and `Box<&'static str>` (a `Box`
+//! wrapping that same pointer) **both pass cleanly** -- 9.5s and
+//! 29.8s respectively, the fastest and cheapest rungs on the whole
+//! ladder. So it is specifically "`Box` wraps a type that *owns* a
+//! heap allocation" (has its own `RawVec`/`Drop`-driven
+//! deallocation), not "`Box` wraps anything that happens to contain a
+//! pointer" -- a reference, boxed or not, is never the problem.
+//!
+//! **That rule was still wrong, in the other direction.** It predicts
+//! `Box<Vec<u32>>` should OOM the same way `Box<String>` does -- `Vec`
+//! is `RawVec`-backed exactly like `String`. It doesn't: confirmed
+//! **passes**, 76.5s, 159/159 checks. Nor does `Box<Vec<u8>>`,
+//! matching `String`'s own internal byte type exactly (confirmed
+//! passes, 67.0s, 152/152 checks) -- ruling out element type as the
+//! explanation too. `Box<Vec<T>>` passes for every `T` tried; only
+//! `Box<String>` OOMs. The true boundary, as far as this ladder
+//! reaches, is narrower still: it is specific to `String`, not to
+//! "any `RawVec`-owning type behind a `Box`" -- something about
+//! `String`'s own representation or drop glue (UTF-8 invariant,
+//! `Display`/`Debug` machinery, or some CBMC-model-specific detail of
+//! `std::string::String` vs. `std::vec::Vec`) that `Vec` does not
+//! share, not yet pulled apart further. This still fully explains the
+//! real crash:
 //! `TemporalError`'s `Box<TemporalErrorKind>`, with
 //! `InvalidDescriptorSource`'s `String` fields nested inside the
 //! boxed enum, is exactly this shape. It's that DFCC's own
@@ -128,6 +152,68 @@
 //! it doesn't change the recommended fix (remove all heap allocation
 //! under `cfg(kani)`, already confirmed sufficient), so this is left
 //! as a genuinely open question rather than chased further here.
+//!
+//! **Prior art in `~/repos/elicitation`, with a correction.**
+//! `~/repos/elicitation` has already chased two related but distinct
+//! failure classes -- but the first one below required digging past a
+//! superseded hypothesis to find the actual, confirmed conclusion:
+//!
+//! - `crates/elicit_proofs/src/kani/gallery/level17.rs` isolates a
+//!   *plain, unboxed* `String` field dropped inside a
+//!   `#[kani::proof_for_contract]`-analyzed function. Concrete content
+//!   passes (17a/17b, matching this file's rung 3). 17c's doc comment
+//!   *predicts* ("Expected: FAIL", literally with a question mark in
+//!   the table) that symbolic content would fail DFCC's "ptr is
+//!   freeable" check -- but that prediction was never the final word.
+//!   `level18.rs`, built specifically to probe this further, found the
+//!   real bug was something else entirely: their `kani_depth1()`
+//!   helper returned `String::new()`, identical to depth-0, which made
+//!   any proof with a non-empty precondition **vacuous** (the
+//!   `kani::assume` silently pruned the only path, so the proof
+//!   reported PASS without ever exercising the real case). Once fixed
+//!   to return one genuinely symbolic char (`kani::any::<char>()
+//!   .to_string()`), the proof was both non-vacuous *and* passed --
+//!   directly refuting the DFCC concern. Confirmed by the fixing
+//!   commit itself (`6de484ca`, 2026-05-20, "fix(kani): fix unsound
+//!   String KaniCompose and generator"): "Gallery18 experiments
+//!   confirmed symbolic strings can be safely dropped in
+//!   proof_for_contract; the old DFCC concern was unfounded." So
+//!   elicitation's own conclusion is the *opposite* of what 17c
+//!   predicted: a plain, unboxed, genuinely symbolic `String`, dropped
+//!   under `proof_for_contract`, is fine. This does not overturn
+//!   anything in this file -- every `Box<String>` rung here used
+//!   concrete, always-present literals (never a vacuous precondition
+//!   to hide behind), so this file's OOM is a separate, independently
+//!   reproduced phenomenon from elicitation's retracted hypothesis,
+//!   not a confirmation of it. The real, transferable lesson is the
+//!   **vacuity trap**: substituting `String::new()` for a symbolic
+//!   value under `cfg(kani)` is only sound when nothing requires
+//!   non-emptiness (or any other content-dependent precondition) --
+//!   worth rechecking before applying this file's own "empty the
+//!   String under cfg(kani)" recommendation to any real field that
+//!   does have such a precondition (`InvalidDescriptorSource`'s
+//!   `detail` currently has none, confirmed directly: nothing in this
+//!   codebase ever branches on its content).
+//! - `crates/elicitation_kani/src/diag.rs` and
+//!   `crates/elicit_proofs/src/kani/diag.rs` chase a *different*
+//!   mechanism: large struct variants inflating an enum's overall
+//!   union footprint, fixed by boxing the **struct variant itself**
+//!   (`Box<ConnectionProfile>`) -- the opposite of what helped in this
+//!   file's `small_discriminant` rung, where boxing the heavy variant
+//!   changed nothing. Not the same failure class as this file's;
+//!   worth not conflating the two.
+//! - `elicitation::verification::types::Utf8Bytes<const MAX_LEN:
+//!   usize>` (`crates/elicitation/src/verification/types/utf8.rs`) is
+//!   the production answer to "how do you represent a bounded string
+//!   to Kani cheaply": a fixed-size **stack array** (`[u8; MAX_LEN]` +
+//!   `len`), never `String`/`Vec`/`RawVec` internally, with real
+//!   byte-by-byte UTF-8 validation swapped under `cfg(kani)` for a
+//!   single `kani::any::<bool>()` -- sidestepping the exact
+//!   `run_utf8_validation` loop blowup this file's rung 12 hit, by
+//!   never calling it at all. A stronger candidate for
+//!   `InvalidDescriptorSource`'s eventual production fix than simply
+//!   emptying the `String` under `cfg(kani)`, if genuine symbolic
+//!   string reasoning is ever wanted there.
 
 /// Every item here exists only for the Kani harnesses below, so the whole
 /// module is gated once, rather than scattering `#[cfg(kani)]` across each
@@ -642,6 +728,225 @@ mod kani_only {
         let _ = boxed_string_only_fallible(u32::from(v3));
     }
 
+    /// Escalation ladder, rung 8: a bare `&'static str` field -- a fat
+    /// pointer (ptr + length) into the binary's static data. No
+    /// allocation, no `Drop` impl, nothing for `RawVec` to touch.
+    /// Isolates whether Kani handles `&'static str` at all, and
+    /// whether a plain reference field (not owning any heap memory)
+    /// behaves like the passing `u32` cases above.
+    pub(super) struct StaticStrError {
+        value: &'static str,
+    }
+
+    impl StaticStrError {
+        fn new(value: &'static str) -> Self {
+            Self { value }
+        }
+    }
+
+    pub(super) fn static_str_fallible(value: u32) -> Result<u8, StaticStrError> {
+        u8::try_from(value).map_err(|_err| StaticStrError::new("placeholder"))
+    }
+
+    /// The same, calling `static_str_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_static_str_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = static_str_fallible(u32::from(v1));
+        let _ = static_str_fallible(u32::from(v2));
+        let _ = static_str_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 9: `Box<&'static str>` -- a `Box`
+    /// wrapping a pointer, but that pointer owns no heap allocation of
+    /// its own (unlike `Box<String>`, confirmed to OOM). Sharpens the
+    /// refined hypothesis from rung 7: is the trigger "`Box` wrapping
+    /// *anything containing a pointer*", or specifically "`Box`
+    /// wrapping a type that *owns* a heap allocation (has `RawVec`/
+    /// `Drop`-driven deallocation)"? `&'static str` has neither.
+    pub(super) struct BoxedStaticStrError {
+        value: Box<&'static str>,
+    }
+
+    impl BoxedStaticStrError {
+        fn new(value: &'static str) -> Self {
+            Self {
+                value: Box::new(value),
+            }
+        }
+    }
+
+    pub(super) fn boxed_static_str_fallible(value: u32) -> Result<u8, BoxedStaticStrError> {
+        u8::try_from(value).map_err(|_err| BoxedStaticStrError::new("placeholder"))
+    }
+
+    /// The same, calling `boxed_static_str_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_static_str_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_static_str_fallible(u32::from(v1));
+        let _ = boxed_static_str_fallible(u32::from(v2));
+        let _ = boxed_static_str_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 10: `Box<Vec<u32>>` -- a direct
+    /// prediction from rung 9's refined rule ("`Box` wraps a type
+    /// that *owns* a heap allocation"). `Vec<u32>` (rung 2) is
+    /// `RawVec`-backed exactly like `String`, just without `String`'s
+    /// UTF-8/`Display` machinery. If the rule holds, this should OOM
+    /// the same way `Box<String>` did.
+    pub(super) struct BoxedVecError {
+        value: Box<Vec<u32>>,
+    }
+
+    impl BoxedVecError {
+        fn new(value: u32) -> Self {
+            Self {
+                value: Box::new(vec![value]),
+            }
+        }
+    }
+
+    pub(super) fn boxed_vec_fallible(value: u32) -> Result<u8, BoxedVecError> {
+        u8::try_from(value).map_err(|_err| BoxedVecError::new(value))
+    }
+
+    /// The same, calling `boxed_vec_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_vec_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_vec_fallible(u32::from(v1));
+        let _ = boxed_vec_fallible(u32::from(v2));
+        let _ = boxed_vec_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 11: `Box<Vec<u8>>` -- `Box<Vec<u32>>`
+    /// (rung 10) unexpectedly passed, refuting "`Box` wraps a type
+    /// that owns a heap allocation" as stated: `Vec<u32>` is
+    /// `RawVec`-backed exactly like `String`, yet only `Box<String>`
+    /// OOMs. This isolates the one remaining difference: element
+    /// type. `String` is internally `Vec<u8>`; this tests `Vec<u8>`
+    /// directly, same backing byte type as `String`, still no
+    /// `String`-specific UTF-8/`Display` machinery.
+    pub(super) struct BoxedVecU8Error {
+        value: Box<Vec<u8>>,
+    }
+
+    impl BoxedVecU8Error {
+        fn new(value: u8) -> Self {
+            Self {
+                value: Box::new(vec![value]),
+            }
+        }
+    }
+
+    pub(super) fn boxed_vec_u8_fallible(value: u32) -> Result<u8, BoxedVecU8Error> {
+        u8::try_from(value).map_err(|_err| BoxedVecU8Error::new(0))
+    }
+
+    /// The same, calling `boxed_vec_u8_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_vec_u8_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_vec_u8_fallible(u32::from(v1));
+        let _ = boxed_vec_u8_fallible(u32::from(v2));
+        let _ = boxed_vec_u8_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 12: does bounding the `String`'s size
+    /// tame the `Box<String>` blowup? Every `Box<String>` rung so far
+    /// used a fixed, *concrete* 11-byte literal (`"placeholder"`) --
+    /// never symbolic at all. This builds a genuinely symbolic
+    /// `String`, bounded to exactly 8 bytes, each byte constrained to
+    /// printable ASCII so the result is always valid UTF-8 (so
+    /// `String::from_utf8`'s own validation never has a failure path
+    /// to reason about -- that would be a separate confound). Reuses
+    /// `BoxedStringOnlyError` itself (rung 7) unchanged; only the
+    /// content fed into it changes. Isolates whether the cost comes
+    /// from CBMC's freedom to reason about an unconstrained symbolic
+    /// buffer, or is inherent to `Box<String>`'s type/drop-glue shape
+    /// regardless of content.
+    pub(super) fn boxed_bounded_string_fallible(value: u32) -> Result<u8, BoxedStringOnlyError> {
+        u8::try_from(value).map_err(|_err| {
+            let bytes: [u8; 8] = kani::any();
+            for byte in &bytes {
+                kani::assume(*byte >= 0x20 && *byte < 0x7f);
+            }
+            let text = String::from_utf8(bytes.to_vec()).unwrap();
+            BoxedStringOnlyError::new(&text)
+        })
+    }
+
+    /// The same, calling `boxed_bounded_string_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_bounded_string_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_bounded_string_fallible(u32::from(v1));
+        let _ = boxed_bounded_string_fallible(u32::from(v2));
+        let _ = boxed_bounded_string_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 13: the corrected version of rung 12.
+    /// `String::from_utf8` on fully symbolic bytes turned out to be
+    /// its own expensive confound (an unwound `run_utf8_validation`
+    /// loop, not a heap-OOM question at all). This builds the same
+    /// genuinely symbolic, exactly-8-byte `String` without calling
+    /// `from_utf8`: each byte is pushed as a `char` directly
+    /// (`char::from(u8)` is total -- every `u8` is a valid Unicode
+    /// scalar value, no validation, no panic path), restricted to
+    /// `< 0x80` so every `char` encodes as exactly one UTF-8 byte,
+    /// keeping the buffer's length an exact, known 8 bytes. The loop
+    /// itself has a fixed, compile-time-constant bound (`0..8`), so
+    /// there's nothing for CBMC to unwind unboundedly.
+    ///
+    /// Confirmed OOM at 418,600 steps / 7,154 VCCs -- but this result
+    /// is **conflated, not conclusive**: building the `String` via 8
+    /// sequential `push` calls measures the cost of incremental
+    /// `RawVec` growth/reallocation, repeated three times by the
+    /// `thrice_contracted` wrapper -- not the cost of a known size
+    /// bound as a fact the solver has to represent. A `String` of
+    /// provably-bounded size built in one shot, without incremental
+    /// growth, was never actually tested here. Left open rather than
+    /// chased further without checking in first.
+    pub(super) fn boxed_bounded_string_v2_fallible(value: u32) -> Result<u8, BoxedStringOnlyError> {
+        u8::try_from(value).map_err(|_err| {
+            let mut text = String::new();
+            for _ in 0..8 {
+                let byte: u8 = kani::any();
+                kani::assume(byte < 0x80);
+                text.push(char::from(byte));
+            }
+            BoxedStringOnlyError::new(&text)
+        })
+    }
+
+    /// The same, calling `boxed_bounded_string_v2_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_bounded_string_v2_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_bounded_string_v2_fallible(u32::from(v1));
+        let _ = boxed_bounded_string_v2_fallible(u32::from(v2));
+        let _ = boxed_bounded_string_v2_fallible(u32::from(v3));
+    }
+
     /// Three real, inlined calls to `nine_variant_fallible`, wrapped in
     /// a trivially-contracted function -- the exact shape that crashed
     /// for the real `narrow_to_u8`.
@@ -671,10 +976,13 @@ mod kani_only {
 
 #[cfg(kani)]
 use kani_only::{
-    call_boxed_string_only_thrice_contracted, call_boxed_u32_thrice_contracted,
-    call_mixed_thrice_contracted, call_nine_variant_thrice_contracted,
-    call_no_box_no_heap_thrice_contracted, call_no_box_thrice_contracted,
-    call_one_variant_thrice_contracted, call_small_discriminant_thrice_contracted,
+    call_boxed_bounded_string_thrice_contracted, call_boxed_bounded_string_v2_thrice_contracted,
+    call_boxed_static_str_thrice_contracted, call_boxed_string_only_thrice_contracted,
+    call_boxed_u32_thrice_contracted, call_boxed_vec_thrice_contracted,
+    call_boxed_vec_u8_thrice_contracted, call_mixed_thrice_contracted,
+    call_nine_variant_thrice_contracted, call_no_box_no_heap_thrice_contracted,
+    call_no_box_thrice_contracted, call_one_variant_thrice_contracted,
+    call_small_discriminant_thrice_contracted, call_static_str_thrice_contracted,
     call_string_thrice_contracted, call_vec_u32_thrice_contracted,
     call_wrapped_boxed_string_thrice_contracted, call_wrapped_mixed_thrice_contracted,
 };
@@ -939,6 +1247,138 @@ amenable_derive::gallery_harness! {
         #[kani::proof_for_contract(call_boxed_string_only_thrice_contracted)]
         fn check_call_boxed_string_only_thrice_contracted() {
             call_boxed_string_only_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::static_str_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_static_str_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 8: a bare &'static str field -- a fat pointer into static data, no allocation, no Drop impl -- confirmed PASSES, 9.5s, 32/32 checks: Kani handles references with no trouble at all, the fastest rung on this whole ladder".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_STATIC_STR_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_static_str_thrice_contracted)]
+        fn check_call_static_str_thrice_contracted() {
+            call_static_str_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_static_str_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_static_str_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 9: Box<&'static str> -- a Box wrapping a pointer that owns no heap allocation of its own -- confirmed PASSES, 29.8s, 95/95 checks: resolves rung 7/8's open question decisively -- the trigger is specifically Box wrapping a type that OWNS a heap allocation (RawVec/Drop-driven deallocation), not Box wrapping anything that merely contains a pointer. A reference, boxed or not, is never the problem.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_STATIC_STR_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_static_str_thrice_contracted)]
+        fn check_call_boxed_static_str_thrice_contracted() {
+            call_boxed_static_str_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_vec_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_vec_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 10: Box<Vec<u32>> -- a direct prediction from rung 9's rule, since Vec is RawVec-backed exactly like String -- confirmed PASSES, 76.5s, 159/159 checks: REFUTES the rung-9 rule as stated. Vec<u32> and String are both RawVec-backed, yet Box<Vec<u32>> passes where Box<String> OOMs. 'Box wraps a type that owns a heap allocation' is not sufficient on its own -- something more specific to String (or its u8 element type) is required too.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_VEC_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_vec_thrice_contracted)]
+        fn check_call_boxed_vec_thrice_contracted() {
+            call_boxed_vec_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_vec_u8_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_vec_u8_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 11: Box<Vec<u8>> -- same backing byte type as String's internal Vec<u8>, isolated from rung 10's u32 element and from String's own UTF-8/Display machinery -- confirmed PASSES, 67.0s, 152/152 checks: element type (u8 vs u32) is not the differentiator either. Box<Vec<T>> passes for any T tried; only Box<String> OOMs. The trigger is specific to String itself, not to RawVec/Vec ownership in general.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_VEC_U8_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_vec_u8_thrice_contracted)]
+        fn check_call_boxed_vec_u8_thrice_contracted() {
+            call_boxed_vec_u8_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_bounded_string_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_bounded_string_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 12: Box<String>, but the content is a genuinely symbolic, UTF-8-safe, 8-byte string instead of the fixed 'placeholder' literal every prior Box<String> rung used -- INVALIDATED by a confound: times out (CBMC's own harness-timeout, not OOM) inside core::str::validations::run_utf8_validation's internal loop, unwound 2600+ iterations over 8 symbolic bytes. Calling String::from_utf8 on fully unconstrained bytes forces CBMC to validate UTF-8 generically -- an unrelated cost, not the heap-allocation question this rung meant to isolate. Superseded by rung 13, which builds the symbolic string without from_utf8.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_BOUNDED_STRING_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_bounded_string_thrice_contracted)]
+        fn check_call_boxed_bounded_string_thrice_contracted() {
+            call_boxed_bounded_string_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_bounded_string_v2_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_bounded_string_v2_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 13: the corrected rung 12 -- a genuinely symbolic, exactly-8-byte String built by pushing char::from(byte) in a fixed 0..8 loop, no String::from_utf8, no unbounded validation loop -- confirmed OUT OF MEMORY, same RawVecInner::deallocate signature, 418,600 steps / 7,154 VCCs (vs. rung 7's 16,685 steps / 246 VCCs for a fixed literal). CONFLATED, not conclusive: this measures the cost of constructing a String via 8 sequential incremental pushes (each carrying its own RawVec capacity-growth/reallocation branching, tripled by the thrice-contracted wrapper), not the cost of a size bound as a fact the solver has to represent. Whether a String genuinely known to be <=8 bytes, built in one shot without incremental growth, behaves differently from an unbounded one remains untested -- this rung does not answer the question it set out to ask.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_BOUNDED_STRING_V2_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_bounded_string_v2_thrice_contracted)]
+        fn check_call_boxed_bounded_string_v2_thrice_contracted() {
+            call_boxed_bounded_string_v2_thrice_contracted();
         }
     }
 }

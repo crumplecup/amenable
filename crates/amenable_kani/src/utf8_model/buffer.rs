@@ -87,6 +87,44 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes[..self.len]
     }
+
+    /// Append one byte, growing the modeled length by one -- the
+    /// bounds-checked building block a depth-based induction over
+    /// this buffer's length composes with (mirrors `String::push`'s
+    /// shape for this fixed-capacity model).
+    ///
+    /// # Errors
+    ///
+    /// Returns `KaniUtf8BufferError::TooLong` if already at `MAX_LEN`
+    /// capacity.
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    pub fn push_byte(mut self, byte: u8) -> Result<Self, KaniUtf8BufferError> {
+        if self.len >= MAX_LEN {
+            return Err(KaniUtf8BufferError::TooLong);
+        }
+        self.bytes[self.len] = byte;
+        self.len += 1;
+        Ok(self)
+    }
+}
+
+/// Every field (`[u8; MAX_LEN]`, `usize`) already implements
+/// `kani::Arbitrary`, so this is free to add and not circular: it
+/// comes straight from the fields' own existing impls, not from
+/// anything this type's own proofs establish. A local type, so no
+/// orphan-rule issue implementing a foreign trait on it. Deliberately
+/// field-wise, not validated -- `len` can come out `> MAX_LEN` here,
+/// matching `KaniUtf8Buffer::new`'s own fallible `TooLong` path rather
+/// than silently narrowing it; callers that need the validated
+/// invariant go through `new`, not this raw construction.
+#[cfg(kani)]
+impl<const MAX_LEN: usize> kani::Arbitrary for KaniUtf8Buffer<MAX_LEN> {
+    fn any() -> Self {
+        Self {
+            bytes: kani::any(),
+            len: kani::any(),
+        }
+    }
 }
 
 impl<const MAX_LEN: usize> Evidence for KaniUtf8Buffer<MAX_LEN> {

@@ -27,9 +27,28 @@ amenable_derive::harness! {
     kani, VERIFY_KANI_COMPOSE_STRING_DEPTHS_SRC, {
         #[kani::proof]
         fn verify_kani_compose_string_depths() {
+            // `.chars().count()` would state the exact-char-count claim
+            // directly, but it's expensive for Kani in its own right --
+            // `core::str::count::char_count_general_case` has a loop
+            // CBMC cannot cheaply bound even over 1-2 chars, confirmed
+            // directly (unwound 1480+ iterations, harness timeout).
+            // `.len()` (byte count) is a cheap O(1) stored-field read,
+            // but since `kani_depth1/2` now draw from the full Unicode
+            // domain (`amenable_kani::compose::model::symbolic_char`,
+            // fixed from an ASCII-only restriction -- see
+            // `amenable_kani::gallery::string_compose_ascii_restriction`),
+            // a multi-byte `char` makes exact byte-length no longer
+            // match char count. `ComposeAnyLengthIsBounded`'s `<=`
+            // check states the true, cheaply-checkable bound instead
+            // (at most 4 UTF-8 bytes per `char`): weaker than "exactly
+            // N", but correct for any char, not just ASCII.
             assert!(ComposeDepthZeroIsEmpty::ensures(String::kani_depth0().len()));
-            assert!(ComposeArrayLengthIsFixed::ensures((String::kani_depth1().len(), 1)));
-            assert!(ComposeArrayLengthIsFixed::ensures((String::kani_depth2().len(), 2)));
+            let depth1 = String::kani_depth1();
+            assert!(!depth1.is_empty());
+            assert!(ComposeAnyLengthIsBounded::ensures((depth1.len(), 4)));
+            let depth2 = String::kani_depth2();
+            assert!(depth2.len() >= 2);
+            assert!(ComposeAnyLengthIsBounded::ensures((depth2.len(), 8)));
         }
     }
 }
@@ -73,7 +92,10 @@ amenable_derive::harness! {
             assert!(ComposeDepthZeroIsEmpty::ensures(depth0.flags.len()));
 
             let depth1 = DerivedNode::kani_depth1();
-            assert!(ComposeArrayLengthIsFixed::ensures((depth1.name.len(), 1)));
+            // Bounded, not exact byte length -- see
+            // `verify_kani_compose_string_depths`'s own comment.
+            assert!(!depth1.name.is_empty());
+            assert!(ComposeAnyLengthIsBounded::ensures((depth1.name.len(), 4)));
             assert!(ComposeFieldPresenceTracksDepth::ensures((
                 depth1.maybe_child.is_some(),
                 1
@@ -91,14 +113,19 @@ amenable_derive::harness! {
             match choice {
                 DerivedChoice::Empty => {}
                 DerivedChoice::Pair(name, values) => {
-                    assert!(ComposeAnyLengthIsBounded::ensures((name.len(), 4)));
+                    // `kani_any`'s bound (4) is on char count; byte
+                    // length can be up to 4x that for multi-byte
+                    // chars -- see `verify_kani_compose_string_depths`'s
+                    // own comment on why `.len()`, not
+                    // `.chars().count()`, is the cheap check here.
+                    assert!(ComposeAnyLengthIsBounded::ensures((name.len(), 16)));
                     assert!(ComposeAnyLengthIsBounded::ensures((values.len(), 3)));
                 }
                 DerivedChoice::Boxed { inner } => {
                     let DerivedLeaf(value, maybe_text) = *inner;
                     let _ = value;
                     if let Some(text) = maybe_text {
-                        assert!(ComposeAnyLengthIsBounded::ensures((text.len(), 4)));
+                        assert!(ComposeAnyLengthIsBounded::ensures((text.len(), 16)));
                     }
                 }
             }
