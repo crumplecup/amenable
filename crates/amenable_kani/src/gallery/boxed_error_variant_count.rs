@@ -413,6 +413,70 @@ mod kani_only {
             .map_err(|_err| OneVariantError::new(OneVariantKind::V1(Payload::new("placeholder"))))
     }
 
+    /// The general tactic this whole gallery file's investigation
+    /// points to, demonstrated on the most faithful possible
+    /// recreation of the real blocker -- not just a bare
+    /// `Box<KaniUtf8Buffer>` (rung 14 below), but this exact shape:
+    /// a boxed `Kind` enum wrapping a multi-field `Source` struct
+    /// with a string-like field, matching `TemporalError { kind:
+    /// Box<TemporalErrorKind> }` / `TemporalErrorKind::
+    /// InvalidDescriptor(InvalidDescriptorSource { detail: String,
+    /// line: u32, .. })` almost exactly. `ProxyPayload` is `Payload`
+    /// (confirmed to OOM when boxed, `one_variant_fallible` above)
+    /// with its one real structural change: `detail` is a
+    /// `KaniUtf8Buffer<8>` instead of a `String`, justified by the
+    /// demonstrated (not assumed) `String`<->`KaniUtf8Buffer`
+    /// refinement (`gallery::string_buffer_correspondence`) rather
+    /// than an unjustified hack -- any property that would hold for
+    /// the real `String`-backed version transfers to this one.
+    #[derive(Debug)]
+    pub(super) struct ProxyPayload {
+        detail: crate::KaniUtf8Buffer<8>,
+        line: u32,
+    }
+
+    #[derive(Debug)]
+    pub(super) enum ProxyKind {
+        V1(ProxyPayload),
+    }
+
+    pub(super) struct ProxyError {
+        kind: Box<ProxyKind>,
+    }
+
+    impl ProxyError {
+        fn new(kind: ProxyKind) -> Self {
+            Self {
+                kind: Box::new(kind),
+            }
+        }
+    }
+
+    /// Identical shape to `one_variant_fallible`, with the one
+    /// structural change the proxy tactic makes: `detail` is a
+    /// genuinely symbolic `KaniUtf8Buffer<8>` (not a fixed literal
+    /// like `one_variant_fallible`'s "placeholder" -- a stronger
+    /// claim than that comparison needs, since the proxy covers any
+    /// content, not one fixed string) instead of `String`.
+    pub(super) fn proxy_fallible(value: u32) -> Result<u8, ProxyError> {
+        u8::try_from(value).map_err(|_err| {
+            let detail: crate::KaniUtf8Buffer<8> = kani::any();
+            ProxyError::new(ProxyKind::V1(ProxyPayload { detail, line: 0 }))
+        })
+    }
+
+    /// The same, calling `proxy_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_proxy_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = proxy_fallible(u32::from(v1));
+        let _ = proxy_fallible(u32::from(v2));
+        let _ = proxy_fallible(u32::from(v3));
+    }
+
     /// Tests a specific inversion of the whole-enum-boxed pattern above:
     /// keep the enum's own discriminant tiny -- most variants carry no
     /// heap allocation at all -- and box only the one variant's heavy
@@ -499,6 +563,50 @@ mod kani_only {
         let _ = boxed_u32_fallible(u32::from(v1));
         let _ = boxed_u32_fallible(u32::from(v2));
         let _ = boxed_u32_fallible(u32::from(v3));
+    }
+
+    /// Escalation ladder, rung 14 (out of numeric order -- added
+    /// after the `String`<->`KaniUtf8Buffer` correspondence was
+    /// demonstrated, `gallery::string_buffer_correspondence`):
+    /// `Box<KaniUtf8Buffer<8>>`. Does boxing the trenchcoat stay
+    /// cheap the way boxing `u32`/`&'static str` (rungs 1 and 8) did,
+    /// or does it secretly reproduce the real `Box<String>` OOM?
+    /// `KaniUtf8Buffer` owns no heap allocation internally (`Copy`,
+    /// backed by a fixed `[u8; N]` + `usize`), so this should be
+    /// structurally the former -- not a retest of the real wall,
+    /// which was specifically about boxing a type that OWNS its own
+    /// heap allocation.
+    pub(super) struct BoxedKaniUtf8BufferError {
+        value: Box<crate::KaniUtf8Buffer<8>>,
+    }
+
+    impl BoxedKaniUtf8BufferError {
+        fn new(value: crate::KaniUtf8Buffer<8>) -> Self {
+            Self {
+                value: Box::new(value),
+            }
+        }
+    }
+
+    pub(super) fn boxed_kani_utf8_buffer_fallible(
+        value: u32,
+    ) -> Result<u8, BoxedKaniUtf8BufferError> {
+        u8::try_from(value).map_err(|_err| {
+            let buffer: crate::KaniUtf8Buffer<8> = kani::any();
+            BoxedKaniUtf8BufferError::new(buffer)
+        })
+    }
+
+    /// The same, calling `boxed_kani_utf8_buffer_fallible` instead.
+    #[kani::requires(true)]
+    #[kani::ensures(|_: &()| true)]
+    pub(super) fn call_boxed_kani_utf8_buffer_thrice_contracted() {
+        let v1: u8 = kani::any();
+        let v2: u8 = kani::any();
+        let v3: u8 = kani::any();
+        let _ = boxed_kani_utf8_buffer_fallible(u32::from(v1));
+        let _ = boxed_kani_utf8_buffer_fallible(u32::from(v2));
+        let _ = boxed_kani_utf8_buffer_fallible(u32::from(v3));
     }
 
     /// Escalation ladder, rung 2: `Box<u32>` (rung 1) passed cleanly --
@@ -977,11 +1085,12 @@ mod kani_only {
 #[cfg(kani)]
 use kani_only::{
     call_boxed_bounded_string_thrice_contracted, call_boxed_bounded_string_v2_thrice_contracted,
-    call_boxed_static_str_thrice_contracted, call_boxed_string_only_thrice_contracted,
-    call_boxed_u32_thrice_contracted, call_boxed_vec_thrice_contracted,
-    call_boxed_vec_u8_thrice_contracted, call_mixed_thrice_contracted,
-    call_nine_variant_thrice_contracted, call_no_box_no_heap_thrice_contracted,
-    call_no_box_thrice_contracted, call_one_variant_thrice_contracted,
+    call_boxed_kani_utf8_buffer_thrice_contracted, call_boxed_static_str_thrice_contracted,
+    call_boxed_string_only_thrice_contracted, call_boxed_u32_thrice_contracted,
+    call_boxed_vec_thrice_contracted, call_boxed_vec_u8_thrice_contracted,
+    call_mixed_thrice_contracted, call_nine_variant_thrice_contracted,
+    call_no_box_no_heap_thrice_contracted, call_no_box_thrice_contracted,
+    call_one_variant_thrice_contracted, call_proxy_thrice_contracted,
     call_small_discriminant_thrice_contracted, call_static_str_thrice_contracted,
     call_string_thrice_contracted, call_vec_u32_thrice_contracted,
     call_wrapped_boxed_string_thrice_contracted, call_wrapped_mixed_thrice_contracted,
@@ -1379,6 +1488,50 @@ amenable_derive::gallery_harness! {
         #[kani::proof_for_contract(call_boxed_bounded_string_v2_thrice_contracted)]
         fn check_call_boxed_bounded_string_v2_thrice_contracted() {
             call_boxed_bounded_string_v2_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::boxed_kani_utf8_buffer_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_boxed_kani_utf8_buffer_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "escalation ladder rung 14, added after gallery::string_buffer_correspondence demonstrated the String<->KaniUtf8Buffer refinement: Box<KaniUtf8Buffer<8>> -- confirmed PASSES, 27.3s, 95/95 checks, matching Box<u32>/Box<&'static str>'s already-confirmed cheapness, not Box<String>'s OOM. Confirms boxing the trenchcoat stays cheap: swapping a production field's cfg(kani) representation from String to KaniUtf8Buffer, justified by the now-demonstrated correspondence, is a viable fix for the Box<TemporalErrorKind> wall that doesn't carry String's own vacuity risk (an empty-placeholder swap would have).".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_BOXED_KANI_UTF8_BUFFER_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_boxed_kani_utf8_buffer_thrice_contracted)]
+        fn check_call_boxed_kani_utf8_buffer_thrice_contracted() {
+            call_boxed_kani_utf8_buffer_thrice_contracted();
+        }
+    }
+}
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::boxed_error_variant_count::proxy_tactic_isolation".to_owned(),
+            "gallery::boxed_error_variant_count::check_call_proxy_thrice_contracted".to_owned(),
+            "amenable_kani".to_owned(),
+            "the general proxy tactic, demonstrated on the most faithful possible recreation of the real blocker: ProxyError { kind: Box<ProxyKind> }, ProxyKind::V1(ProxyPayload { detail: KaniUtf8Buffer<8>, line: u32 }) -- OneVariantError's exact shape (confirmed OOM) with the one structural change the tactic makes, detail swapped from String to KaniUtf8Buffer, with a genuinely symbolic (not fixed-literal) detail -- confirmed PASSES, 26.0s, 95/95 checks. The exact shape that OOM'd with String now passes cleanly with the proxy swap, same enum/struct nesting, same Box wrapping, nothing simplified away. The general tactic, end to end: wherever Box<Kind>-wrapping-a-String-bearing-Source is the blocker, swap the field's cfg(kani) representation to KaniUtf8Buffer, and lean on the demonstrated (gallery::string_buffer_correspondence) refinement to carry any property proven on the proxy back to the real String.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::BestPractice,
+            ::amenable_kani::KaniGalleryExpectation::Passed,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_CALL_PROXY_THRICE_CONTRACTED_SRC, {
+        #[kani::proof_for_contract(call_proxy_thrice_contracted)]
+        fn check_call_proxy_thrice_contracted() {
+            call_proxy_thrice_contracted();
         }
     }
 }

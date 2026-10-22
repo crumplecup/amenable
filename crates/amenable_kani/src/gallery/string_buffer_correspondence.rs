@@ -227,3 +227,50 @@ amenable_derive::gallery_harness! {
         }
     }
 }
+
+::inventory::submit! {
+    ::amenable_kani::KaniGalleryRegistration::new(
+        || ::amenable_kani::KaniGalleryCase::new(
+            "amenable_kani::gallery::string_buffer_correspondence::buffer_converts_back_to_string".to_owned(),
+            "gallery::string_buffer_correspondence::check_buffer_converts_back_to_string".to_owned(),
+            "amenable_kani".to_owned(),
+            "confirmed TIMES OUT: std::str::from_utf8 runs the exact same generic run_utf8_validation loop (3315+ unwound iterations) regardless of the input's actual provenance -- CBMC has no way to know these bytes came from push_char and are already valid; it just sees a &[u8] and runs the full algorithm. A real dead end for 'buffer bytes -> validate -> String' specifically, not just slow: there is no safe, cheap, provenance-aware bytes-to-str conversion in std. A From<MirrorType> for RealType impl built this way cannot work as envisioned.".to_owned(),
+            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
+            ::amenable_kani::KaniGalleryExpectation::Timeout,
+        ),
+    )
+}
+
+amenable_derive::gallery_harness! {
+    kani, CHECK_BUFFER_CONVERTS_BACK_TO_STRING_SRC, {
+        /// The *reverse* direction every rung above has avoided: does
+        /// `std::str::from_utf8` on a buffer's bytes -- bytes we
+        /// already know, via provenance (built exclusively through
+        /// `push_char`), to be valid -- actually cost anything under
+        /// Kani, or does the real validation algorithm run its full
+        /// generic scan regardless of that provenance, reproducing
+        /// the exact cost `KaniAssumedUtf8Validity::decide`'s bool
+        /// hack exists to avoid? This is the one piece a `From
+        /// <MirrorType> for RealType>` impl (buffer -> String) would
+        /// actually need.
+        #[kani::proof]
+        fn check_buffer_converts_back_to_string() {
+            let c: char = kani::any();
+            let s = c.to_string();
+
+            let empty: crate::KaniUtf8Buffer<4> = kani::any();
+            kani::assume(empty.len() == 0);
+            let buffer = empty
+                .push_char(c)
+                .expect("empty buffer, any char fits within MAX_LEN==4");
+
+            let recovered = std::str::from_utf8(buffer.as_bytes())
+                .expect("built via push_char, always valid UTF-8");
+
+            assert!(
+                bytes_equal_const_bound(s.as_bytes(), recovered.as_bytes()),
+                "a buffer converted back via std::str::from_utf8 recovers the original String's bytes exactly"
+            );
+        }
+    }
+}

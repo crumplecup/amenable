@@ -43,12 +43,14 @@ mod chrono_year_span_growth;
 mod chrono_year_span_with_free_month_day_growth;
 mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
+mod fixed_offset_descriptor_mirror;
 mod iter_materialization;
 #[cfg(feature = "jiff")]
 mod jiff_error_drop_cost;
 mod ledger_account_id_comparison;
 mod ledger_commit_contract_timeout;
 mod ledger_gaap_free_function_contract;
+mod narrow_to_u8_mirror;
 mod replace_recommendations;
 mod slice_escape_ascii;
 mod slice_split_position;
