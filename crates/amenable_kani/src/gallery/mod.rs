@@ -55,6 +55,7 @@ mod slice_split_position;
 mod string_bounded_arbitrary;
 mod string_compose_ascii_restriction;
 mod string_depth_induction;
+mod string_buffer_correspondence;
 mod string_drain;
 mod string_drop_vacuity;
 mod udp_inbox_removal_cost;
