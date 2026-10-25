@@ -84,19 +84,15 @@ mod kani_only {
     /// -- same full complexity -- but no `Box`, no heap indirection,
     /// under `cfg(kani)`. Isolates `Box` itself as the variable,
     /// independent of variant count or content.
+    #[derive(derive_new::new)]
+    #[new(visibility = "")]
     pub(super) struct NoBoxError {
         #[cfg(not(kani))]
+        #[new(into)]
         kind: Box<NineVariantKind>,
         #[cfg(kani)]
+        #[new(into)]
         kind: NineVariantKind,
-    }
-
-    impl NoBoxError {
-        fn new(kind: NineVariantKind) -> Self {
-            #[cfg(not(kani))]
-            let kind = Box::new(kind);
-            Self { kind }
-        }
     }
 
     /// Identical shape to `nine_variant_fallible`, differing only in
@@ -144,19 +140,15 @@ mod kani_only {
         V9(NoHeapPayload),
     }
 
+    #[derive(derive_new::new)]
+    #[new(visibility = "")]
     pub(super) struct NoBoxNoHeapError {
         #[cfg(not(kani))]
+        #[new(into)]
         kind: Box<NineVariantKindNoHeap>,
         #[cfg(kani)]
+        #[new(into)]
         kind: NineVariantKindNoHeap,
-    }
-
-    impl NoBoxNoHeapError {
-        fn new(kind: NineVariantKindNoHeap) -> Self {
-            #[cfg(not(kani))]
-            let kind = Box::new(kind);
-            Self { kind }
-        }
     }
 
     pub(super) fn no_box_no_heap_fallible(value: u32) -> Result<u8, NoBoxNoHeapError> {

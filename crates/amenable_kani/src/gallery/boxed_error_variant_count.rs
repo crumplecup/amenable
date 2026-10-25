@@ -215,6 +215,50 @@
 //!   emptying the `String` under `cfg(kani)`, if genuine symbolic
 //!   string reasoning is ever wanted there.
 //!
+//! **Retired branch: mirror/proxy types for `narrow_to_u8` and
+//! `fixed_offset_to_utc_offset_descriptor` specifically.** A later
+//! session built `gallery::narrow_to_u8_mirror` and `gallery::
+//! fixed_offset_descriptor_mirror` -- `MirrorTemporalError`, a
+//! `KaniUtf8Buffer`-backed stand-in for `TemporalError`, substituted
+//! at every real call site -- to test whether the *unrestricted*
+//! domain (`requires(true)`, the `Err` arm genuinely reachable, not
+//! assumed away) could be made cheap by swapping the error
+//! representation alone. It confirmed two things worth keeping: the
+//! proxy approach does work end to end (mirror contract, the real
+//! three-call pattern, and `stub_verified` composition all passed),
+//! and `stub_verified`'s own postcondition-checking overhead can cost
+//! *more* than it saves once the inlined body is already cheap
+//! (112.6s stubbed vs. 58.4s unstubbed on the same claim) -- a
+//! reusable data point about when not to reach for stubbing by
+//! default.
+//!
+//! Both files were removed once two things became clear. First, the
+//! real wall was already resolved more simply, directly on the real
+//! functions, via domain restriction: `narrow_to_u8`'s own `requires
+//! (value <= 255)` (every real call site's actual domain, confirmed
+//! by inspection) makes its `Err` arm -- and therefore the
+//! `#[track_caller]`-driven `ComponentOutOfRangeSource` construction
+//! inside it -- provably unreachable, sidestepping the heap-allocation
+//! question entirely rather than needing a cheap substitute for it.
+//! See `chrono_offset_date_time_round_trip_pipeline_shape_and_binning.
+//! rs`, which proves the real, un-mirrored `narrow_to_u8` directly,
+//! repeated three times, contracted, with no proxy involved. Second,
+//! the mirror's own premise was inaccurate: its doc comment described
+//! the real `narrow_to_u8` as `(value: u32, context: &'static str)`;
+//! the real signature has always been `(value: u32, component:
+//! TemporalComponent)` -- a small `Copy` enum, never a string. The
+//! real `String` this whole investigation chased lives one level
+//! deeper, in `ComponentOutOfRangeSource::file` (the `#[track_caller]`
+//! call-site path) -- and that field is already substituted for a
+//! cheap `String::new()` under `cfg(kani)` in production
+//! (`crates/amenable_time/src/error/validation.rs`), the same pattern
+//! applied across every error-source type in `amenable_time::error`.
+//! The mirror ladder's general finding (proxy types work, stubbing
+//! isn't always a win) stays true and is recorded here; the two files
+//! themselves added no coverage the production code and the direct
+//! proof above didn't already provide, so they were retired rather
+//! than kept as a redundant parallel path.
+//!
 //! **Where each chapter now lives**, split out once this file grew
 //! past the point a human reader could take it in as one unit:
 //! first-pass hypothesis test, variant-count rungs

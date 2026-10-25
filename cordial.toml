@@ -110,6 +110,29 @@ generated_files = [
     "src/gallery/generated",
 ]
 
+# [antipatterns] skip_paths -- ANTIPATTERN-STRUCT-STATIC-REF-001 exempt for
+# the two amenable_kani gallery files whose own subject IS a bare
+# `&'static` reference field. These two files are the "references and
+# vectors" and "production fix candidates" chapters of the
+# boxed_error_variant_count escalation ladder: the whole point of each
+# fixture type here is to let Kani/CBMC model a struct containing a
+# reference with no owned allocation, to isolate that shape from the
+# `Box<String>` OOM trigger the investigation is about (see each file's
+# own doc comment). A `&'static str`/`&'static` field is the literal
+# subject under test, not a lazy stand-in for owned data -- the two cases
+# this rule exists to catch are the same thing here, so no owned-field
+# refactor can keep testing the same claim (confirmed: a fn-pointer
+# indirection changes the measured shape from a stored fat pointer to a
+# stored thin pointer plus an indirect call; a `Cow<'static, str>` field
+# reintroduces an owned-allocation variant the ladder is specifically
+# ruling out). Scoped to these two files and this one rule only --
+# every other antipattern rule, and every other gallery file, stays live.
+[antipatterns]
+skip_paths = { "ANTIPATTERN-STRUCT-STATIC-REF-001" = [
+    "src/gallery/boxed_error_variant_count_escalation_references_and_vectors.rs",
+    "src/gallery/boxed_error_variant_count_production_fix_candidates.rs",
+] }
+
 # Disabled by explicit request, not a false-positive/tooling-gap finding
 # like the other exceptions in this file.
 [proof_patterns]

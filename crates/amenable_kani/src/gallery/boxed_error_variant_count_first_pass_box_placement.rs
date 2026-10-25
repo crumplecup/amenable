@@ -25,17 +25,11 @@ mod kani_only {
     /// this file, and this shape is small enough that a one-off local
     /// copy is cheaper than widening visibility crate-wide for a
     /// single use site.
-    #[derive(Debug)]
+    #[derive(Debug, derive_new::new)]
+    #[new(visibility = "")]
     pub(super) struct Payload {
+        #[new(into)]
         detail: String,
-    }
-
-    impl Payload {
-        fn new(detail: &str) -> Self {
-            Self {
-                detail: detail.to_owned(),
-            }
-        }
     }
 
     /// Tests a specific inversion of the whole-enum-boxed pattern above:
