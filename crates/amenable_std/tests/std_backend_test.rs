@@ -147,7 +147,7 @@ fn reversed_endpoints_are_rejected() -> miette::Result<()> {
         })?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::EpochSecondsEndpointsReversed(_)
     ));
     Ok(())
 }
@@ -200,7 +200,7 @@ fn realize_duration_rejects_calendar_variable_components() -> miette::Result<()>
         .ok_or_else(|| miette::miette!("a year is not a fixed std::time::Duration"))?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::CalendarComponentsPresent(_)
     ));
     Ok(())
 }

@@ -94,7 +94,7 @@ fn rejects_malformed_duration_text() -> miette::Result<()> {
     let err = result
         .err()
         .ok_or_else(|| miette::miette!("malformed text is not a real ISO 8601 duration"))?;
-    assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::JiffParseRejected(_)));
     Ok(())
 }
 
@@ -162,7 +162,7 @@ fn order_offset_endpoints_rejects_a_reversed_pair() -> miette::Result<()> {
         .ok_or_else(|| miette::miette!("start is genuinely after end"))?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::IntervalEndpointsReversed(_)
     ));
     Ok(())
 }

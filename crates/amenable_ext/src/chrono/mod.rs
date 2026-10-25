@@ -55,9 +55,11 @@ pub use self::{
 
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
-    naive_date_time_to_local_date_time_descriptor,
+    local_date_time_descriptor_to_naive, naive_date_time_to_local_date_time_descriptor,
 };
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{
     ChronoInstant, ChronoOffset, ChronoOffsetDateTime, chrono_to_offset_date_time_descriptor,
+    fixed_offset_sign_and_magnitude, fixed_offset_to_utc_offset_descriptor, narrow_to_u8,
+    offset_date_time_descriptor_to_chrono, utc_offset_descriptor_to_fixed_offset,
 };

@@ -1,9 +1,12 @@
 use crate::jiff::backend::instant::jiff_offset_to_utc_offset_descriptor;
 use crate::jiff::backend::instant::utc_offset_descriptor_to_jiff_offset;
 use amenable_time::{
-    InvalidDescriptorSource, IxdtfTimeZoneAnnotationDescriptor, NamedTimeZoneDescriptorBuilder,
+    ComponentNarrowingFailedSource, IxdtfTimeZoneAnnotationDescriptor, JiffParseRejectedSource,
+    JiffTimeConstructionFailedSource, NamedTimeZoneBuilderFailedSource,
+    NamedTimeZoneDescriptorBuilder, NarrowingComponent, ParseIntRejectedSource,
     ParseRejectedSource, ReducedCalendarDateDescriptor, ReducedLocalTimeDescriptor, TemporalError,
-    TemporalErrorKind, UnsupportedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
+    TemporalErrorKind, UnsupportedCase, UnsupportedDetail, UnsupportedSource,
+    UtcOffsetBuilderFailedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
     UtcOffsetRelationship, UtcOffsetSign,
 };
 
@@ -31,12 +34,10 @@ use amenable_time::{
 /// Report that this backend cannot parse the named form -- the
 /// CalConnect/ISO 8601-2 extension family (plus `TimeInterval`, which
 /// needs the general endpoint parser this backend still lacks).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-pub(super) fn unsupported_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-        format!(
-            "jiff backend cannot parse {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
-        ),
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(case)))]
+pub(super) fn unsupported_parse(case: UnsupportedCase) -> TemporalError {
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+        case,
     )))
 }
 
@@ -71,12 +72,16 @@ pub(super) fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), Temporal
     let day_str = text
         .get(day_range)
         .ok_or_else(|| reject(format!("{text:?} has an invalid day-of-year slice")))?;
-    let year = year_str
-        .parse::<i32>()
-        .map_err(|err| reject(format!("invalid year in {text:?}: {err}")))?;
-    let day_of_year = day_str
-        .parse::<u16>()
-        .map_err(|err| reject(format!("invalid day-of-year in {text:?}: {err}")))?;
+    let year = year_str.parse::<i32>().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 ordinal date", err),
+        ))
+    })?;
+    let day_of_year = day_str.parse::<u16>().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 ordinal date", err),
+        ))
+    })?;
     Ok((year, day_of_year))
 }
 
@@ -120,15 +125,21 @@ pub(super) fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), Temporal
     let weekday_str = text
         .get(weekday_range)
         .ok_or_else(|| reject(format!("{text:?} has an invalid weekday slice")))?;
-    let week_year = year_str
-        .parse::<i32>()
-        .map_err(|err| reject(format!("invalid week-year in {text:?}: {err}")))?;
-    let week = week_str
-        .parse::<u8>()
-        .map_err(|err| reject(format!("invalid week number in {text:?}: {err}")))?;
-    let weekday = weekday_str
-        .parse::<u8>()
-        .map_err(|err| reject(format!("invalid weekday in {text:?}: {err}")))?;
+    let week_year = year_str.parse::<i32>().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 week date", err),
+        ))
+    })?;
+    let week = week_str.parse::<u8>().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 week date", err),
+        ))
+    })?;
+    let weekday = weekday_str.parse::<u8>().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 week date", err),
+        ))
+    })?;
     Ok((week_year, week, weekday))
 }
 
@@ -153,7 +164,11 @@ pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, T
             .sign(UtcOffsetSign::Positive)
             .hours(0u8)
             .build()
-            .map_err(|err| reject(format!("could not build a Zulu offset descriptor: {err}")));
+            .map_err(|err| {
+                TemporalError::new(TemporalErrorKind::UtcOffsetBuilderFailed(
+                    UtcOffsetBuilderFailedSource::new(err),
+                ))
+            });
     }
     if !text.is_ascii() || text.len() < 3 {
         return Err(reject(format!("{text:?} is too short to be a UTC offset")));
@@ -186,15 +201,18 @@ pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, T
         } else {
             (rest, None)
         };
-    let hours: u8 = hours_str
-        .parse()
-        .map_err(|err| reject(format!("invalid offset hours in {text:?}: {err}")))?;
+    let hours: u8 = hours_str.parse().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 / RFC 9557 UTC offset", err),
+        ))
+    })?;
     let minutes: Option<u8> = match minutes_str {
         None => None,
-        Some(m) => Some(
-            m.parse()
-                .map_err(|err| reject(format!("invalid offset minutes in {text:?}: {err}")))?,
-        ),
+        Some(m) => Some(m.parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseIntRejected(
+                ParseIntRejectedSource::new("ISO 8601 / RFC 9557 UTC offset", err),
+            ))
+        })?),
     };
     let mut builder = UtcOffsetDescriptorBuilder::default()
         .sign(sign)
@@ -205,9 +223,11 @@ pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, T
     if sign == UtcOffsetSign::Negative && hours == 0 && minutes.unwrap_or(0) == 0 {
         builder = builder.relationship(UtcOffsetRelationship::UnknownLocalOffset);
     }
-    let descriptor = builder
-        .build()
-        .map_err(|err| reject(format!("could not build a UTC offset descriptor: {err}")))?;
+    let descriptor = builder.build().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::UtcOffsetBuilderFailed(
+            UtcOffsetBuilderFailedSource::new(err),
+        ))
+    })?;
     // Real validation: reuse Phase 2's own offset conversion as the
     // range oracle (rejects e.g. hours = 99), rather than re-deriving
     // jiff's own component bounds by hand. Skipped for the unknown-
@@ -242,15 +262,19 @@ pub(super) fn parse_reduced_calendar_date_text(
         return Err(reject(format!("{text:?} is not ASCII")));
     }
     if let Some((year_str, month_str)) = text.split_once('-') {
-        let year: i32 = year_str
-            .parse()
-            .map_err(|err| reject(format!("invalid year in {text:?}: {err}")))?;
-        let month: u8 = month_str
-            .parse()
-            .map_err(|err| reject(format!("invalid month in {text:?}: {err}")))?;
+        let year: i32 = year_str.parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseIntRejected(
+                ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
+            ))
+        })?;
+        let month: u8 = month_str.parse().map_err(|err| {
+            TemporalError::new(TemporalErrorKind::ParseIntRejected(
+                ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
+            ))
+        })?;
         i16::try_from(year).map_err(|err| {
-            reject(format!(
-                "year {year} in {text:?} is beyond jiff's representable range: {err}"
+            TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+                ComponentNarrowingFailedSource::new(NarrowingComponent::Year, i64::from(year), err),
             ))
         })?;
         if !(1..=12).contains(&month) {
@@ -261,13 +285,13 @@ pub(super) fn parse_reduced_calendar_date_text(
         return Ok(ReducedCalendarDateDescriptor::YearMonth { year, month });
     }
     let year: i32 = text.parse().map_err(|err| {
-        reject(format!(
-            "{text:?} is not a valid reduced calendar date: {err}"
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
         ))
     })?;
     i16::try_from(year).map_err(|err| {
-        reject(format!(
-            "year {year} in {text:?} is beyond jiff's representable range: {err}"
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(NarrowingComponent::Year, i64::from(year), err),
         ))
     })?;
     Ok(ReducedCalendarDateDescriptor::Year { year })
@@ -294,9 +318,8 @@ pub(super) fn parse_reduced_local_time_text(
     }
     if text.contains(['.', ',']) {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff's civil time has no representation for a fractional hour/minute \
-             component, as in {text:?}"
+            UnsupportedSource::from_detail(UnsupportedDetail::FractionalHourMinuteComponent(
+                text.to_owned(),
             )),
         )));
     }
@@ -315,22 +338,31 @@ pub(super) fn parse_reduced_local_time_text(
     } else {
         (text, None)
     };
-    let hour: u8 = hour_str
-        .parse()
-        .map_err(|err| reject(format!("invalid hour in {text:?}: {err}")))?;
+    let hour: u8 = hour_str.parse().map_err(|err| {
+        TemporalError::new(TemporalErrorKind::ParseIntRejected(
+            ParseIntRejectedSource::new("ISO 8601 reduced-precision local time", err),
+        ))
+    })?;
     match minute_str {
         None => {
-            jiff::civil::Time::new(i8::try_from(hour).unwrap_or(i8::MAX), 0, 0, 0)
-                .map_err(|err| reject(format!("hour {hour} in {text:?} is out of range: {err}")))?;
+            jiff::civil::Time::new(i8::try_from(hour).unwrap_or(i8::MAX), 0, 0, 0).map_err(
+                |err| {
+                    TemporalError::new(TemporalErrorKind::JiffTimeConstructionFailed(
+                        JiffTimeConstructionFailedSource::new(err),
+                    ))
+                },
+            )?;
             Ok(ReducedLocalTimeDescriptor::Hour {
                 hour,
                 fractional_component: None,
             })
         }
         Some(minute_str) => {
-            let minute: u8 = minute_str
-                .parse()
-                .map_err(|err| reject(format!("invalid minute in {text:?}: {err}")))?;
+            let minute: u8 = minute_str.parse().map_err(|err| {
+                TemporalError::new(TemporalErrorKind::ParseIntRejected(
+                    ParseIntRejectedSource::new("ISO 8601 reduced-precision local time", err),
+                ))
+            })?;
             jiff::civil::Time::new(
                 i8::try_from(hour).unwrap_or(i8::MAX),
                 i8::try_from(minute).unwrap_or(i8::MAX),
@@ -338,8 +370,8 @@ pub(super) fn parse_reduced_local_time_text(
                 0,
             )
             .map_err(|err| {
-                reject(format!(
-                    "hour/minute {hour}:{minute} in {text:?} is out of range: {err}"
+                TemporalError::new(TemporalErrorKind::JiffTimeConstructionFailed(
+                    JiffTimeConstructionFailedSource::new(err),
                 ))
             })?;
             Ok(ReducedLocalTimeDescriptor::HourMinute {
@@ -359,10 +391,9 @@ pub(super) fn parse_temporal_pieces<'i>(
     profile: &'static str,
 ) -> Result<jiff::fmt::temporal::Pieces<'i>, TemporalError> {
     jiff::fmt::temporal::Pieces::parse(text).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            profile.to_owned(),
-            format!("{err}"),
-        )))
+        TemporalError::new(TemporalErrorKind::JiffParseRejected(
+            JiffParseRejectedSource::new(profile, err),
+        ))
     })
 }
 
@@ -432,10 +463,8 @@ pub(super) fn jiff_time_zone_annotation_to_descriptor(
                 .identifier(name.as_str())
                 .build()
                 .map_err(|err| {
-                    TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                        InvalidDescriptorSource::new(format!(
-                            "could not build a named time zone descriptor: {err}"
-                        )),
+                    TemporalError::new(TemporalErrorKind::NamedTimeZoneBuilderFailed(
+                        NamedTimeZoneBuilderFailedSource::new(err),
                     ))
                 })?;
             Ok(IxdtfTimeZoneAnnotationDescriptor::Named(descriptor))
@@ -445,8 +474,8 @@ pub(super) fn jiff_time_zone_annotation_to_descriptor(
             Ok(IxdtfTimeZoneAnnotationDescriptor::Offset(descriptor))
         }
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff backend does not recognize this time-zone annotation kind: {other:?}"
+            UnsupportedSource::from_detail(UnsupportedDetail::UnrecognizedTimeZoneAnnotationKind(
+                other.clone().into_owned(),
             )),
         ))),
     }

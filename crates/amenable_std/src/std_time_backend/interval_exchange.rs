@@ -1,10 +1,10 @@
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
-    CompleteDateDescriptor, InvalidDescriptorSource, OffsetDateTimeDescriptor,
+    CompleteDateDescriptor, EpochSecondsEndpointsReversedSource, OffsetDateTimeDescriptor,
     OrderOffsetEndpointsEstablished, OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput,
     OrderOffsetEndpointsPreconditionsToken, ParsedDuration, ParsedRecurringInterval,
-    ParsedTimeInterval, RawInput, TemporalError, TemporalErrorKind, UnsupportedSource,
-    UtcOffsetSign,
+    ParsedTimeInterval, RawInput, TemporalError, TemporalErrorKind, UnsupportedCase,
+    UnsupportedSource, UtcOffsetSign,
 };
 
 use crate::{CanaryVerifier, StdTimeBackend};
@@ -36,10 +36,7 @@ fn offset_datetime_to_epoch_seconds(
     let local = descriptor.local();
     let CompleteDateDescriptor::Calendar(date) = local.date() else {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(
-                "std::time canary resolves complete calendar dates only, not ordinal or week dates"
-                    .to_owned(),
-            ),
+            UnsupportedSource::closed(UnsupportedCase::StdCanaryCompleteCalendarDatesOnly),
         )));
     };
 
@@ -78,12 +75,10 @@ fn offset_datetime_to_epoch_seconds(
 // contract the formal backends prove statically.
 
 /// Report the missing ISO 8601 parser for a text-parse edge.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-fn unsupported_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-        format!(
-            "std::time cannot parse {edge}: no ISO 8601 / RFC 3339 parser in the standard library"
-        ),
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(case)))]
+fn unsupported_parse(case: UnsupportedCase) -> TemporalError {
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+        case,
     )))
 }
 
@@ -92,7 +87,7 @@ impl Exchange<RawInput, ParsedDuration, CanaryVerifier> for StdTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedDuration, TemporalError> {
-        Err(unsupported_parse("an ISO 8601 duration"))
+        Err(unsupported_parse(UnsupportedCase::StdParseIso8601Duration))
     }
 }
 
@@ -101,7 +96,7 @@ impl Exchange<RawInput, ParsedRecurringInterval, CanaryVerifier> for StdTimeBack
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedRecurringInterval, TemporalError> {
-        Err(unsupported_parse("a recurring interval"))
+        Err(unsupported_parse(UnsupportedCase::StdParseRecurringInterval))
     }
 }
 
@@ -110,7 +105,7 @@ impl Exchange<RawInput, ParsedTimeInterval, CanaryVerifier> for StdTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedTimeInterval, TemporalError> {
-        Err(unsupported_parse("a time interval"))
+        Err(unsupported_parse(UnsupportedCase::StdParseTimeInterval))
     }
 }
 
@@ -132,11 +127,11 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, CanaryVerif
         // chronologically ordered. If they are not, there is no proof to
         // re-issue.
         if start > end {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "interval start ({start}s) is after its end ({end}s)"
-                )),
-            )));
+            return Err(TemporalError::new(
+                TemporalErrorKind::EpochSecondsEndpointsReversed(
+                    EpochSecondsEndpointsReversedSource::new(start, end),
+                ),
+            ));
         }
 
         let credential: OrderOffsetEndpointsPreconditionsToken =

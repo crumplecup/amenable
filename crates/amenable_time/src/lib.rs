@@ -302,9 +302,33 @@ pub use contracts::{
 };
 pub use coverage::{TemporalCoverage, TemporalCoverageRow};
 pub use error::{
-    AmbiguousLocalTimestampSource, InvalidDescriptorSource, LeapSecondNotRepresentableSource,
-    LossyConversionRequiresAuthoritySource, NamedZoneInconsistencySource, ParseRejectedSource,
-    TemporalError, TemporalErrorKind, TemporalResult, UnsupportedSource,
+    AmbiguousLocalTimestampSource, CalendarComponentsPresentSource, ComponentOutOfRangeSource,
+    DeclaredEndpoint, DurationBuilderFailedSource, DurationDayOverflowSource,
+    EndpointHasNoTemporalValueSource, EpochSecondsEndpointsReversedSource,
+    FixedOffsetOutOfRangeSource, InvalidCalendarDateSource,
+    InvalidIsoWeekdaySource, InvalidLocalTimeSource, InvalidOrdinalDateSource,
+    InvalidWeekDateSource, IxdtfTimestampBuilderFailedSource,
+    LeapSecondNotRepresentableSource, LocalDateTimeBuilderFailedSource,
+    LocalTimeBuilderFailedSource, LossyConversionRequiresAuthoritySource,
+    NamedTimeZoneBuilderFailedSource, NamedZoneInconsistencySource, NanosecondOutOfRangeSource,
+    NoUniqueLocalMappingSource, NonDigitFractionByteSource, OffsetDateTimeBuilderFailedSource,
+    ParseIntRejectedSource, ParseRejectedSource, RecurringIntervalBuilderFailedSource,
+    TemporalError, TemporalErrorKind,
+    TemporalResult, UnsupportedCase, UnsupportedDetail, UnsupportedSource,
+    UtcOffsetBuilderFailedSource, ZonedDateTimeBuilderFailedSource,
+};
+#[cfg(feature = "chrono")]
+pub use error::{NonPositiveDeltaSource, OffsetDiscoveryRangeReversedSource};
+#[cfg(feature = "chrono-tz")]
+pub use error::{NamedZoneResolutionFailedSource, OffsetInconsistentWithNamedZoneSource};
+#[cfg(feature = "jiff")]
+pub use error::{
+    ComponentNarrowingFailedSource, IntervalEndpointsReversedSource,
+    JiffDateConstructionFailedSource, JiffInstantPinFailedSource,
+    JiffDateTimeConstructionFailedSource, JiffNamedZoneResolutionFailedSource,
+    JiffOffsetConstructionFailedSource, JiffOffsetInconsistentWithNamedZoneSource,
+    JiffParseRejectedSource, JiffSpanConstructionFailedSource, JiffTimeConstructionFailedSource,
+    LosslessPrecisionAdjustmentRejectedSource, NarrowingComponent,
 };
 pub use exchange::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyEstablishedToken,
@@ -533,7 +557,7 @@ pub use types::{
     DateDescriptor, DateTimeFormulaDescriptor, DateTimeFormulaEvaluationKindDescriptor,
     DateWithShiftDescriptor, DateWithShiftDescriptorBuilder, DecadeDescriptor,
     DecadeDescriptorBuilder, DurationDescriptor, DurationDescriptorBuilder,
-    DurationFractionDescriptor, EligibleTimeIntervalsDescriptor,
+    DurationDescriptorBuilderError, DurationFractionDescriptor, EligibleTimeIntervalsDescriptor,
     EligibleTimeIntervalsDescriptorBuilder, ExplicitDateTimeDescriptor,
     ExplicitDateTimeDescriptorBuilder, ExplicitDateTimeWithShiftDescriptor,
     ExplicitDateTimeWithShiftDescriptorBuilder, ExplicitDurationDescriptor,
@@ -548,17 +572,20 @@ pub use types::{
     GroupedTimeScaleUnitDescriptorBuilder, IxdtfAnnotationDescriptor,
     IxdtfAnnotationDescriptorBuilder, IxdtfCalendarAnnotationDescriptor,
     IxdtfCalendarAnnotationDescriptorBuilder, IxdtfTimeZoneAnnotationDescriptor,
-    IxdtfTimestampDescriptor, IxdtfTimestampDescriptorBuilder, LocalDateTimeDescriptor,
-    LocalDateTimeDescriptorBuilder, LocalTimeDescriptor, LocalTimeDescriptorBuilder,
-    LocalTimeScaleDescriptor, LocalTimeZoneResolutionAuthorityDescriptor,
-    MaskedNumericComponentDescriptor, MaskedNumericComponentDescriptorBuilder,
-    NamedSeasonDescriptor, NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder,
-    OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder, OrdinalDateDescriptor,
+    IxdtfTimestampDescriptor, IxdtfTimestampDescriptorBuilder,
+    IxdtfTimestampDescriptorBuilderError, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
+    LocalDateTimeDescriptorBuilderError, LocalTimeDescriptor, LocalTimeDescriptorBuilder,
+    LocalTimeDescriptorBuilderError, LocalTimeScaleDescriptor,
+    LocalTimeZoneResolutionAuthorityDescriptor, MaskedNumericComponentDescriptor,
+    MaskedNumericComponentDescriptorBuilder, NamedSeasonDescriptor, NamedTimeZoneDescriptor,
+    NamedTimeZoneDescriptorBuilder, NamedTimeZoneDescriptorBuilderError, OffsetDateTimeDescriptor,
+    OffsetDateTimeDescriptorBuilder, OffsetDateTimeDescriptorBuilderError, OrdinalDateDescriptor,
     PrecisionDescriptor, PrecisionDescriptorBuilder, QuadrimesterOfYearDescriptor,
     QualificationPlacementDescriptor, QualificationScopeDescriptor,
     QualifiedOrBareTemporalValueDescriptor, QualifiedTemporalExpressionDescriptor,
     QualifiedTemporalValueDescriptor, QuarterOfYearDescriptor, RecurringIntervalDescriptor,
-    RecurringIntervalDescriptorBuilder, RecurringIntervalWithRepeatRuleDescriptor,
+    RecurringIntervalDescriptorBuilder, RecurringIntervalDescriptorBuilderError,
+    RecurringIntervalWithRepeatRuleDescriptor,
     RecurringIntervalWithRepeatRuleDescriptorBuilder,
     RecurringIntervalWithRepeatRuleIntervalDescriptor, ReducedCalendarDateDescriptor,
     ReducedLocalTimeDescriptor, RepeatRuleDescriptor, RoundingModeDescriptor,
@@ -576,9 +603,10 @@ pub use types::{
     UnspecifiedComponentExpressionDescriptor, UnspecifiedComponentExpressionDescriptorBuilder,
     UnspecifiedDigitDescriptor, UnspecifiedPrecisionProfileDescriptor,
     UnspecifiedTemporalShapeDescriptor, UtcOfDayDescriptor, UtcOffsetDescriptor,
-    UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign, UtcTimeScaleDescriptor,
-    WeekDateDescriptor, ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor,
-    ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
+    UtcOffsetDescriptorBuilder, UtcOffsetDescriptorBuilderError, UtcOffsetRelationship,
+    UtcOffsetSign, UtcTimeScaleDescriptor, WeekDateDescriptor, ZoneAmbiguityResolutionDescriptor,
+    ZoneGapResolutionDescriptor, ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
+    ZonedDateTimeDescriptorBuilderError,
 };
 #[cfg(feature = "verus")]
 pub use verus_witness::TemporalVerusProof;

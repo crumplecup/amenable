@@ -3,12 +3,15 @@ use crate::jiff::backend::duration::nanos_to_fractional_seconds_digits;
 use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    CalendarDateDescriptor, CompleteDateDescriptor, FractionalSecondDescriptor,
-    InvalidDescriptorSource, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
-    LocalTimeDescriptorBuilder, OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder,
-    ProvenOffsetDateTimeCarrier, ReflectedOffsetDateTime, TemporalError, TemporalErrorKind,
-    TemporalInstantProps, UnsupportedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
-    UtcOffsetRelationship, UtcOffsetSign,
+    CalendarDateDescriptor, ComponentNarrowingFailedSource, CompleteDateDescriptor,
+    FractionalSecondDescriptor, JiffDateConstructionFailedSource,
+    JiffOffsetConstructionFailedSource, JiffTimeConstructionFailedSource, LocalDateTimeDescriptor,
+    LocalDateTimeDescriptorBuilder, LocalDateTimeBuilderFailedSource, LocalTimeBuilderFailedSource,
+    LocalTimeDescriptorBuilder, NarrowingComponent, OffsetDateTimeBuilderFailedSource,
+    OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder, ProvenOffsetDateTimeCarrier,
+    ReflectedOffsetDateTime, TemporalError, TemporalErrorKind, TemporalInstantProps,
+    UnsupportedCase, UnsupportedSource, UtcOffsetBuilderFailedSource, UtcOffsetDescriptor,
+    UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign,
 };
 
 // ── Phase 2: Instant ─────────────────────────────────────────────────
@@ -114,10 +117,7 @@ pub(super) fn utc_offset_descriptor_to_jiff_offset(
 ) -> Result<jiff::tz::Offset, TemporalError> {
     if descriptor.relationship() == UtcOffsetRelationship::UnknownLocalOffset {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(
-                "jiff::tz::Offset has no representation for the RFC 9557 unknown-local-offset case"
-                    .to_owned(),
-            ),
+            UnsupportedSource::closed(UnsupportedCase::JiffUnknownLocalOffset),
         )));
     }
 
@@ -129,10 +129,8 @@ pub(super) fn utc_offset_descriptor_to_jiff_offset(
     };
 
     jiff::tz::Offset::from_seconds(seconds).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "offset out of jiff::tz::Offset's representable range: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffOffsetConstructionFailed(
+            JiffOffsetConstructionFailedSource::new(err),
         ))
     })
 }
@@ -158,10 +156,12 @@ pub(super) fn jiff_offset_to_utc_offset_descriptor(
     };
     let magnitude = seconds.unsigned_abs();
     let hours = u8::try_from(magnitude / 3600).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "offset's hour component does not fit the descriptor's u8 component: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(
+                NarrowingComponent::OffsetHour,
+                i64::from(magnitude / 3600),
+                err,
+            ),
         ))
     })?;
     let remainder_minutes = (magnitude % 3600) / 60;
@@ -171,18 +171,20 @@ pub(super) fn jiff_offset_to_utc_offset_descriptor(
         .hours(hours);
     if remainder_minutes != 0 {
         let minutes = u8::try_from(remainder_minutes).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "offset's minute component does not fit the descriptor's u8 component: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+                ComponentNarrowingFailedSource::new(
+                    NarrowingComponent::OffsetMinute,
+                    i64::from(remainder_minutes),
+                    err,
+                ),
             ))
         })?;
         builder = builder.minutes(minutes);
     }
 
     builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!("could not build a UTC offset descriptor: {err}")),
+        TemporalError::new(TemporalErrorKind::UtcOffsetBuilderFailed(
+            UtcOffsetBuilderFailedSource::new(err),
         ))
     })
 }
@@ -203,32 +205,38 @@ pub(super) fn jiff_offset_to_utc_offset_descriptor(
 pub(super) fn complete_date_descriptor_to_jiff_date(
     date: CompleteDateDescriptor,
 ) -> Result<jiff::civil::Date, TemporalError> {
-    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "{field} does not fit jiff::civil::Date's component range: {err}"
-            )),
+    let out_of_range = |component: NarrowingComponent, value: i64, err| {
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(component, value, err),
         ))
     };
     let range_err = |err: jiff::Error| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "date out of jiff::civil::Date's representable range: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffDateConstructionFailed(
+            JiffDateConstructionFailedSource::new(err),
         ))
     };
 
     match date {
         CompleteDateDescriptor::Calendar(cal) => {
-            let year = i16::try_from(cal.year()).map_err(|e| out_of_range("year", e))?;
-            let month = i8::try_from(cal.month()).map_err(|e| out_of_range("month", e))?;
-            let day = i8::try_from(cal.day()).map_err(|e| out_of_range("day", e))?;
+            let year = i16::try_from(cal.year())
+                .map_err(|err| out_of_range(NarrowingComponent::Year, i64::from(cal.year()), err))?;
+            let month = i8::try_from(cal.month()).map_err(|err| {
+                out_of_range(NarrowingComponent::Month, i64::from(cal.month()), err)
+            })?;
+            let day = i8::try_from(cal.day())
+                .map_err(|err| out_of_range(NarrowingComponent::Day, i64::from(cal.day()), err))?;
             jiff::civil::Date::new(year, month, day).map_err(range_err)
         }
         CompleteDateDescriptor::Ordinal(ord) => {
-            let year = i16::try_from(ord.year()).map_err(|e| out_of_range("year", e))?;
-            let day_of_year =
-                i16::try_from(ord.day_of_year()).map_err(|e| out_of_range("day_of_year", e))?;
+            let year = i16::try_from(ord.year())
+                .map_err(|err| out_of_range(NarrowingComponent::Year, i64::from(ord.year()), err))?;
+            let day_of_year = i16::try_from(ord.day_of_year()).map_err(|err| {
+                out_of_range(
+                    NarrowingComponent::DayOfYear,
+                    i64::from(ord.day_of_year()),
+                    err,
+                )
+            })?;
             jiff::civil::Date::new(year, 1, 1)
                 .map_err(range_err)?
                 .with()
@@ -237,11 +245,19 @@ pub(super) fn complete_date_descriptor_to_jiff_date(
                 .map_err(range_err)
         }
         CompleteDateDescriptor::Week(week) => {
-            let week_year =
-                i16::try_from(week.week_year()).map_err(|e| out_of_range("week_year", e))?;
-            let week_number = i8::try_from(week.week()).map_err(|e| out_of_range("week", e))?;
-            let weekday_number =
-                i8::try_from(week.weekday()).map_err(|e| out_of_range("weekday", e))?;
+            let week_year = i16::try_from(week.week_year()).map_err(|err| {
+                out_of_range(
+                    NarrowingComponent::WeekYear,
+                    i64::from(week.week_year()),
+                    err,
+                )
+            })?;
+            let week_number = i8::try_from(week.week()).map_err(|err| {
+                out_of_range(NarrowingComponent::Week, i64::from(week.week()), err)
+            })?;
+            let weekday_number = i8::try_from(week.weekday()).map_err(|err| {
+                out_of_range(NarrowingComponent::Weekday, i64::from(week.weekday()), err)
+            })?;
             let weekday =
                 jiff::civil::Weekday::from_monday_one_offset(weekday_number).map_err(range_err)?;
             jiff::civil::ISOWeekDate::new(week_year, week_number, weekday)
@@ -262,26 +278,28 @@ pub(super) fn local_date_time_descriptor_to_jiff_civil_datetime(
     let date = complete_date_descriptor_to_jiff_date(descriptor.date())?;
     let time = descriptor.time();
 
-    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "{field} does not fit jiff::civil::Time's component range: {err}"
-            )),
+    let out_of_range = |component: NarrowingComponent, value: i64, err| {
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(component, value, err),
         ))
     };
-    let hour = i8::try_from(time.hour()).map_err(|e| out_of_range("hour", e))?;
-    let minute = i8::try_from(time.minute()).map_err(|e| out_of_range("minute", e))?;
-    let second = i8::try_from(time.second()).map_err(|e| out_of_range("second", e))?;
+    let hour = i8::try_from(time.hour())
+        .map_err(|err| out_of_range(NarrowingComponent::Hour, i64::from(time.hour()), err))?;
+    let minute = i8::try_from(time.minute())
+        .map_err(|err| out_of_range(NarrowingComponent::Minute, i64::from(time.minute()), err))?;
+    let second = i8::try_from(time.second())
+        .map_err(|err| out_of_range(NarrowingComponent::Second, i64::from(time.second()), err))?;
     let subsec_nanosecond = match time.fractional_second() {
         None => 0,
-        Some(fraction) => i32::try_from(fractional_seconds_digits_to_nanos(fraction.digits())?)
-            .map_err(|e| out_of_range("fractional second", e))?,
+        Some(fraction) => {
+            let nanos = fractional_seconds_digits_to_nanos(fraction.digits())?;
+            i32::try_from(nanos)
+                .map_err(|err| out_of_range(NarrowingComponent::FractionalSecond, nanos, err))?
+        }
     };
     let time = jiff::civil::Time::new(hour, minute, second, subsec_nanosecond).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "local time out of jiff::civil::Time's representable range: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffTimeConstructionFailed(
+            JiffTimeConstructionFailedSource::new(err),
         ))
     })?;
 
@@ -301,19 +319,25 @@ pub(super) fn local_date_time_descriptor_to_jiff_civil_datetime(
 pub(super) fn jiff_civil_datetime_to_local_date_time_descriptor(
     datetime: jiff::civil::DateTime,
 ) -> Result<LocalDateTimeDescriptor, TemporalError> {
-    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "datetime's {field} does not fit the descriptor's component range: {err}"
-            )),
+    let out_of_range = |component: NarrowingComponent, value: i64, err| {
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(component, value, err),
         ))
     };
     let year = i32::from(datetime.year());
-    let month = u8::try_from(datetime.month()).map_err(|e| out_of_range("month", e))?;
-    let day = u8::try_from(datetime.day()).map_err(|e| out_of_range("day", e))?;
-    let hour = u8::try_from(datetime.hour()).map_err(|e| out_of_range("hour", e))?;
-    let minute = u8::try_from(datetime.minute()).map_err(|e| out_of_range("minute", e))?;
-    let second = u8::try_from(datetime.second()).map_err(|e| out_of_range("second", e))?;
+    let month = u8::try_from(datetime.month()).map_err(|err| {
+        out_of_range(NarrowingComponent::Month, i64::from(datetime.month()), err)
+    })?;
+    let day = u8::try_from(datetime.day())
+        .map_err(|err| out_of_range(NarrowingComponent::Day, i64::from(datetime.day()), err))?;
+    let hour = u8::try_from(datetime.hour())
+        .map_err(|err| out_of_range(NarrowingComponent::Hour, i64::from(datetime.hour()), err))?;
+    let minute = u8::try_from(datetime.minute()).map_err(|err| {
+        out_of_range(NarrowingComponent::Minute, i64::from(datetime.minute()), err)
+    })?;
+    let second = u8::try_from(datetime.second()).map_err(|err| {
+        out_of_range(NarrowingComponent::Second, i64::from(datetime.second()), err)
+    })?;
     let nanos = datetime.subsec_nanosecond();
 
     let mut time_builder = LocalTimeDescriptorBuilder::default()
@@ -326,8 +350,8 @@ pub(super) fn jiff_civil_datetime_to_local_date_time_descriptor(
         ));
     }
     let time = time_builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!("could not build a local time descriptor: {err}")),
+        TemporalError::new(TemporalErrorKind::LocalTimeBuilderFailed(
+            LocalTimeBuilderFailedSource::new(err),
         ))
     })?;
 
@@ -338,10 +362,8 @@ pub(super) fn jiff_civil_datetime_to_local_date_time_descriptor(
         .time(time)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build a local date-time descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::LocalDateTimeBuilderFailed(
+                LocalDateTimeBuilderFailedSource::new(err),
             ))
         })
 }
@@ -374,10 +396,8 @@ pub(super) fn jiff_parts_to_offset_date_time_descriptor(
         .offset(offset)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build an offset date-time descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::OffsetDateTimeBuilderFailed(
+                OffsetDateTimeBuilderFailedSource::new(err),
             ))
         })
 }

@@ -2,8 +2,9 @@ use std::time::Duration;
 
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    DurationDescriptor, DurationDescriptorBuilder, InvalidDescriptorSource, ProvenDurationCarrier,
-    ReflectedDuration, TemporalError, TemporalErrorKind, UnsupportedSource,
+    CalendarComponentsPresentSource, DurationBuilderFailedSource, DurationDayOverflowSource,
+    DurationDescriptor, DurationDescriptorBuilder, ProvenDurationCarrier, ReflectedDuration,
+    TemporalError, TemporalErrorKind, UnsupportedCase, UnsupportedSource,
 };
 
 use crate::{CanaryVerifier, StdDuration, StdTimeBackend};
@@ -18,18 +19,13 @@ use crate::{CanaryVerifier, StdDuration, StdTimeBackend};
 #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
 fn duration_descriptor_to_std(descriptor: &DurationDescriptor) -> Result<Duration, TemporalError> {
     if descriptor.years() != 0 || descriptor.months() != 0 {
-        return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(
-                "a duration with year or month components has no fixed std::time::Duration"
-                    .to_owned(),
-            ),
+        return Err(TemporalError::new(TemporalErrorKind::CalendarComponentsPresent(
+            CalendarComponentsPresentSource::new(descriptor.years(), descriptor.months()),
         )));
     }
     if descriptor.fractional_component().is_some() {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(
-                "the std::time canary carries whole-second durations only".to_owned(),
-            ),
+            UnsupportedSource::closed(UnsupportedCase::StdCanaryWholeSecondDurationsOnly),
         )));
     }
 
@@ -53,11 +49,10 @@ fn std_to_duration_descriptor(span: Duration) -> Result<DurationDescriptor, Temp
     let minutes = remaining / 60;
     let seconds = remaining % 60;
 
+    let raw_days = days;
     let days = u32::try_from(days).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "duration's {days}-day span exceeds the descriptor's u32 day component: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::DurationDayOverflow(
+            DurationDayOverflowSource::new(err, raw_days),
         ))
     })?;
 
@@ -68,10 +63,8 @@ fn std_to_duration_descriptor(span: Duration) -> Result<DurationDescriptor, Temp
         .seconds(u32::try_from(seconds).unwrap_or_default())
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build a duration descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::DurationBuilderFailed(
+                DurationBuilderFailedSource::new(err),
             ))
         })
 }

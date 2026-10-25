@@ -4,9 +4,11 @@ use crate::jiff::backend::zone_factory::offset_is_consistent_with_named_zone;
 use crate::{JiffTimeBackend, JiffTimeZone, JiffVerifier, JiffZoned};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    InvalidDescriptorSource, NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder,
-    ProvenNamedTimeZoneCarrier, ProvenZonedDateTimeCarrier, ReflectedNamedTimeZone,
-    ReflectedZonedDateTime, TemporalError, TemporalErrorKind, UnsupportedSource,
+    JiffInstantPinFailedSource, JiffNamedZoneResolutionFailedSource,
+    JiffOffsetInconsistentWithNamedZoneSource, NamedTimeZoneBuilderFailedSource,
+    NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder, ProvenNamedTimeZoneCarrier,
+    ProvenZonedDateTimeCarrier, ReflectedNamedTimeZone, ReflectedZonedDateTime, TemporalError,
+    TemporalErrorKind, UnsupportedCase, UnsupportedSource, ZonedDateTimeBuilderFailedSource,
     ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
 };
 
@@ -30,11 +32,8 @@ pub(super) fn named_time_zone_descriptor_to_jiff_time_zone(
     descriptor: &NamedTimeZoneDescriptor,
 ) -> Result<jiff::tz::TimeZone, TemporalError> {
     jiff::tz::TimeZone::get(descriptor.identifier()).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "could not resolve IANA time zone {:?}: {err}",
-                descriptor.identifier()
-            )),
+        TemporalError::new(TemporalErrorKind::JiffNamedZoneResolutionFailed(
+            JiffNamedZoneResolutionFailedSource::new(err, descriptor.identifier().clone()),
         ))
     })
 }
@@ -59,20 +58,16 @@ fn jiff_time_zone_to_named_time_zone_descriptor(
     tz: &jiff::tz::TimeZone,
 ) -> Result<NamedTimeZoneDescriptor, TemporalError> {
     let identifier = tz.iana_name().ok_or_else(|| {
-        TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-            "this jiff::tz::TimeZone has no IANA identifier to decompose into a named-zone \
-             descriptor (it is unknown, or a fixed offset)"
-                .to_owned(),
+        TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+            UnsupportedCase::JiffUnidentifiedNamedZone,
         )))
     })?;
     NamedTimeZoneDescriptorBuilder::default()
         .identifier(identifier)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build a named time zone descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::NamedTimeZoneBuilderFailed(
+                NamedTimeZoneBuilderFailedSource::new(err),
             ))
         })
 }
@@ -100,21 +95,21 @@ pub(super) fn zoned_date_time_descriptor_to_jiff_zoned(
     let (local, offset) = offset_date_time_descriptor_to_jiff_parts(descriptor.timestamp())?;
     let named_tz = named_time_zone_descriptor_to_jiff_time_zone(descriptor.zone())?;
     if !offset_is_consistent_with_named_zone(local, &named_tz, offset) {
-        return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "offset {offset:?} is not one of the real offsets {}'s own rules produce for local \
-             time {local}",
-                named_tz.iana_name().unwrap_or("<unnamed>"),
-            )),
-        )));
+        return Err(TemporalError::new(
+            TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(
+                JiffOffsetInconsistentWithNamedZoneSource::new(
+                    offset,
+                    local,
+                    named_tz.iana_name().unwrap_or("<unnamed>").to_owned(),
+                ),
+            ),
+        ));
     }
     let timestamp = jiff::tz::TimeZone::fixed(offset)
         .to_zoned(local)
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not pin the offset date-time to a fixed instant: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+                JiffInstantPinFailedSource::new(err),
             ))
         })?
         .timestamp();
@@ -134,10 +129,8 @@ pub(super) fn jiff_zoned_to_zoned_date_time_descriptor(
         .zone(zone)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build a zoned date-time descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::ZonedDateTimeBuilderFailed(
+                ZonedDateTimeBuilderFailedSource::new(err),
             ))
         })
 }

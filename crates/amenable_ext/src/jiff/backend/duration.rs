@@ -1,9 +1,10 @@
 use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    DurationDescriptor, DurationDescriptorBuilder, DurationFractionDescriptor,
-    InvalidDescriptorSource, ProvenDurationCarrier, ReflectedDuration, TemporalComponent,
-    TemporalDurationProps, TemporalError, TemporalErrorKind, UnsupportedSource,
+    ComponentNarrowingFailedSource, DurationBuilderFailedSource, DurationDescriptor,
+    DurationDescriptorBuilder, DurationFractionDescriptor, JiffSpanConstructionFailedSource,
+    NarrowingComponent, ProvenDurationCarrier, ReflectedDuration, TemporalComponent,
+    TemporalDurationProps, TemporalError, TemporalErrorKind, UnsupportedDetail, UnsupportedSource,
 };
 
 // ── Native carrier ───────────────────────────────────────────────────
@@ -58,10 +59,8 @@ pub(super) fn duration_descriptor_to_jiff_span(
     descriptor: &DurationDescriptor,
 ) -> Result<jiff::Span, TemporalError> {
     let out_of_range = |err: jiff::Error| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "duration component out of jiff::Span's representable range: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffSpanConstructionFailed(
+            JiffSpanConstructionFailedSource::new(err),
         ))
     };
 
@@ -82,9 +81,8 @@ pub(super) fn duration_descriptor_to_jiff_span(
             span.try_nanoseconds(nanos).map_err(out_of_range)
         }
         Some(fraction) => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff backend supports a fractional-second component only, not a fraction on {}",
-                fraction.component()
+            UnsupportedSource::from_detail(UnsupportedDetail::FractionComponentNotSecond(
+                fraction.component(),
             )),
         ))),
     }
@@ -98,27 +96,41 @@ pub(super) fn duration_descriptor_to_jiff_span(
 pub(super) fn jiff_span_to_duration_descriptor(
     span: jiff::Span,
 ) -> Result<DurationDescriptor, TemporalError> {
-    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "span's {field} does not fit the descriptor's u32 component: {err}"
-            )),
+    let out_of_range = |component: NarrowingComponent, value: i64, err| {
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(component, value, err),
         ))
     };
 
-    let years = u32::try_from(span.get_years()).map_err(|e| out_of_range("years", e))?;
-    let months = u32::try_from(span.get_months()).map_err(|e| out_of_range("months", e))?;
-    let weeks = u32::try_from(span.get_weeks()).map_err(|e| out_of_range("weeks", e))?;
-    let days = u32::try_from(span.get_days()).map_err(|e| out_of_range("days", e))?;
-    let hours = u32::try_from(span.get_hours()).map_err(|e| out_of_range("hours", e))?;
-    let minutes = u32::try_from(span.get_minutes()).map_err(|e| out_of_range("minutes", e))?;
-    let seconds = u32::try_from(span.get_seconds()).map_err(|e| out_of_range("seconds", e))?;
+    let years = u32::try_from(span.get_years()).map_err(|err| {
+        out_of_range(NarrowingComponent::Years, i64::from(span.get_years()), err)
+    })?;
+    let months = u32::try_from(span.get_months()).map_err(|err| {
+        out_of_range(
+            NarrowingComponent::Months,
+            i64::from(span.get_months()),
+            err,
+        )
+    })?;
+    let weeks = u32::try_from(span.get_weeks()).map_err(|err| {
+        out_of_range(NarrowingComponent::Weeks, i64::from(span.get_weeks()), err)
+    })?;
+    let days = u32::try_from(span.get_days())
+        .map_err(|err| out_of_range(NarrowingComponent::Days, i64::from(span.get_days()), err))?;
+    let hours = u32::try_from(span.get_hours()).map_err(|err| {
+        out_of_range(NarrowingComponent::Hours, i64::from(span.get_hours()), err)
+    })?;
+    let minutes = u32::try_from(span.get_minutes())
+        .map_err(|err| out_of_range(NarrowingComponent::Minutes, span.get_minutes(), err))?;
+    let seconds = u32::try_from(span.get_seconds())
+        .map_err(|err| out_of_range(NarrowingComponent::Seconds, span.get_seconds(), err))?;
 
     let nanos = span.get_nanoseconds();
     let fractional_component = if nanos == 0 {
         None
     } else {
-        let nanos_u32 = u32::try_from(nanos).map_err(|e| out_of_range("nanoseconds", e))?;
+        let nanos_u32 = u32::try_from(nanos)
+            .map_err(|err| out_of_range(NarrowingComponent::Nanoseconds, nanos, err))?;
         Some(DurationFractionDescriptor::new(
             TemporalComponent::Second,
             nanos_to_fractional_seconds_digits(i64::from(nanos_u32)),
@@ -137,8 +149,8 @@ pub(super) fn jiff_span_to_duration_descriptor(
         builder = builder.fractional_component(fraction);
     }
     builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!("could not build a duration descriptor: {err}")),
+        TemporalError::new(TemporalErrorKind::DurationBuilderFailed(
+            DurationBuilderFailedSource::new(err),
         ))
     })
 }

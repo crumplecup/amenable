@@ -12,7 +12,8 @@ mod standard_and_shift;
 mod zone;
 
 pub use local::{
-    LocalTimeDescriptor, LocalTimeDescriptorBuilder, ReducedLocalTimeDescriptor, TimeDescriptor,
+    LocalTimeDescriptor, LocalTimeDescriptorBuilder, LocalTimeDescriptorBuilderError,
+    ReducedLocalTimeDescriptor, TimeDescriptor,
 };
 pub use standard_and_shift::{
     ExplicitTimeOfDayDescriptor, ExplicitTimeOfDayDescriptorBuilder, ExplicitTimeShiftDescriptor,
@@ -20,6 +21,6 @@ pub use standard_and_shift::{
     StandardTimeOfDayDescriptor,
 };
 pub use zone::{
-    UtcOfDayDescriptor, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetRelationship,
-    UtcOffsetSign, UtcTimeScaleDescriptor,
+    UtcOfDayDescriptor, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
+    UtcOffsetDescriptorBuilderError, UtcOffsetRelationship, UtcOffsetSign, UtcTimeScaleDescriptor,
 };

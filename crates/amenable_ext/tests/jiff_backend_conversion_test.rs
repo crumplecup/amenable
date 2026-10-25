@@ -324,7 +324,7 @@ fn adjust_precision_losslessly_rejects_a_narrower_target() -> miette::Result<()>
         })?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::LosslessPrecisionAdjustmentRejected(_)
     ));
     Ok(())
 }

@@ -1,7 +1,7 @@
 use amenable_core::Ensures;
 use amenable_std::{
-    ComposeAnyLengthIsBounded, ComposeArrayLengthIsFixed, ComposeDepthZeroIsEmpty,
-    ComposeFieldPresenceTracksDepth,
+    ComposeAnyLengthHasMinimum, ComposeAnyLengthIsBounded, ComposeArrayLengthIsFixed,
+    ComposeDepthZeroIsEmpty, ComposeFieldPresenceTracksDepth,
 };
 
 use super::KaniCompose;
@@ -44,10 +44,10 @@ amenable_derive::harness! {
             // N", but correct for any char, not just ASCII.
             assert!(ComposeDepthZeroIsEmpty::ensures(String::kani_depth0().len()));
             let depth1 = String::kani_depth1();
-            assert!(!depth1.is_empty());
+            assert!(ComposeAnyLengthHasMinimum::ensures((depth1.len(), 1)));
             assert!(ComposeAnyLengthIsBounded::ensures((depth1.len(), 4)));
             let depth2 = String::kani_depth2();
-            assert!(depth2.len() >= 2);
+            assert!(ComposeAnyLengthHasMinimum::ensures((depth2.len(), 2)));
             assert!(ComposeAnyLengthIsBounded::ensures((depth2.len(), 8)));
         }
     }
@@ -94,7 +94,7 @@ amenable_derive::harness! {
             let depth1 = DerivedNode::kani_depth1();
             // Bounded, not exact byte length -- see
             // `verify_kani_compose_string_depths`'s own comment.
-            assert!(!depth1.name.is_empty());
+            assert!(ComposeAnyLengthHasMinimum::ensures((depth1.name.len(), 1)));
             assert!(ComposeAnyLengthIsBounded::ensures((depth1.name.len(), 4)));
             assert!(ComposeFieldPresenceTracksDepth::ensures((
                 depth1.maybe_child.is_some(),

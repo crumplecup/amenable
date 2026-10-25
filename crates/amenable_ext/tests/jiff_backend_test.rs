@@ -139,7 +139,7 @@ fn realize_duration_rejects_a_component_beyond_jiffs_representable_range() -> mi
         })?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::JiffSpanConstructionFailed(_)
     ));
     Ok(())
 }

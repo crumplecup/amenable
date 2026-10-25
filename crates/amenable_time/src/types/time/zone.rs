@@ -33,6 +33,24 @@ pub enum UtcOffsetSign {
     #[display("-")]
     Negative,
 }
+
+// No new Cargo dependency: `kani` is available as an implicit crate name
+// under the Kani compiler regardless of `Cargo.toml`, the same way this
+// workspace already gates `tracing::instrument` calls behind `cfg(kani)`
+// elsewhere -- needed so Kani proofs that `#[kani::stub_verified]` a
+// function returning this type (or a tuple containing it) can generate a
+// nondeterministic replacement value for it.
+#[cfg(kani)]
+impl kani::Arbitrary for UtcOffsetSign {
+    fn any() -> Self {
+        if kani::any::<bool>() {
+            Self::Positive
+        } else {
+            Self::Negative
+        }
+    }
+}
+
 /// The semantic interpretation of a UTC-relationship payload in an
 /// offset-aware timestamp.
 #[derive(

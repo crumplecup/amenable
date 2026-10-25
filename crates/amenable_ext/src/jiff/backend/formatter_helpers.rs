@@ -4,9 +4,9 @@ use amenable_time::{
     IxdtfTimestampDescriptor, LocalDateTimeDescriptor, LocalTimeDescriptor,
     OffsetDateTimeDescriptor, OrdinalDateDescriptor, QualifiedOrBareTemporalValueDescriptor,
     ReducedCalendarDateDescriptor, ReducedLocalTimeDescriptor, TemporalError, TemporalErrorKind,
-    TemporalValueDescriptor, TimeIntervalEndpoint, TimeIntervalRepresentation, UnsupportedSource,
-    UtcOffsetDescriptor, UtcOffsetRelationship, UtcOffsetSign, WeekDateDescriptor,
-    ZonedDateTimeDescriptor,
+    TemporalValueDescriptor, TimeIntervalEndpoint, TimeIntervalRepresentation, UnsupportedCase,
+    UnsupportedDetail, UnsupportedSource, UtcOffsetDescriptor, UtcOffsetRelationship,
+    UtcOffsetSign, WeekDateDescriptor, ZonedDateTimeDescriptor,
 };
 
 // ── Formatter (Phase 10) ────────────────────────────────────────────
@@ -40,12 +40,10 @@ use amenable_time::{
 // classified as out of scope, a real, honest `Unsupported`.
 
 /// Report that this backend cannot format the named form.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-pub(super) fn unsupported_format(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-        format!(
-            "jiff backend cannot format {edge}: outside jiff's Level-1 Gregorian/IANA-zone model"
-        ),
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(case)))]
+pub(super) fn unsupported_format(case: UnsupportedCase) -> TemporalError {
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+        case,
     )))
 }
 
@@ -181,7 +179,7 @@ pub(super) fn format_reduced_local_time(
             }
         }
         _ => Err(unsupported_format(
-            "a reduced local time with a fractional hour/minute component",
+            UnsupportedCase::FormatReducedLocalTimeFractionalComponent,
         )),
     }
 }
@@ -300,9 +298,8 @@ fn format_temporal_value(value: &TemporalValueDescriptor) -> Result<String, Temp
         TemporalValueDescriptor::OffsetDateTime(d) => Ok(format_offset_date_time(d, false)),
         TemporalValueDescriptor::ZonedDateTime(d) => Ok(format_zoned_date_time(d)),
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff backend cannot format the {other:?} interval-endpoint form \
-             (ISO 8601-2 / CalConnect extension family, out of scope)"
+            UnsupportedSource::from_detail(UnsupportedDetail::UnformattableTemporalValue(
+                other.clone(),
             )),
         ))),
     }
@@ -323,10 +320,10 @@ fn format_time_interval_endpoint(endpoint: &TimeIntervalEndpoint) -> Result<Stri
             format_temporal_value(value)
         }
         TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Qualified(_)) => Err(
-            unsupported_format("an explicitly qualified (ISO 8601-2) interval-endpoint value"),
+            unsupported_format(UnsupportedCase::FormatQualifiedIntervalEndpointValue),
         ),
         TimeIntervalEndpoint::Open | TimeIntervalEndpoint::Unknown => Err(unsupported_format(
-            "an Open/Unknown interval boundary (no independently sourced textual convention)",
+            UnsupportedCase::FormatOpenOrUnknownIntervalBoundary,
         )),
     }
 }

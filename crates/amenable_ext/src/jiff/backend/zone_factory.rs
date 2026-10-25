@@ -12,9 +12,11 @@ use amenable_time::{
     ConfirmNamedZoneRevisionNativeOutput, ConfirmNamedZoneRevisionOutput,
     ConfirmNamedZoneRevisionPreconditions, ConfirmNamedZoneRevisionPreconditionsToken,
     ConfirmZoneAuthorityEstablished, ConfirmZoneAuthorityInput, ConfirmZoneAuthorityOutput,
-    ConfirmZoneAuthorityPreconditionsToken, InvalidDescriptorSource,
-    LocalTimeZoneResolutionAuthorityDescriptor, NamedTimeZoneDescriptorBuilder,
-    NamedTimeZoneIdentityValid, NamedTimeZoneRevisionBundle, ProvenZonedDateTimeCarrier, RawInput,
+    ConfirmZoneAuthorityPreconditionsToken, JiffInstantPinFailedSource,
+    JiffNamedZoneResolutionFailedSource, JiffOffsetInconsistentWithNamedZoneSource,
+    LocalTimeZoneResolutionAuthorityDescriptor, NamedTimeZoneBuilderFailedSource,
+    NamedTimeZoneDescriptorBuilder, NamedTimeZoneIdentityValid, NamedTimeZoneRevisionBundle,
+    ProvenZonedDateTimeCarrier, RawInput,
     ResolveLocalDateTimeEstablished, ResolveLocalDateTimeInput,
     ResolveLocalDateTimeNativeEstablished, ResolveLocalDateTimeNativeInput,
     ResolveLocalDateTimeNativeOutput, ResolveLocalDateTimeOutput,
@@ -115,10 +117,8 @@ fn resolve_local_date_time_to_jiff_zoned(
     let ambiguous = tz.to_ambiguous_zoned(local).offset();
     let offset = resolve_ambiguous_offset(ambiguous, authority);
     let timestamp = offset.to_timestamp(local).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "resolved local date-time out of jiff's representable instant range: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+            JiffInstantPinFailedSource::new(err),
         ))
     })?;
     Ok(timestamp.to_zoned(tz))
@@ -137,19 +137,19 @@ fn attach_named_zone_to_jiff_zoned(
     tz: jiff::tz::TimeZone,
 ) -> Result<jiff::Zoned, TemporalError> {
     if !offset_is_consistent_with_named_zone(local, &tz, offset) {
-        return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "offset {offset:?} is not one of the real offsets {}'s own rules produce for local \
-             time {local}",
-                tz.iana_name().unwrap_or("<unnamed>"),
-            )),
-        )));
+        return Err(TemporalError::new(
+            TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(
+                JiffOffsetInconsistentWithNamedZoneSource::new(
+                    offset,
+                    local,
+                    tz.iana_name().unwrap_or("<unnamed>").to_owned(),
+                ),
+            ),
+        ));
     }
     let timestamp = offset.to_timestamp(local).map_err(|err| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "could not pin the offset date-time to a fixed instant: {err}"
-            )),
+        TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+            JiffInstantPinFailedSource::new(err),
         ))
     })?;
     Ok(timestamp.to_zoned(tz))
@@ -170,20 +170,16 @@ impl Exchange<RawInput, ResolvedNamedTimeZone, JiffVerifier> for JiffTimeBackend
     fn exchange(&self, input: RawInput) -> Result<ResolvedNamedTimeZone, TemporalError> {
         let identifier = input.as_str();
         jiff::tz::TimeZone::get(identifier).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not resolve IANA time zone {identifier:?}: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::JiffNamedZoneResolutionFailed(
+                JiffNamedZoneResolutionFailedSource::new(err, identifier.to_owned()),
             ))
         })?;
         let descriptor = NamedTimeZoneDescriptorBuilder::default()
             .identifier(identifier)
             .build()
             .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(format!(
-                        "could not build a named time zone descriptor: {err}"
-                    )),
+                TemporalError::new(TemporalErrorKind::NamedTimeZoneBuilderFailed(
+                    NamedTimeZoneBuilderFailedSource::new(err),
                 ))
             })?;
         let input_token = <RawInput as Sidecar<JiffVerifier>>::sidecar(&input);
@@ -291,13 +287,15 @@ impl Exchange<ConfirmNamedZoneRevisionInput, ConfirmNamedZoneRevisionOutput, Jif
         let (local, offset) = offset_date_time_descriptor_to_jiff_parts(descriptor.timestamp())?;
         let tz = named_time_zone_descriptor_to_jiff_time_zone(descriptor.zone())?;
         if !offset_is_consistent_with_named_zone(local, &tz, offset) {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "offset {offset:?} is no longer consistent with {}'s real rules for local time \
-                 {local}",
-                    tz.iana_name().unwrap_or("<unnamed>"),
-                )),
-            )));
+            return Err(TemporalError::new(
+                TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(
+                    JiffOffsetInconsistentWithNamedZoneSource::new(
+                        offset,
+                        local,
+                        tz.iana_name().unwrap_or("<unnamed>").to_owned(),
+                    ),
+                ),
+            ));
         }
         let input_token = <ConfirmNamedZoneRevisionInput as Sidecar<JiffVerifier>>::sidecar(&input);
         let token = <ConfirmNamedZoneRevisionEstablished as Establish<
@@ -422,13 +420,15 @@ impl
         let local = zoned.datetime();
         let offset = zoned.offset();
         if !offset_is_consistent_with_named_zone(local, tz, offset) {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "offset {offset:?} is no longer consistent with {}'s real rules for local time \
-                 {local}",
-                    tz.iana_name().unwrap_or("<unnamed>"),
-                )),
-            )));
+            return Err(TemporalError::new(
+                TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(
+                    JiffOffsetInconsistentWithNamedZoneSource::new(
+                        offset,
+                        local,
+                        tz.iana_name().unwrap_or("<unnamed>").to_owned(),
+                    ),
+                ),
+            ));
         }
         // This edge's own input is an already-proven native carrier,
         // not a fresh `TemporalInputToken`-backed request -- there is

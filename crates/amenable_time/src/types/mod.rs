@@ -44,19 +44,21 @@ pub use datetime::{
     DateWithShiftDescriptor, DateWithShiftDescriptorBuilder, ExplicitDateTimeDescriptor,
     ExplicitDateTimeDescriptorBuilder, ExplicitDateTimeWithShiftDescriptor,
     ExplicitDateTimeWithShiftDescriptorBuilder, LocalDateTimeDescriptor,
-    LocalDateTimeDescriptorBuilder, OffsetDateTimeDescriptor, OffsetDateTimeDescriptorBuilder,
+    LocalDateTimeDescriptorBuilder, LocalDateTimeDescriptorBuilderError, OffsetDateTimeDescriptor,
+    OffsetDateTimeDescriptorBuilder, OffsetDateTimeDescriptorBuilderError,
     TimeOfDayWithShiftDescriptor, TimeOfDayWithShiftDescriptorBuilder,
 };
 pub use duration::{
-    DurationDescriptor, DurationDescriptorBuilder, ExplicitDurationDescriptor,
-    ExplicitDurationDescriptorBuilder, ExplicitDurationRepresentationKindDescriptor,
-    ExplicitDurationSemanticKindDescriptor, ExplicitDurationSignDescriptor,
+    DurationDescriptor, DurationDescriptorBuilder, DurationDescriptorBuilderError,
+    ExplicitDurationDescriptor, ExplicitDurationDescriptorBuilder,
+    ExplicitDurationRepresentationKindDescriptor, ExplicitDurationSemanticKindDescriptor,
+    ExplicitDurationSignDescriptor,
 };
 pub use interval::{
     ExplicitTimeIntervalDescriptor, ExplicitTimeIntervalEndpointDescriptor,
     ExplicitTimeIntervalRepresentation, RecurringIntervalDescriptor,
-    RecurringIntervalDescriptorBuilder, TimeIntervalDescriptor, TimeIntervalEndpoint,
-    TimeIntervalRepresentation,
+    RecurringIntervalDescriptorBuilder, RecurringIntervalDescriptorBuilderError,
+    TimeIntervalDescriptor, TimeIntervalEndpoint, TimeIntervalRepresentation,
 };
 pub use recurrence::{
     DateTimeFormulaDescriptor, DateTimeFormulaEvaluationKindDescriptor,
@@ -73,9 +75,10 @@ pub use season::{
     SubYearGroupingExpressionDescriptorBuilder,
 };
 pub use serialization::{
-    IxdtfTimestampDescriptor, IxdtfTimestampDescriptorBuilder, PrecisionDescriptor,
-    PrecisionDescriptorBuilder, RoundingModeDescriptor, SerializationProfile,
-    TemporalSerializationDescriptor, TemporalSerializationDescriptorBuilder,
+    IxdtfTimestampDescriptor, IxdtfTimestampDescriptorBuilder,
+    IxdtfTimestampDescriptorBuilderError, PrecisionDescriptor, PrecisionDescriptorBuilder,
+    RoundingModeDescriptor, SerializationProfile, TemporalSerializationDescriptor,
+    TemporalSerializationDescriptorBuilder,
 };
 pub use set::{
     TemporalSetDescriptor, TemporalSetDescriptorBuilder, TemporalSetMemberDescriptor,
@@ -84,9 +87,10 @@ pub use set::{
 pub use time::{
     ExplicitTimeOfDayDescriptor, ExplicitTimeOfDayDescriptorBuilder, ExplicitTimeShiftDescriptor,
     ExplicitTimeShiftDescriptorBuilder, LocalTimeDescriptor, LocalTimeDescriptorBuilder,
-    LocalTimeScaleDescriptor, ReducedLocalTimeDescriptor, StandardTimeDescriptor,
-    StandardTimeOfDayDescriptor, TimeDescriptor, UtcOfDayDescriptor, UtcOffsetDescriptor,
-    UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign, UtcTimeScaleDescriptor,
+    LocalTimeDescriptorBuilderError, LocalTimeScaleDescriptor, ReducedLocalTimeDescriptor,
+    StandardTimeDescriptor, StandardTimeOfDayDescriptor, TimeDescriptor, UtcOfDayDescriptor,
+    UtcOffsetDescriptor, UtcOffsetDescriptorBuilder, UtcOffsetDescriptorBuilderError,
+    UtcOffsetRelationship, UtcOffsetSign, UtcTimeScaleDescriptor,
 };
 pub use unspecified::{
     MaskedNumericComponentDescriptor, MaskedNumericComponentDescriptorBuilder,
@@ -104,6 +108,7 @@ pub use zone::{
     IxdtfAnnotationDescriptor, IxdtfAnnotationDescriptorBuilder, IxdtfCalendarAnnotationDescriptor,
     IxdtfCalendarAnnotationDescriptorBuilder, IxdtfTimeZoneAnnotationDescriptor,
     LocalTimeZoneResolutionAuthorityDescriptor, NamedTimeZoneDescriptor,
-    NamedTimeZoneDescriptorBuilder, ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor,
-    ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
+    NamedTimeZoneDescriptorBuilder, NamedTimeZoneDescriptorBuilderError,
+    ZoneAmbiguityResolutionDescriptor, ZoneGapResolutionDescriptor, ZonedDateTimeDescriptor,
+    ZonedDateTimeDescriptorBuilder, ZonedDateTimeDescriptorBuilderError,
 };

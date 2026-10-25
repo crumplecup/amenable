@@ -47,7 +47,7 @@ use amenable_core::{Ensures, Requires};
 mod kani_only {
     #![cfg(kani)]
 
-    pub(super) use chrono::{Datelike, NaiveDate, Weekday};
+    pub(super) use chrono::{NaiveDate, Weekday};
 
     pub(super) use crate::chrono::civil_naive_week::weekday_of;
 
@@ -114,8 +114,8 @@ mod kani_only {
 
 #[cfg(kani)]
 use kani_only::{
-    ComputedPartitionIndexInRange, Datelike, InPartition, MAX_YEAR, MIN_YEAR, NaiveDate,
-    PARTITION_COUNT, PARTITION_SIZE, Weekday, YearInSupportedRange, weekday_of,
+    ComputedPartitionIndexInRange, InPartition, MIN_YEAR, NaiveDate, PARTITION_COUNT,
+    PARTITION_SIZE, Weekday, YearInSupportedRange, weekday_of,
 };
 
 amenable_derive::gallery_harness! {

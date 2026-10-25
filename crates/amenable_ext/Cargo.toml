@@ -42,6 +42,7 @@ default = []
 jiff = [
     "dep:jiff",
     "dep:amenable_time",
+    "amenable_time?/jiff",
     "jiff/serde",
     "jiff/defmt",
     "jiff/logging",
@@ -56,6 +57,7 @@ jiff = [
 chrono = [
     "dep:chrono",
     "dep:amenable_time",
+    "amenable_time?/chrono",
     "chrono/serde",
     "chrono/defmt",
     "chrono/unstable-locales",
@@ -66,6 +68,7 @@ chrono-tz = [
     "chrono",
     "dep:chrono-tz",
     "dep:amenable_std",
+    "amenable_time?/chrono-tz",
     "chrono-tz/serde",
     "chrono-tz/case-insensitive",
     "chrono-tz/filter-by-regex",

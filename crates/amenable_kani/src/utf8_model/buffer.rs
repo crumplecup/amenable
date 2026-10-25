@@ -6,11 +6,14 @@ use crate::{CalculationProof, KaniVerifier};
 // `Ensures`/`Requires`/`EmptinessTracksZeroLength`/`IndexRecoversTheStoredElement`
 // stay behind `#[cfg(kani)]` here because the `harness! { .. }` expansion is
 // pasted into this module's top level but only generates a proof body under
-// `kani`; outside that build those names are genuinely unused.
+// `kani`; outside that build those names are genuinely unused. One combined
+// group, not one `#[cfg(kani)]` per source crate, so this is a single
+// scattered item, not two.
 #[cfg(kani)]
-use crate::{EmptinessTracksZeroLength, IndexRecoversTheStoredElement};
-#[cfg(kani)]
-use amenable_core::{Ensures, Requires};
+use {
+    amenable_core::{Ensures, Requires},
+    crate::{EmptinessTracksZeroLength, IndexRecoversTheStoredElement},
+};
 
 use super::KaniAssumedUtf8Validity;
 
@@ -136,21 +139,26 @@ impl<const MAX_LEN: usize> KaniUtf8Buffer<MAX_LEN> {
     }
 }
 
-/// Every field (`[u8; MAX_LEN]`, `usize`) already implements
-/// `kani::Arbitrary`, so this is free to add and not circular: it
-/// comes straight from the fields' own existing impls, not from
-/// anything this type's own proofs establish. A local type, so no
-/// orphan-rule issue implementing a foreign trait on it. Deliberately
-/// field-wise, not validated -- `len` can come out `> MAX_LEN` here,
-/// matching `KaniUtf8Buffer::new`'s own fallible `TooLong` path rather
-/// than silently narrowing it; callers that need the validated
-/// invariant go through `new`, not this raw construction.
-#[cfg(kani)]
-impl<const MAX_LEN: usize> kani::Arbitrary for KaniUtf8Buffer<MAX_LEN> {
-    fn any() -> Self {
-        Self {
-            bytes: kani::any(),
-            len: kani::any(),
+mod kani_only {
+    #![cfg(kani)]
+
+    use super::KaniUtf8Buffer;
+
+    /// Every field (`[u8; MAX_LEN]`, `usize`) already implements
+    /// `kani::Arbitrary`, so this is free to add and not circular: it
+    /// comes straight from the fields' own existing impls, not from
+    /// anything this type's own proofs establish. A local type, so no
+    /// orphan-rule issue implementing a foreign trait on it. Deliberately
+    /// field-wise, not validated -- `len` can come out `> MAX_LEN` here,
+    /// matching `KaniUtf8Buffer::new`'s own fallible `TooLong` path rather
+    /// than silently narrowing it; callers that need the validated
+    /// invariant go through `new`, not this raw construction.
+    impl<const MAX_LEN: usize> kani::Arbitrary for KaniUtf8Buffer<MAX_LEN> {
+        fn any() -> Self {
+            Self {
+                bytes: kani::any(),
+                len: kani::any(),
+            }
         }
     }
 }

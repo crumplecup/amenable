@@ -9,7 +9,8 @@ use amenable_time::{
     AdjustPrecisionLosslesslyEstablished, AdjustPrecisionLosslesslyInput,
     AdjustPrecisionLosslesslyNativeEstablished, AdjustPrecisionLosslesslyNativeInput,
     AdjustPrecisionLosslesslyNativeOutput, AdjustPrecisionLosslesslyOutput,
-    AdjustPrecisionLosslesslyPreconditionsToken, InvalidDescriptorSource,
+    AdjustPrecisionLosslesslyPreconditionsToken, JiffDateTimeConstructionFailedSource,
+    JiffInstantPinFailedSource, LosslessPrecisionAdjustmentRejectedSource,
     NormalizeToUtcEstablished, NormalizeToUtcInput, NormalizeToUtcNativeEstablished,
     NormalizeToUtcNativeOutput, NormalizeToUtcOutput, NormalizeToUtcPreconditionsToken,
     OffsetDateTimeDescriptor, OffsetDateTimeProof, OffsetDateTimeProofToken,
@@ -19,7 +20,7 @@ use amenable_time::{
     TemporalError, TemporalErrorKind, TemporalInputToken, TruncateSubsecondsEstablished,
     TruncateSubsecondsInput, TruncateSubsecondsNativeEstablished, TruncateSubsecondsNativeInput,
     TruncateSubsecondsNativeOutput, TruncateSubsecondsOutput, TruncateSubsecondsPreconditionsToken,
-    UnsupportedSource,
+    UnsupportedDetail, UnsupportedSource,
 };
 
 // ── Conversion factory (Phase 5) ────────────────────────────────────
@@ -43,9 +44,7 @@ use amenable_time::{
 fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, TemporalError> {
     if target.smallest_component() != TemporalComponent::Second {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff backend's precision-adjustment edges anchor at the second; \
-             smallest_component = {} is not supported",
+            UnsupportedSource::from_detail(UnsupportedDetail::PrecisionAdjustmentRequiresSecond(
                 target.smallest_component(),
             )),
         )));
@@ -53,10 +52,7 @@ fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, Temporal
     let digits = target.fractional_digits().unwrap_or(0);
     if digits > 9 {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff's civil time is nanosecond-precision (9 fractional digits); \
-             {digits} fractional digits exceeds its representable range"
-            )),
+            UnsupportedSource::from_detail(UnsupportedDetail::FractionalDigitsOutOfRange(digits)),
         )));
     }
     Ok(digits)
@@ -92,20 +88,18 @@ fn adjust_jiff_local_precision(
     let truncated_nanos = truncate_nanos_to_digits(original_nanos, digits);
     if truncated_nanos != original_nanos {
         if lossless {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "adjusting to {digits} fractional digits would discard non-zero \
-                 sub-second precision ({original_nanos} nanoseconds); not lossless"
-                )),
-            )));
+            return Err(TemporalError::new(
+                TemporalErrorKind::LosslessPrecisionAdjustmentRejected(
+                    LosslessPrecisionAdjustmentRejectedSource::new(digits, original_nanos),
+                ),
+            ));
         }
         match target_precision.rounding_mode() {
             None | Some(RoundingModeDescriptor::Truncate) => {}
             Some(other) => {
                 return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-                    UnsupportedSource::new(format!(
-                        "jiff backend only implements truncation for sub-second \
-                     precision reduction, not rounding mode {other}"
+                    UnsupportedSource::from_detail(UnsupportedDetail::UnsupportedRoundingMode(
+                        other.clone(),
                     )),
                 )));
             }
@@ -116,10 +110,8 @@ fn adjust_jiff_local_precision(
         .subsec_nanosecond(truncated_nanos)
         .build()
         .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not rebuild the precision-adjusted local time: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::JiffDateTimeConstructionFailed(
+                JiffDateTimeConstructionFailedSource::new(err),
             ))
         })
 }
@@ -147,10 +139,8 @@ impl Exchange<NormalizeToUtcInput, NormalizeToUtcOutput, JiffVerifier> for JiffT
         let (local, offset) =
             offset_date_time_descriptor_to_jiff_parts(input.request().timestamp())?;
         let timestamp = offset.to_timestamp(local).map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not pin the offset date-time to a fixed instant: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+                JiffInstantPinFailedSource::new(err),
             ))
         })?;
         let utc = timestamp.to_zoned(jiff::tz::TimeZone::UTC);
@@ -259,10 +249,8 @@ impl
             .offset()
             .to_timestamp(*carrier.local())
             .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(format!(
-                        "could not pin the offset date-time to a fixed instant: {err}"
-                    )),
+                TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+                    JiffInstantPinFailedSource::new(err),
                 ))
             })?;
         let utc = timestamp.to_zoned(jiff::tz::TimeZone::UTC);

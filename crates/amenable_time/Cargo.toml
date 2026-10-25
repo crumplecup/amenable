@@ -16,12 +16,20 @@ categories = ["date-and-time", "development-tools"]
 [dependencies]
 amenable_core = { workspace = true }
 amenable_derive = { workspace = true }
+# Optional: only pulled in by the same-named feature, purely to name the
+# real foreign error type a backend-specific native error source wraps
+# (e.g. `chrono_tz::ParseError`) -- never to depend on the backend's
+# conversion logic itself, which stays in `amenable_ext`. Mirrors
+# `amenable_ext`'s own per-backend optional-dependency shape.
+chrono = { workspace = true, optional = true }
+chrono-tz = { workspace = true, optional = true }
 derive_builder = { workspace = true }
 derive-getters = { workspace = true }
 derive-new = { workspace = true }
 derive_more = { workspace = true }
 derive_setters = { workspace = true }
 inventory = { workspace = true }
+jiff = { workspace = true, optional = true }
 strum = { workspace = true }
 tracing = { workspace = true }
 
@@ -35,6 +43,16 @@ miette = { workspace = true }
 # Off by default (an experimental, still-partial verifier backend); the
 # real `verus! { .. }` proof content lives in `amenable_verus`.
 verus = ["amenable_core/verus", "amenable_derive/verus"]
+# Lets `error.rs` name `chrono_tz::ParseError` as a real `source` field
+# on the one native source struct that wraps it -- see that struct's own
+# doc comment. No conversion logic; that stays in `amenable_ext`.
+chrono-tz = ["chrono", "dep:chrono-tz"]
+# Lets `error.rs` name `chrono`-specific types directly (not just through
+# `chrono-tz`) where a native source needs one.
+chrono = ["dep:chrono"]
+# Lets `error.rs` name jiff's own foreign error types as real `source`
+# fields on the native sources that wrap them.
+jiff = ["dep:jiff"]
 
 [lints]
 workspace = true

@@ -90,7 +90,7 @@ fn realize_named_time_zone_rejects_an_unknown_identifier() -> miette::Result<()>
         .ok_or_else(|| miette::miette!("Nowhere/Fictional is not a real IANA zone"))?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::JiffNamedZoneResolutionFailed(_)
     ));
     Ok(())
 }

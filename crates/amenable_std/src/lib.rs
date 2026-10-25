@@ -29,6 +29,7 @@ mod array_into_iter_advance_matches_position;
 mod array_into_iter_starts_at_first_position;
 mod ascii_byte;
 mod cert;
+mod compose_any_length_has_minimum;
 mod compose_any_length_is_bounded;
 mod compose_array_length_is_fixed;
 mod compose_depth_zero_is_empty;
@@ -67,6 +68,7 @@ pub use array_into_iter_advance_matches_position::ArrayIntoIterAdvanceMatchesPos
 pub use array_into_iter_starts_at_first_position::ArrayIntoIterStartsAtFirstPosition;
 pub use ascii_byte::AsciiByte;
 pub use cert::{CertId, CertRegistry, ProvenanceCertificate};
+pub use compose_any_length_has_minimum::ComposeAnyLengthHasMinimum;
 pub use compose_any_length_is_bounded::ComposeAnyLengthIsBounded;
 pub use compose_array_length_is_fixed::ComposeArrayLengthIsFixed;
 pub use compose_depth_zero_is_empty::ComposeDepthZeroIsEmpty;

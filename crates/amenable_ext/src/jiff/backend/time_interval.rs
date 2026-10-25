@@ -11,15 +11,18 @@ use crate::jiff::backend::zone_conversions::zoned_date_time_descriptor_to_jiff_z
 use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
-    CalendarDateDescriptor, CompleteDateDescriptor, IntervalEndpointOrderingBundle,
-    InvalidDescriptorSource, OrderOffsetEndpointsEstablished, OrderOffsetEndpointsEstablishedToken,
+    CalendarDateDescriptor, ComponentNarrowingFailedSource, CompleteDateDescriptor,
+    DeclaredEndpoint, EndpointHasNoTemporalValueSource, IntervalEndpointOrderingBundle,
+    IntervalEndpointsReversedSource, JiffInstantPinFailedSource, NarrowingComponent,
+    OrderOffsetEndpointsEstablished, OrderOffsetEndpointsEstablishedToken,
     OrderOffsetEndpointsNativeInput, OrderOffsetEndpointsNativeOutput,
     ProvenRecurringIntervalCarrier, ProvenTimeIntervalCarrier,
-    QualifiedOrBareTemporalValueDescriptor, RecurringIntervalDescriptorBuilder,
-    ReflectedRecurringInterval, ReflectedTimeInterval, TemporalError, TemporalErrorKind,
-    TemporalInputToken, TemporalRecurringIntervalProps, TemporalTimeIntervalProps,
-    TemporalValueDescriptor, TimeIntervalDescriptor, TimeIntervalEndpoint,
-    TimeIntervalRepresentation, UnsupportedSource,
+    QualifiedOrBareTemporalValueDescriptor, RecurringIntervalBuilderFailedSource,
+    RecurringIntervalDescriptorBuilder, ReflectedRecurringInterval, ReflectedTimeInterval,
+    TemporalError, TemporalErrorKind, TemporalInputToken, TemporalRecurringIntervalProps,
+    TemporalTimeIntervalProps, TemporalValueDescriptor, TimeIntervalDescriptor,
+    TimeIntervalEndpoint, TimeIntervalRepresentation, UnsupportedCase, UnsupportedDetail,
+    UnsupportedSource,
 };
 
 // ── Time interval / recurring interval carriers (Phase 8) ───────────
@@ -144,16 +147,16 @@ impl TemporalRecurringIntervalProps for JiffTimeBackend {
 pub(super) fn jiff_date_to_calendar_date_descriptor(
     date: jiff::civil::Date,
 ) -> Result<CalendarDateDescriptor, TemporalError> {
-    let out_of_range = |field: &str, err: std::num::TryFromIntError| {
-        TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-            InvalidDescriptorSource::new(format!(
-                "date's {field} does not fit the descriptor's component range: {err}"
-            )),
+    let out_of_range = |component: NarrowingComponent, value: i64, err| {
+        TemporalError::new(TemporalErrorKind::ComponentNarrowingFailed(
+            ComponentNarrowingFailedSource::new(component, value, err),
         ))
     };
     let year = i32::from(date.year());
-    let month = u8::try_from(date.month()).map_err(|e| out_of_range("month", e))?;
-    let day = u8::try_from(date.day()).map_err(|e| out_of_range("day", e))?;
+    let month = u8::try_from(date.month())
+        .map_err(|err| out_of_range(NarrowingComponent::Month, i64::from(date.month()), err))?;
+    let day = u8::try_from(date.day())
+        .map_err(|err| out_of_range(NarrowingComponent::Day, i64::from(date.day()), err))?;
     Ok(CalendarDateDescriptor::new(year, month, day))
 }
 
@@ -189,9 +192,8 @@ fn temporal_value_descriptor_to_jiff_endpoint(
             ))
         }
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::new(format!(
-                "jiff backend has no representation for the {other:?} interval-endpoint \
-             form (ISO 8601-2 / CalConnect extension family, out of scope)"
+            UnsupportedSource::from_detail(UnsupportedDetail::UnrepresentableIntervalEndpointValue(
+                other.clone(),
             )),
         ))),
     }
@@ -204,13 +206,16 @@ fn jiff_endpoint_to_temporal_value_descriptor(
     endpoint: &JiffTimeIntervalEndpoint,
 ) -> Result<TemporalValueDescriptor, TemporalError> {
     match endpoint {
-        JiffTimeIntervalEndpoint::Open | JiffTimeIntervalEndpoint::Unknown => {
-            Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(
-                    "an Open/Unknown endpoint carries no temporal value to decompose".to_owned(),
-                ),
-            )))
-        }
+        JiffTimeIntervalEndpoint::Open => Err(TemporalError::new(
+            TemporalErrorKind::EndpointHasNoTemporalValue(EndpointHasNoTemporalValueSource::new(
+                DeclaredEndpoint::Open,
+            )),
+        )),
+        JiffTimeIntervalEndpoint::Unknown => Err(TemporalError::new(
+            TemporalErrorKind::EndpointHasNoTemporalValue(EndpointHasNoTemporalValueSource::new(
+                DeclaredEndpoint::Unknown,
+            )),
+        )),
         JiffTimeIntervalEndpoint::CalendarDate(date) => Ok(TemporalValueDescriptor::CalendarDate(
             jiff_date_to_calendar_date_descriptor(*date)?,
         )),
@@ -245,10 +250,8 @@ fn time_interval_endpoint_descriptor_to_jiff(
             temporal_value_descriptor_to_jiff_endpoint(value)
         }
         TimeIntervalEndpoint::Value(QualifiedOrBareTemporalValueDescriptor::Qualified(_)) => Err(
-            TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-                "jiff backend has no representation for an explicitly qualified \
-                 (ISO 8601-2) interval-endpoint value"
-                    .to_owned(),
+            TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+                UnsupportedCase::JiffQualifiedIntervalEndpoint,
             ))),
         ),
     }
@@ -421,10 +424,8 @@ impl
             .interval(TimeIntervalDescriptor::new(representation))
             .build()
             .map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(format!(
-                        "could not build a recurring interval descriptor: {err}"
-                    )),
+                TemporalError::new(TemporalErrorKind::RecurringIntervalBuilderFailed(
+                    RecurringIntervalBuilderFailedSource::new(err),
                 ))
             })?;
         let token = <ProvenRecurringIntervalCarrier<JiffRecurringInterval> as Sidecar<
@@ -451,10 +452,8 @@ impl
         let request = input.request();
         let pin = |odt: &JiffOffsetDateTime| {
             odt.offset().to_timestamp(*odt.local()).map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(format!(
-                        "could not pin the offset date-time to a fixed instant: {err}"
-                    )),
+                TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+                    JiffInstantPinFailedSource::new(err),
                 ))
             })
         };
@@ -462,10 +461,8 @@ impl
         let end = pin(request.end())?;
 
         if start > end {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "interval start ({start}) is after its end ({end})"
-                )),
+            return Err(TemporalError::new(TemporalErrorKind::IntervalEndpointsReversed(
+                IntervalEndpointsReversedSource::new(start, end),
             )));
         }
 

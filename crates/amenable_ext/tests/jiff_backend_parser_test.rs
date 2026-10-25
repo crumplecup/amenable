@@ -52,7 +52,7 @@ fn parse_calendar_date_rejects_malformed_text() -> miette::Result<()> {
     let err = result
         .err()
         .ok_or_else(|| miette::miette!("malformed text is not a real calendar date"))?;
-    assert!(matches!(&**err.kind(), TemporalErrorKind::ParseRejected(_)));
+    assert!(matches!(&**err.kind(), TemporalErrorKind::JiffParseRejected(_)));
     Ok(())
 }
 

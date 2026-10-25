@@ -22,21 +22,14 @@
 
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
-    InvalidDescriptorSource, TemporalError, TemporalErrorKind, TemporalInputToken,
+    NonPositiveDeltaSource, OffsetDiscoveryRangeReversedSource, TemporalError, TemporalErrorKind,
+    TemporalInputToken,
 };
 use chrono::{Duration, NaiveDateTime};
 use chrono_tz::{OffsetComponents, Tz};
 
 use crate::BoundedStepWalk;
 use crate::chrono::identity::{ChronoTimeBackend, ChronoVerifier};
-
-/// Build a [`TemporalError`] for a malformed discovery request.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
-fn invalid(detail: String) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-        InvalidDescriptorSource::new(detail),
-    ))
-}
 
 /// A real zone's offset at a given instant: its `base_utc_offset()` and
 /// `dst_offset()`, each in seconds.
@@ -164,10 +157,16 @@ impl Exchange<OffsetDiscoveryRequest, DiscoveredOffsetTable, ChronoVerifier> for
         let params = *<OffsetDiscoveryRequest as Sidecar<ChronoVerifier>>::primary(&input);
         let (lo, hi, delta) = (params.lo(), params.hi(), params.delta());
         if delta <= Duration::zero() {
-            return Err(invalid(format!("delta must be positive, got {delta:?}")));
+            return Err(TemporalError::new(TemporalErrorKind::NonPositiveDelta(
+                NonPositiveDeltaSource::new(delta),
+            )));
         }
         if lo > hi {
-            return Err(invalid(format!("lo {lo:?} must not be after hi {hi:?}")));
+            return Err(TemporalError::new(
+                TemporalErrorKind::OffsetDiscoveryRangeReversed(
+                    OffsetDiscoveryRangeReversedSource::new(lo, hi),
+                ),
+            ));
         }
 
         // The real grid walk: `BoundedStepWalk`'s own one-step lemma

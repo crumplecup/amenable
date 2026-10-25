@@ -16,19 +16,20 @@ use crate::jiff::backend::time_interval::jiff_date_to_calendar_date_descriptor;
 use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
-    CalendarDateValid, CompleteDateDescriptor, FractionalSecondDescriptor, InvalidDescriptorSource,
-    IxdtfTimestampDescriptorBuilder, IxdtfTimestampProof, LocalDateTimeProof,
+    CalendarDateValid, CompleteDateDescriptor, FractionalSecondDescriptor,
+    IxdtfTimestampBuilderFailedSource, IxdtfTimestampDescriptorBuilder, IxdtfTimestampProof,
+    JiffParseRejectedSource, LocalDateTimeProof, LocalTimeBuilderFailedSource,
     LocalTimeDescriptorBuilder, LocalTimeValid, OffsetDateTimeProof, OrdinalDateDescriptor,
-    OrdinalDateValid, ParseRejectedSource, ParsedCalendarDate, ParsedCentury,
-    ParsedDateTimeFormula, ParsedDateWithShift, ParsedDecade, ParsedExtendedYear,
-    ParsedGroupedTimeScaleUnit, ParsedIxdtfTimestamp, ParsedLocalDateTime, ParsedLocalTime,
-    ParsedOffsetDateTime, ParsedOrdinalDate, ParsedQualifiedTemporalValue,
-    ParsedReducedCalendarDate, ParsedReducedLocalTime, ParsedRfc3339Timestamp,
-    ParsedSeasonalTemporalExpression, ParsedSubYearGroupingExpression, ParsedTemporalSet,
-    ParsedTimeOfDayWithShift, ParsedUnspecifiedComponentExpression, ParsedUtcOffset,
-    ParsedWeekDate, RawInput, ReducedCalendarDateValid, ReducedLocalTimeValid,
-    Rfc3339TimestampProof, TemporalError, TemporalErrorKind, TemporalInputToken, UtcOffsetValid,
-    WeekDateDescriptor, WeekDateValid,
+    OrdinalDateValid, ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula,
+    ParsedDateWithShift, ParsedDecade, ParsedExtendedYear, ParsedGroupedTimeScaleUnit,
+    ParsedIxdtfTimestamp, ParsedLocalDateTime, ParsedLocalTime, ParsedOffsetDateTime,
+    ParsedOrdinalDate, ParsedQualifiedTemporalValue, ParsedReducedCalendarDate,
+    ParsedReducedLocalTime, ParsedRfc3339Timestamp, ParsedSeasonalTemporalExpression,
+    ParsedSubYearGroupingExpression, ParsedTemporalSet, ParsedTimeOfDayWithShift,
+    ParsedUnspecifiedComponentExpression, ParsedUtcOffset, ParsedWeekDate, RawInput,
+    ReducedCalendarDateValid, ReducedLocalTimeValid, Rfc3339TimestampProof, TemporalError,
+    TemporalErrorKind, TemporalInputToken, UnsupportedCase, UtcOffsetValid, WeekDateDescriptor,
+    WeekDateValid,
 };
 
 impl Exchange<RawInput, ParsedCalendarDate, JiffVerifier> for JiffTimeBackend {
@@ -37,10 +38,9 @@ impl Exchange<RawInput, ParsedCalendarDate, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedCalendarDate, TemporalError> {
         let date: jiff::civil::Date = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-                "ISO 8601 calendar date".to_owned(),
-                format!("{err}"),
-            )))
+            TemporalError::new(TemporalErrorKind::JiffParseRejected(
+                JiffParseRejectedSource::new("ISO 8601 calendar date", err),
+            ))
         })?;
         let descriptor = jiff_date_to_calendar_date_descriptor(date)?;
         let token = <CalendarDateValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -69,7 +69,7 @@ impl Exchange<RawInput, ParsedExtendedYear, JiffVerifier> for JiffTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedExtendedYear, TemporalError> {
-        Err(unsupported_parse("an ISO 8601-2 extended year"))
+        Err(unsupported_parse(UnsupportedCase::ParseIso8601ExtendedYear))
     }
 }
 
@@ -78,7 +78,7 @@ impl Exchange<RawInput, ParsedDecade, JiffVerifier> for JiffTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedDecade, TemporalError> {
-        Err(unsupported_parse("a Gregorian decade"))
+        Err(unsupported_parse(UnsupportedCase::ParseGregorianDecade))
     }
 }
 
@@ -87,7 +87,7 @@ impl Exchange<RawInput, ParsedCentury, JiffVerifier> for JiffTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedCentury, TemporalError> {
-        Err(unsupported_parse("a Gregorian century"))
+        Err(unsupported_parse(UnsupportedCase::ParseGregorianCentury))
     }
 }
 
@@ -97,7 +97,7 @@ impl Exchange<RawInput, ParsedQualifiedTemporalValue, JiffVerifier> for JiffTime
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedQualifiedTemporalValue, TemporalError> {
         Err(unsupported_parse(
-            "an ISO 8601-2 explicitly-qualified temporal value",
+            UnsupportedCase::ParseIso8601QualifiedTemporalValue,
         ))
     }
 }
@@ -150,10 +150,9 @@ impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalTime, TemporalError> {
         let time: jiff::civil::Time = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-                "ISO 8601 local time".to_owned(),
-                format!("{err}"),
-            )))
+            TemporalError::new(TemporalErrorKind::JiffParseRejected(
+                JiffParseRejectedSource::new("ISO 8601 local time", err),
+            ))
         })?;
         let mut builder = LocalTimeDescriptorBuilder::default()
             .hour(u8::try_from(time.hour()).unwrap_or_default())
@@ -166,10 +165,8 @@ impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
             ));
         }
         let descriptor = builder.build().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build a local time descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::LocalTimeBuilderFailed(
+                LocalTimeBuilderFailedSource::new(err),
             ))
         })?;
         let token = <LocalTimeValid as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -212,10 +209,9 @@ impl Exchange<RawInput, ParsedLocalDateTime, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalDateTime, TemporalError> {
         let datetime: jiff::civil::DateTime = input.as_str().parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-                "ISO 8601 local date-time".to_owned(),
-                format!("{err}"),
-            )))
+            TemporalError::new(TemporalErrorKind::JiffParseRejected(
+                JiffParseRejectedSource::new("ISO 8601 local date-time", err),
+            ))
         })?;
         let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(datetime)?;
         let token = <LocalDateTimeProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -249,7 +245,7 @@ impl Exchange<RawInput, ParsedDateWithShift, JiffVerifier> for JiffTimeBackend {
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedDateWithShift, TemporalError> {
         Err(unsupported_parse(
-            "a CalConnect explicit date-with-shift value",
+            UnsupportedCase::ParseCalConnectDateWithShift,
         ))
     }
 }
@@ -260,7 +256,7 @@ impl Exchange<RawInput, ParsedTimeOfDayWithShift, JiffVerifier> for JiffTimeBack
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedTimeOfDayWithShift, TemporalError> {
         Err(unsupported_parse(
-            "a CalConnect explicit time-of-day-with-shift value",
+            UnsupportedCase::ParseCalConnectTimeOfDayWithShift,
         ))
     }
 }
@@ -299,10 +295,8 @@ impl Exchange<RawInput, ParsedIxdtfTimestamp, JiffVerifier> for JiffTimeBackend 
                 builder.time_zone_annotation(jiff_time_zone_annotation_to_descriptor(annotation)?);
         }
         let descriptor = builder.build().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "could not build an IXDTF timestamp descriptor: {err}"
-                )),
+            TemporalError::new(TemporalErrorKind::IxdtfTimestampBuilderFailed(
+                IxdtfTimestampBuilderFailedSource::new(err),
             ))
         })?;
         let token = <IxdtfTimestampProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -320,7 +314,7 @@ impl Exchange<RawInput, ParsedSeasonalTemporalExpression, JiffVerifier> for Jiff
         &self,
         _input: RawInput,
     ) -> Result<ParsedSeasonalTemporalExpression, TemporalError> {
-        Err(unsupported_parse("an ISO 8601-2 seasonal expression"))
+        Err(unsupported_parse(UnsupportedCase::ParseIso8601SeasonalExpression))
     }
 }
 
@@ -330,7 +324,7 @@ impl Exchange<RawInput, ParsedSubYearGroupingExpression, JiffVerifier> for JiffT
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedSubYearGroupingExpression, TemporalError> {
         Err(unsupported_parse(
-            "an ISO 8601-2 sub-year grouping expression",
+            UnsupportedCase::ParseIso8601SubYearGroupingExpression,
         ))
     }
 }
@@ -344,7 +338,7 @@ impl Exchange<RawInput, ParsedUnspecifiedComponentExpression, JiffVerifier> for 
         _input: RawInput,
     ) -> Result<ParsedUnspecifiedComponentExpression, TemporalError> {
         Err(unsupported_parse(
-            "an ISO 8601-2 unspecified-component expression",
+            UnsupportedCase::ParseIso8601UnspecifiedComponentExpression,
         ))
     }
 }
@@ -354,7 +348,7 @@ impl Exchange<RawInput, ParsedTemporalSet, JiffVerifier> for JiffTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedTemporalSet, TemporalError> {
-        Err(unsupported_parse("an ISO 8601-2 temporal set"))
+        Err(unsupported_parse(UnsupportedCase::ParseIso8601TemporalSet))
     }
 }
 
@@ -364,7 +358,7 @@ impl Exchange<RawInput, ParsedGroupedTimeScaleUnit, JiffVerifier> for JiffTimeBa
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedGroupedTimeScaleUnit, TemporalError> {
         Err(unsupported_parse(
-            "an ISO 8601-2 grouped time-scale unit expression",
+            UnsupportedCase::ParseIso8601GroupedTimeScaleUnit,
         ))
     }
 }
@@ -374,6 +368,6 @@ impl Exchange<RawInput, ParsedDateTimeFormula, JiffVerifier> for JiffTimeBackend
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedDateTimeFormula, TemporalError> {
-        Err(unsupported_parse("a CalConnect date-time formula"))
+        Err(unsupported_parse(UnsupportedCase::ParseCalConnectDateTimeFormula))
     }
 }

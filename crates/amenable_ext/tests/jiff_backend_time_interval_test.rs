@@ -334,7 +334,7 @@ fn order_offset_endpoints_native_rejects_a_reversed_pair() -> miette::Result<()>
         .ok_or_else(|| miette::miette!("start is genuinely after end"))?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::IntervalEndpointsReversed(_)
     ));
     Ok(())
 }

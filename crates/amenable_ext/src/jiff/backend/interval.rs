@@ -3,10 +3,11 @@ use crate::jiff::backend::instant::offset_date_time_descriptor_to_jiff_parts;
 use crate::{JiffTimeBackend, JiffVerifier};
 use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
-    DurationFormValid, InvalidDescriptorSource, OrderOffsetEndpointsEstablished,
-    OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken,
-    ParseRejectedSource, ParsedDuration, ParsedRecurringInterval, ParsedTimeInterval, RawInput,
-    TemporalError, TemporalErrorKind, TemporalInputToken, UnsupportedSource,
+    DurationFormValid, IntervalEndpointsReversedSource, JiffInstantPinFailedSource,
+    JiffParseRejectedSource, OrderOffsetEndpointsEstablished, OrderOffsetEndpointsInput,
+    OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken, ParsedDuration,
+    ParsedRecurringInterval, ParsedTimeInterval, RawInput, TemporalError, TemporalErrorKind,
+    TemporalInputToken, UnsupportedCase, UnsupportedSource,
 };
 
 // ── Interval factory (Phase 7) ──────────────────────────────────────
@@ -42,10 +43,9 @@ impl Exchange<RawInput, ParsedDuration, JiffVerifier> for JiffTimeBackend {
     fn exchange(&self, input: RawInput) -> Result<ParsedDuration, TemporalError> {
         let text = input.as_str();
         let span: jiff::Span = text.parse().map_err(|err| {
-            TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-                "ISO 8601 duration".to_owned(),
-                format!("{err}"),
-            )))
+            TemporalError::new(TemporalErrorKind::JiffParseRejected(
+                JiffParseRejectedSource::new("ISO 8601 duration", err),
+            ))
         })?;
         let descriptor = jiff_span_to_duration_descriptor(span)?;
         let input_token = <RawInput as Sidecar<JiffVerifier>>::sidecar(&input);
@@ -58,13 +58,10 @@ impl Exchange<RawInput, ParsedDuration, JiffVerifier> for JiffTimeBackend {
 
 /// Report that arbitrary interval-endpoint text parsing is not yet
 /// implemented on this backend (see the module doc comment above).
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
-fn unsupported_interval_endpoint_parse(edge: &'static str) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::new(
-        format!(
-            "this backend cannot yet parse an arbitrary temporal value as an interval \
-         endpoint for {edge}: that requires TemporalParser (Phase 9), not yet built here"
-        ),
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(case)))]
+fn unsupported_interval_endpoint_parse(case: UnsupportedCase) -> TemporalError {
+    TemporalError::new(TemporalErrorKind::Unsupported(UnsupportedSource::closed(
+        case,
     )))
 }
 
@@ -73,7 +70,7 @@ impl Exchange<RawInput, ParsedRecurringInterval, JiffVerifier> for JiffTimeBacke
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedRecurringInterval, TemporalError> {
-        Err(unsupported_interval_endpoint_parse("a recurring interval"))
+        Err(unsupported_interval_endpoint_parse(UnsupportedCase::JiffIntervalEndpointParseRecurringInterval))
     }
 }
 
@@ -82,7 +79,7 @@ impl Exchange<RawInput, ParsedTimeInterval, JiffVerifier> for JiffTimeBackend {
 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, _input)))]
     fn exchange(&self, _input: RawInput) -> Result<ParsedTimeInterval, TemporalError> {
-        Err(unsupported_interval_endpoint_parse("a time interval"))
+        Err(unsupported_interval_endpoint_parse(UnsupportedCase::JiffIntervalEndpointParseTimeInterval))
     }
 }
 
@@ -102,10 +99,8 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, JiffVerifie
         let (end_local, end_offset) = offset_date_time_descriptor_to_jiff_parts(request.end())?;
         let pin = |offset: jiff::tz::Offset, local: jiff::civil::DateTime| {
             offset.to_timestamp(local).map_err(|err| {
-                TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(format!(
-                        "could not pin the offset date-time to a fixed instant: {err}"
-                    )),
+                TemporalError::new(TemporalErrorKind::JiffInstantPinFailed(
+                    JiffInstantPinFailedSource::new(err),
                 ))
             })
         };
@@ -113,10 +108,8 @@ impl Exchange<OrderOffsetEndpointsInput, OrderOffsetEndpointsOutput, JiffVerifie
         let end = pin(end_offset, end_local)?;
 
         if start > end {
-            return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                InvalidDescriptorSource::new(format!(
-                    "interval start ({start}) is after its end ({end})"
-                )),
+            return Err(TemporalError::new(TemporalErrorKind::IntervalEndpointsReversed(
+                IntervalEndpointsReversedSource::new(start, end),
             )));
         }
 

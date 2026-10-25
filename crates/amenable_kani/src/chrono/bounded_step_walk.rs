@@ -12,8 +12,6 @@
 //! on: a stray `.max` instead of `.min`, a dropped clamp, or a `delta`
 //! added twice would all be caught here.
 
-#[cfg(kani)]
-use amenable_core::Ensures;
 use amenable_core::Witness;
 use amenable_ext::BoundedStepWalk;
 

@@ -4,7 +4,7 @@
 //! into whole nanoseconds, and back. The conversion is the same for every
 //! backend, so it lives here once rather than in each backend.
 
-use amenable_time::{InvalidDescriptorSource, TemporalError, TemporalErrorKind};
+use amenable_time::{NonDigitFractionByteSource, TemporalError, TemporalErrorKind};
 
 /// The pure arithmetic core of the digits<->nanos conversion: a full,
 /// zero-padded 9-digit buffer in, the whole number it encodes out.
@@ -73,11 +73,9 @@ pub fn fractional_seconds_digits_to_nanos(digits: &str) -> Result<i64, TemporalE
     for (index, slot) in buffer.iter_mut().enumerate() {
         match bytes.get(index) {
             Some(byte) if byte.is_ascii_digit() => *slot = *byte,
-            Some(_) => {
-                return Err(TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-                    InvalidDescriptorSource::new(
-                        "fractional-second digits contain a non-digit character".to_owned(),
-                    ),
+            Some(byte) => {
+                return Err(TemporalError::new(TemporalErrorKind::NonDigitFractionByte(
+                    NonDigitFractionByteSource::new(*byte),
                 )));
             }
             None => {}

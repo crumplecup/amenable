@@ -121,7 +121,7 @@ fn resolve_named_zone_rejects_a_fake_identifier() -> miette::Result<()> {
         .ok_or_else(|| miette::miette!("Nowhere/Fictional is not real"))?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::JiffNamedZoneResolutionFailed(_)
     ));
     Ok(())
 }
@@ -333,7 +333,7 @@ fn attach_named_zone_rejects_an_inconsistent_offset() -> miette::Result<()> {
         })?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(_)
     ));
     Ok(())
 }
@@ -431,7 +431,7 @@ fn attach_named_zone_native_rejects_an_inconsistent_offset() -> miette::Result<(
     })?;
     assert!(matches!(
         &**err.kind(),
-        TemporalErrorKind::InvalidDescriptor(_)
+        TemporalErrorKind::JiffOffsetInconsistentWithNamedZone(_)
     ));
     Ok(())
 }

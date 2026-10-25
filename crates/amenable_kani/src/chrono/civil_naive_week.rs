@@ -44,7 +44,7 @@ use crate::rust_std::bridge_kani_witness;
 mod kani_only {
     #![cfg(kani)]
 
-    use chrono::{Datelike, Days, Weekday};
+    use chrono::{Datelike, Weekday};
 
     /// Map any `u8` onto the seven weekdays, so a symbolic `u8` covers every
     /// weekday. Used only inside the harnesses below, and re-exported one level

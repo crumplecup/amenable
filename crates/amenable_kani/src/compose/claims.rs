@@ -34,6 +34,7 @@ macro_rules! impl_compose_claim_witness {
 impl_compose_claim_witness!(amenable_std::ComposeDepthZeroIsEmpty);
 impl_compose_claim_witness!(amenable_std::ComposeFieldPresenceTracksDepth);
 impl_compose_claim_witness!(amenable_std::ComposeAnyLengthIsBounded);
+impl_compose_claim_witness!(amenable_std::ComposeAnyLengthHasMinimum);
 impl_compose_claim_witness!(amenable_std::ComposeArrayLengthIsFixed);
 
 kani_ensures!(
@@ -55,6 +56,13 @@ kani_ensures!(
     "amenable_std::ComposeAnyLengthIsBounded",
     (usize, usize),
     |(actual, bound)| actual <= bound
+);
+
+kani_ensures!(
+    amenable_std::ComposeAnyLengthHasMinimum,
+    "amenable_std::ComposeAnyLengthHasMinimum",
+    (usize, usize),
+    |(actual, minimum)| actual >= minimum
 );
 
 kani_ensures!(

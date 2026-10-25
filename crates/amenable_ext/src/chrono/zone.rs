@@ -4,10 +4,11 @@ use crate::chrono::instant::{
 };
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    InvalidDescriptorSource, NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder,
+    NamedTimeZoneBuilderFailedSource, NamedTimeZoneDescriptor, NamedTimeZoneDescriptorBuilder,
+    NamedZoneResolutionFailedSource, OffsetInconsistentWithNamedZoneSource,
     ProvenNamedTimeZoneCarrier, ProvenZonedDateTimeCarrier, ReflectedNamedTimeZone,
     ReflectedZonedDateTime, TemporalError, TemporalErrorKind, TemporalZoneProps,
-    ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
+    ZonedDateTimeBuilderFailedSource, ZonedDateTimeDescriptor, ZonedDateTimeDescriptorBuilder,
 };
 use chrono::{Offset, TimeZone};
 
@@ -74,15 +75,6 @@ impl TemporalZoneProps for ChronoTimeBackend {
 
 // ── Descriptor conversions ───────────────────────────────────────────
 
-/// Build a [`TemporalError`] for a descriptor that chrono-tz cannot
-/// represent.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
-fn invalid(detail: String) -> TemporalError {
-    TemporalError::new(TemporalErrorKind::InvalidDescriptor(
-        InvalidDescriptorSource::new(detail),
-    ))
-}
-
 /// Resolve a named-time-zone descriptor to a real [`chrono_tz::Tz`].
 ///
 /// Real IANA zone lookup via `Tz::from_str`. chrono-tz's own
@@ -99,9 +91,8 @@ pub(super) fn named_time_zone_descriptor_to_chrono_tz(
         .identifier()
         .parse()
         .map_err(|err: chrono_tz::ParseError| {
-            invalid(format!(
-                "could not resolve IANA time zone {:?}: {err}",
-                descriptor.identifier()
+            TemporalError::new(TemporalErrorKind::NamedZoneResolutionFailed(
+                NamedZoneResolutionFailedSource::new(err, descriptor.identifier().clone()),
             ))
         })
 }
@@ -122,8 +113,8 @@ pub(super) fn chrono_tz_to_named_time_zone_descriptor(
         .identifier(tz.name().to_owned())
         .build()
         .map_err(|err| {
-            invalid(format!(
-                "could not build a named time zone descriptor: {err}"
+            TemporalError::new(TemporalErrorKind::NamedTimeZoneBuilderFailed(
+                NamedTimeZoneBuilderFailedSource::new(err),
             ))
         })
 }
@@ -173,11 +164,11 @@ pub(super) fn zoned_date_time_descriptor_to_chrono(
     let offset = *pinned.offset();
     let tz = named_time_zone_descriptor_to_chrono_tz(descriptor.zone())?;
     if !offset_is_consistent_with_named_zone(local, tz, offset) {
-        return Err(invalid(format!(
-            "offset {offset:?} is not one of the real offsets {}'s own rules produce for local \
-             time {local}",
-            tz.name(),
-        )));
+        return Err(TemporalError::new(
+            TemporalErrorKind::OffsetInconsistentWithNamedZone(
+                OffsetInconsistentWithNamedZoneSource::new(offset, local, tz.name().to_owned()),
+            ),
+        ));
     }
     Ok(pinned.with_timezone(&tz))
 }
@@ -196,8 +187,8 @@ pub(super) fn chrono_to_zoned_date_time_descriptor(
         .zone(zone)
         .build()
         .map_err(|err| {
-            invalid(format!(
-                "could not build a zoned date-time descriptor: {err}"
+            TemporalError::new(TemporalErrorKind::ZonedDateTimeBuilderFailed(
+                ZonedDateTimeBuilderFailedSource::new(err),
             ))
         })
 }

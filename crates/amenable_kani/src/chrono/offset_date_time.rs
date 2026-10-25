@@ -47,6 +47,38 @@ bridge_kani_witness!(ExtStandard<DateTime<FixedOffset>>);
 mod kani_only {
     #![cfg(kani)]
 
+    /// Reflects then realizes a real `FixedOffset` through the bridge's
+    /// own offset-descriptor pair, isolated from the naive-date-time
+    /// half -- no fractional-second string logic, no `NaiveDate`
+    /// construction, nothing else. Calls the real, now self-contracted
+    /// `amenable_ext::fixed_offset_to_utc_offset_descriptor` directly
+    /// (its own `#[kani::ensures]` states the real sign-and-magnitude
+    /// relation) -- `#[kani::stub_verified(amenable_ext::
+    /// fixed_offset_sign_and_magnitude)]` on this contract's own proof
+    /// (below) substitutes that arithmetic step's *proven relation*
+    /// wherever it's reached, including inside this inlined call,
+    /// rather than inlining it too. Confirmed the direct cause of this
+    /// claim's earlier timeout (see `gallery::
+    /// chrono_offset_date_time_round_trip`'s isolation cases): the
+    /// combined sign-and-magnitude conjunction exceeded the 3-minute
+    /// budget as one unstubbed call, resolved once that arithmetic half
+    /// -- `fixed_offset_sign_and_magnitude`, split out of `amenable_ext`
+    /// itself for exactly this reason -- has its own contract and is
+    /// stubbed instead of inlined.
+    #[kani::requires(true)]
+    #[kani::ensures(|result: &Result<chrono::FixedOffset, amenable_time::TemporalError>| {
+        match result {
+            Ok(round_tripped) => *round_tripped == offset,
+            Err(_) => true,
+        }
+    })]
+    pub(super) fn offset_round_trips(
+        offset: chrono::FixedOffset,
+    ) -> Result<chrono::FixedOffset, amenable_time::TemporalError> {
+        let descriptor = amenable_ext::fixed_offset_to_utc_offset_descriptor(offset)?;
+        amenable_ext::utc_offset_descriptor_to_fixed_offset(descriptor)
+    }
+
     pub(super) struct OffsetDateTimeRoundTripsThroughDescriptor;
     crate::rust_std::kani_local_claim!(OffsetDateTimeRoundTripsThroughDescriptor);
 
@@ -102,7 +134,7 @@ mod kani_only {
 }
 
 #[cfg(kani)]
-use kani_only::OffsetDateTimeRoundTripsThroughDescriptor;
+use kani_only::{OffsetDateTimeRoundTripsThroughDescriptor, offset_round_trips};
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
@@ -111,6 +143,61 @@ use kani_only::OffsetDateTimeRoundTripsThroughDescriptor;
         "ensures",
         || "backend.exchange(reflect(original)) realizes back to original",
     )
+}
+
+amenable_derive::harness! {
+    kani, CHECK_FIXED_OFFSET_SIGN_AND_MAGNITUDE_SRC, {
+        /// The real `amenable_ext::fixed_offset_sign_and_magnitude`'s
+        /// own contract -- the base case, nothing to stub yet.
+        #[kani::proof_for_contract(amenable_ext::fixed_offset_sign_and_magnitude)]
+        fn check_fixed_offset_sign_and_magnitude() {
+            let offset_seconds: i32 = kani::any();
+            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
+                return;
+            };
+            let _ = amenable_ext::fixed_offset_sign_and_magnitude(offset);
+        }
+    }
+}
+
+amenable_derive::harness! {
+    kani, CHECK_FIXED_OFFSET_TO_UTC_OFFSET_DESCRIPTOR_SRC, {
+        /// SCRATCH: `narrow_to_u8`'s Kani contract temporarily removed
+        /// to test whether a *plain, uncontracted* helper (no DFCC
+        /// machinery attached at all) avoids both costs confirmed so
+        /// far: the unstubbed-but-contracted auto-wrap cost, and the
+        /// stubbed `Result<_, TemporalError>` substitution cost.
+        #[kani::proof_for_contract(amenable_ext::fixed_offset_to_utc_offset_descriptor)]
+        #[kani::stub_verified(amenable_ext::fixed_offset_sign_and_magnitude)]
+        fn check_fixed_offset_to_utc_offset_descriptor() {
+            let offset_seconds: i32 = kani::any();
+            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
+                return;
+            };
+            let _ = amenable_ext::fixed_offset_to_utc_offset_descriptor(offset);
+        }
+    }
+}
+
+amenable_derive::harness! {
+    kani, CHECK_OFFSET_ROUND_TRIPS_SRC, {
+        /// `offset_round_trips`'s own contract: every real `FixedOffset`
+        /// round-trips through the bridge's offset-descriptor pair,
+        /// isolated from the naive-date-time half -- `fixed_offset_
+        /// sign_and_magnitude` is stubbed with its own proven relation
+        /// wherever Kani's stubbing reaches it in the call graph,
+        /// including inside the inlined `fixed_offset_to_utc_offset_
+        /// descriptor` call, rather than inlining that arithmetic too.
+        #[kani::proof_for_contract(offset_round_trips)]
+        #[kani::stub_verified(amenable_ext::fixed_offset_sign_and_magnitude)]
+        fn check_offset_round_trips() {
+            let offset_seconds: i32 = kani::any();
+            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
+                return;
+            };
+            let _ = offset_round_trips(offset);
+        }
+    }
 }
 
 amenable_derive::harness! {

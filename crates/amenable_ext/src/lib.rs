@@ -61,7 +61,9 @@ pub use chrono::{
     ChronoDate, ChronoDateTime, ChronoInstant, ChronoOffset, ChronoOffsetDateTime,
     ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime, ChronoTimeBackend,
     ChronoVerifier, ChronoVerifierMetadata, chrono_to_offset_date_time_descriptor,
-    naive_date_time_to_local_date_time_descriptor,
+    fixed_offset_sign_and_magnitude, fixed_offset_to_utc_offset_descriptor,
+    local_date_time_descriptor_to_naive, naive_date_time_to_local_date_time_descriptor,
+    narrow_to_u8, offset_date_time_descriptor_to_chrono, utc_offset_descriptor_to_fixed_offset,
 };
 pub use ext_type::{ExtLanguageProvenance, ExtProvenance, ExtStandard, ExtType};
 #[cfg(feature = "jiff")]

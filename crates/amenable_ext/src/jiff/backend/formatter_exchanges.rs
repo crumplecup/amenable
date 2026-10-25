@@ -35,7 +35,7 @@ use amenable_time::{
     ParsedUtcOffset, ParsedWeekDate, RecurringIntervalFormatted, ReducedCalendarDateBasicFormatted,
     ReducedCalendarDateExtendedFormatted, ReducedLocalTimeBasicFormatted,
     ReducedLocalTimeExtendedFormatted, Rfc3339TimestampFormatted, TemporalError,
-    TimeIntervalFormatted, UtcOffsetBasicFormatted, UtcOffsetExtendedFormatted,
+    TimeIntervalFormatted, UnsupportedCase, UtcOffsetBasicFormatted, UtcOffsetExtendedFormatted,
     WeekDateBasicFormatted, WeekDateExtendedFormatted,
 };
 
@@ -59,7 +59,7 @@ macro_rules! jiff_backend_format_edge {
 }
 
 macro_rules! jiff_backend_format_unsupported {
-    ($($parsed:ident => $output:ident, $label:literal;)+) => {
+    ($($parsed:ident => $output:ident, $label:path;)+) => {
         $(
             impl Exchange<$parsed, $output, JiffVerifier> for JiffTimeBackend {
                 type Error = TemporalError;
@@ -216,16 +216,16 @@ jiff_backend_format_edge!(
 );
 
 jiff_backend_format_unsupported! {
-    ParsedDateWithShift => FormattedDateWithShift, "a CalConnect explicit date-with-shift value";
-    ParsedTimeOfDayWithShift => FormattedTimeOfDayWithShift, "a CalConnect explicit time-of-day-with-shift value";
-    ParsedExtendedYear => FormattedExtendedYear, "an ISO 8601-2 extended year";
-    ParsedDecade => FormattedDecade, "a Gregorian decade";
-    ParsedCentury => FormattedCentury, "a Gregorian century";
-    ParsedQualifiedTemporalValue => FormattedQualifiedTemporalValue, "an ISO 8601-2 explicitly-qualified temporal value";
-    ParsedSeasonalTemporalExpression => FormattedSeasonalTemporalExpression, "an ISO 8601-2 seasonal expression";
-    ParsedSubYearGroupingExpression => FormattedSubYearGroupingExpression, "an ISO 8601-2 sub-year grouping expression";
-    ParsedUnspecifiedComponentExpression => FormattedUnspecifiedComponentExpression, "an ISO 8601-2 unspecified-component expression";
-    ParsedTemporalSet => FormattedTemporalSet, "an ISO 8601-2 temporal set";
-    ParsedGroupedTimeScaleUnit => FormattedGroupedTimeScaleUnit, "an ISO 8601-2 grouped time-scale unit expression";
-    ParsedDateTimeFormula => FormattedDateTimeFormula, "a CalConnect date-time formula";
+    ParsedDateWithShift => FormattedDateWithShift, UnsupportedCase::FormatCalConnectDateWithShift;
+    ParsedTimeOfDayWithShift => FormattedTimeOfDayWithShift, UnsupportedCase::FormatCalConnectTimeOfDayWithShift;
+    ParsedExtendedYear => FormattedExtendedYear, UnsupportedCase::FormatIso8601ExtendedYear;
+    ParsedDecade => FormattedDecade, UnsupportedCase::FormatGregorianDecade;
+    ParsedCentury => FormattedCentury, UnsupportedCase::FormatGregorianCentury;
+    ParsedQualifiedTemporalValue => FormattedQualifiedTemporalValue, UnsupportedCase::FormatIso8601QualifiedTemporalValue;
+    ParsedSeasonalTemporalExpression => FormattedSeasonalTemporalExpression, UnsupportedCase::FormatIso8601SeasonalExpression;
+    ParsedSubYearGroupingExpression => FormattedSubYearGroupingExpression, UnsupportedCase::FormatIso8601SubYearGroupingExpression;
+    ParsedUnspecifiedComponentExpression => FormattedUnspecifiedComponentExpression, UnsupportedCase::FormatIso8601UnspecifiedComponentExpression;
+    ParsedTemporalSet => FormattedTemporalSet, UnsupportedCase::FormatIso8601TemporalSet;
+    ParsedGroupedTimeScaleUnit => FormattedGroupedTimeScaleUnit, UnsupportedCase::FormatIso8601GroupedTimeScaleUnit;
+    ParsedDateTimeFormula => FormattedDateTimeFormula, UnsupportedCase::FormatCalConnectDateTimeFormula;
 }
