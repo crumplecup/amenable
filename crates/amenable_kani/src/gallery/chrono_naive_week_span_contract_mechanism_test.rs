@@ -30,7 +30,7 @@
 mod kani_only {
     #![cfg(kani)]
 
-    use chrono::{Datelike, NaiveDate, Weekday};
+    use chrono::{NaiveDate, Weekday};
 
     /// Map any `u8` onto the seven weekdays.
     pub(super) fn weekday_of(index: u8) -> Weekday {

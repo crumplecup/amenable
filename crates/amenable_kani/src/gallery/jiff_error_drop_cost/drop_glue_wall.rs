@@ -180,9 +180,8 @@ amenable_derive::gallery_harness! {
             let d = jiff::civil::Date::new(year, month, day)
                 .expect("year/month/day are already checked to always be a valid civil::Date");
             let mut series = d.series(period_days.days());
-            let next = series.next();
+            let _ = series.next();
             std::mem::forget(series);
-            std::mem::forget(next);
         }
     }
 }
@@ -253,9 +252,8 @@ amenable_derive::gallery_harness! {
                 .expect("year/month/day are already checked to always be a valid civil::Date");
             let dt = d.at(0, 0, 0, 0);
             let mut series = dt.series(period_days.days());
-            let next = series.next();
+            let _ = series.next();
             std::mem::forget(series);
-            std::mem::forget(next);
         }
     }
 }
@@ -330,9 +328,8 @@ amenable_derive::gallery_harness! {
                 "hour/minute/second/subsec_nanosecond are already checked to always be a valid civil::Time",
             );
             let mut series = t.series(period_hours.hours());
-            let next = series.next();
+            let _ = series.next();
             std::mem::forget(series);
-            std::mem::forget(next);
         }
     }
 }

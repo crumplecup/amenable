@@ -37,91 +37,96 @@
 //! that chain or into `KaniUtf8Buffer` itself, which still carries the
 //! bool hack as of this writing.
 
-/// Enough bytes for two chars at their maximum UTF-8 width.
-#[cfg(kani)]
-const MAX_SEAM_BYTES: usize = 8;
+mod kani_only {
+    #![cfg(kani)]
 
-/// The same state machine as `utf8_model::validation::is_valid_utf8`,
-/// rewritten to loop a fixed, compile-time-constant number of times
-/// (`MAX_SEAM_BYTES`) instead of `while i < len` -- the same fix
-/// `gallery::string_depth_induction::no_embedded_nul` already
-/// confirmed. `.get()` handles bounds safely past the real length.
-#[cfg(kani)]
-fn is_valid_utf8_const_bound(bytes: &[u8], len: usize) -> bool {
-    let mut i = 0usize;
-    for _ in 0..MAX_SEAM_BYTES {
-        if i >= len {
-            return true;
-        }
-        let byte = match bytes.get(i) {
-            Some(&b) => b,
-            None => return true,
-        };
-        if byte & 0b1000_0000 == 0 {
-            i += 1;
-            continue;
-        }
-        if byte & 0b1110_0000 == 0b1100_0000 {
-            if byte & 0b0001_1110 == 0 {
-                return false;
+    /// Enough bytes for two chars at their maximum UTF-8 width.
+    pub(super) const MAX_SEAM_BYTES: usize = 8;
+
+    /// The same state machine as `utf8_model::validation::is_valid_utf8`,
+    /// rewritten to loop a fixed, compile-time-constant number of times
+    /// (`MAX_SEAM_BYTES`) instead of `while i < len` -- the same fix
+    /// `gallery::string_depth_induction::no_embedded_nul` already
+    /// confirmed. `.get()` handles bounds safely past the real length.
+    pub(super) fn is_valid_utf8_const_bound(bytes: &[u8], len: usize) -> bool {
+        let mut i = 0usize;
+        for _ in 0..MAX_SEAM_BYTES {
+            if i >= len {
+                return true;
             }
-            let ok = matches!(bytes.get(i + 1), Some(&b1) if b1 & 0b1100_0000 == 0b1000_0000);
-            if !ok {
-                return false;
-            }
-            i += 2;
-            continue;
-        }
-        if byte & 0b1111_0000 == 0b1110_0000 {
-            let (b1, b2) = match (bytes.get(i + 1), bytes.get(i + 2)) {
-                (Some(&b1), Some(&b2)) => (b1, b2),
-                _ => return false,
+            let byte = match bytes.get(i) {
+                Some(&b) => b,
+                None => return true,
             };
-            if b1 & 0b1100_0000 != 0b1000_0000 || b2 & 0b1100_0000 != 0b1000_0000 {
-                return false;
+            if byte & 0b1000_0000 == 0 {
+                i += 1;
+                continue;
             }
-            if byte == 0b1110_0000 && b1 & 0b0010_0000 == 0 {
-                return false;
+            if byte & 0b1110_0000 == 0b1100_0000 {
+                if byte & 0b0001_1110 == 0 {
+                    return false;
+                }
+                let ok = matches!(bytes.get(i + 1), Some(&b1) if b1 & 0b1100_0000 == 0b1000_0000);
+                if !ok {
+                    return false;
+                }
+                i += 2;
+                continue;
             }
-            let code_point =
-                ((byte & 0x0F) as u32) << 12 | ((b1 & 0x3F) as u32) << 6 | (b2 & 0x3F) as u32;
-            if (0xD800..=0xDFFF).contains(&code_point) {
-                return false;
+            if byte & 0b1111_0000 == 0b1110_0000 {
+                let (b1, b2) = match (bytes.get(i + 1), bytes.get(i + 2)) {
+                    (Some(&b1), Some(&b2)) => (b1, b2),
+                    _ => return false,
+                };
+                if b1 & 0b1100_0000 != 0b1000_0000 || b2 & 0b1100_0000 != 0b1000_0000 {
+                    return false;
+                }
+                if byte == 0b1110_0000 && b1 & 0b0010_0000 == 0 {
+                    return false;
+                }
+                let code_point =
+                    ((byte & 0x0F) as u32) << 12 | ((b1 & 0x3F) as u32) << 6 | (b2 & 0x3F) as u32;
+                if (0xD800..=0xDFFF).contains(&code_point) {
+                    return false;
+                }
+                i += 3;
+                continue;
             }
-            i += 3;
-            continue;
+            if byte & 0b1111_1000 == 0b1111_0000 {
+                let (b1, b2, b3) = match (bytes.get(i + 1), bytes.get(i + 2), bytes.get(i + 3)) {
+                    (Some(&b1), Some(&b2), Some(&b3)) => (b1, b2, b3),
+                    _ => return false,
+                };
+                if b1 & 0b1100_0000 != 0b1000_0000
+                    || b2 & 0b1100_0000 != 0b1000_0000
+                    || b3 & 0b1100_0000 != 0b1000_0000
+                {
+                    return false;
+                }
+                if byte == 0b1111_0000 && b1 & 0b0011_0000 == 0 {
+                    return false;
+                }
+                if byte > 0b1111_0100 {
+                    return false;
+                }
+                let code_point = ((byte & 0x07) as u32) << 18
+                    | ((b1 & 0x3F) as u32) << 12
+                    | ((b2 & 0x3F) as u32) << 6
+                    | (b3 & 0x3F) as u32;
+                if code_point > 0x10_FFFF {
+                    return false;
+                }
+                i += 4;
+                continue;
+            }
+            return false;
         }
-        if byte & 0b1111_1000 == 0b1111_0000 {
-            let (b1, b2, b3) = match (bytes.get(i + 1), bytes.get(i + 2), bytes.get(i + 3)) {
-                (Some(&b1), Some(&b2), Some(&b3)) => (b1, b2, b3),
-                _ => return false,
-            };
-            if b1 & 0b1100_0000 != 0b1000_0000
-                || b2 & 0b1100_0000 != 0b1000_0000
-                || b3 & 0b1100_0000 != 0b1000_0000
-            {
-                return false;
-            }
-            if byte == 0b1111_0000 && b1 & 0b0011_0000 == 0 {
-                return false;
-            }
-            if byte > 0b1111_0100 {
-                return false;
-            }
-            let code_point = ((byte & 0x07) as u32) << 18
-                | ((b1 & 0x3F) as u32) << 12
-                | ((b2 & 0x3F) as u32) << 6
-                | (b3 & 0x3F) as u32;
-            if code_point > 0x10_FFFF {
-                return false;
-            }
-            i += 4;
-            continue;
-        }
-        return false;
+        i >= len
     }
-    i >= len
 }
+
+#[cfg(kani)]
+use kani_only::{MAX_SEAM_BYTES, is_valid_utf8_const_bound};
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(

@@ -86,18 +86,27 @@
 //!   3-minute harness budget, but the trend it shows does not.
 //! - hierarchical grouping (three digits peeled via three stubbed calls to
 //!   `peel_digit`, then three of *that* group related at the top level,
-//!   so no level ever relates more than three independent values) versus
-//!   incremental chaining (each link stubs exactly one prior link plus one
-//!   `peel_digit` call, so the combination at every step relates exactly
-//!   two opaque values, no matter how long the chain grows): both tried,
-//!   to see whether bounding how many values are related *at once* (not
-//!   just how many steps exist overall) changes the curve. The incremental
-//!   chain's own measured series: N=1 ~3s, N=2 ~3.5s, N=3 ~25-30s, N=4
-//!   ~176s (extrapolated roughly 20 minutes for N=5; the series' memory
-//!   use was non-monotonic across these runs -- 37, 658, 655, 70 MiB -- and
-//!   not itself extrapolatable). Growth stayed super-linear regardless of
-//!   topology: relating only two opaque values at a time slowed the curve
-//!   but never flattened it.
+//!   so no level ever relates more than three independent values) was
+//!   tried and, like flat grouping, accelerated with depth.
+//! - **incremental chaining, corrected and resolved.** An earlier,
+//!   informal pass at this same idea (each link stubbing exactly one
+//!   prior link plus one `peel_digit` call) was never captured as a
+//!   committed, reproducible harness and reported a super-linear series
+//!   (N=1 ~3s, N=2 ~3.5s, N=3 ~25-30s, N=4 ~176s) that, if real, would have
+//!   made the full nine-digit claim impractical. Rebuilt explicitly this
+//!   session as nine named, individually registered steps
+//!   (`digit_chain_step_1` through `digit_chain_step_9`, each proving only
+//!   its own contract and stubbing the *immediately preceding step's
+//!   already-proven contract* -- never `peel_digit` directly past step 1,
+//!   and never any step's real body) -- the cost stayed flat at every
+//!   step, measured at roughly 13-22s each, all the way to
+//!   `digit_chain_step_9`'s full `0 <= x < 1_000_000_000` nine-digit
+//!   domain. The earlier super-linear series does not reproduce under
+//!   this structure; whatever it measured, it was not this. **The
+//!   nine-digit digit/fraction-arithmetic identity is fully resolved**,
+//!   cheaply, via proper incremental contract staging -- no step came
+//!   anywhere near the project's 3-minute budget, so no long-running
+//!   carve-out or feature flag is needed for this layer.
 //! - the two-hop round trip itself, day-only (31 possible values, not the
 //!   full nine-digit `nanos` domain), staged via Kani contracts the same
 //!   way the `NaiveWeek` gallery case (`chrono_naive_week_stub_
@@ -117,6 +126,61 @@
 //!   "evaluating this specific shape-predicate under CBMC." Kept below as
 //!   `contracted_reflect_step_day_only_exhausts_memory`.
 //!
+//! **A second, later investigation: the offset-only round trip's own
+//! cost, decomposed by fact count.** Separately from the digit layer
+//! above, the production `amenable_kani::chrono::offset_date_time::
+//! offset_round_trips` (reflect then realize a `FixedOffset` through the
+//! bridge's offset-descriptor pair alone, pure integer arithmetic, no
+//! strings, no chrono date construction) also timed out -- ruling out
+//! strings as the whole story. Decomposed by chaining first:
+//!
+//! - the identical body, uncontracted (no DFCC at all): passes in ~77s.
+//! - the identical body, DFCC-contracted but with the `reflect` half
+//!   alone (trivial ensures): passes in ~127s.
+//! - both directions chained, trivial ensures on both: **times out** --
+//!   confirming the earlier pattern again (chaining two real, unstubbed
+//!   calls compounds under DFCC), independent of the postcondition's
+//!   content.
+//!
+//! The fix for *that* is the same one that resolved the digit chain:
+//! give the reflect half its own real (non-trivial) contract and stub it
+//! rather than inline it when composing the round trip. But writing that
+//! real contract surfaced a second, different cost axis: `reflect_
+//! offset`'s own contract -- a *single* real call, no chaining -- timed
+//! out once its ensures stated the real relation (sign matches *and* the
+//! three-field magnitude reconstruction matches), despite the identical
+//! body passing easily under a trivial ensures. Decomposed by fact count
+//! instead:
+//!
+//! - each of the four individual facts alone (`sign`, `hours`,
+//!   `minutes`, `seconds` against the offset) passes cheaply (~127-160s).
+//! - two facts together still pass: `sign` + `hours` (~154s, neither
+//!   conditionally set), `minutes` + `seconds` (~180s, both independently
+//!   conditional -- already closer to the edge).
+//! - three facts (`hours` + `minutes` + `seconds`, the full magnitude,
+//!   `sign` left out) passes, but right at the edge (~187s wall against
+//!   the 3-minute budget).
+//! - all four facts together **times out** -- confirmed twice, once
+//!   stated as `sign_matches && (one summed-magnitude equality)` and
+//!   once restated as four fully separate per-field equalities with no
+//!   summing at all. Both shapes time out identically, ruling out "the
+//!   sum is the cost" as cleanly as the fact-count bracketing ruled out
+//!   any single field.
+//!
+//! So this threshold is specifically about **how many correlated facts
+//! one proof obligation states about a single symbolic builder
+//! invocation at once** -- not which facts, not their arithmetic
+//! representation, not `Option` branching alone (each conditional field
+//! passed fine by itself and in the `minutes`+`seconds` pair). For
+//! `reflect_offset`, the line sits strictly between three and four. This
+//! reopens the question the digit chain's fix doesn't answer: stubbing
+//! works when the *caller* composes already-proven facts about *other*
+//! calls, but it doesn't help prove a single call's own contract when
+//! that contract itself needs to state more facts than the verifier can
+//! jointly discharge in one pass. The production `offset_round_trips`
+//! claim remains open on this axis -- not yet resolved, kept honest as a
+//! known timeout rather than patched around.
+//!
 //! **Conclusion.** No decomposition technique tried here -- byte-core
 //! extraction, restating as pure arithmetic, flat grouping, hierarchical
 //! grouping, incremental two-value chaining, or staged contract composition
@@ -135,306 +199,20 @@
 //! here, down to relating exactly two values at a time, still accelerated
 //! with depth. The full round-trip claim remains open; the production
 //! harness records that honestly as a known timeout rather than a verdict.
-
-/// Every item here exists only for the Kani harnesses below, so the whole
-/// module is gated once, rather than scattering `#[cfg(kani)]` across each
-/// item individually (cordial's own `CFG-SCATTER-001`).
-mod kani_only {
-    #![cfg(kani)]
-
-    use amenable_core::{Establish, Exchange};
-    use amenable_ext::{ChronoOffsetDateTime, ChronoTimeBackend, ChronoVerifier};
-    use amenable_time::{
-        OffsetDateTimeProof, OffsetDateTimeProofToken, OffsetDateTimeSemanticBundle,
-        OffsetDateTimeSemanticBundleToken, ProvenOffsetDateTimeCarrier, TemporalInputToken,
-    };
-
-    pub(super) fn token() -> OffsetDateTimeSemanticBundleToken {
-        let proof: OffsetDateTimeProofToken = <OffsetDateTimeProof as Establish<
-            TemporalInputToken,
-            ChronoVerifier,
-        >>::establish(TemporalInputToken::new());
-        <OffsetDateTimeSemanticBundle as Establish<OffsetDateTimeProofToken, ChronoVerifier>>::establish(proof)
-    }
-
-    /// Concrete, indexed window -- never `kani::any()` for
-    /// `offset_seconds` itself -- the smallest useful bin size.
-    pub(super) const WINDOW: i32 = 2;
-
-    /// Everything but `offset_seconds` fully symbolic; `offset_seconds`
-    /// itself ranges over a tiny concrete window. Confirmed to time out
-    /// even at `WINDOW = 2`: the cost is about the offset being symbolic
-    /// at all, not the size of its range.
-    pub(super) fn reflect_with_binned_offset() {
-        let year: i32 = kani::any();
-        let month: u32 = kani::any();
-        let day: u32 = kani::any();
-        let hour: u32 = kani::any();
-        let minute: u32 = kani::any();
-        let second: u32 = kani::any();
-        let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) else {
-            return;
-        };
-        let Some(naive) = date.and_hms_opt(hour, minute, second) else {
-            return;
-        };
-        for offset_seconds in 0..WINDOW {
-            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
-                continue;
-            };
-            let Some(original) = naive.and_local_timezone(offset).single() else {
-                continue;
-            };
-
-            let backend = ChronoTimeBackend;
-            let carrier = ProvenOffsetDateTimeCarrier::<ChronoOffsetDateTime>::new(
-                ChronoOffsetDateTime::new(original),
-                token(),
-            );
-            let Ok(reflected) = backend.exchange(carrier) else {
-                continue;
-            };
-            let Ok(round_tripped) = backend.exchange(reflected) else {
-                continue;
-            };
-            assert_eq!(**round_tripped.carrier(), original);
-        }
-    }
-
-    /// Day symbolic only, everything else concrete: both `Exchange`
-    /// calls (reflect then realize), no equality check on the result at
-    /// all. Confirmed expensive on its own -- the two-hop call sequence
-    /// is already the cost, before any comparison happens.
-    pub(super) fn two_hop_exchange_no_equality() {
-        let day: u32 = kani::any();
-        let Some(date) = chrono::NaiveDate::from_ymd_opt(2024, 3, day) else {
-            return;
-        };
-        let Some(naive) = date.and_hms_opt(12, 0, 0) else {
-            return;
-        };
-        let offset = chrono::FixedOffset::east_opt(0).expect("0 is always a valid offset");
-        let Some(original) = naive.and_local_timezone(offset).single() else {
-            return;
-        };
-
-        let backend = ChronoTimeBackend;
-        let carrier = ProvenOffsetDateTimeCarrier::<ChronoOffsetDateTime>::new(
-            ChronoOffsetDateTime::new(original),
-            token(),
-        );
-        let Ok(reflected) = backend.exchange(carrier) else {
-            return;
-        };
-        let _round_tripped = backend.exchange(reflected);
-    }
-
-    /// One step of digit extraction: `remaining % 10` (the digit) and
-    /// `remaining / 10` (what's left). The contract relates the single
-    /// division back to its own input only, never to any other call --
-    /// the one piece of this whole investigation that stayed cheap at
-    /// every scale tried (confirmed around 3.7s).
-    #[kani::requires(remaining >= 0)]
-    #[kani::ensures(|result: &(i64, i64)| {
-        // `i128`, not `i64`: when `stub_verified` substitutes this
-        // contract elsewhere, it evaluates this expression against an
-        // otherwise-unconstrained candidate `new_remaining` before the
-        // equality filters it out -- an `i64` `new_remaining * 10` can
-        // overflow for such a candidate (confirmed: a real, reachable
-        // overflow inside this closure, not in any composed caller).
-        let (digit, new_remaining) = *result;
-        i128::from(remaining) == i128::from(new_remaining) * 10 + i128::from(digit)
-            && digit >= 0
-            && digit <= 9
-    })]
-    pub(super) fn peel_digit(remaining: i64) -> (i64, i64) {
-        (remaining % 10, remaining / 10)
-    }
-
-    /// Chains and combines `STEPS` stubbed calls to `peel_digit` in one
-    /// flat proof obligation -- isolating the *combining* step's own
-    /// cost from `peel_digit`'s (already confirmed cheap alone). Growing
-    /// this from 5 to 7 steps jumped about 55x (1.74s to 96.3s),
-    /// confirmed genuinely accelerating, not a one-off measurement. Kept
-    /// at 7 (96.3s), not higher: the next data point in this series
-    /// (growing further) would exceed the project's 3-minute harness
-    /// budget, matching the standing "no manual unwind/timeout bounds"
-    /// discipline -- this case records the trend, not the limit.
-    pub(super) fn combine_seven_steps() -> i64 {
-        const STEPS: u32 = 7;
-        let bound: i64 = 10i64.pow(STEPS);
-        let nanos: i64 = kani::any();
-        kani::assume(nanos >= 0 && nanos < bound);
-
-        let mut remaining = nanos;
-        let mut reconstructed: i64 = 0;
-        let mut pow10: i64 = 1;
-        for _ in 0..STEPS {
-            let (digit, new_remaining) = peel_digit(remaining);
-            reconstructed += digit * pow10;
-            pow10 *= 10;
-            remaining = new_remaining;
-        }
-        assert_eq!(
-            reconstructed, nanos,
-            "combined steps must reconstruct exactly"
-        );
-        reconstructed
-    }
-
-    /// The day-only investigation's fixed shape (year=2024, month=3,
-    /// time=12:00:00, offset=+00:00:00), reflected through the real
-    /// `Exchange` pipeline, day left symbolic. The contracted version of
-    /// this function exhausted memory under Kani -- not merely timed out
-    /// -- even restricted to this 31-value domain.
-    #[kani::requires(true)]
-    #[kani::ensures(|_result: &Option<amenable_time::ReflectedOffsetDateTime>| true)]
-    pub(super) fn reflect_step_day_only(day: u8) -> Option<amenable_time::ReflectedOffsetDateTime> {
-        let date = chrono::NaiveDate::from_ymd_opt(2024, 3, u32::from(day))?;
-        let naive = date.and_hms_opt(12, 0, 0)?;
-        let offset = chrono::FixedOffset::east_opt(0).expect("0 is always a valid offset");
-        let original = naive.and_local_timezone(offset).single()?;
-
-        let backend = ChronoTimeBackend;
-        let carrier = ProvenOffsetDateTimeCarrier::<ChronoOffsetDateTime>::new(
-            ChronoOffsetDateTime::new(original),
-            token(),
-        );
-        backend.exchange(carrier).ok()
-    }
-}
-
-#[cfg(kani)]
-use kani_only::{
-    combine_seven_steps, peel_digit, reflect_step_day_only, reflect_with_binned_offset,
-    two_hop_exchange_no_equality,
-};
-
-::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration::new(
-        || ::amenable_kani::KaniGalleryCase::new(
-            "amenable_kani::gallery::chrono_offset_date_time_round_trip::offset_binning_times_out_even_at_the_smallest_window".to_owned(),
-            "gallery::chrono_offset_date_time_round_trip::offset_binning_times_out_even_at_the_smallest_window".to_owned(),
-            "amenable_kani".to_owned(),
-            "binning offset_seconds over a concrete WINDOW=2 loop, rather than leaving it fully symbolic, still times out -- the cost is the offset being symbolic at all, not the size of its range".to_owned(),
-            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Timeout,
-        ),
-    )
-}
-
-amenable_derive::gallery_harness! {
-    kani, OFFSET_BINNING_TIMES_OUT_EVEN_AT_THE_SMALLEST_WINDOW_SRC, {
-        /// `offset_seconds` binned over a concrete `WINDOW = 2` loop,
-        /// every other field symbolic. Confirmed to time out even at
-        /// this smallest useful window.
-        #[kani::proof]
-        fn offset_binning_times_out_even_at_the_smallest_window() {
-            reflect_with_binned_offset();
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration::new(
-        || ::amenable_kani::KaniGalleryCase::new(
-            "amenable_kani::gallery::chrono_offset_date_time_round_trip::two_hop_exchange_without_equality_already_times_out".to_owned(),
-            "gallery::chrono_offset_date_time_round_trip::two_hop_exchange_without_equality_already_times_out".to_owned(),
-            "amenable_kani".to_owned(),
-            "reflect then realize, day symbolic, with no equality check on the result at all, is already expensive -- the two-hop call sequence is the cost, before any comparison happens".to_owned(),
-            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Timeout,
-        ),
-    )
-}
-
-amenable_derive::gallery_harness! {
-    kani, TWO_HOP_EXCHANGE_WITHOUT_EQUALITY_ALREADY_TIMES_OUT_SRC, {
-        /// Reflect then realize, day symbolic, with no equality check
-        /// on the result. Confirmed expensive on its own -- the two-hop
-        /// call sequence is the cost, before any comparison happens.
-        #[kani::proof]
-        fn two_hop_exchange_without_equality_already_times_out() {
-            two_hop_exchange_no_equality();
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration::new(
-        || ::amenable_kani::KaniGalleryCase::new(
-            "amenable_kani::gallery::chrono_offset_date_time_round_trip::peel_digit_contract_passes_cheaply".to_owned(),
-            "gallery::chrono_offset_date_time_round_trip::check_peel_digit_contract".to_owned(),
-            "amenable_kani".to_owned(),
-            "a single digit-extraction step, contracted against its own input only (never chained), passes cheaply -- the one building block in this investigation that stayed cheap at every scale tried".to_owned(),
-            ::amenable_kani::KaniGalleryDisposition::BestPractice,
-            ::amenable_kani::KaniGalleryExpectation::Passed,
-        ),
-    )
-}
-
-amenable_derive::gallery_harness! {
-    kani, CHECK_PEEL_DIGIT_CONTRACT_SRC, {
-        /// `peel_digit`'s own contract, relating the division only to
-        /// its own input, never chained. Passes cheaply.
-        #[kani::proof_for_contract(peel_digit)]
-        fn check_peel_digit_contract() {
-            let remaining: i64 = kani::any();
-            kani::assume(remaining >= 0);
-            let _ = peel_digit(remaining);
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration::new(
-        || ::amenable_kani::KaniGalleryCase::new(
-            "amenable_kani::gallery::chrono_offset_date_time_round_trip::combining_seven_steps_passes_but_reveals_the_growth_curve".to_owned(),
-            "gallery::chrono_offset_date_time_round_trip::combining_seven_steps_passes_but_reveals_the_growth_curve".to_owned(),
-            "amenable_kani".to_owned(),
-            "chaining and combining 7 stubbed peel_digit calls in one flat proof obligation passes (96.3s), but growing from 5 to 7 steps jumped about 55x (1.74s to 96.3s) -- the trend, not this one run, is the finding".to_owned(),
-            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Passed,
-        ),
-    )
-}
-
-amenable_derive::gallery_harness! {
-    kani, COMBINING_SEVEN_STEPS_PASSES_BUT_REVEALS_THE_GROWTH_CURVE_SRC, {
-        /// Seven stubbed `peel_digit` calls, chained and combined in
-        /// one flat proof obligation. Passes (96.3s), but growing from
-        /// 5 to 7 steps jumped about 55x over the same technique --
-        /// the trend, not this one run, is the finding.
-        #[kani::proof]
-        #[kani::stub_verified(peel_digit)]
-        fn combining_seven_steps_passes_but_reveals_the_growth_curve() {
-            let _ = combine_seven_steps();
-        }
-    }
-}
-
-::inventory::submit! {
-    ::amenable_kani::KaniGalleryRegistration::new(
-        || ::amenable_kani::KaniGalleryCase::new(
-            "amenable_kani::gallery::chrono_offset_date_time_round_trip::contracted_reflect_step_day_only_exhausts_memory".to_owned(),
-            "gallery::chrono_offset_date_time_round_trip::contracted_reflect_step_day_only_exhausts_memory".to_owned(),
-            "amenable_kani".to_owned(),
-            "DFCC-contracting the real Exchange-backed reflect step, day-only (31 values), exhausts memory under Kani rather than merely timing out, even under a trivial ensures predicate".to_owned(),
-            ::amenable_kani::KaniGalleryDisposition::FalseTrail,
-            ::amenable_kani::KaniGalleryExpectation::Timeout,
-        ),
-    )
-}
-
-amenable_derive::gallery_harness! {
-    kani, CONTRACTED_REFLECT_STEP_DAY_ONLY_EXHAUSTS_MEMORY_SRC, {
-        /// `reflect_step_day_only`'s own trivial-ensures contract,
-        /// day-only (31 values). Confirmed to exhaust memory under
-        /// Kani, not merely time out.
-        #[kani::proof_for_contract(reflect_step_day_only)]
-        fn contracted_reflect_step_day_only_exhausts_memory() {
-            let day: u8 = kani::any();
-            let _ = reflect_step_day_only(day);
-        }
-    }
-}
+//!
+//! **Where each chapter now lives**, split out once this file grew past
+//! the point a human reader could take it in as one unit: baseline
+//! isolation of the trivial-ensures/reflect/realize/uncontracted variants
+//! (`chrono_offset_date_time_round_trip_offset_fact_count_baseline.rs`);
+//! `reflect_offset`'s own contract decomposed by fact count
+//! (`chrono_offset_date_time_round_trip_offset_fact_count_decomposition.rs`);
+//! the staged fix built from that decomposition
+//! (`chrono_offset_date_time_round_trip_offset_staged_fix.rs`); pipeline-
+//! shape isolation and offset binning
+//! (`chrono_offset_date_time_round_trip_pipeline_shape_and_binning.rs`);
+//! and the digit decomposition, split into the incremental steps
+//! (`chrono_offset_date_time_round_trip_digit_decomposition_steps.rs`)
+//! and the two-hop day-only round trip
+//! (`chrono_offset_date_time_round_trip_digit_decomposition_day_only.rs`).
+//! Those six are declared as this module's own siblings in
+//! `gallery/mod.rs`, not as children of this file.

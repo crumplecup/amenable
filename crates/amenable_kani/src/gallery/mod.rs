@@ -17,6 +17,12 @@
 
 mod atomic_ptr_compare_exchange;
 mod boxed_error_variant_count;
+mod boxed_error_variant_count_escalation_primitives;
+mod boxed_error_variant_count_escalation_references_and_vectors;
+mod boxed_error_variant_count_escalation_string_boxing;
+mod boxed_error_variant_count_first_pass_box_placement;
+mod boxed_error_variant_count_first_pass_variant_count;
+mod boxed_error_variant_count_production_fix_candidates;
 #[cfg(feature = "chrono")]
 mod chrono_day_count_staging;
 #[cfg(feature = "chrono")]
@@ -34,6 +40,18 @@ mod chrono_naive_week_stub_composition;
 #[cfg(feature = "chrono")]
 mod chrono_offset_date_time_round_trip;
 #[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_digit_decomposition_day_only;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_digit_decomposition_steps;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_offset_fact_count_baseline;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_offset_fact_count_decomposition;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_offset_staged_fix;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_pipeline_shape_and_binning;
+#[cfg(feature = "chrono")]
 mod chrono_year_partition_exhaustiveness_test;
 #[cfg(feature = "chrono")]
 mod chrono_year_partition_sweep;
@@ -43,14 +61,12 @@ mod chrono_year_span_growth;
 mod chrono_year_span_with_free_month_day_growth;
 mod derive_witness_generic_enum;
 mod filesystem_observation_granularity;
-mod fixed_offset_descriptor_mirror;
 mod iter_materialization;
 #[cfg(feature = "jiff")]
 mod jiff_error_drop_cost;
 mod ledger_account_id_comparison;
 mod ledger_commit_contract_timeout;
 mod ledger_gaap_free_function_contract;
-mod narrow_to_u8_mirror;
 mod replace_recommendations;
 mod slice_escape_ascii;
 mod slice_split_position;

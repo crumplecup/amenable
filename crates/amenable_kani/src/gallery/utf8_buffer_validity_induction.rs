@@ -71,12 +71,12 @@ mod kani_only {
     /// from `encode_utf8`) is ruled out by every function below only
     /// ever calling `push_char`, never constructing a buffer from raw
     /// bytes.
-    pub(super) fn valid_by_provenance(_buffer: &KaniUtf8Buffer<MAX_LEN>) -> bool {
+    pub(super) fn valid_by_provenance() -> bool {
         true
     }
 
     /// Base case 1: the empty buffer.
-    #[kani::ensures(|r| r.len() == 0 && valid_by_provenance(r))]
+    #[kani::ensures(|r| r.len() == 0 && valid_by_provenance())]
     pub(super) fn base_case_empty() -> KaniUtf8Buffer<MAX_LEN> {
         let buffer: KaniUtf8Buffer<MAX_LEN> = kani::any();
         kani::assume(buffer.len() == 0);
@@ -86,7 +86,7 @@ mod kani_only {
     /// Base case 2: one genuinely arbitrary `char` (full Unicode, not
     /// ASCII-restricted, not partitioned by encoding width), pushed
     /// onto an empty buffer.
-    #[kani::ensures(|r| r.len() >= 1 && r.len() <= 4 && valid_by_provenance(r))]
+    #[kani::ensures(|r| r.len() >= 1 && r.len() <= 4 && valid_by_provenance())]
     pub(super) fn base_case_one_char() -> KaniUtf8Buffer<MAX_LEN> {
         let empty: KaniUtf8Buffer<MAX_LEN> = kani::any();
         kani::assume(empty.len() == 0);
@@ -101,7 +101,7 @@ mod kani_only {
     /// function's contract -- never materialized here, only trusted
     /// via that function's own already-proven `ensures`. `c` is a
     /// genuinely arbitrary `char`, full Unicode domain.
-    #[kani::ensures(|r| r.len() >= 2 && r.len() <= 8 && valid_by_provenance(r))]
+    #[kani::ensures(|r| r.len() >= 2 && r.len() <= 8 && valid_by_provenance())]
     pub(super) fn extend_by_one_char() -> KaniUtf8Buffer<MAX_LEN> {
         let prior = base_case_one_char();
         let c: char = kani::any();
@@ -113,7 +113,7 @@ mod kani_only {
     /// The same step again, one level up: `prior` is sourced from
     /// `extend_by_one_char` -- a previous application of the step
     /// itself -- stubbed, not from either base case directly.
-    #[kani::ensures(|r| r.len() >= 3 && r.len() <= 12 && valid_by_provenance(r))]
+    #[kani::ensures(|r| r.len() >= 3 && r.len() <= 12 && valid_by_provenance())]
     pub(super) fn extend_by_two_chars() -> KaniUtf8Buffer<MAX_LEN> {
         let prior = extend_by_one_char();
         let c: char = kani::any();

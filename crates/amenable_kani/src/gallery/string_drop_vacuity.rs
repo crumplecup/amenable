@@ -100,6 +100,18 @@ mod kani_only {
             },
         }
     }
+
+    /// Neither proof above ever constructs `Idle` -- both harnesses
+    /// start from `Active` (confirmed: the investigation is
+    /// specifically about `Active`'s label-dropping behavior), so it
+    /// exists only to mirror elicitation's real `G18State` shape.
+    /// This proof constructs it, outside any contract boundary, so it
+    /// stays a real variant rather than dead code -- it must not
+    /// touch the specific check/timing counts cited above.
+    #[kani::proof]
+    fn verify_idle_satisfies_its_own_invariant() {
+        assert!(label_non_empty(&LabeledState::Idle));
+    }
 }
 
 #[cfg(kani)]

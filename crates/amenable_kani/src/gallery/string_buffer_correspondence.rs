@@ -39,31 +39,37 @@
 //! for `KaniUtf8Buffer` at any depth now transfers to the
 //! corresponding `String`, demonstrated rather than assumed.
 
-#[cfg(kani)]
-const MAX_LEN: usize = 4;
+mod kani_only {
+    #![cfg(kani)]
 
-/// Byte-slice equality, bounded by a compile-time constant
-/// (`MAX_LEN`) instead of either slice's own symbolic length -- the
-/// same fix as every other "obviously simple" slice operation this
-/// gallery has had to replace (`gallery::string_depth_induction`'s
-/// `no_embedded_nul`, `gallery::utf8_seam_concatenation`'s validator).
-/// Length is compared first (cheap, O(1)); the loop only runs if
-/// lengths already match.
-#[cfg(kani)]
-fn bytes_equal_const_bound(a: &[u8], b: &[u8]) -> bool {
-    if a.len() != b.len() {
-        return false;
-    }
-    for i in 0..MAX_LEN {
-        if i >= a.len() {
-            return true;
-        }
-        if a.get(i) != b.get(i) {
+    pub(super) const MAX_LEN: usize = 4;
+
+    /// Byte-slice equality, bounded by a compile-time constant
+    /// (`MAX_LEN`) instead of either slice's own symbolic length --
+    /// the same fix as every other "obviously simple" slice
+    /// operation this gallery has had to replace
+    /// (`gallery::string_depth_induction`'s `no_embedded_nul`,
+    /// `gallery::utf8_seam_concatenation`'s validator). Length is
+    /// compared first (cheap, O(1)); the loop only runs if lengths
+    /// already match.
+    pub(super) fn bytes_equal_const_bound(a: &[u8], b: &[u8]) -> bool {
+        if a.len() != b.len() {
             return false;
         }
+        for i in 0..MAX_LEN {
+            if i >= a.len() {
+                return true;
+            }
+            if a.get(i) != b.get(i) {
+                return false;
+            }
+        }
+        true
     }
-    true
 }
+
+#[cfg(kani)]
+use kani_only::{MAX_LEN, bytes_equal_const_bound};
 
 ::inventory::submit! {
     ::amenable_kani::KaniGalleryRegistration::new(

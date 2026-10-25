@@ -38,7 +38,7 @@ mod kani_only {
 }
 
 #[cfg(kani)]
-use chrono::{Datelike, NaiveDate};
+use chrono::NaiveDate;
 #[cfg(kani)]
 use kani_only::{BASE_YEAR, PARTITION_SIZE, weekday_of};
 

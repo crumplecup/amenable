@@ -26,7 +26,7 @@ amenable_derive::gallery_harness! {
             let ts = jiff::Timestamp::from_second(0)
                 .expect("0 is within Timestamp's valid range");
             let offset = tz.to_offset(ts);
-            std::mem::forget(offset);
+            let _ = offset;
         }
     }
 }
