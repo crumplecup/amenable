@@ -85,7 +85,7 @@ impl ChaptersCache {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).map_err(|error| AmenableError::io(parent, error))?;
         }
-        let contents = serde_json::to_string_pretty(self).map_err(AmenableError::from)?;
+        let contents = serde_json::to_string_pretty(self)?;
         fs::write(path, contents).map_err(|error| AmenableError::io(path, error))
     }
 }
@@ -121,7 +121,7 @@ pub(super) fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
 
     let (mut child, stdout, stderr) = match spawn_piped(record, harness_timeout) {
         Ok(parts) => parts,
-        Err(failure) => return failure,
+        Err(error) => return ProofRun::new(ProofStatus::Failed, Some(error.to_string())),
     };
 
     let stderr_thread = std::thread::spawn(move || {
@@ -153,17 +153,12 @@ pub(super) fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
 fn spawn_piped(
     record: &KaniProof,
     harness_timeout: &str,
-) -> Result<(Child, ChildStdout, ChildStderr), ProofRun> {
+) -> Result<(Child, ChildStdout, ChildStderr), AmenableError> {
     let mut child = kani_command(record, harness_timeout)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .map_err(|error| {
-            ProofRun::new(
-                ProofStatus::Failed,
-                Some(format!("could not start cargo kani: {error}")),
-            )
-        })?;
+        .map_err(|error| AmenableError::kani_spawn_failed(record.id(), error))?;
 
     let (Some(stdout), Some(stderr)) = (child.stdout.take(), child.stderr.take()) else {
         // Unreachable for a real `Command`: both were just requested
@@ -171,10 +166,7 @@ fn spawn_piped(
         // panic, since nothing about this path is worth asserting
         // via an abort when the existing `Err` arm just above already
         // shows the honest shape for "this run could not proceed".
-        return Err(ProofRun::new(
-            ProofStatus::Failed,
-            Some("cargo kani's stdout/stderr were not piped as requested".to_owned()),
-        ));
+        return Err(AmenableError::kani_stdout_stderr_not_piped());
     };
     Ok((child, stdout, stderr))
 }

@@ -211,9 +211,7 @@ fn parse_score(value: &str) -> AmenableResult<u8> {
         .parse()
         .map_err(|error| AmenableError::invalid_score(value, error))?;
     if score > 4 {
-        return Err(AmenableError::invariant(format!(
-            "invalid score {score}; expected an integer from 0 to 4"
-        )));
+        return Err(AmenableError::invalid_score_range(score));
     }
 
     Ok(score)

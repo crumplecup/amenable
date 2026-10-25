@@ -73,9 +73,7 @@ impl GalleryCommand {
 fn list_cases() -> AmenableResult<()> {
     let cases = registered_cases();
     if cases.is_empty() {
-        return Err(AmenableError::invariant(
-            "no Kani proof-gallery cases are registered",
-        ));
+        return Err(AmenableError::no_gallery_cases_registered());
     }
 
     for case in cases {
@@ -136,9 +134,7 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     if mismatches == 0 {
         Ok(())
     } else {
-        Err(AmenableError::invariant(format!(
-            "{mismatches} proof-gallery case(s) did not match their expected outcome"
-        )))
+        Err(AmenableError::gallery_cases_mismatched(mismatches))
     }
 }
 
@@ -161,9 +157,7 @@ fn select_cases<'a>(
             .iter()
             .find(|case| case.id() == id)
             .map(|case| vec![case])
-            .ok_or_else(|| {
-                AmenableError::invariant(format!("unknown Kani proof-gallery case ID: {id}"))
-            }),
+            .ok_or_else(|| AmenableError::unknown_gallery_case_id(id)),
         None => Ok(cases.iter().collect()),
     }
 }
@@ -290,10 +284,7 @@ impl Ledger {
         match lines.next() {
             Some(LEDGER_HEADER) => {}
             _ => {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani proof-gallery ledger header in {}",
-                    path.display()
-                )));
+                return Err(AmenableError::invalid_gallery_ledger_header(path));
             }
         }
 
@@ -317,11 +308,10 @@ impl Ledger {
             let (false, Some(expected), Some(observed), Some(matched)) =
                 (row_is_malformed, expected, observed, matched)
             else {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani proof-gallery ledger row {} in {}",
+                return Err(AmenableError::invalid_gallery_ledger_row(
                     line_number + 2,
-                    path.display()
-                )));
+                    path,
+                ));
             };
 
             rows.insert(

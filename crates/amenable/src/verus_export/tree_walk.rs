@@ -17,13 +17,9 @@ pub(super) fn render_node(
 ) -> AmenableResult<RenderedNode> {
     match node.shape() {
         WitnessArtifactShape::Leaf => render_leaf_node(node, route, names),
-        WitnessArtifactShape::Enum => Err(AmenableError::invariant(format!(
-            "Verus composition for a nested enum-shaped witness is not supported yet (route: {}); \
-             match-per-variant composition (see render_enum_module) only handles an export's own \
-             root shape -- no real nested-enum type is registered anywhere in this codebase yet, \
-             so exclude this type from Verus export until one needs it",
-            route_display(route)
-        ))),
+        WitnessArtifactShape::Enum => Err(AmenableError::verus_nested_enum_witness_unsupported(
+            route_display(route),
+        )),
         WitnessArtifactShape::NamedStruct
         | WitnessArtifactShape::TupleStruct
         | WitnessArtifactShape::UnitStruct
@@ -54,13 +50,10 @@ fn render_leaf_node(
         }
         WitnessSupportKind::Checked => render_checked_leaf(node, route, names),
         WitnessSupportKind::Mixed | WitnessSupportKind::Opaque => {
-            Err(AmenableError::invariant(format!(
-                "leaf at {} reports an impossible per-leaf support kind {:?} -- Mixed only \
-                 arises from composing multiple leaves, and Opaque leaves cannot reach this \
-                 renderer (amenable_core::ClassifiedWitness blocks them at cargo check time)",
+            Err(AmenableError::verus_impossible_leaf_support_kind(
                 route_display(route),
-                node.kind()
-            )))
+                format!("{:?}", node.kind()),
+            ))
         }
     }
 }
@@ -71,22 +64,11 @@ fn render_checked_leaf(
     route: &[RouteSegment],
     names: &mut NameAllocator,
 ) -> AmenableResult<RenderedNode> {
-    let harness = metadata_value(node.metadata(), "harness").ok_or_else(|| {
-        AmenableError::invariant(format!(
-            "checked leaf at {} has no \"harness\" metadata entry",
-            route_display(route)
-        ))
-    })?;
+    let harness = metadata_value(node.metadata(), "harness")
+        .ok_or_else(|| AmenableError::verus_leaf_missing_harness_metadata(route_display(route)))?;
 
     let shape = verus_call_shape(harness).ok_or_else(|| {
-        AmenableError::invariant(format!(
-            "no Verus call shape found for harness `{harness}` (route: {}) -- it should be a real, \
-             public `pub fn` in some crates/amenable_verus/src/**/*.rs carrier file (call shapes \
-             derive automatically from real source), or explicitly registered via \
-             amenable_std::register_verus_call_shape! if it's a synthetic/test-only shape with no \
-             real carrier file behind it",
-            route_display(route)
-        ))
+        AmenableError::verus_no_call_shape_for_harness(harness, route_display(route))
     })?;
 
     let route_hint = route_hint_name(route);
@@ -168,11 +150,10 @@ fn build_checked_call(
     let ty = match &shape.kind() {
         VerusCallKind::Function { returns } => returns.clone(),
         VerusCallKind::Predicate => {
-            return Err(AmenableError::invariant(format!(
-                "harness `{harness}` (route: {}) is registered as a bare predicate, not a \
-                 callable function -- predicate-kind composition isn't wired up yet",
-                route_display(route)
-            )));
+            return Err(AmenableError::verus_harness_registered_as_bare_predicate(
+                harness,
+                route_display(route),
+            ));
         }
     };
 

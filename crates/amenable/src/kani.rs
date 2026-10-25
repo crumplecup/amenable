@@ -90,9 +90,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     if unsuccessful == 0 {
         Ok(())
     } else {
-        Err(AmenableError::invariant(format!(
-            "{unsuccessful} Kani proof(s) did not pass"
-        )))
+        Err(AmenableError::kani_proofs_did_not_pass(unsuccessful))
     }
 }
 
@@ -116,7 +114,7 @@ fn select_records<'a>(
             .iter()
             .find(|record| record.id() == proof)
             .map(|record| vec![record])
-            .ok_or_else(|| AmenableError::invariant(format!("unknown Kani proof ID: {proof}")));
+            .ok_or_else(|| AmenableError::unknown_kani_proof_id(proof.as_str()));
     }
 
     if !args.retry_failed && !args.retry_timeout {

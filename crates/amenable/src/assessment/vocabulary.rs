@@ -87,7 +87,7 @@ impl SummaryDimension {
 
 /// Six independently scored dimensions of proof quality.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, derive_builder::Builder)]
-pub(super) struct Rubric {
+pub struct Rubric {
     claim_alignment: u8,
     assumption_adequacy: u8,
     model_fidelity: u8,
@@ -108,9 +108,7 @@ impl Rubric {
             ("clarity", self.clarity),
         ] {
             if score > 4 {
-                return Err(AmenableError::invariant(format!(
-                    "invalid {name} score {score}; expected an integer from 0 to 4"
-                )));
+                return Err(AmenableError::invalid_named_score(name, score));
             }
         }
 

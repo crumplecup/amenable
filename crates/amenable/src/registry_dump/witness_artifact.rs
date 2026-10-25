@@ -10,7 +10,7 @@ use tracing::instrument;
 /// doc comment names.
 #[derive(serde::Serialize, derive_builder::Builder)]
 #[builder(pattern = "owned")]
-pub(super) struct WitnessExportRecordDump {
+pub struct WitnessExportRecordDump {
     verifier: String,
     evidence: String,
     destination_module: String,

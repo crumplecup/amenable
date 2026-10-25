@@ -79,32 +79,28 @@ impl ProofAssessment {
     #[instrument(level = "debug", skip(self))]
     pub(super) fn validate(&self) -> AmenableResult<()> {
         if self.version != CURRENT_ASSESSMENT_VERSION && self.version != LEGACY_ASSESSMENT_VERSION {
-            return Err(AmenableError::invariant(format!(
-                "unsupported assessment version {}; expected one of {LEGACY_ASSESSMENT_VERSION} or {CURRENT_ASSESSMENT_VERSION}",
-                self.version
-            )));
+            return Err(AmenableError::unsupported_assessment_version(
+                self.version.clone(),
+            ));
         }
         if self.proof_id.trim().is_empty() || self.reviewer.trim().is_empty() {
-            return Err(AmenableError::invariant(
-                "assessment proof ID and reviewer must not be empty",
-            ));
+            return Err(AmenableError::proof_id_and_reviewer_required());
         }
         if self.comment.trim().is_empty() {
-            return Err(AmenableError::invariant(
-                "assessment comment must not be empty",
-            ));
+            return Err(AmenableError::comment_must_not_be_empty());
         }
         if self.version == CURRENT_ASSESSMENT_VERSION {
-            let assessment_id = self.assessment_id.as_ref().ok_or_else(|| {
-                AmenableError::invariant("assessment ID is required for version 0.1.0")
-            })?;
+            let assessment_id = self
+                .assessment_id
+                .as_ref()
+                .ok_or_else(|| AmenableError::assessment_id_required())?;
             if assessment_id.trim().is_empty() {
-                return Err(AmenableError::invariant("assessment ID must not be empty"));
+                return Err(AmenableError::assessment_id_must_not_be_empty());
             }
 
-            let resolution_path = self.resolution_path.ok_or_else(|| {
-                AmenableError::invariant("resolution path is required for version 0.1.0")
-            })?;
+            let resolution_path = self
+                .resolution_path
+                .ok_or_else(|| AmenableError::resolution_path_required())?;
             validate_resolution_path(self.recommendation, resolution_path)?;
         }
 
@@ -132,11 +128,10 @@ fn validate_resolution_path(
     };
 
     valid.then_some(()).ok_or_else(|| {
-        AmenableError::invariant(format!(
-            "resolution path {} is incompatible with recommendation {}",
+        AmenableError::resolution_path_incompatible(
             resolution_path.as_str(),
-            recommendation.as_str()
-        ))
+            recommendation.as_str(),
+        )
     })
 }
 
@@ -169,19 +164,17 @@ impl StoredProofAssessment {
             (Some(version), None) => version,
             (None, Some(LEGACY_SCHEMA_VERSION)) => LEGACY_ASSESSMENT_VERSION.to_owned(),
             (None, Some(schema_version)) => {
-                return Err(AmenableError::invariant(format!(
-                    "unsupported legacy assessment schema version {schema_version}; expected {LEGACY_SCHEMA_VERSION}"
-                )));
+                return Err(AmenableError::unsupported_legacy_schema_version(
+                    schema_version,
+                ));
             }
             (Some(_), Some(_)) => {
-                return Err(AmenableError::invariant(format!(
-                    "assessment record for {proof_id} must not contain both version and schema_version"
-                )));
+                return Err(AmenableError::duplicate_version_and_schema_version(
+                    proof_id,
+                ));
             }
             (None, None) => {
-                return Err(AmenableError::invariant(format!(
-                    "assessment record for {proof_id} is missing version metadata"
-                )));
+                return Err(AmenableError::missing_version_metadata(proof_id));
             }
         };
 
@@ -189,14 +182,10 @@ impl StoredProofAssessment {
             (Some(timestamp), None) => timestamp,
             (None, Some(timestamp)) => timestamp,
             (Some(_), Some(_)) => {
-                return Err(AmenableError::invariant(format!(
-                    "assessment record for {proof_id} must not contain both timestamp and timestamp_unix_seconds"
-                )));
+                return Err(AmenableError::duplicate_timestamp_fields(proof_id));
             }
             (None, None) => {
-                return Err(AmenableError::invariant(format!(
-                    "assessment record for {proof_id} is missing timestamp metadata"
-                )));
+                return Err(AmenableError::missing_timestamp_metadata(proof_id));
             }
         };
 
@@ -211,7 +200,7 @@ impl StoredProofAssessment {
             .resolution_path(self.resolution_path)
             .comment(self.comment)
             .build()
-            .map_err(|error| AmenableError::invariant(error.to_string()))
+            .map_err(|error| AmenableError::proof_assessment_builder_failed(error))
     }
 }
 
@@ -256,18 +245,10 @@ pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {
             let assessment: StoredProofAssessment = serde_json::from_str(line)
                 .map_err(|error| AmenableError::json_line(path, index + 1, error))?;
             let assessment = assessment.into_assessment().map_err(|error| {
-                AmenableError::invariant(format!(
-                    "invalid assessment on line {} in {}: {error}",
-                    index + 1,
-                    path.display()
-                ))
+                AmenableError::invalid_assessment_line(error, path, index + 1)
             })?;
             assessment.validate().map_err(|error| {
-                AmenableError::invariant(format!(
-                    "invalid assessment on line {} in {}: {error}",
-                    index + 1,
-                    path.display()
-                ))
+                AmenableError::invalid_assessment_line(error, path, index + 1)
             })?;
             Ok(assessment)
         })

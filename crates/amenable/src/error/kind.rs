@@ -1,11 +1,21 @@
 //! Error kind enumeration for `amenable`'s CLI-facing operations.
 
-use crate::error::sources::{
-    AssessmentCountSource, ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource,
-    IoSource, JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
-    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
-    TimestampTooLargeSource,
+use super::assessment::AssessmentSource;
+use super::gallery::GallerySource;
+use super::internal::{
+    ChainSource, InvalidAssessmentLineSource, ProofAssessmentBuilderFailedSource,
+    RubricBuilderFailedSource, StdSource, WitnessExportRecordDumpBuilderFailedSource,
 };
+use super::io::{IoSource, JsonLineSource, KaniSpawnFailedSource, SerdeSource};
+use super::kani::KaniSource;
+use super::numeric::{
+    AssessmentCountSource, InvalidScoreSource, PreEpochDateSource, TimestampTooLargeSource,
+};
+use super::time::{
+    InvalidUtcDateSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
+    TimeFormatSource, TimeParseSource,
+};
+use super::verus_export::VerusExportSource;
 
 /// Error kind for `amenable` CLI operations. Every variant is a clean
 /// 1-tuple wrapping a real, named, `Error`-implementing source type --
@@ -29,6 +39,11 @@ pub enum AmenableErrorKind {
     /// carries the artifact path and the 1-indexed line that failed.
     #[display("{_0}")]
     JsonLine(JsonLineSource),
+
+    /// Spawning `cargo kani` for a registered proof failed -- `KaniSpawnFailedSource`
+    /// carries the proof ID the failing spawn targeted.
+    #[display("{_0}")]
+    KaniSpawnFailed(KaniSpawnFailedSource),
 
     /// Serde JSON error (assessment/registry-dump serialization).
     #[display("JSON error: {}", _0)]
@@ -65,12 +80,21 @@ pub enum AmenableErrorKind {
     #[from(TimeFormatSource)]
     TimeFormat(TimeFormatSource),
 
-    /// A business-rule invariant was violated (bad input, unknown ID,
-    /// mismatched counts, and similar non-foreign validation failures) --
-    /// `InvariantSource` is a real `Error`-implementing leaf, not a
-    /// bare `String`.
+    /// An assessment recording/validation business-rule invariant.
     #[display("{_0}")]
-    Invariant(InvariantSource),
+    Assessment(AssessmentSource),
+
+    /// A Kani proof-gallery CLI business-rule invariant.
+    #[display("{_0}")]
+    Gallery(GallerySource),
+
+    /// A Kani verification CLI business-rule invariant.
+    #[display("{_0}")]
+    Kani(KaniSource),
+
+    /// A generated-Verus-module export pipeline business-rule invariant.
+    #[display("{_0}")]
+    VerusExport(VerusExportSource),
 
     /// A proof-chain lookup failed (`amenable_core::ChainError::NotFound`/
     /// `Incomplete`), preserved as the real typed value.
@@ -97,6 +121,23 @@ pub enum AmenableErrorKind {
     /// An assessment count is too large to convert to `u32`.
     #[display("{_0}")]
     AssessmentCount(AssessmentCountSource),
+
+    /// A `RubricBuilder::build` call failed validation.
+    #[display("{_0}")]
+    RubricBuilderFailed(RubricBuilderFailedSource),
+
+    /// A `ProofAssessmentBuilder::build` call failed validation.
+    #[display("{_0}")]
+    ProofAssessmentBuilderFailed(ProofAssessmentBuilderFailedSource),
+
+    /// An assessment record on one line of a JSON Lines artifact failed
+    /// conversion or validation.
+    #[display("{_0}")]
+    InvalidAssessmentLine(InvalidAssessmentLineSource),
+
+    /// A `WitnessExportRecordDumpBuilder::build` call failed validation.
+    #[display("{_0}")]
+    WitnessExportRecordDumpBuilderFailed(WitnessExportRecordDumpBuilderFailedSource),
 }
 
 impl AmenableErrorKind {
@@ -112,6 +153,7 @@ impl AmenableErrorKind {
         match self {
             Self::Io(_) => "Io",
             Self::JsonLine(_) => "JsonLine",
+            Self::KaniSpawnFailed(_) => "KaniSpawnFailed",
             Self::Serde(_) => "Serde",
             Self::SystemTime(_) => "SystemTime",
             Self::TimeFormatDescription(_) => "TimeFormatDescription",
@@ -119,13 +161,20 @@ impl AmenableErrorKind {
             Self::InvalidUtcDate(_) => "InvalidUtcDate",
             Self::TimeComponentRange(_) => "TimeComponentRange",
             Self::TimeFormat(_) => "TimeFormat",
-            Self::Invariant(_) => "Invariant",
+            Self::Assessment(_) => "Assessment",
+            Self::Gallery(_) => "Gallery",
+            Self::Kani(_) => "Kani",
+            Self::VerusExport(_) => "VerusExport",
             Self::Chain(_) => "Chain",
             Self::Std(_) => "Std",
             Self::InvalidScore(_) => "InvalidScore",
             Self::PreEpochDate(_) => "PreEpochDate",
             Self::TimestampTooLarge(_) => "TimestampTooLarge",
             Self::AssessmentCount(_) => "AssessmentCount",
+            Self::RubricBuilderFailed(_) => "RubricBuilderFailed",
+            Self::ProofAssessmentBuilderFailed(_) => "ProofAssessmentBuilderFailed",
+            Self::InvalidAssessmentLine(_) => "InvalidAssessmentLine",
+            Self::WitnessExportRecordDumpBuilderFailed(_) => "WitnessExportRecordDumpBuilderFailed",
         }
     }
 }

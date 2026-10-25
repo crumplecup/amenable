@@ -96,3 +96,35 @@ impl JsonLineSource {
         }
     }
 }
+
+/// Preserved `std::io::Error` source from spawning `cargo kani` for one
+/// registered proof, naming the proof ID the failing spawn targeted.
+#[derive(Debug, derive_more::Display, derive_more::Error)]
+#[display("could not start cargo kani for proof {proof_id}: {source}")]
+pub struct KaniSpawnFailedSource {
+    /// The preserved `std::io::Error`.
+    source: std::io::Error,
+    /// The proof ID whose `cargo kani` invocation failed to spawn.
+    #[error(ignore)]
+    proof_id: String,
+    /// Source line of the call site that produced this error.
+    line: u32,
+    /// Source file of the call site that produced this error.
+    file: String,
+}
+
+impl KaniSpawnFailedSource {
+    /// Preserve a spawn failure alongside the proof ID it targeted and
+    /// the caller's location.
+    #[track_caller]
+    #[instrument(level = "debug", skip(source, proof_id))]
+    pub fn new(source: std::io::Error, proof_id: impl Into<String>) -> Self {
+        let loc = std::panic::Location::caller();
+        Self {
+            source,
+            proof_id: proof_id.into(),
+            line: loc.line(),
+            file: loc.file().to_string(),
+        }
+    }
+}

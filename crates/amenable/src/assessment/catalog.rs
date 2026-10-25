@@ -65,5 +65,5 @@ pub(super) fn ensure_registered(proof_id: &str) -> AmenableResult<()> {
         .into_iter()
         .any(|proof| proof.id == proof_id)
         .then_some(())
-        .ok_or_else(|| AmenableError::invariant(format!("unknown registered proof ID: {proof_id}")))
+        .ok_or_else(|| AmenableError::unknown_registered_proof_id(proof_id))
 }

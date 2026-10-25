@@ -108,8 +108,8 @@ fn gallery_run_rejects_unknown_case_before_spawning_kani() -> miette::Result<()>
     // wraps its rendered diagnostic across lines, so a single combined
     // assertion would be brittle against wrap width.
     assert!(
-        stderr.contains("amenable::Invariant"),
-        "stderr should carry the Invariant diagnostic code: {stderr}"
+        stderr.contains("amenable::Gallery"),
+        "stderr should carry the Gallery diagnostic code: {stderr}"
     );
     assert!(
         stderr.contains("unknown Kani proof-gallery case ID"),

@@ -91,9 +91,7 @@ pub fn write_verus_gaap_token_companion(path: &Path) -> AmenableResult<PathBuf> 
     let mut specs = Vec::with_capacity(TOKENS.len());
     for &token in TOKENS {
         let Some(spec) = gathered.get(token) else {
-            return Err(AmenableError::invariant(format!(
-                "no ProofTokenMintRecord registered for {token} (named in verus_gaap_tokens_export::TOKENS)"
-            )));
+            return Err(AmenableError::no_proof_token_mint_record(token));
         };
         specs.push(spec);
     }

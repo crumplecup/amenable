@@ -100,10 +100,7 @@ impl Ledger {
         match lines.next() {
             Some(LEDGER_HEADER) => {}
             _ => {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani result ledger header in {}",
-                    path.display()
-                )));
+                return Err(AmenableError::invalid_result_ledger_header(path));
             }
         }
 
@@ -120,11 +117,10 @@ impl Ledger {
 
             let (false, Some(timestamp), Some(status)) = (row_is_malformed, timestamp, status)
             else {
-                return Err(AmenableError::invariant(format!(
-                    "invalid Kani result ledger row {} in {}",
+                return Err(AmenableError::invalid_result_ledger_row(
                     line_number + 2,
-                    path.display()
-                )));
+                    path,
+                ));
             };
             rows.insert(proof_id.to_owned(), LedgerRow { timestamp, status });
         }

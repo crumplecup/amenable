@@ -38,12 +38,12 @@ pub fn write_verus_witness_modules(root: &Path) -> AmenableResult<Vec<PathBuf>> 
     }
 
     if !failures.is_empty() {
-        return Err(AmenableError::invariant(format!(
-            "failed to render {} of {} Verus witness export(s):\n{}",
+        let total = written_paths.len() + failures.len();
+        return Err(AmenableError::verus_render_failures_summary(
             failures.len(),
-            written_paths.len() + failures.len(),
-            failures.join("\n")
-        )));
+            total,
+            failures.join("\n"),
+        ));
     }
 
     Ok(written_paths)
@@ -67,30 +67,29 @@ fn render_and_write_export(root: &Path, export: &WitnessExportSnapshot) -> Amena
 fn parse_destination_module(destination_module: &str) -> AmenableResult<(Vec<String>, String)> {
     let mut parts = destination_module.split("::");
     let crate_root = parts.next().ok_or_else(|| {
-        AmenableError::invariant(format!(
-            "invalid Verus destination module {destination_module:?}: expected crate-relative path"
-        ))
+        AmenableError::verus_destination_module_not_crate_relative(destination_module)
     })?;
 
     if crate_root != "crate" {
-        return Err(AmenableError::invariant(format!(
-            "invalid Verus destination module {destination_module:?}: expected path to start with \"crate::\""
-        )));
+        return Err(AmenableError::verus_destination_module_missing_crate_prefix(
+            destination_module,
+        ));
     }
 
     let mut segments = parts.map(str::to_owned).collect::<Vec<_>>();
     for segment in &segments {
         if !is_valid_module_segment(segment) {
-            return Err(AmenableError::invariant(format!(
-                "invalid Verus destination module {destination_module:?}: bad Rust module segment {segment:?}"
-            )));
+            return Err(AmenableError::verus_destination_module_bad_segment(
+                destination_module,
+                segment.as_str(),
+            ));
         }
     }
 
     let Some(final_segment) = segments.pop() else {
-        return Err(AmenableError::invariant(format!(
-            "invalid Verus destination module {destination_module:?}: missing module segments"
-        )));
+        return Err(AmenableError::verus_destination_module_missing_segments(
+            destination_module,
+        ));
     };
 
     Ok((segments, final_segment))

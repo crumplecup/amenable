@@ -8,12 +8,18 @@
 
 use std::path::PathBuf;
 
+use crate::error::internal::{
+    ChainSource, InvalidAssessmentLineSource, ProofAssessmentBuilderFailedSource,
+    RubricBuilderFailedSource, StdSource, WitnessExportRecordDumpBuilderFailedSource,
+};
+use crate::error::io::{IoSource, JsonLineSource, KaniSpawnFailedSource, SerdeSource};
 use crate::error::kind::AmenableErrorKind;
-use crate::error::sources::{
-    AssessmentCountSource, ChainSource, InvalidScoreSource, InvalidUtcDateSource, InvariantSource,
-    IoSource, JsonLineSource, PreEpochDateSource, SerdeSource, StdSource, SystemTimeSource,
-    TimeComponentRangeSource, TimeFormatDescriptionSource, TimeFormatSource, TimeParseSource,
-    TimestampTooLargeSource,
+use crate::error::numeric::{
+    AssessmentCountSource, InvalidScoreSource, PreEpochDateSource, TimestampTooLargeSource,
+};
+use crate::error::time::{
+    InvalidUtcDateSource, SystemTimeSource, TimeComponentRangeSource, TimeFormatDescriptionSource,
+    TimeFormatSource, TimeParseSource,
 };
 
 use tracing::instrument;
@@ -56,19 +62,22 @@ impl AmenableError {
         }
     }
 
-    /// Construct an [`AmenableErrorKind::Invariant`] business-rule error.
-    #[track_caller]
-    #[instrument(level = "debug", skip(detail))]
-    pub fn invariant(detail: impl Into<String>) -> Self {
-        Self::new(AmenableErrorKind::Invariant(InvariantSource::new(detail)))
-    }
-
     /// Construct an [`AmenableErrorKind::Io`] error naming the artifact
     /// path that failed.
     #[track_caller]
     #[instrument(level = "debug", skip(path, source))]
     pub fn io(path: impl Into<PathBuf>, source: std::io::Error) -> Self {
         Self::new(AmenableErrorKind::Io(IoSource::new(source, path)))
+    }
+
+    /// Construct an [`AmenableErrorKind::KaniSpawnFailed`] error naming the
+    /// proof ID whose `cargo kani` invocation failed to spawn.
+    #[track_caller]
+    #[instrument(level = "debug", skip(proof_id, source))]
+    pub fn kani_spawn_failed(proof_id: impl Into<String>, source: std::io::Error) -> Self {
+        Self::new(AmenableErrorKind::KaniSpawnFailed(KaniSpawnFailedSource::new(
+            source, proof_id,
+        )))
     }
 
     /// Construct an [`AmenableErrorKind::JsonLine`] error naming the file
@@ -144,6 +153,56 @@ impl AmenableError {
     pub fn assessment_count(count: usize, source: std::num::TryFromIntError) -> Self {
         Self::new(AmenableErrorKind::AssessmentCount(
             AssessmentCountSource::new(source, count),
+        ))
+    }
+
+    /// Construct an [`AmenableErrorKind::RubricBuilderFailed`] error
+    /// preserving a `RubricBuilder::build` failure.
+    #[track_caller]
+    #[instrument(level = "debug", skip(source))]
+    pub fn rubric_builder_failed(source: crate::assessment::RubricBuilderError) -> Self {
+        Self::new(AmenableErrorKind::RubricBuilderFailed(
+            RubricBuilderFailedSource::new(source),
+        ))
+    }
+
+    /// Construct an [`AmenableErrorKind::ProofAssessmentBuilderFailed`]
+    /// error preserving a `ProofAssessmentBuilder::build` failure.
+    #[track_caller]
+    #[instrument(level = "debug", skip(source))]
+    pub fn proof_assessment_builder_failed(
+        source: crate::assessment::ProofAssessmentBuilderError,
+    ) -> Self {
+        Self::new(AmenableErrorKind::ProofAssessmentBuilderFailed(
+            ProofAssessmentBuilderFailedSource::new(source),
+        ))
+    }
+
+    /// Construct an [`AmenableErrorKind::InvalidAssessmentLine`] error
+    /// preserving an already-real nested error from one line of a JSON
+    /// Lines assessment artifact.
+    #[track_caller]
+    #[instrument(level = "debug", skip(source, path))]
+    pub fn invalid_assessment_line(
+        source: AmenableError,
+        path: impl Into<std::path::PathBuf>,
+        artifact_line: usize,
+    ) -> Self {
+        Self::new(AmenableErrorKind::InvalidAssessmentLine(
+            InvalidAssessmentLineSource::new(source, path, artifact_line),
+        ))
+    }
+
+    /// Construct an
+    /// [`AmenableErrorKind::WitnessExportRecordDumpBuilderFailed`] error
+    /// preserving a `WitnessExportRecordDumpBuilder::build` failure.
+    #[track_caller]
+    #[instrument(level = "debug", skip(source))]
+    pub fn witness_export_record_dump_builder_failed(
+        source: crate::registry_dump::WitnessExportRecordDumpBuilderError,
+    ) -> Self {
+        Self::new(AmenableErrorKind::WitnessExportRecordDumpBuilderFailed(
+            WitnessExportRecordDumpBuilderFailedSource::new(source),
         ))
     }
 }

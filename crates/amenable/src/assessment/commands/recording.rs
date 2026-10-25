@@ -24,7 +24,7 @@ pub(super) fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
         .adversarial_coverage(args.adversarial_coverage)
         .clarity(args.clarity)
         .build()
-        .map_err(|error| AmenableError::invariant(error.to_string()))?;
+        .map_err(|error| AmenableError::rubric_builder_failed(error))?;
     let assessment = ProofAssessmentBuilder::default()
         .version(CURRENT_ASSESSMENT_VERSION.to_owned())
         .assessment_id(Some(assessment_id()?))
@@ -36,7 +36,7 @@ pub(super) fn record(args: RecordAssessmentArgs) -> AmenableResult<()> {
         .resolution_path(Some(args.resolution_path))
         .comment(comment)
         .build()
-        .map_err(|error| AmenableError::invariant(error.to_string()))?;
+        .map_err(|error| AmenableError::proof_assessment_builder_failed(error))?;
     assessment.validate()?;
     record::append(&args.assessments, &assessment)?;
 
@@ -56,12 +56,8 @@ fn read_comment(comment: Option<String>, comment_file: Option<PathBuf>) -> Amena
         (None, Some(path)) => {
             fs::read_to_string(&path).map_err(|error| AmenableError::io(path, error))
         }
-        (Some(_), Some(_)) => Err(AmenableError::invariant(
-            "provide either --comment or --comment-file, not both",
-        )),
-        (None, None) => Err(AmenableError::invariant(
-            "provide --comment or --comment-file",
-        )),
+        (Some(_), Some(_)) => Err(AmenableError::comment_conflict()),
+        (None, None) => Err(AmenableError::comment_or_file_required()),
     }
 }
 

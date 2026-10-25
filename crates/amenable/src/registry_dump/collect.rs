@@ -73,7 +73,9 @@ impl RegistryDump {
                         .opaque(support.opaque())
                         .artifact(dump_witness_artifact(artifact))
                         .build()
-                        .map_err(|error| crate::AmenableError::invariant(error.to_string()))
+                        .map_err(|error| {
+                            crate::AmenableError::witness_export_record_dump_builder_failed(error)
+                        })
                 })
                 .collect::<crate::AmenableResult<Vec<_>>>()?,
             kani_proofs: inventory::iter::<KaniProofRegistration>()

@@ -28,10 +28,9 @@ pub(super) fn render_enum_module(
     names: &mut NameAllocator,
 ) -> AmenableResult<String> {
     if export.artifact().variants().is_empty() {
-        return Err(AmenableError::invariant(format!(
-            "enum-shaped export {} has no variants -- nothing to compose",
-            export.evidence()
-        )));
+        return Err(AmenableError::enum_export_has_no_variants(
+            export.evidence(),
+        ));
     }
 
     let type_prefix = to_pascal_case(module_stem);

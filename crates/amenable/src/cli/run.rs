@@ -13,7 +13,7 @@ use crate::AmenableResult;
 pub(super) fn run_certify() -> AmenableResult<()> {
     let directory = crate::paths::artifacts_directory().join("std-certificates");
     let paths = crate::write_rust_std_certificate_artifacts(&directory)
-        .map_err(crate::AmenableError::std)?;
+        .map_err(|err| crate::AmenableError::std(err))?;
 
     crate::write_stdout_line(format!(
         "Wrote {} provenance certificate artifact(s) to {}:",

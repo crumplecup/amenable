@@ -14,3 +14,4 @@ mod proof;
 mod witness_artifact;
 
 pub(crate) use collect::RegistryDump;
+pub(crate) use witness_artifact::WitnessExportRecordDumpBuilderError;
