@@ -58,7 +58,12 @@ amenable_kani::chrono::gap_info::gap_info_bin_15,1791930571,passed
 amenable_kani::chrono::gap_info::gap_info_bin_16,1791930764,passed
 amenable_kani::chrono::gap_info::gap_info_bin_17,1791930944,passed
 amenable_kani::chrono::gap_info::gap_info_bin_18,1791931130,passed
+amenable_kani::chrono::offset_date_time::check_fixed_offset_sign_and_magnitude,1792534503,passed
+amenable_kani::chrono::offset_date_time::check_fixed_offset_to_utc_offset_descriptor,1792539923,timeout
+amenable_kani::chrono::offset_date_time::check_narrow_to_u8,1792536486,passed
 amenable_kani::chrono::offset_date_time::check_offset_date_time_round_trips_through_descriptor,1791916337,timeout
+amenable_kani::chrono::offset_date_time::check_offset_round_trips,1792526443,timeout
+amenable_kani::chrono::offset_date_time::check_reflect_offset,1792529032,timeout
 amenable_kani::chrono::tz::tz_bin_0,1791819451,passed
 amenable_kani::chrono::tz::tz_bin_1,1791819629,passed
 amenable_kani::chrono::tz::tz_bin_2,1791819696,failed

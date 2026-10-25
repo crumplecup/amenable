@@ -1,5 +1,8 @@
 {
   "chapters": {
+    "amenable_kani::chrono::offset_date_time::check_fixed_offset_sign_and_magnitude": 2,
+    "amenable_kani::chrono::offset_date_time::check_fixed_offset_to_utc_offset_descriptor": 2,
+    "amenable_kani::chrono::offset_date_time::check_narrow_to_u8": 2,
     "amenable_kani::chrono::week_span_partitions::span_partition_0": 7,
     "amenable_kani::chrono::week_span_partitions::span_partition_1": 5
   }
