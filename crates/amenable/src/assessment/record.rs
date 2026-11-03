@@ -244,12 +244,12 @@ pub fn load(path: &Path) -> AmenableResult<Vec<ProofAssessment>> {
         .map(|(index, line)| {
             let assessment: StoredProofAssessment = serde_json::from_str(line)
                 .map_err(|error| AmenableError::json_line(path, index + 1, error))?;
-            let assessment = assessment.into_assessment().map_err(|error| {
-                AmenableError::invalid_assessment_line(error, path, index + 1)
-            })?;
-            assessment.validate().map_err(|error| {
-                AmenableError::invalid_assessment_line(error, path, index + 1)
-            })?;
+            let assessment = assessment
+                .into_assessment()
+                .map_err(|error| AmenableError::invalid_assessment_line(error, path, index + 1))?;
+            assessment
+                .validate()
+                .map_err(|error| AmenableError::invalid_assessment_line(error, path, index + 1))?;
             Ok(assessment)
         })
         .collect()

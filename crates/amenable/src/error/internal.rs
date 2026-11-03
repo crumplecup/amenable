@@ -64,64 +64,104 @@ impl StdSource {
     }
 }
 
-/// A `RubricBuilder::build` validation failure, preserving the real
-/// `derive_builder`-generated error as `source` rather than stringifying
-/// it -- the builder's own error *is* the genuine cause, so wrapping it
-/// natively is normalizing, not the stringifying antipattern
-/// `AmenableError::invariant(error.to_string())` used to commit.
-#[derive(Debug, derive_more::Display, derive_more::Error)]
-#[display("could not build a rubric: {source}")]
-pub struct RubricBuilderFailedSource {
-    /// The preserved `RubricBuilderError`.
-    source: crate::assessment::RubricBuilderError,
-    /// Source line of the call site that produced this error.
-    line: u32,
-    /// Source file of the call site that produced this error.
-    file: String,
-}
+mod cli_only {
+    #![cfg(feature = "cli")]
 
-impl RubricBuilderFailedSource {
-    /// Preserve a `RubricBuilder` failure alongside the caller's
-    /// location.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn new(source: crate::assessment::RubricBuilderError) -> Self {
-        let loc = std::panic::Location::caller();
-        Self {
-            source,
-            line: loc.line(),
-            file: loc.file().to_string(),
+    use tracing::instrument;
+
+    /// A `RubricBuilder::build` validation failure, preserving the real
+    /// `derive_builder`-generated error as `source` rather than stringifying
+    /// it -- the builder's own error *is* the genuine cause, so wrapping it
+    /// natively is normalizing, not the stringifying antipattern
+    /// `AmenableError::invariant(error.to_string())` used to commit.
+    #[derive(Debug, derive_more::Display, derive_more::Error)]
+    #[display("could not build a rubric: {source}")]
+    pub struct RubricBuilderFailedSource {
+        /// The preserved `RubricBuilderError`.
+        source: crate::assessment::RubricBuilderError,
+        /// Source line of the call site that produced this error.
+        line: u32,
+        /// Source file of the call site that produced this error.
+        file: String,
+    }
+
+    impl RubricBuilderFailedSource {
+        /// Preserve a `RubricBuilder` failure alongside the caller's
+        /// location.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn new(source: crate::assessment::RubricBuilderError) -> Self {
+            let loc = std::panic::Location::caller();
+            Self {
+                source,
+                line: loc.line(),
+                file: loc.file().to_string(),
+            }
+        }
+    }
+
+    /// A `ProofAssessmentBuilder::build` validation failure, preserving the
+    /// real builder error as `source`.
+    #[derive(Debug, derive_more::Display, derive_more::Error)]
+    #[display("could not build a proof assessment: {source}")]
+    pub struct ProofAssessmentBuilderFailedSource {
+        /// The preserved `ProofAssessmentBuilderError`.
+        source: crate::assessment::ProofAssessmentBuilderError,
+        /// Source line of the call site that produced this error.
+        line: u32,
+        /// Source file of the call site that produced this error.
+        file: String,
+    }
+
+    impl ProofAssessmentBuilderFailedSource {
+        /// Preserve a `ProofAssessmentBuilder` failure alongside the
+        /// caller's location.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn new(source: crate::assessment::ProofAssessmentBuilderError) -> Self {
+            let loc = std::panic::Location::caller();
+            Self {
+                source,
+                line: loc.line(),
+                file: loc.file().to_string(),
+            }
+        }
+    }
+
+    /// A `WitnessExportRecordDumpBuilder::build` validation failure,
+    /// preserving the real builder error as `source`.
+    #[derive(Debug, derive_more::Display, derive_more::Error)]
+    #[display("could not build a witness export record dump: {source}")]
+    pub struct WitnessExportRecordDumpBuilderFailedSource {
+        /// The preserved `WitnessExportRecordDumpBuilderError`.
+        source: crate::registry_dump::WitnessExportRecordDumpBuilderError,
+        /// Source line of the call site that produced this error.
+        line: u32,
+        /// Source file of the call site that produced this error.
+        file: String,
+    }
+
+    impl WitnessExportRecordDumpBuilderFailedSource {
+        /// Preserve a `WitnessExportRecordDumpBuilder` failure alongside the
+        /// caller's location.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn new(source: crate::registry_dump::WitnessExportRecordDumpBuilderError) -> Self {
+            let loc = std::panic::Location::caller();
+            Self {
+                source,
+                line: loc.line(),
+                file: loc.file().to_string(),
+            }
         }
     }
 }
 
-/// A `ProofAssessmentBuilder::build` validation failure, preserving the
-/// real builder error as `source`.
-#[derive(Debug, derive_more::Display, derive_more::Error)]
-#[display("could not build a proof assessment: {source}")]
-pub struct ProofAssessmentBuilderFailedSource {
-    /// The preserved `ProofAssessmentBuilderError`.
-    source: crate::assessment::ProofAssessmentBuilderError,
-    /// Source line of the call site that produced this error.
-    line: u32,
-    /// Source file of the call site that produced this error.
-    file: String,
-}
-
-impl ProofAssessmentBuilderFailedSource {
-    /// Preserve a `ProofAssessmentBuilder` failure alongside the
-    /// caller's location.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn new(source: crate::assessment::ProofAssessmentBuilderError) -> Self {
-        let loc = std::panic::Location::caller();
-        Self {
-            source,
-            line: loc.line(),
-            file: loc.file().to_string(),
-        }
-    }
-}
+#[cfg(feature = "cli")]
+pub(crate) use cli_only::{
+    ProofAssessmentBuilderFailedSource, RubricBuilderFailedSource,
+    WitnessExportRecordDumpBuilderFailedSource,
+};
 
 /// An assessment record on one line of a JSON Lines artifact failed
 /// `StoredProofAssessment::into_assessment` or `ProofAssessment::validate`,
@@ -147,34 +187,6 @@ pub struct InvalidAssessmentLineSource {
     line: u32,
     /// Source file of the call site that produced this error.
     file: String,
-}
-
-/// A `WitnessExportRecordDumpBuilder::build` validation failure,
-/// preserving the real builder error as `source`.
-#[derive(Debug, derive_more::Display, derive_more::Error)]
-#[display("could not build a witness export record dump: {source}")]
-pub struct WitnessExportRecordDumpBuilderFailedSource {
-    /// The preserved `WitnessExportRecordDumpBuilderError`.
-    source: crate::registry_dump::WitnessExportRecordDumpBuilderError,
-    /// Source line of the call site that produced this error.
-    line: u32,
-    /// Source file of the call site that produced this error.
-    file: String,
-}
-
-impl WitnessExportRecordDumpBuilderFailedSource {
-    /// Preserve a `WitnessExportRecordDumpBuilder` failure alongside the
-    /// caller's location.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn new(source: crate::registry_dump::WitnessExportRecordDumpBuilderError) -> Self {
-        let loc = std::panic::Location::caller();
-        Self {
-            source,
-            line: loc.line(),
-            file: loc.file().to_string(),
-        }
-    }
 }
 
 impl InvalidAssessmentLineSource {

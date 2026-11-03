@@ -55,7 +55,6 @@ impl UnsupportedLegacySchemaVersionSource {
 
 #[derive(Debug, derive_more::Display, derive_more::Error)]
 #[display(
-
     "assessment record for {proof_id} must not contain both version and schema_version ({file}:{line})"
 )]
 pub(super) struct DuplicateVersionAndSchemaVersionSource {

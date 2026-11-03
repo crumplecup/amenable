@@ -9,8 +9,8 @@
 
 use tracing::instrument;
 
-use crate::error::kind::AmenableErrorKind;
 use crate::AmenableError;
+use crate::error::kind::AmenableErrorKind;
 
 use super::assessment_sources_comment::{
     CommentConflictSource, CommentMustNotBeEmptySource, CommentOrFileRequiredSource,

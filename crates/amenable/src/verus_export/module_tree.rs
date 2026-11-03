@@ -71,9 +71,9 @@ fn parse_destination_module(destination_module: &str) -> AmenableResult<(Vec<Str
     })?;
 
     if crate_root != "crate" {
-        return Err(AmenableError::verus_destination_module_missing_crate_prefix(
-            destination_module,
-        ));
+        return Err(
+            AmenableError::verus_destination_module_missing_crate_prefix(destination_module),
+        );
     }
 
     let mut segments = parts.map(str::to_owned).collect::<Vec<_>>();

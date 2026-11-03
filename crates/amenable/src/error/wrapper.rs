@@ -8,10 +8,7 @@
 
 use std::path::PathBuf;
 
-use crate::error::internal::{
-    ChainSource, InvalidAssessmentLineSource, ProofAssessmentBuilderFailedSource,
-    RubricBuilderFailedSource, StdSource, WitnessExportRecordDumpBuilderFailedSource,
-};
+use crate::error::internal::{ChainSource, InvalidAssessmentLineSource, StdSource};
 use crate::error::io::{IoSource, JsonLineSource, KaniSpawnFailedSource, SerdeSource};
 use crate::error::kind::AmenableErrorKind;
 use crate::error::numeric::{
@@ -75,9 +72,9 @@ impl AmenableError {
     #[track_caller]
     #[instrument(level = "debug", skip(proof_id, source))]
     pub fn kani_spawn_failed(proof_id: impl Into<String>, source: std::io::Error) -> Self {
-        Self::new(AmenableErrorKind::KaniSpawnFailed(KaniSpawnFailedSource::new(
-            source, proof_id,
-        )))
+        Self::new(AmenableErrorKind::KaniSpawnFailed(
+            KaniSpawnFailedSource::new(source, proof_id),
+        ))
     }
 
     /// Construct an [`AmenableErrorKind::JsonLine`] error naming the file
@@ -156,28 +153,6 @@ impl AmenableError {
         ))
     }
 
-    /// Construct an [`AmenableErrorKind::RubricBuilderFailed`] error
-    /// preserving a `RubricBuilder::build` failure.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn rubric_builder_failed(source: crate::assessment::RubricBuilderError) -> Self {
-        Self::new(AmenableErrorKind::RubricBuilderFailed(
-            RubricBuilderFailedSource::new(source),
-        ))
-    }
-
-    /// Construct an [`AmenableErrorKind::ProofAssessmentBuilderFailed`]
-    /// error preserving a `ProofAssessmentBuilder::build` failure.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn proof_assessment_builder_failed(
-        source: crate::assessment::ProofAssessmentBuilderError,
-    ) -> Self {
-        Self::new(AmenableErrorKind::ProofAssessmentBuilderFailed(
-            ProofAssessmentBuilderFailedSource::new(source),
-        ))
-    }
-
     /// Construct an [`AmenableErrorKind::InvalidAssessmentLine`] error
     /// preserving an already-real nested error from one line of a JSON
     /// Lines assessment artifact.
@@ -192,19 +167,6 @@ impl AmenableError {
             InvalidAssessmentLineSource::new(source, path, artifact_line),
         ))
     }
-
-    /// Construct an
-    /// [`AmenableErrorKind::WitnessExportRecordDumpBuilderFailed`] error
-    /// preserving a `WitnessExportRecordDumpBuilder::build` failure.
-    #[track_caller]
-    #[instrument(level = "debug", skip(source))]
-    pub fn witness_export_record_dump_builder_failed(
-        source: crate::registry_dump::WitnessExportRecordDumpBuilderError,
-    ) -> Self {
-        Self::new(AmenableErrorKind::WitnessExportRecordDumpBuilderFailed(
-            WitnessExportRecordDumpBuilderFailedSource::new(source),
-        ))
-    }
 }
 
 impl From<AmenableErrorKind> for AmenableError {
@@ -215,23 +177,71 @@ impl From<AmenableErrorKind> for AmenableError {
     }
 }
 
-/// `AmenableError` presented directly, with no bin-only wrapper type: one
-/// error, one place to add a `miette` code/help. `Diagnostic: std::error::Error`
-/// is already satisfied by `derive_more::Error` above, so this only adds
-/// the two `miette`-specific methods on top of the same value the rest of
-/// the crate already constructs and propagates with `?`.
-#[cfg(feature = "cli")]
-impl miette::Diagnostic for AmenableError {
-    #[instrument(level = "trace", skip(self))]
-    fn code<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
-        Some(Box::new(format!("amenable::{}", self.kind.code_name())))
+mod cli_only {
+    #![cfg(feature = "cli")]
+
+    use tracing::instrument;
+
+    use super::{AmenableError, AmenableErrorKind};
+    use crate::error::internal::{
+        ProofAssessmentBuilderFailedSource, RubricBuilderFailedSource,
+        WitnessExportRecordDumpBuilderFailedSource,
+    };
+
+    impl AmenableError {
+        /// Construct an [`AmenableErrorKind::RubricBuilderFailed`] error
+        /// preserving a `RubricBuilder::build` failure.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn rubric_builder_failed(source: crate::assessment::RubricBuilderError) -> Self {
+            Self::new(AmenableErrorKind::RubricBuilderFailed(
+                RubricBuilderFailedSource::new(source),
+            ))
+        }
+
+        /// Construct an [`AmenableErrorKind::ProofAssessmentBuilderFailed`]
+        /// error preserving a `ProofAssessmentBuilder::build` failure.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn proof_assessment_builder_failed(
+            source: crate::assessment::ProofAssessmentBuilderError,
+        ) -> Self {
+            Self::new(AmenableErrorKind::ProofAssessmentBuilderFailed(
+                ProofAssessmentBuilderFailedSource::new(source),
+            ))
+        }
+
+        /// Construct an
+        /// [`AmenableErrorKind::WitnessExportRecordDumpBuilderFailed`] error
+        /// preserving a `WitnessExportRecordDumpBuilder::build` failure.
+        #[track_caller]
+        #[instrument(level = "debug", skip(source))]
+        pub fn witness_export_record_dump_builder_failed(
+            source: crate::registry_dump::WitnessExportRecordDumpBuilderError,
+        ) -> Self {
+            Self::new(AmenableErrorKind::WitnessExportRecordDumpBuilderFailed(
+                WitnessExportRecordDumpBuilderFailedSource::new(source),
+            ))
+        }
     }
 
-    #[instrument(level = "trace", skip(self))]
-    fn help<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
-        Some(Box::new(
-            "See the CSV/JSONL ledgers under artifacts/ for verification and assessment history.",
-        ))
+    /// `AmenableError` presented directly, with no bin-only wrapper type: one
+    /// error, one place to add a `miette` code/help. `Diagnostic: std::error::Error`
+    /// is already satisfied by `derive_more::Error` above, so this only adds
+    /// the two `miette`-specific methods on top of the same value the rest of
+    /// the crate already constructs and propagates with `?`.
+    impl miette::Diagnostic for AmenableError {
+        #[instrument(level = "trace", skip(self))]
+        fn code<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
+            Some(Box::new(format!("amenable::{}", self.kind.code_name())))
+        }
+
+        #[instrument(level = "trace", skip(self))]
+        fn help<'a>(&'a self) -> Option<Box<dyn std::fmt::Display + 'a>> {
+            Some(Box::new(
+                "See the CSV/JSONL ledgers under artifacts/ for verification and assessment history.",
+            ))
+        }
     }
 }
 

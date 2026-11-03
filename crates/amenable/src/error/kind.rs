@@ -2,10 +2,7 @@
 
 use super::assessment::AssessmentSource;
 use super::gallery::GallerySource;
-use super::internal::{
-    ChainSource, InvalidAssessmentLineSource, ProofAssessmentBuilderFailedSource,
-    RubricBuilderFailedSource, StdSource, WitnessExportRecordDumpBuilderFailedSource,
-};
+use super::internal::{ChainSource, InvalidAssessmentLineSource, StdSource};
 use super::io::{IoSource, JsonLineSource, KaniSpawnFailedSource, SerdeSource};
 use super::kani::KaniSource;
 use super::numeric::{
@@ -123,12 +120,14 @@ pub enum AmenableErrorKind {
     AssessmentCount(AssessmentCountSource),
 
     /// A `RubricBuilder::build` call failed validation.
+    #[cfg(feature = "cli")]
     #[display("{_0}")]
-    RubricBuilderFailed(RubricBuilderFailedSource),
+    RubricBuilderFailed(super::internal::RubricBuilderFailedSource),
 
     /// A `ProofAssessmentBuilder::build` call failed validation.
+    #[cfg(feature = "cli")]
     #[display("{_0}")]
-    ProofAssessmentBuilderFailed(ProofAssessmentBuilderFailedSource),
+    ProofAssessmentBuilderFailed(super::internal::ProofAssessmentBuilderFailedSource),
 
     /// An assessment record on one line of a JSON Lines artifact failed
     /// conversion or validation.
@@ -136,8 +135,11 @@ pub enum AmenableErrorKind {
     InvalidAssessmentLine(InvalidAssessmentLineSource),
 
     /// A `WitnessExportRecordDumpBuilder::build` call failed validation.
+    #[cfg(feature = "cli")]
     #[display("{_0}")]
-    WitnessExportRecordDumpBuilderFailed(WitnessExportRecordDumpBuilderFailedSource),
+    WitnessExportRecordDumpBuilderFailed(
+        super::internal::WitnessExportRecordDumpBuilderFailedSource,
+    ),
 }
 
 impl AmenableErrorKind {

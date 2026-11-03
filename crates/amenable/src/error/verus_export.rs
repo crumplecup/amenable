@@ -9,8 +9,8 @@
 
 use tracing::instrument;
 
-use crate::error::kind::AmenableErrorKind;
 use crate::AmenableError;
+use crate::error::kind::AmenableErrorKind;
 
 use super::verus_export_sources_call_shape::{
     HarnessRegisteredAsBarePredicateSource, LeafMissingHarnessMetadataSource,

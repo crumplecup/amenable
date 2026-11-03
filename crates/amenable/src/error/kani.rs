@@ -209,5 +209,4 @@ impl AmenableError {
             KaniErrorKind::StdoutStderrNotPiped(StdoutStderrNotPipedSource::new()),
         )))
     }
-
 }

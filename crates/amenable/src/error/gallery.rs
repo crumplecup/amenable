@@ -208,5 +208,4 @@ impl AmenableError {
             GalleryErrorKind::InvalidLedgerRow(InvalidGalleryLedgerRowSource::new(row, path)),
         )))
     }
-
 }

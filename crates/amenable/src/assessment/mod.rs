@@ -16,6 +16,6 @@ mod record;
 mod vocabulary;
 
 pub use cli::AssessArgs;
-pub use record::load;
 pub(crate) use record::ProofAssessmentBuilderError;
+pub use record::load;
 pub(crate) use vocabulary::RubricBuilderError;

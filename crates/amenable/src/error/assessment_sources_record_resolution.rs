@@ -53,7 +53,6 @@ impl ResolutionPathIncompatibleSource {
 
 #[derive(Debug, derive_more::Display, derive_more::Error)]
 #[display(
-
     "assessment record for {proof_id} must not contain both timestamp and timestamp_unix_seconds ({file}:{line})"
 )]
 pub(super) struct DuplicateTimestampFieldsSource {
