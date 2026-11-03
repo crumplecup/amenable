@@ -105,9 +105,9 @@ crate_verifier = { amenable_kani = "kani", amenable_creusot = "creusot", amenabl
 # signal on real hand-maintained files.
 [modularity]
 generated_files = [
-    "src/derived_witness",
-    "src/generated",
-    "src/gallery/generated",
+  "src/derived_witness",
+  "src/generated",
+  "src/gallery/generated",
 ]
 
 # [antipatterns] skip_paths -- ANTIPATTERN-STRUCT-STATIC-REF-001 exempt for
@@ -129,12 +129,13 @@ generated_files = [
 # every other antipattern rule, and every other gallery file, stays live.
 [antipatterns]
 skip_paths = { "ANTIPATTERN-STRUCT-STATIC-REF-001" = [
-    "src/gallery/boxed_error_variant_count_escalation_references_and_vectors.rs",
-    "src/gallery/boxed_error_variant_count_production_fix_candidates.rs",
+  "src/gallery/boxed_error_variant_count_escalation_references_and_vectors.rs",
+  "src/gallery/boxed_error_variant_count_production_fix_candidates.rs",
 ] }
 
 # Disabled by explicit request, not a false-positive/tooling-gap finding
 # like the other exceptions in this file.
+# This lint gathers information only and has no findings yet, a WIP.
 [proof_patterns]
 enabled = false
 
@@ -145,7 +146,7 @@ enabled = false
 # hand (`just check-features`, or flip this to `true` for one `cordial
 # quality` pass) at real phase boundaries instead -- not every commit.
 [feature_warnings]
-enabled = false
+enabled = true
 
 # The creusot-diagnostics etiquette shells out to `cargo creusot prove`,
 # which needs the full Creusot toolchain (nightly + why3 + z3 +
@@ -155,7 +156,7 @@ enabled = false
 # was driven to zero findings (2026-09-06, amenable_derive `814552e` +
 # amenable_creusot `3373abd`). Re-enable if the toolchain ever lands in CI.
 [creusot_diagnostics]
-enabled = false
+enabled = true
 
 # amenable_verus's gallery/ is a deliberately narrow "one investigation,
 # one file" convention: each file documents a single confirmed Verus

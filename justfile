@@ -48,15 +48,26 @@ install:
 check-features:
     cargo hack check --workspace --feature-powerset --no-dev-deps --keep-going
 
-# Loads the committed `.cordial-exceptions/` into the local store, then runs
-# every quality etiquette and fails if any curated action item is open
-# (`quality-report.md`'s "Total open items"). Needs `cordial` on PATH
-# (`just install` in ~/repos/cordial). `creusot_diagnostics` is off in
-# `cordial.toml` -- it needs the Creusot toolchain; run `just verify-creusot`
-# for that surface. Pre-merge; CI runs this too.
-cordial-gate:
+# Loads the committed `.cordial-exceptions/` into the local store, then
+# reruns the gate and builds a fresh worklist, failing if it still has
+# open items -- the `open`/`done`/`skip`/`submit` agentic worklist, not
+# the older one-shot `cordial quality --deny-open` call. Needs `cordial`
+# on PATH (`just install` in ~/repos/cordial). `creusot_diagnostics` is
+# enabled in `cordial.toml` on this machine, so this run covers that
+# surface too -- see `cordial.toml`'s own `[creusot_diagnostics]`
+# comment for the CI-vs-local distinction. `--json` buys a heartbeat
+# ticker while the gate runs, instead of a silent terminal for however
+# long this takes. `tier` defaults to `build` and is always passed
+# explicitly, since `cordial submit` with no `--tier` reuses whatever
+# tier set built the *currently stored* worklist rather than the
+# project's own configured default -- a real cordial wrinkle (filed
+# with the cordial agent, 2026-11-01) that can otherwise silently pin
+# this recipe to a slow tier left over from an earlier `cordial open`.
+# Pass a different tier (`just cordial-gate deep`) for one deeper run.
+# Pre-merge; CI runs this too.
+cordial-gate tier="build":
     cordial exceptions load
-    cordial quality --deny-open
+    cordial submit --deny-open --json --tier {{ tier }}
 
 # Runs every registered coverage etiquette for this workspace's hub
 # (amenable-std + amenable-ext-jiff, once cordial is installed with the
