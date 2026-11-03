@@ -44,6 +44,19 @@ serde_json = { workspace = true }
 time = { workspace = true }
 tracing = { workspace = true }
 
+# Memory-quota enforcement for `verify kani`'s own spawned `cargo kani`
+# child (lowering this process's own `RLIMIT_AS` immediately before
+# `spawn`, inherited by the child at fork time, then restoring it) is
+# a POSIX-only mechanism -- Kani/CBMC verification is a Linux-only
+# workflow in practice, so this is scoped to `cfg(unix)` rather than
+# pulled in unconditionally; the CLI still builds everywhere, the
+# memory cap is just a no-op off Unix. `rlimit`'s own `Resource::AS`
+# get/set are plain safe functions (no `pre_exec`/raw `libc::setrlimit`
+# needed here), which matters because this crate's own `#![forbid(
+# unsafe_code)]` cannot be locally overridden for this one module.
+[target.'cfg(unix)'.dependencies]
+rlimit = { workspace = true }
+
 [dependencies.miette]
 workspace = true
 optional = true

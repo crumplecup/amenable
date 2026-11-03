@@ -110,8 +110,8 @@ mod cli_surface {
     pub use crate::cli::{Cli, install_hook};
     pub use crate::gallery::GalleryArgs;
     pub use crate::kani::{
-        Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line, is_kani_timeout, kani_command,
-        verify,
+        DEFAULT_MEMORY_LIMIT_PERCENT, Ledger, ProofStatus, VerifyKaniArgs, first_diagnostic_line,
+        is_kani_timeout, kani_command, spawn_with_memory_limit, verify,
     };
     pub use crate::kani_progress::{KaniProgressTracker, KaniStage};
     pub use crate::paths::{
@@ -123,9 +123,10 @@ mod cli_surface {
 pub(crate) use cli_output::{write_stderr_line, write_stdout_line};
 #[cfg(feature = "cli")]
 pub use cli_surface::{
-    AssessArgs, Cli, GalleryArgs, KaniProgressTracker, KaniStage, Ledger, ProofStatus,
-    VerifyKaniArgs, artifacts_directory, creusot_generated_directory, first_diagnostic_line,
-    install_hook, is_kani_timeout, kani_command, load, verify, verus_exchange_generated_directory,
+    AssessArgs, Cli, DEFAULT_MEMORY_LIMIT_PERCENT, GalleryArgs, KaniProgressTracker, KaniStage,
+    Ledger, ProofStatus, VerifyKaniArgs, artifacts_directory, creusot_generated_directory,
+    first_diagnostic_line, install_hook, is_kani_timeout, kani_command, load,
+    spawn_with_memory_limit, verify, verus_exchange_generated_directory,
     verus_gaap_ledger_tokens_path, verus_source_directory,
 };
 #[cfg(feature = "creusot")]

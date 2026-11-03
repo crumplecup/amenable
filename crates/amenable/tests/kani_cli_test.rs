@@ -6,8 +6,8 @@
 //! serialized operation, not something a fast unit test should trigger.
 
 use amenable::{
-    KaniProgressTracker, KaniProof, KaniStage, Ledger, ProofStatus, first_diagnostic_line,
-    is_kani_timeout, kani_command,
+    DEFAULT_MEMORY_LIMIT_PERCENT, KaniProgressTracker, KaniProof, KaniStage, Ledger, ProofStatus,
+    first_diagnostic_line, is_kani_timeout, kani_command, spawn_with_memory_limit,
 };
 use miette::{IntoDiagnostic, WrapErr};
 
@@ -49,6 +49,30 @@ fn command_uses_kani_native_timeout_without_an_outer_timeout_program() {
         ]
     );
     assert!(!arguments.iter().any(|argument| argument == "timeout"));
+}
+
+#[test]
+fn zero_percent_memory_limit_spawns_uncapped() -> miette::Result<()> {
+    amenable::init_tracing();
+    let command = std::process::Command::new("true");
+    let mut child = spawn_with_memory_limit(command, 0)
+        .into_diagnostic()
+        .wrap_err("spawn `true`")?;
+    let status = child.wait().into_diagnostic().wrap_err("wait on `true`")?;
+    assert!(status.success());
+    Ok(())
+}
+
+#[test]
+fn a_real_memory_limit_percent_still_spawns_successfully() -> miette::Result<()> {
+    amenable::init_tracing();
+    let command = std::process::Command::new("true");
+    let mut child = spawn_with_memory_limit(command, DEFAULT_MEMORY_LIMIT_PERCENT)
+        .into_diagnostic()
+        .wrap_err("spawn `true` under a memory cap")?;
+    let status = child.wait().into_diagnostic().wrap_err("wait on `true`")?;
+    assert!(status.success());
+    Ok(())
 }
 
 #[test]

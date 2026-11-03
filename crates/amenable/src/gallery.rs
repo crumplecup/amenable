@@ -44,6 +44,15 @@ struct RunGalleryArgs {
     /// Kani-native timeout applied to each harness, for example `3m`.
     #[arg(long, default_value = "3m")]
     harness_timeout: String,
+    /// Cap each spawned `cargo kani` child's own virtual memory at
+    /// this percentage of memory available right now (`RLIMIT_AS`),
+    /// so a genuine CBMC state-space explosion fails that one case
+    /// cleanly instead of exhausting real RAM. `0` disables the cap.
+    /// Gallery cases are the more exploratory, less-proven harnesses
+    /// in this workspace -- the ones most likely to actually explode --
+    /// so this defaults on exactly like `verify kani`'s own cap.
+    #[arg(long, default_value_t = crate::kani::DEFAULT_MEMORY_LIMIT_PERCENT)]
+    memory_limit_percent: u8,
 }
 
 #[instrument(level = "debug")]
@@ -102,6 +111,14 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
     crate::write_stdout_line(format!("Kani proof gallery: {} case(s)", selected.len()))?;
     crate::write_stdout_line(format!("Results: {}", args.results.display()))?;
     crate::write_stdout_line(format!("Per-harness timeout: {}", args.harness_timeout))?;
+    crate::write_stdout_line(if args.memory_limit_percent == 0 {
+        "Memory limit: disabled".to_owned()
+    } else {
+        format!(
+            "Memory limit: {}% of available RAM per case",
+            args.memory_limit_percent
+        )
+    })?;
 
     let mut mismatches = 0;
     for (index, case) in selected.iter().enumerate() {
@@ -111,7 +128,7 @@ fn run_cases(args: RunGalleryArgs) -> AmenableResult<()> {
             selected.len(),
             case.id()
         ))?;
-        let run = run_case(case, &args.harness_timeout);
+        let run = run_case(case, &args.harness_timeout, args.memory_limit_percent);
         if let Some(message) = &run.message {
             crate::write_stderr_line(format!("    {message}"))?;
         }
@@ -163,11 +180,11 @@ fn select_cases<'a>(
 }
 
 #[instrument(level = "info", skip(case))]
-fn run_case(case: &KaniGalleryCase, harness_timeout: &str) -> GalleryRun {
-    let output = kani_command(case, harness_timeout)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .output();
+fn run_case(case: &KaniGalleryCase, harness_timeout: &str, memory_limit_percent: u8) -> GalleryRun {
+    let mut command = kani_command(case, harness_timeout);
+    command.stdout(Stdio::piped()).stderr(Stdio::piped());
+    let output = crate::kani::spawn_with_memory_limit(command, memory_limit_percent)
+        .and_then(std::process::Child::wait_with_output);
 
     match output {
         Ok(output) if output.status.success() => GalleryRun {

@@ -15,7 +15,9 @@ use std::{
 use serde::{Deserialize, Serialize};
 use tracing::instrument;
 
-use super::{ProofStatus, first_diagnostic_line, is_kani_timeout, kani_command};
+use super::{
+    ProofStatus, first_diagnostic_line, is_kani_timeout, kani_command, spawn_with_memory_limit,
+};
 use crate::{AmenableError, AmenableResult, KaniProof};
 
 /// Separate from the verification-status ledger in `kani.rs` on
@@ -112,17 +114,22 @@ impl ChaptersCache {
 /// real, stable, honest bar from its very first frame, seeded with
 /// what this exact harness actually produced last time.
 #[instrument(level = "info", skip(record))]
-pub(super) fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
+pub(super) fn run_proof(
+    record: &KaniProof,
+    harness_timeout: &str,
+    memory_limit_percent: u8,
+) -> ProofRun {
     use std::io::{BufReader, Read};
 
     let cache_path = default_chapters_cache_path();
     let mut cache = ChaptersCache::load(&cache_path);
     let known_chapters = cache.get(record.id());
 
-    let (mut child, stdout, stderr) = match spawn_piped(record, harness_timeout) {
-        Ok(parts) => parts,
-        Err(error) => return ProofRun::new(ProofStatus::Failed, Some(error.to_string())),
-    };
+    let (mut child, stdout, stderr) =
+        match spawn_piped(record, harness_timeout, memory_limit_percent) {
+            Ok(parts) => parts,
+            Err(error) => return ProofRun::new(ProofStatus::Failed, Some(error.to_string())),
+        };
 
     let stderr_thread = std::thread::spawn(move || {
         let mut buffer = String::new();
@@ -153,11 +160,11 @@ pub(super) fn run_proof(record: &KaniProof, harness_timeout: &str) -> ProofRun {
 fn spawn_piped(
     record: &KaniProof,
     harness_timeout: &str,
+    memory_limit_percent: u8,
 ) -> Result<(Child, ChildStdout, ChildStderr), AmenableError> {
-    let mut child = kani_command(record, harness_timeout)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
+    let mut command = kani_command(record, harness_timeout);
+    command.stdout(Stdio::piped()).stderr(Stdio::piped());
+    let mut child = spawn_with_memory_limit(command, memory_limit_percent)
         .map_err(|error| AmenableError::kani_spawn_failed(record.id(), error))?;
 
     let (Some(stdout), Some(stderr)) = (child.stdout.take(), child.stderr.take()) else {

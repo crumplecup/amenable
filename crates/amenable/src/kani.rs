@@ -8,9 +8,11 @@ use serde::Serialize;
 use tracing::instrument;
 
 mod ledger;
+mod memory_limit;
 mod run;
 pub use ledger::Ledger;
 pub(crate) use ledger::{default_results_path, load_results};
+pub use memory_limit::{DEFAULT_MEMORY_LIMIT_PERCENT, spawn_with_memory_limit};
 use run::run_proof;
 
 /// Selection and execution options for `amenable verify kani`.
@@ -34,6 +36,13 @@ pub struct VerifyKaniArgs {
     /// Kani-native timeout applied to each harness, for example `3m`.
     #[arg(long, default_value = "3m")]
     harness_timeout: String,
+    /// Cap each spawned `cargo kani` child's own virtual memory at
+    /// this percentage of memory available right now (`RLIMIT_AS`),
+    /// so a genuine CBMC state-space explosion fails that one harness
+    /// cleanly instead of exhausting real RAM and taking the rest of
+    /// the machine down. `0` disables the cap.
+    #[arg(long, default_value_t = DEFAULT_MEMORY_LIMIT_PERCENT)]
+    memory_limit_percent: u8,
 }
 
 /// List or run the selected Kani harnesses.
@@ -57,6 +66,14 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
     crate::write_stdout_line(format!("Kani verification: {} harness(es)", selected.len()))?;
     crate::write_stdout_line(format!("Results: {}", args.results.display()))?;
     crate::write_stdout_line(format!("Per-harness timeout: {}", args.harness_timeout))?;
+    crate::write_stdout_line(if args.memory_limit_percent == 0 {
+        "Memory limit: disabled".to_owned()
+    } else {
+        format!(
+            "Memory limit: {}% of available RAM per harness",
+            args.memory_limit_percent
+        )
+    })?;
 
     let mut unsuccessful = 0;
     for (index, record) in selected.iter().enumerate() {
@@ -66,7 +83,7 @@ pub fn verify(args: VerifyKaniArgs) -> AmenableResult<()> {
             selected.len(),
             record.id()
         ))?;
-        let result = run_proof(record, &args.harness_timeout);
+        let result = run_proof(record, &args.harness_timeout, args.memory_limit_percent);
         if let Some(message) = result.message() {
             crate::write_stderr_line(format!("    {message}"))?;
         }
@@ -143,7 +160,12 @@ fn select_records<'a>(
 /// `kani::proof_for_contract`/`kani::stub_verified`, and harmless for a
 /// harness that doesn't (this is the one canonical invocation, so it
 /// has to handle both without the caller needing to know which kind of
-/// harness they're running).
+/// harness they're running). Does not itself cap the spawned child's
+/// memory -- that's applied at spawn time instead, by
+/// `memory_limit::spawn_with_memory_limit` (see its own doc comment
+/// for why: lowering a resource limit is a property of *spawning* a
+/// process, not of describing one, and that function needs the whole
+/// `Command`, not just its argument list).
 #[instrument(level = "debug", skip(record))]
 pub fn kani_command(record: &KaniProof, harness_timeout: &str) -> Command {
     let mut command = Command::new("cargo");
