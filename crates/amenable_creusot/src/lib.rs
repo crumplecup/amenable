@@ -17,7 +17,6 @@
 //! `rust_std/` holds the actual harness functions; `witness.rs` holds
 //! the trait/marker definitions `rust_std_witness` implements against.
 
-#![cfg_attr(creusot, feature(allocator_api))]
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
