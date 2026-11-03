@@ -125,7 +125,7 @@ pub use rust_std::{
     OptionIsSomeReportsTrue, PeekRevealsTheStoredReference, PopRecoversTheStoredValue,
     RenderedKindMatchesTheBuildingOperation, SplitOperandsAreDistinctFromThePattern,
     StrongCountTracksLiveReferences, ThreeBytesAreEachAscii,
-    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAtLeast, ValueIsBelow,
+    ThreeSplitOperandsAreDistinctFromThePattern, ValueIsAbove, ValueIsAtLeast, ValueIsBelow,
     ValueIsOutsideInclusiveRange, ValueIsWithinInclusiveRange, VecLengthTracksPushesAndPops,
     WeakUpgradeReturnsNone,
 };

@@ -49,6 +49,29 @@ impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier>
     )
 }
 
+/// The postcondition counterpart to `ValueIsWithinInclusiveRange`'s own
+/// `Requires` impl, same body, for real sites that assert this shape as
+/// an `Ensures` claim rather than assume it as a `Requires`
+/// precondition -- same reasoning as `ValueIsAtLeast`'s own pair below.
+impl<T: PartialOrd> amenable_core::Ensures<crate::KaniVerifier> for ValueIsWithinInclusiveRange<T> {
+    type Input = (T, T, T);
+    type Bound = bool;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(value, low, high)))]
+    fn ensures((value, low, high): (T, T, T)) -> bool {
+        low <= value && value <= high
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsWithinInclusiveRange",
+        "kani",
+        "ensures",
+        || stringify!(low <= value && value <= high),
+    )
+}
+
 ::inventory::submit! {
     ::amenable_core::ProofRecord::new(
         "amenable_kani::ValueIsWithinInclusiveRange",
@@ -353,5 +376,96 @@ impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier> for ValueIsBelo
         "amenable_kani::ValueIsBelow",
         "kani",
         || <ValueIsBelow<i32> as KaniWitness>::proof().to_string(),
+    )
+}
+
+/// A `(value, bound)` pair known to satisfy the precondition every
+/// proof over a symbolic value with a one-sided strict lower bound
+/// assumes: the value is strictly above the given bound. The mirror
+/// image of `ValueIsBelow`, generic and hand-written for the same
+/// reason.
+///
+/// Independently hand-written as `kani::assume(nano > 0)` at 1 real
+/// site (`chrono::offset_date_time`'s fractional-second-path diagnostic
+/// over a real `chrono::NaiveTime`'s nanosecond field).
+pub struct ValueIsAbove<T>(std::marker::PhantomData<T>);
+
+impl<T> amenable_core::Standard for ValueIsAbove<T> {
+    type Provenance = amenable_std::RustStdProvenance;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn provenance(&self) -> Self::Provenance {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+}
+
+impl<T> Evidence for ValueIsAbove<T> {
+    type Basis = RustStdStandard<i32>;
+    type Audit = amenable_std::RustStdProvenance;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn basis() -> Self::Basis {
+        RustStdStandard::<i32>::new()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self)))]
+    fn audit(&self) -> Self::Audit {
+        <i32 as amenable_std::RustStdType>::provenance()
+    }
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace", ret))]
+    fn is_root() -> bool {
+        false
+    }
+}
+
+impl<T> KaniWitness for ValueIsAbove<T> {
+    type SupportingEvidence = Self;
+    type ProofArtifact = CheckedProof;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        CheckedProof::new(
+            "verify_encode_wide_encodes_a_bmp_char_as_one_code_unit".to_owned(),
+            crate::os_windows_model::VERIFY_ENCODE_WIDE_ENCODES_A_BMP_CHAR_AS_ONE_CODE_UNIT_SRC
+                .to_owned(),
+            <Self::SupportingEvidence as Evidence>::basis().audit(),
+        )
+    }
+}
+
+impl<T> amenable_core::Witness<crate::KaniVerifier> for ValueIsAbove<T> {
+    type SupportingEvidence = <Self as KaniWitness>::SupportingEvidence;
+    type ProofArtifact = <Self as KaniWitness>::ProofArtifact;
+
+    #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+    fn proof() -> Self::ProofArtifact {
+        <Self as KaniWitness>::proof()
+    }
+}
+
+impl<T: PartialOrd> amenable_core::Requires<crate::KaniVerifier> for ValueIsAbove<T> {
+    type Input = (T, T);
+    type Bound = bool;
+
+    fn requires((value, bound): (T, T)) -> bool {
+        value > bound
+    }
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::ValueIsAbove",
+        "kani",
+        "requires",
+        || stringify!(value > bound),
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ProofRecord::new(
+        "amenable_kani::ValueIsAbove",
+        "kani",
+        || <ValueIsAbove<i32> as KaniWitness>::proof().to_string(),
     )
 }

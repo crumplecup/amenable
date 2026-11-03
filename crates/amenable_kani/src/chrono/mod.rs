@@ -17,6 +17,10 @@ mod gap_info;
 mod gregorian;
 mod local;
 mod offset_date_time;
+mod offset_date_time_fractional_digit;
+mod offset_date_time_full_descriptor;
+mod offset_date_time_local;
+mod offset_date_time_utc_offset;
 #[cfg(feature = "chrono-tz")]
 mod parse_error;
 #[cfg(feature = "chrono-tz")]

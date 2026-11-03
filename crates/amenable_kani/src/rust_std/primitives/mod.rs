@@ -29,7 +29,7 @@ mod tuple_fn_ptr;
 
 pub use ascii::{FourBytesAreEachAscii, ThreeBytesAreEachAscii, ValueIsWithinInclusiveRange};
 pub use char_string::EmptinessTracksZeroLength;
-pub use range_bounds::{ValueIsAtLeast, ValueIsBelow, ValueIsOutsideInclusiveRange};
+pub use range_bounds::{ValueIsAbove, ValueIsAtLeast, ValueIsBelow, ValueIsOutsideInclusiveRange};
 pub use references::{
     DerefReflectsTheStoredValue, FieldAccessRecoversTheStoredValue, IndexRecoversTheStoredElement,
 };

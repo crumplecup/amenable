@@ -28,6 +28,50 @@ mod chrono_day_count_staging;
 #[cfg(feature = "chrono")]
 mod chrono_day_span_growth;
 #[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_buffer_string;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_chain_distinct;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_chain_distinct_deep;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_combine_digit;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_combine_digit_tail;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_combine_prefix;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_contract_array_bound_shape;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_contract_bound_shape;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_contract_bound_shape_deep;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_contract_cost;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_decode_chain;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_decode_closed;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_descriptor;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_decode_prefix;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_decode_staged;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_encode_staged;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_full_prefix;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_full_prefix_deep;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_growing_ensures;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_round_trip;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_staged_encode_deep;
+#[cfg(feature = "chrono")]
+mod chrono_fractional_nanos_truncate_stage;
+#[cfg(feature = "chrono")]
 mod chrono_month_span_growth;
 #[cfg(feature = "chrono")]
 mod chrono_naive_week_span;
@@ -51,6 +95,8 @@ mod chrono_offset_date_time_round_trip_offset_fact_count_decomposition;
 mod chrono_offset_date_time_round_trip_offset_staged_fix;
 #[cfg(feature = "chrono")]
 mod chrono_offset_date_time_round_trip_pipeline_shape_and_binning;
+#[cfg(feature = "chrono")]
+mod chrono_offset_date_time_round_trip_realize_staged_fix;
 #[cfg(feature = "chrono")]
 mod chrono_year_partition_exhaustiveness_test;
 #[cfg(feature = "chrono")]
@@ -76,6 +122,7 @@ mod string_depth_induction;
 mod string_buffer_correspondence;
 mod string_drain;
 mod string_drop_vacuity;
+mod temporal_error_construction;
 mod udp_inbox_removal_cost;
 mod utf8_buffer_validity_induction;
 mod utf8_seam_concatenation;

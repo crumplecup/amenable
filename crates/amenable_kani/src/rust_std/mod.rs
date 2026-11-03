@@ -90,8 +90,8 @@ pub use option_result::{
 };
 pub use primitives::{
     DerefReflectsTheStoredValue, EmptinessTracksZeroLength, FieldAccessRecoversTheStoredValue,
-    FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsAtLeast,
-    ValueIsBelow, ValueIsOutsideInclusiveRange, ValueIsWithinInclusiveRange,
+    FourBytesAreEachAscii, IndexRecoversTheStoredElement, ThreeBytesAreEachAscii, ValueIsAbove,
+    ValueIsAtLeast, ValueIsBelow, ValueIsOutsideInclusiveRange, ValueIsWithinInclusiveRange,
 };
 pub use slice::{
     SplitOperandsAreDistinctFromThePattern, ThreeSplitOperandsAreDistinctFromThePattern,

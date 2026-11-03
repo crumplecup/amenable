@@ -12,7 +12,7 @@
 //! instead.
 
 #[cfg(kani)]
-use amenable_core::Ensures;
+use amenable_core::{Ensures, Requires};
 use amenable_core::Evidence;
 use amenable_ext::ExtStandard;
 use chrono::{DateTime, FixedOffset};
@@ -75,12 +75,73 @@ mod kani_only {
     pub(super) fn offset_round_trips(
         offset: chrono::FixedOffset,
     ) -> Result<chrono::FixedOffset, amenable_time::TemporalError> {
-        let descriptor = amenable_ext::fixed_offset_to_utc_offset_descriptor(offset)?;
-        amenable_ext::utc_offset_descriptor_to_fixed_offset(descriptor)
+        let descriptor = amenable_ext::fixed_offset_to_utc_offset_descriptor_infallible(offset);
+        Ok(amenable_ext::utc_offset_descriptor_to_fixed_offset_infallible(descriptor).into_inner())
     }
 
     pub(super) struct OffsetDateTimeRoundTripsThroughDescriptor;
     crate::rust_std::kani_local_claim!(OffsetDateTimeRoundTripsThroughDescriptor);
+
+    /// The calendar half of
+    /// `naive_date_time_to_local_date_time_descriptor_infallible`'s own
+    /// correctness claim, named: a `CompleteDateDescriptor` matches a
+    /// real `chrono::NaiveDate` when it's the `Calendar` variant and
+    /// its year/month/day agree with the real date's own.
+    pub(super) struct CalendarDescriptorMatchesTheRealDate;
+    crate::rust_std::kani_local_claim!(CalendarDescriptorMatchesTheRealDate);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for CalendarDescriptorMatchesTheRealDate {
+        type Input = (amenable_time::CompleteDateDescriptor, chrono::NaiveDate);
+        type Bound = bool;
+
+        fn ensures((descriptor, real): Self::Input) -> bool {
+            use chrono::Datelike;
+            match descriptor {
+                amenable_time::CompleteDateDescriptor::Calendar(cal) => {
+                    cal.year() == real.year()
+                        && u32::from(cal.month()) == real.month()
+                        && u32::from(cal.day()) == real.day()
+                }
+                amenable_time::CompleteDateDescriptor::Ordinal(_)
+                | amenable_time::CompleteDateDescriptor::Week(_) => false,
+            }
+        }
+    }
+
+    /// The hour/minute/second half of the same claim: a
+    /// `LocalTimeDescriptor` matches a real `chrono::NaiveDateTime`
+    /// when its hour/minute/second agree with the real datetime's own.
+    pub(super) struct LocalTimeDescriptorMatchesTheRealHourMinuteSecond;
+    crate::rust_std::kani_local_claim!(LocalTimeDescriptorMatchesTheRealHourMinuteSecond);
+
+    impl amenable_core::Ensures<crate::KaniVerifier>
+        for LocalTimeDescriptorMatchesTheRealHourMinuteSecond
+    {
+        type Input = (amenable_time::LocalTimeDescriptor, chrono::NaiveDateTime);
+        type Bound = bool;
+
+        fn ensures((descriptor, real): Self::Input) -> bool {
+            use chrono::Timelike;
+            u32::from(descriptor.hour()) == real.hour()
+                && u32::from(descriptor.minute()) == real.minute()
+                && u32::from(descriptor.second()) == real.second()
+        }
+    }
+
+    /// The fractional-second-presence half of the same claim: a
+    /// `LocalTimeDescriptor` carries a fractional second exactly when
+    /// the real datetime's own nanosecond field is nonzero.
+    pub(super) struct FractionalSecondPresenceMatchesNanos;
+    crate::rust_std::kani_local_claim!(FractionalSecondPresenceMatchesNanos);
+
+    impl amenable_core::Ensures<crate::KaniVerifier> for FractionalSecondPresenceMatchesNanos {
+        type Input = (amenable_time::LocalTimeDescriptor, u32);
+        type Bound = bool;
+
+        fn ensures((descriptor, nanos): Self::Input) -> bool {
+            descriptor.fractional_second().is_some() == (nanos != 0)
+        }
+    }
 
     impl amenable_core::Ensures<crate::KaniVerifier> for OffsetDateTimeRoundTripsThroughDescriptor {
         type Input = chrono::DateTime<chrono::FixedOffset>;
@@ -134,7 +195,38 @@ mod kani_only {
 }
 
 #[cfg(kani)]
-use kani_only::{OffsetDateTimeRoundTripsThroughDescriptor, offset_round_trips};
+use kani_only::{
+    CalendarDescriptorMatchesTheRealDate, FractionalSecondPresenceMatchesNanos,
+    LocalTimeDescriptorMatchesTheRealHourMinuteSecond, OffsetDateTimeRoundTripsThroughDescriptor,
+    offset_round_trips,
+};
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::offset_date_time::CalendarDescriptorMatchesTheRealDate",
+        "kani",
+        "ensures",
+        || "descriptor is the Calendar variant and its year/month/day equal the real date's own",
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::offset_date_time::LocalTimeDescriptorMatchesTheRealHourMinuteSecond",
+        "kani",
+        "ensures",
+        || "descriptor's hour/minute/second equal the real datetime's own",
+    )
+}
+
+::inventory::submit! {
+    ::amenable_core::ContractRecord::new(
+        "amenable_kani::chrono::offset_date_time::FractionalSecondPresenceMatchesNanos",
+        "kani",
+        "ensures",
+        || "descriptor carries a fractional second iff nanos != 0",
+    )
+}
 
 ::inventory::submit! {
     ::amenable_core::ContractRecord::new(
@@ -145,36 +237,96 @@ use kani_only::{OffsetDateTimeRoundTripsThroughDescriptor, offset_round_trips};
     )
 }
 
+// Every harness below that symbolically generates a fractional-second
+// nanosecond value and needs it within the domain
+// `fractional_digit_bytes_to_nanos`/`nanos_to_fractional_digit_bytes`
+// actually cover (`0..=999_999_999`) assumes this shape -- named once
+// rather than left as a raw `&&`-combined inline condition at each of
+// the many call sites that need it.
+#[cfg(kani)]
 amenable_derive::harness! {
-    kani, CHECK_FIXED_OFFSET_SIGN_AND_MAGNITUDE_SRC, {
-        /// The real `amenable_ext::fixed_offset_sign_and_magnitude`'s
-        /// own contract -- the base case, nothing to stub yet.
-        #[kani::proof_for_contract(amenable_ext::fixed_offset_sign_and_magnitude)]
-        fn check_fixed_offset_sign_and_magnitude() {
-            let offset_seconds: i32 = kani::any();
-            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
+    kani, CHECK_NAIVE_DATE_TIME_TO_LOCAL_DATE_TIME_DESCRIPTOR_INFALLIBLE_SRC, {
+        /// `naive_date_time_to_local_date_time_descriptor_infallible`'s
+        /// own contract -- the full civil reflect direction including
+        /// the fractional-second path. Stubs `narrow_to_u8_in_range`
+        /// (x5) and `nanos_to_fractional_digit_bytes` (the pure digit
+        /// core, already proven). Under `#[cfg(kani)]`, this function's
+        /// own body never calls the real, production `nanos_to_
+        /// fractional_seconds_digits` at all -- that function returns
+        /// `String`, which does not implement `kani::Arbitrary`
+        /// (confirmed directly: a hard compiler wall, matching
+        /// `gallery::string_depth_induction`'s own finding), so it can
+        /// never be `stub_verified`, and reading back from its push-
+        /// built result (even one byte) was separately confirmed to
+        /// reintroduce the same OOM its symbolic trim length causes.
+        /// Instead, the Kani-only body builds the fractional-second
+        /// `String` via `digit_bytes_to_string_unconditional` (an
+        /// unconditional 9-push sequence, no symbolic length decision
+        /// at all, confirmed cheap -- 21.3s in isolation) and never
+        /// reads it back.
+        ///
+        /// Checked by a plain proof + direct `assert!`, not `proof_
+        /// for_contract`: confirmed directly that `proof_for_contract`
+        /// explodes on any function returning a heap-allocating type
+        /// (190,650-step OOM here), regardless of what the `ensures`
+        /// checks -- this function returns a `LocalDateTimeDescriptor`
+        /// containing a real `String` via `FractionalSecondDescriptor`,
+        /// inheriting the same wall `buffer_to_string_unconditional`'s
+        /// own isolated test hit. Every constituent operation here,
+        /// called directly together in a plain proof, was separately
+        /// confirmed cheap (30.9s) -- this harness asserts the same
+        /// structural claim the function's own `#[kani::ensures]`
+        /// states, the same pattern `fractional_digit_round_trip`
+        /// already uses for the same reason.
+        #[kani::proof]
+        #[kani::stub_verified(amenable_ext::narrow_to_u8_in_range)]
+        #[kani::stub_verified(amenable_ext::nanos_to_fractional_digit_bytes)]
+        fn check_naive_date_time_to_local_date_time_descriptor_infallible() {
+            use chrono::Timelike;
+            use crate::ValueIsBelow;
+            let year: i32 = kani::any();
+            let month: u32 = kani::any();
+            let day: u32 = kani::any();
+            let Some(date) = chrono::NaiveDate::from_ymd_opt(year, month, day) else {
                 return;
             };
-            let _ = amenable_ext::fixed_offset_sign_and_magnitude(offset);
-        }
-    }
-}
+            let hour: u32 = kani::any();
+            let minute: u32 = kani::any();
+            let second: u32 = kani::any();
+            let nano: u32 = kani::any();
+            let Some(time) = chrono::NaiveTime::from_hms_nano_opt(hour, minute, second, nano)
+            else {
+                return;
+            };
+            let datetime = chrono::NaiveDateTime::new(date, time);
+            // Excludes the genuine leap-second case, matching the
+            // real function's own `requires` -- `from_hms_nano_opt`
+            // allows `nano` up to ~2 billion for leap-second
+            // representation, which this function's own precondition
+            // explicitly does not cover.
+            kani::assume(ValueIsBelow::requires((
+                datetime.nanosecond(),
+                1_000_000_000,
+            )));
+            let nanos = datetime.nanosecond();
+            let result =
+                amenable_ext::naive_date_time_to_local_date_time_descriptor_infallible(datetime);
 
-amenable_derive::harness! {
-    kani, CHECK_FIXED_OFFSET_TO_UTC_OFFSET_DESCRIPTOR_SRC, {
-        /// SCRATCH: `narrow_to_u8`'s Kani contract temporarily removed
-        /// to test whether a *plain, uncontracted* helper (no DFCC
-        /// machinery attached at all) avoids both costs confirmed so
-        /// far: the unstubbed-but-contracted auto-wrap cost, and the
-        /// stubbed `Result<_, TemporalError>` substitution cost.
-        #[kani::proof_for_contract(amenable_ext::fixed_offset_to_utc_offset_descriptor)]
-        #[kani::stub_verified(amenable_ext::fixed_offset_sign_and_magnitude)]
-        fn check_fixed_offset_to_utc_offset_descriptor() {
-            let offset_seconds: i32 = kani::any();
-            let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
-                return;
-            };
-            let _ = amenable_ext::fixed_offset_to_utc_offset_descriptor(offset);
+            assert!(
+                CalendarDescriptorMatchesTheRealDate::ensures((result.date(), date)),
+                "calendar fields match the real datetime"
+            );
+            assert!(
+                LocalTimeDescriptorMatchesTheRealHourMinuteSecond::ensures((
+                    result.time().clone(),
+                    datetime
+                )),
+                "hour/minute/second match the real datetime"
+            );
+            assert!(
+                FractionalSecondPresenceMatchesNanos::ensures((result.time().clone(), nanos)),
+                "fractional second is present iff nanos != 0"
+            );
         }
     }
 }
@@ -183,13 +335,22 @@ amenable_derive::harness! {
     kani, CHECK_OFFSET_ROUND_TRIPS_SRC, {
         /// `offset_round_trips`'s own contract: every real `FixedOffset`
         /// round-trips through the bridge's offset-descriptor pair,
-        /// isolated from the naive-date-time half -- `fixed_offset_
-        /// sign_and_magnitude` is stubbed with its own proven relation
-        /// wherever Kani's stubbing reaches it in the call graph,
-        /// including inside the inlined `fixed_offset_to_utc_offset_
-        /// descriptor` call, rather than inlining that arithmetic too.
+        /// isolated from the naive-date-time half. Its own body (in
+        /// `amenable_kani`, test-support code, not real production
+        /// API) calls the two whole-function infallible siblings
+        /// directly -- `fixed_offset_to_utc_offset_descriptor_
+        /// infallible` and `utc_offset_descriptor_to_fixed_offset_
+        /// infallible` -- rather than the real, un-stubbable
+        /// `Result<_, TemporalError>`-returning functions, so each
+        /// direction can be stubbed as a *whole unit* here instead of
+        /// inlining either one in full: chaining two real calls
+        /// compounds cost even when each is individually cheap
+        /// (confirmed directly -- stubbing only their internal
+        /// arithmetic/build pieces while still inlining both composed
+        /// functions in full still timed out at 5026 VCCs).
         #[kani::proof_for_contract(offset_round_trips)]
-        #[kani::stub_verified(amenable_ext::fixed_offset_sign_and_magnitude)]
+        #[kani::stub_verified(amenable_ext::fixed_offset_to_utc_offset_descriptor_infallible)]
+        #[kani::stub_verified(amenable_ext::utc_offset_descriptor_to_fixed_offset_infallible)]
         fn check_offset_round_trips() {
             let offset_seconds: i32 = kani::any();
             let Some(offset) = chrono::FixedOffset::east_opt(offset_seconds) else {
@@ -239,3 +400,4 @@ amenable_derive::harness! {
         }
     }
 }
+
