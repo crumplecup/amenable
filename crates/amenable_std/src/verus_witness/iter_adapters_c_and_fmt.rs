@@ -40,6 +40,8 @@ impl VerusWitness for RustStdStandard<std::iter::FromFn<fn() -> Option<i32>>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    // No #[instrument] on this type: it's consumed by the real `verus`
+    // binary, which chokes on tracing's macros.
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_from_fn_model_yields_until_the_closure_returns_none".to_owned(),

@@ -11,6 +11,8 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IterMut<'stat
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    // No #[instrument] on this type: it's consumed by the real `verus`
+    // binary, which chokes on tracing's macros.
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_iter_mut_model_writes_through_in_order".to_owned(),

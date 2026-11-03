@@ -221,6 +221,8 @@ impl VerusWitness for RustStdStandard<std::collections::vec_deque::IntoIter<i32>
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    // No #[instrument] on this type: it's consumed by the real `verus`
+    // binary, which chokes on tracing's macros.
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_ordered_pair_into_iter_model_yields_owned_values_in_order".to_owned(),
@@ -354,6 +356,8 @@ impl VerusWitness for RustStdStandard<std::vec::ExtractIf<'static, i32, fn(&mut 
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    // No #[instrument] on this type: it's consumed by the real `verus`
+    // binary, which chokes on tracing's macros.
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_vec_extract_if_model_partitions_by_the_predicate".to_owned(),

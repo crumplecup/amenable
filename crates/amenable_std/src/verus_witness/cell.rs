@@ -434,6 +434,8 @@ impl VerusWitness for RustStdStandard<std::rc::Weak<i32>> {
     type SupportingEvidence = Self;
     type ProofArtifact = VerusCheckedProof;
 
+    // No #[instrument] on this type: it's consumed by the real `verus`
+    // binary, which chokes on tracing's macros.
     fn proof() -> Self::ProofArtifact {
         VerusCheckedProof::new(
             "verify_weak_model_upgrade_fails_once_the_strong_count_hits_zero".to_owned(),
