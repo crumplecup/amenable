@@ -3,8 +3,6 @@
 let%span sord = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 22 8 22 20
 let%span sord'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/logic/ord.rs" 34 8 34 21
 let%span smod = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/num/mod.rs" 1627 12 1627 68
-let%span snum = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 766 12 767 33
-let%span snum'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 736 8 736 31
 let%span sparse = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 183 53 183 55
 let%span sparse'0 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 183 16 183 56
 let%span sparse'1 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 184 53 184 67
@@ -26,6 +24,8 @@ let%span sparse'16 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust
 let%span sparse'17 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 139 16 148 17
 let%span sparse'18 = "/home/erik/repos/amenable/crates/amenable_creusot/src/rust_std/num/parse.rs" 28 20 28 40
 let%span snonzero = "/rustc/11177f2235f0c842b00f82c558ad9480c0c3a895/library/core/src/num/nonzero.rs" 1417 12 1417 61
+let%span snum = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 766 12 767 33
+let%span snum'0 = "/home/erik/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/creusot-std-0.14.0/src/std/num.rs" 736 8 736 31
 
 use creusot.int.Int32
 use seq.Seq
