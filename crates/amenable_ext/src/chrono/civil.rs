@@ -1,17 +1,12 @@
+use crate::chrono::civil_reflect::naive_date_time_to_local_date_time_descriptor;
 use crate::chrono::identity::{ChronoTimeBackend, ChronoVerifier};
-use crate::chrono::instant::narrow_to_u8;
-use crate::temporal_fraction::{
-    fractional_seconds_digits_to_nanos, nanos_to_fractional_seconds_digits,
-};
+use crate::temporal_fraction::fractional_seconds_digits_to_nanos;
 use amenable_core::{Exchange, Sidecar};
 use amenable_time::{
-    CalendarDateDescriptor, CompleteDateDescriptor, FractionalSecondDescriptor,
-    InvalidCalendarDateSource, InvalidIsoWeekdaySource, InvalidLocalTimeSource,
-    InvalidOrdinalDateSource, InvalidWeekDateSource, LeapSecondNotRepresentableSource,
-    LocalDateTimeBuilderFailedSource, LocalDateTimeDescriptor, LocalDateTimeDescriptorBuilder,
-    LocalTimeBuilderFailedSource, LocalTimeDescriptorBuilder, NanosecondOutOfRangeSource,
-    ProvenLocalDateTimeCarrier, ReflectedLocalDateTime, TemporalCivilProps, TemporalComponent,
-    TemporalError, TemporalErrorKind,
+    CompleteDateDescriptor, InvalidCalendarDateSource, InvalidIsoWeekdaySource,
+    InvalidLocalTimeSource, InvalidOrdinalDateSource, InvalidWeekDateSource,
+    LocalDateTimeDescriptor, NanosecondOutOfRangeSource, ProvenLocalDateTimeCarrier,
+    ReflectedLocalDateTime, TemporalCivilProps, TemporalError, TemporalErrorKind,
 };
 
 // ── Carriers ─────────────────────────────────────────────────────────
@@ -258,66 +253,6 @@ pub fn local_date_time_descriptor_to_naive(
     Ok(chrono::NaiveDateTime::new(date, naive_time))
 }
 
-/// Reflect a [`chrono::NaiveDateTime`] as a local date-time descriptor, in
-/// calendar form.
-///
-/// Leap seconds (chrono's nanoseconds past `999_999_999`) are rejected for the
-/// same reason as the inverse direction.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(datetime)))]
-pub fn naive_date_time_to_local_date_time_descriptor(
-    datetime: chrono::NaiveDateTime,
-) -> Result<LocalDateTimeDescriptor, TemporalError> {
-    use chrono::{Datelike, Timelike};
-
-    let nanos = datetime.nanosecond();
-    if nanos >= 1_000_000_000 {
-        return Err(TemporalError::new(
-            TemporalErrorKind::LeapSecondNotRepresentable(LeapSecondNotRepresentableSource::new(
-                nanos,
-            )),
-        ));
-    }
-
-    let date = datetime.date();
-    // chrono's month/day/hour/minute/second are `u32`, always
-    // 1..=12/1..=31/0..=23/0..=59/0..=59, so none of the narrowings
-    // below can genuinely fail for a real chrono value -- every
-    // `narrow_to_u8` call here is unreachable defensive code. Routed
-    // through the shared `narrow_to_u8` helper (not a local inline
-    // `u8::try_from` + hand-written string) so a real overflow reports
-    // the actual component and value via `ComponentOutOfRangeSource`,
-    // not five near-duplicate free-text messages.
-    let calendar = CalendarDateDescriptor::new(
-        date.year(),
-        narrow_to_u8(date.month(), TemporalComponent::Month)?,
-        narrow_to_u8(date.day(), TemporalComponent::Day)?,
-    );
-
-    let mut time_builder = LocalTimeDescriptorBuilder::default()
-        .hour(narrow_to_u8(datetime.hour(), TemporalComponent::Hour)?)
-        .minute(narrow_to_u8(datetime.minute(), TemporalComponent::Minute)?)
-        .second(narrow_to_u8(datetime.second(), TemporalComponent::Second)?);
-    if nanos != 0 {
-        time_builder = time_builder.fractional_second(FractionalSecondDescriptor::new(
-            nanos_to_fractional_seconds_digits(i64::from(nanos)),
-        ));
-    }
-    let time = time_builder.build().map_err(|err| {
-        TemporalError::new(TemporalErrorKind::LocalTimeBuilderFailed(
-            LocalTimeBuilderFailedSource::new(err),
-        ))
-    })?;
-
-    LocalDateTimeDescriptorBuilder::default()
-        .date(CompleteDateDescriptor::Calendar(calendar))
-        .time(time)
-        .build()
-        .map_err(|err| {
-            TemporalError::new(TemporalErrorKind::LocalDateTimeBuilderFailed(
-                LocalDateTimeBuilderFailedSource::new(err),
-            ))
-        })
-}
 
 // ── Civil native bridge ──────────────────────────────────────────────
 //

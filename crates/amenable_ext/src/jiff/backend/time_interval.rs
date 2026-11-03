@@ -192,7 +192,7 @@ fn temporal_value_descriptor_to_jiff_endpoint(
             ))
         }
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::UnrepresentableIntervalEndpointValue(
+            UnsupportedSource::new(UnsupportedDetail::UnrepresentableIntervalEndpointValue(
                 other.clone(),
             )),
         ))),

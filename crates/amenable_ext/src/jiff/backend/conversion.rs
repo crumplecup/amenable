@@ -44,7 +44,7 @@ use amenable_time::{
 fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, TemporalError> {
     if target.smallest_component() != TemporalComponent::Second {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::PrecisionAdjustmentRequiresSecond(
+            UnsupportedSource::new(UnsupportedDetail::PrecisionAdjustmentRequiresSecond(
                 target.smallest_component(),
             )),
         )));
@@ -52,7 +52,7 @@ fn require_second_precision(target: &PrecisionDescriptor) -> Result<u8, Temporal
     let digits = target.fractional_digits().unwrap_or(0);
     if digits > 9 {
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::FractionalDigitsOutOfRange(digits)),
+            UnsupportedSource::new(UnsupportedDetail::FractionalDigitsOutOfRange(digits)),
         )));
     }
     Ok(digits)
@@ -98,7 +98,7 @@ fn adjust_jiff_local_precision(
             None | Some(RoundingModeDescriptor::Truncate) => {}
             Some(other) => {
                 return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-                    UnsupportedSource::from_detail(UnsupportedDetail::UnsupportedRoundingMode(
+                    UnsupportedSource::new(UnsupportedDetail::UnsupportedRoundingMode(
                         other.clone(),
                     )),
                 )));

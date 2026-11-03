@@ -81,7 +81,7 @@ pub(super) fn duration_descriptor_to_jiff_span(
             span.try_nanoseconds(nanos).map_err(out_of_range)
         }
         Some(fraction) => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::FractionComponentNotSecond(
+            UnsupportedSource::new(UnsupportedDetail::FractionComponentNotSecond(
                 fraction.component(),
             )),
         ))),

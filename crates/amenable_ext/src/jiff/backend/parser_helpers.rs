@@ -4,10 +4,10 @@ use amenable_time::{
     ComponentNarrowingFailedSource, IxdtfTimeZoneAnnotationDescriptor, JiffParseRejectedSource,
     JiffTimeConstructionFailedSource, NamedTimeZoneBuilderFailedSource,
     NamedTimeZoneDescriptorBuilder, NarrowingComponent, ParseIntRejectedSource,
-    ParseRejectedSource, ReducedCalendarDateDescriptor, ReducedLocalTimeDescriptor, TemporalError,
-    TemporalErrorKind, UnsupportedCase, UnsupportedDetail, UnsupportedSource,
-    UtcOffsetBuilderFailedSource, UtcOffsetDescriptor, UtcOffsetDescriptorBuilder,
-    UtcOffsetRelationship, UtcOffsetSign,
+    ParseProfile, ParseRejectedSource, ParseRejectionReason, ReducedCalendarDateDescriptor,
+    ReducedLocalTimeDescriptor, TemporalError, TemporalErrorKind, UnsupportedCase,
+    UnsupportedDetail, UnsupportedSource, UtcOffsetBuilderFailedSource, UtcOffsetDescriptor,
+    UtcOffsetDescriptorBuilder, UtcOffsetRelationship, UtcOffsetSign,
 };
 
 // ── Parser (Phase 9) ─────────────────────────────────────────────────
@@ -48,38 +48,37 @@ pub(super) fn unsupported_parse(case: UnsupportedCase) -> TemporalError {
 /// not a jiff gap, exactly as the plan doc's own Phase 9 row predicted.
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 pub(super) fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            "ISO 8601 ordinal date".to_owned(),
-            detail,
+            ParseProfile::Iso8601OrdinalDate,
+            reason,
+            text,
         )))
     };
     if !text.is_ascii() {
-        return Err(reject(format!("{text:?} is not ASCII")));
+        return Err(reject(ParseRejectionReason::NotAscii));
     }
     let (year_range, day_range) = match text.len() {
         7 => (0..4, 4..7),
         8 if text.as_bytes().get(4) == Some(&b'-') => (0..4, 5..8),
         _ => {
-            return Err(reject(format!(
-                "{text:?} is not a 7-digit or 8-character (YYYY-DDD) ordinal date"
-            )));
+            return Err(reject(ParseRejectionReason::NotSevenOrEightCharOrdinalDate));
         }
     };
     let year_str = text
         .get(year_range)
-        .ok_or_else(|| reject(format!("{text:?} has an invalid year slice")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::InvalidYearSlice))?;
     let day_str = text
         .get(day_range)
-        .ok_or_else(|| reject(format!("{text:?} has an invalid day-of-year slice")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::InvalidDayOfYearSlice))?;
     let year = year_str.parse::<i32>().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 ordinal date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601OrdinalDate, err),
         ))
     })?;
     let day_of_year = day_str.parse::<u16>().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 ordinal date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601OrdinalDate, err),
         ))
     })?;
     Ok((year, day_of_year))
@@ -91,14 +90,15 @@ pub(super) fn parse_ordinal_date_text(text: &str) -> Result<(i32, u16), Temporal
 /// form at all.
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 pub(super) fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            "ISO 8601 week date".to_owned(),
-            detail,
+            ParseProfile::Iso8601WeekDate,
+            reason,
+            text,
         )))
     };
     if !text.is_ascii() {
-        return Err(reject(format!("{text:?} is not ASCII")));
+        return Err(reject(ParseRejectionReason::NotAscii));
     }
     let bytes = text.as_bytes();
     let (year_range, week_range, weekday_range) = match text.len() {
@@ -110,34 +110,31 @@ pub(super) fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), Temporal
             (0..4, 6..8, 9..10)
         }
         _ => {
-            return Err(reject(format!(
-                "{text:?} is not an 8-character (YYYYWwwD) or 10-character \
-                 (YYYY-Www-D) ISO week date"
-            )));
+            return Err(reject(ParseRejectionReason::NotEightOrTenCharWeekDate));
         }
     };
     let year_str = text
         .get(year_range)
-        .ok_or_else(|| reject(format!("{text:?} has an invalid week-year slice")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::InvalidWeekYearSlice))?;
     let week_str = text
         .get(week_range)
-        .ok_or_else(|| reject(format!("{text:?} has an invalid week-number slice")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::InvalidWeekNumberSlice))?;
     let weekday_str = text
         .get(weekday_range)
-        .ok_or_else(|| reject(format!("{text:?} has an invalid weekday slice")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::InvalidWeekdaySlice))?;
     let week_year = year_str.parse::<i32>().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 week date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601WeekDate, err),
         ))
     })?;
     let week = week_str.parse::<u8>().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 week date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601WeekDate, err),
         ))
     })?;
     let weekday = weekday_str.parse::<u8>().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 week date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601WeekDate, err),
         ))
     })?;
     Ok((week_year, week, weekday))
@@ -153,10 +150,11 @@ pub(super) fn parse_week_date_text(text: &str) -> Result<(i32, u8, u8), Temporal
 /// zero offset.
 #[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
 pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            "ISO 8601 / RFC 9557 UTC offset".to_owned(),
-            detail,
+            ParseProfile::Iso8601Rfc9557UtcOffset,
+            reason,
+            text,
         )))
     };
     if text.eq_ignore_ascii_case("z") {
@@ -171,46 +169,47 @@ pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, T
             });
     }
     if !text.is_ascii() || text.len() < 3 {
-        return Err(reject(format!("{text:?} is too short to be a UTC offset")));
+        return Err(reject(ParseRejectionReason::TooShortForUtcOffset));
     }
     let sign = match text.as_bytes()[0] {
         b'+' => UtcOffsetSign::Positive,
         b'-' => UtcOffsetSign::Negative,
-        _ => return Err(reject(format!("{text:?} must start with '+', '-', or 'Z'"))),
+        _ => return Err(reject(ParseRejectionReason::MustStartWithSignOrZ)),
     };
     let rest = text
         .get(1..)
-        .ok_or_else(|| reject(format!("{text:?} is too short to be a UTC offset")))?;
-    let (hours_str, minutes_str) =
-        if let Some(idx) = rest.find(':') {
-            (
-                rest.get(..idx)
-                    .ok_or_else(|| reject(format!("{text:?} has an invalid offset-hours slice")))?,
-                Some(rest.get(idx + 1..).ok_or_else(|| {
-                    reject(format!("{text:?} has an invalid offset-minutes slice"))
-                })?),
-            )
-        } else if rest.len() == 4 {
-            (
-                rest.get(..2)
-                    .ok_or_else(|| reject(format!("{text:?} has an invalid offset-hours slice")))?,
-                Some(rest.get(2..).ok_or_else(|| {
-                    reject(format!("{text:?} has an invalid offset-minutes slice"))
-                })?),
-            )
-        } else {
-            (rest, None)
-        };
+        .ok_or_else(|| reject(ParseRejectionReason::TooShortForUtcOffset))?;
+    let (hours_str, minutes_str) = if let Some(idx) = rest.find(':') {
+        (
+            rest.get(..idx)
+                .ok_or_else(|| reject(ParseRejectionReason::InvalidOffsetHoursSlice))?,
+            Some(
+                rest.get(idx + 1..)
+                    .ok_or_else(|| reject(ParseRejectionReason::InvalidOffsetMinutesSlice))?,
+            ),
+        )
+    } else if rest.len() == 4 {
+        (
+            rest.get(..2)
+                .ok_or_else(|| reject(ParseRejectionReason::InvalidOffsetHoursSlice))?,
+            Some(
+                rest.get(2..)
+                    .ok_or_else(|| reject(ParseRejectionReason::InvalidOffsetMinutesSlice))?,
+            ),
+        )
+    } else {
+        (rest, None)
+    };
     let hours: u8 = hours_str.parse().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 / RFC 9557 UTC offset", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601Rfc9557UtcOffset, err),
         ))
     })?;
     let minutes: Option<u8> = match minutes_str {
         None => None,
         Some(m) => Some(m.parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::ParseIntRejected(
-                ParseIntRejectedSource::new("ISO 8601 / RFC 9557 UTC offset", err),
+                ParseIntRejectedSource::new(ParseProfile::Iso8601Rfc9557UtcOffset, err),
             ))
         })?),
     };
@@ -252,24 +251,25 @@ pub(super) fn parse_utc_offset_text(text: &str) -> Result<UtcOffsetDescriptor, T
 pub(super) fn parse_reduced_calendar_date_text(
     text: &str,
 ) -> Result<ReducedCalendarDateDescriptor, TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            "ISO 8601 reduced-precision calendar date".to_owned(),
-            detail,
+            ParseProfile::Iso8601ReducedPrecisionCalendarDate,
+            reason,
+            text,
         )))
     };
     if !text.is_ascii() {
-        return Err(reject(format!("{text:?} is not ASCII")));
+        return Err(reject(ParseRejectionReason::NotAscii));
     }
     if let Some((year_str, month_str)) = text.split_once('-') {
         let year: i32 = year_str.parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::ParseIntRejected(
-                ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
+                ParseIntRejectedSource::new(ParseProfile::Iso8601ReducedPrecisionCalendarDate, err),
             ))
         })?;
         let month: u8 = month_str.parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::ParseIntRejected(
-                ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
+                ParseIntRejectedSource::new(ParseProfile::Iso8601ReducedPrecisionCalendarDate, err),
             ))
         })?;
         i16::try_from(year).map_err(|err| {
@@ -278,15 +278,13 @@ pub(super) fn parse_reduced_calendar_date_text(
             ))
         })?;
         if !(1..=12).contains(&month) {
-            return Err(reject(format!(
-                "month {month} in {text:?} is out of range 1..=12"
-            )));
+            return Err(reject(ParseRejectionReason::MonthOutOfRange(month)));
         }
         return Ok(ReducedCalendarDateDescriptor::YearMonth { year, month });
     }
     let year: i32 = text.parse().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 reduced-precision calendar date", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601ReducedPrecisionCalendarDate, err),
         ))
     })?;
     i16::try_from(year).map_err(|err| {
@@ -307,20 +305,23 @@ pub(super) fn parse_reduced_calendar_date_text(
 pub(super) fn parse_reduced_local_time_text(
     text: &str,
 ) -> Result<ReducedLocalTimeDescriptor, TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            "ISO 8601 reduced-precision local time".to_owned(),
-            detail,
+            ParseProfile::Iso8601ReducedPrecisionLocalTime,
+            reason,
+            text,
         )))
     };
     if !text.is_ascii() {
-        return Err(reject(format!("{text:?} is not ASCII")));
+        return Err(reject(ParseRejectionReason::NotAscii));
     }
     if text.contains(['.', ',']) {
+        #[cfg(not(kani))]
+        let detail = UnsupportedDetail::FractionalHourMinuteComponent(text.to_owned());
+        #[cfg(kani)]
+        let detail = UnsupportedDetail::FractionalHourMinuteComponent;
         return Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::FractionalHourMinuteComponent(
-                text.to_owned(),
-            )),
+            UnsupportedSource::new(detail),
         )));
     }
     let (hour_str, minute_str) = if let Some((h, m)) = text.split_once(':') {
@@ -328,10 +329,10 @@ pub(super) fn parse_reduced_local_time_text(
     } else if text.len() == 4 && text.bytes().all(|b| b.is_ascii_digit()) {
         (
             text.get(0..2)
-                .ok_or_else(|| reject(format!("{text:?} has an invalid hour slice")))?,
+                .ok_or_else(|| reject(ParseRejectionReason::InvalidHourSlice))?,
             Some(
                 text.get(2..4)
-                    .ok_or_else(|| reject(format!("{text:?} has an invalid minute slice")))?
+                    .ok_or_else(|| reject(ParseRejectionReason::InvalidMinuteSlice))?
                     .to_owned(),
             ),
         )
@@ -340,7 +341,7 @@ pub(super) fn parse_reduced_local_time_text(
     };
     let hour: u8 = hour_str.parse().map_err(|err| {
         TemporalError::new(TemporalErrorKind::ParseIntRejected(
-            ParseIntRejectedSource::new("ISO 8601 reduced-precision local time", err),
+            ParseIntRejectedSource::new(ParseProfile::Iso8601ReducedPrecisionLocalTime, err),
         ))
     })?;
     match minute_str {
@@ -360,7 +361,7 @@ pub(super) fn parse_reduced_local_time_text(
         Some(minute_str) => {
             let minute: u8 = minute_str.parse().map_err(|err| {
                 TemporalError::new(TemporalErrorKind::ParseIntRejected(
-                    ParseIntRejectedSource::new("ISO 8601 reduced-precision local time", err),
+                    ParseIntRejectedSource::new(ParseProfile::Iso8601ReducedPrecisionLocalTime, err),
                 ))
             })?;
             jiff::civil::Time::new(
@@ -385,10 +386,10 @@ pub(super) fn parse_reduced_local_time_text(
 
 /// Parse text into jiff's real `Pieces` decomposition, wrapping any
 /// parse failure under `profile`.
-#[cfg_attr(not(kani), tracing::instrument(level = "trace"))]
+#[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(profile)))]
 pub(super) fn parse_temporal_pieces<'i>(
     text: &'i str,
-    profile: &'static str,
+    profile: ParseProfile,
 ) -> Result<jiff::fmt::temporal::Pieces<'i>, TemporalError> {
     jiff::fmt::temporal::Pieces::parse(text).map_err(|err| {
         TemporalError::new(TemporalErrorKind::JiffParseRejected(
@@ -401,24 +402,23 @@ pub(super) fn parse_temporal_pieces<'i>(
 /// requiring both a time-of-day and a UTC offset to be present (an
 /// offset with no time makes no sense under any of the profiles this
 /// helper backs).
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces)))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces, profile)))]
 pub(super) fn pieces_to_offset_date_time(
     pieces: &jiff::fmt::temporal::Pieces<'_>,
     text: &str,
-    profile: &'static str,
+    profile: ParseProfile,
 ) -> Result<(jiff::civil::DateTime, jiff::tz::Offset), TemporalError> {
-    let reject = |detail: String| {
+    let reject = |reason: ParseRejectionReason| {
         TemporalError::new(TemporalErrorKind::ParseRejected(ParseRejectedSource::new(
-            profile.to_owned(),
-            detail,
+            profile, reason, text,
         )))
     };
     let time = pieces
         .time()
-        .ok_or_else(|| reject(format!("{text:?} has no time-of-day component")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::NoTimeOfDayComponent))?;
     let offset = pieces
         .offset()
-        .ok_or_else(|| reject(format!("{text:?} has no UTC offset")))?;
+        .ok_or_else(|| reject(ParseRejectionReason::NoUtcOffset))?;
     Ok((
         jiff::civil::DateTime::from_parts(pieces.date(), time),
         offset.to_numeric_offset(),
@@ -428,20 +428,15 @@ pub(super) fn pieces_to_offset_date_time(
 /// Reject a zone annotation on `pieces` -- neither plain ISO 8601
 /// offset date-times nor RFC 3339 timestamps have `[...]` zone-bracket
 /// syntax at all; only RFC 9557 IXDTF does.
-#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces)))]
+#[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(pieces, profile)))]
 pub(super) fn reject_zone_annotation(
     pieces: &jiff::fmt::temporal::Pieces<'_>,
     text: &str,
-    profile: &'static str,
+    profile: ParseProfile,
 ) -> Result<(), TemporalError> {
     if pieces.time_zone_annotation().is_some() {
         return Err(TemporalError::new(TemporalErrorKind::ParseRejected(
-            ParseRejectedSource::new(
-                profile.to_owned(),
-                format!(
-                    "{text:?} carries an RFC 9557 zone annotation, not valid under this profile"
-                ),
-            ),
+            ParseRejectedSource::new(profile, ParseRejectionReason::CarriesZoneAnnotation, text),
         )));
     }
     Ok(())
@@ -474,7 +469,7 @@ pub(super) fn jiff_time_zone_annotation_to_descriptor(
             Ok(IxdtfTimeZoneAnnotationDescriptor::Offset(descriptor))
         }
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::UnrecognizedTimeZoneAnnotationKind(
+            UnsupportedSource::new(UnsupportedDetail::UnrecognizedTimeZoneAnnotationKind(
                 other.clone().into_owned(),
             )),
         ))),

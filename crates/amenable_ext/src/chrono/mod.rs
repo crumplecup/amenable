@@ -13,6 +13,10 @@
 //!   `LocalDateTime` realize and reflect bridge.
 //! - **instant (Phase 3):** the `TemporalInstantProps` carriers and the
 //!   `OffsetDateTime` realize and reflect bridge.
+//! - **utc_offset:** `UtcOffsetDescriptor` <-> `chrono::FixedOffset`
+//!   conversion, in both directions, and its own staged decomposition
+//!   proof layer -- split out of `instant` once it grew large enough to
+//!   be its own cohesive concern.
 //! - **zone (Phase 3):** the `TemporalZoneProps` carriers and the
 //!   `NamedTimeZone`/`ZonedDateTime` realize and reflect bridge, over
 //!   chrono-tz.
@@ -22,6 +26,7 @@ mod bounded_step_walk;
 #[cfg(feature = "chrono-tz")]
 mod chrono_tz_value_types;
 mod civil;
+mod civil_reflect;
 #[cfg(feature = "chrono-tz")]
 mod discovered_gap_table;
 #[cfg(feature = "chrono-tz")]
@@ -31,6 +36,8 @@ mod instant;
 #[cfg(feature = "chrono-tz")]
 mod offset_discovery;
 mod trusted_witness;
+mod utc_offset;
+mod utc_offset_reflect;
 mod value_types;
 #[cfg(feature = "verus")]
 mod verus_witness;
@@ -55,11 +62,32 @@ pub use self::{
 
 pub use civil::{
     ChronoDate, ChronoDateTime, ChronoReducedCalendarDate, ChronoReducedLocalTime, ChronoTime,
-    local_date_time_descriptor_to_naive, naive_date_time_to_local_date_time_descriptor,
+    local_date_time_descriptor_to_naive,
+};
+pub use civil_reflect::naive_date_time_to_local_date_time_descriptor;
+#[cfg(kani)]
+pub use civil_reflect::{
+    naive_date_time_to_local_date_time_descriptor_infallible,
+    naive_date_time_to_local_date_time_descriptor_no_fraction,
 };
 pub use identity::{ChronoTimeBackend, ChronoVerifier, ChronoVerifierMetadata};
 pub use instant::{
     ChronoInstant, ChronoOffset, ChronoOffsetDateTime, chrono_to_offset_date_time_descriptor,
-    fixed_offset_sign_and_magnitude, fixed_offset_to_utc_offset_descriptor, narrow_to_u8,
-    offset_date_time_descriptor_to_chrono, utc_offset_descriptor_to_fixed_offset,
+    offset_date_time_descriptor_to_chrono,
+};
+#[cfg(kani)]
+pub use utc_offset::{
+    RefinedFixedOffset, build_refined_fixed_offset_in_range,
+    utc_offset_descriptor_to_fixed_offset_infallible,
+};
+pub use utc_offset::{
+    build_fixed_offset_from_signed_seconds, signed_seconds_parts_2, signed_seconds_parts_3,
+    signed_seconds_parts_4, utc_offset_descriptor_to_fixed_offset,
+};
+#[cfg(kani)]
+pub use utc_offset_reflect::fixed_offset_to_utc_offset_descriptor_infallible;
+pub use utc_offset_reflect::{
+    build_utc_offset_descriptor_from_parts, fixed_offset_sign_and_magnitude,
+    fixed_offset_to_utc_offset_descriptor, narrow_to_u8, narrow_to_u8_in_range,
+    offset_descriptor_parts_2, offset_descriptor_parts_3, offset_descriptor_parts_4,
 };

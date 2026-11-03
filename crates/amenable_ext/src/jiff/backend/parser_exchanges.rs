@@ -20,7 +20,7 @@ use amenable_time::{
     IxdtfTimestampBuilderFailedSource, IxdtfTimestampDescriptorBuilder, IxdtfTimestampProof,
     JiffParseRejectedSource, LocalDateTimeProof, LocalTimeBuilderFailedSource,
     LocalTimeDescriptorBuilder, LocalTimeValid, OffsetDateTimeProof, OrdinalDateDescriptor,
-    OrdinalDateValid, ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula,
+    OrdinalDateValid, ParseProfile, ParsedCalendarDate, ParsedCentury, ParsedDateTimeFormula,
     ParsedDateWithShift, ParsedDecade, ParsedExtendedYear, ParsedGroupedTimeScaleUnit,
     ParsedIxdtfTimestamp, ParsedLocalDateTime, ParsedLocalTime, ParsedOffsetDateTime,
     ParsedOrdinalDate, ParsedQualifiedTemporalValue, ParsedReducedCalendarDate,
@@ -39,7 +39,7 @@ impl Exchange<RawInput, ParsedCalendarDate, JiffVerifier> for JiffTimeBackend {
     fn exchange(&self, input: RawInput) -> Result<ParsedCalendarDate, TemporalError> {
         let date: jiff::civil::Date = input.as_str().parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::JiffParseRejected(
-                JiffParseRejectedSource::new("ISO 8601 calendar date", err),
+                JiffParseRejectedSource::new(ParseProfile::Iso8601CalendarDate, err),
             ))
         })?;
         let descriptor = jiff_date_to_calendar_date_descriptor(date)?;
@@ -151,7 +151,7 @@ impl Exchange<RawInput, ParsedLocalTime, JiffVerifier> for JiffTimeBackend {
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalTime, TemporalError> {
         let time: jiff::civil::Time = input.as_str().parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::JiffParseRejected(
-                JiffParseRejectedSource::new("ISO 8601 local time", err),
+                JiffParseRejectedSource::new(ParseProfile::Iso8601LocalTime, err),
             ))
         })?;
         let mut builder = LocalTimeDescriptorBuilder::default()
@@ -210,7 +210,7 @@ impl Exchange<RawInput, ParsedLocalDateTime, JiffVerifier> for JiffTimeBackend {
     fn exchange(&self, input: RawInput) -> Result<ParsedLocalDateTime, TemporalError> {
         let datetime: jiff::civil::DateTime = input.as_str().parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::JiffParseRejected(
-                JiffParseRejectedSource::new("ISO 8601 local date-time", err),
+                JiffParseRejectedSource::new(ParseProfile::Iso8601LocalDateTime, err),
             ))
         })?;
         let descriptor = jiff_civil_datetime_to_local_date_time_descriptor(datetime)?;
@@ -227,10 +227,10 @@ impl Exchange<RawInput, ParsedOffsetDateTime, JiffVerifier> for JiffTimeBackend 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedOffsetDateTime, TemporalError> {
         let text = input.as_str();
-        let pieces = parse_temporal_pieces(text, "ISO 8601 offset date-time")?;
-        reject_zone_annotation(&pieces, text, "ISO 8601 offset date-time")?;
+        let pieces = parse_temporal_pieces(text, ParseProfile::Iso8601OffsetDateTime)?;
+        reject_zone_annotation(&pieces, text, ParseProfile::Iso8601OffsetDateTime)?;
         let (local, offset) =
-            pieces_to_offset_date_time(&pieces, text, "ISO 8601 offset date-time")?;
+            pieces_to_offset_date_time(&pieces, text, ParseProfile::Iso8601OffsetDateTime)?;
         let descriptor = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
         let token = <OffsetDateTimeProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
             <RawInput as Sidecar<JiffVerifier>>::sidecar(&input),
@@ -267,9 +267,9 @@ impl Exchange<RawInput, ParsedRfc3339Timestamp, JiffVerifier> for JiffTimeBacken
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedRfc3339Timestamp, TemporalError> {
         let text = input.as_str();
-        let pieces = parse_temporal_pieces(text, "RFC 3339 timestamp")?;
-        reject_zone_annotation(&pieces, text, "RFC 3339 timestamp")?;
-        let (local, offset) = pieces_to_offset_date_time(&pieces, text, "RFC 3339 timestamp")?;
+        let pieces = parse_temporal_pieces(text, ParseProfile::Rfc3339Timestamp)?;
+        reject_zone_annotation(&pieces, text, ParseProfile::Rfc3339Timestamp)?;
+        let (local, offset) = pieces_to_offset_date_time(&pieces, text, ParseProfile::Rfc3339Timestamp)?;
         let descriptor = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
         let token =
             <Rfc3339TimestampProof as Establish<TemporalInputToken, JiffVerifier>>::establish(
@@ -285,9 +285,9 @@ impl Exchange<RawInput, ParsedIxdtfTimestamp, JiffVerifier> for JiffTimeBackend 
     #[cfg_attr(not(kani), tracing::instrument(level = "trace", skip(self, input)))]
     fn exchange(&self, input: RawInput) -> Result<ParsedIxdtfTimestamp, TemporalError> {
         let text = input.as_str();
-        let pieces = parse_temporal_pieces(text, "RFC 9557 IXDTF timestamp")?;
+        let pieces = parse_temporal_pieces(text, ParseProfile::Rfc9557IxdtfTimestamp)?;
         let (local, offset) =
-            pieces_to_offset_date_time(&pieces, text, "RFC 9557 IXDTF timestamp")?;
+            pieces_to_offset_date_time(&pieces, text, ParseProfile::Rfc9557IxdtfTimestamp)?;
         let timestamp = jiff_parts_to_offset_date_time_descriptor(local, offset)?;
         let mut builder = IxdtfTimestampDescriptorBuilder::default().timestamp(timestamp);
         if let Some(annotation) = pieces.time_zone_annotation() {

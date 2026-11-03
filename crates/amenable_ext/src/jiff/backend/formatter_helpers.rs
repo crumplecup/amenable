@@ -298,7 +298,7 @@ fn format_temporal_value(value: &TemporalValueDescriptor) -> Result<String, Temp
         TemporalValueDescriptor::OffsetDateTime(d) => Ok(format_offset_date_time(d, false)),
         TemporalValueDescriptor::ZonedDateTime(d) => Ok(format_zoned_date_time(d)),
         other => Err(TemporalError::new(TemporalErrorKind::Unsupported(
-            UnsupportedSource::from_detail(UnsupportedDetail::UnformattableTemporalValue(
+            UnsupportedSource::new(UnsupportedDetail::UnformattableTemporalValue(
                 other.clone(),
             )),
         ))),

@@ -5,7 +5,7 @@ use amenable_core::{Establish, Exchange, Sidecar};
 use amenable_time::{
     DurationFormValid, IntervalEndpointsReversedSource, JiffInstantPinFailedSource,
     JiffParseRejectedSource, OrderOffsetEndpointsEstablished, OrderOffsetEndpointsInput,
-    OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken, ParsedDuration,
+    OrderOffsetEndpointsOutput, OrderOffsetEndpointsPreconditionsToken, ParseProfile, ParsedDuration,
     ParsedRecurringInterval, ParsedTimeInterval, RawInput, TemporalError, TemporalErrorKind,
     TemporalInputToken, UnsupportedCase, UnsupportedSource,
 };
@@ -44,7 +44,7 @@ impl Exchange<RawInput, ParsedDuration, JiffVerifier> for JiffTimeBackend {
         let text = input.as_str();
         let span: jiff::Span = text.parse().map_err(|err| {
             TemporalError::new(TemporalErrorKind::JiffParseRejected(
-                JiffParseRejectedSource::new("ISO 8601 duration", err),
+                JiffParseRejectedSource::new(ParseProfile::Iso8601Duration, err),
             ))
         })?;
         let descriptor = jiff_span_to_duration_descriptor(span)?;
