@@ -15,8 +15,10 @@ pub struct NonPositiveDeltaSource {
     #[error(ignore)]
     delta: chrono::Duration,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -25,14 +27,18 @@ impl NonPositiveDeltaSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(delta)))]
     pub fn new(delta: chrono::Duration) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { delta, line, file }
+        Self {
+            delta,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -47,8 +53,10 @@ pub struct OffsetDiscoveryRangeReversedSource {
     #[error(ignore)]
     hi: chrono::NaiveDateTime,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -58,13 +66,18 @@ impl OffsetDiscoveryRangeReversedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(lo, hi)))]
     pub fn new(lo: chrono::NaiveDateTime, hi: chrono::NaiveDateTime) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { lo, hi, line, file }
+        Self {
+            lo,
+            hi,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }

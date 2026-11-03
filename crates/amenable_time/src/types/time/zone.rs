@@ -75,6 +75,21 @@ pub enum UtcOffsetRelationship {
     #[display("unknown-local-offset")]
     UnknownLocalOffset,
 }
+
+// Same reasoning as `UtcOffsetSign`'s own impl just above: no new
+// Cargo dependency, needed so a Kani proof that `#[kani::stub_
+// verified]` a function returning this type (or a struct containing
+// it) can generate a nondeterministic replacement value for it.
+#[cfg(kani)]
+impl kani::Arbitrary for UtcOffsetRelationship {
+    fn any() -> Self {
+        if kani::any::<bool>() {
+            Self::Known
+        } else {
+            Self::UnknownLocalOffset
+        }
+    }
+}
 /// A UTC-offset relationship descriptor for an offset-aware timestamp.
 #[derive(
     Debug,
@@ -138,6 +153,34 @@ pub struct UtcOffsetDescriptor {
     #[getter(copy)]
     relationship: UtcOffsetRelationship,
 }
+
+// Covers this type's *entire* constructible domain, not just the
+// bounded subset real internal callers happen to produce: the
+// builder (`#[builder(pattern = "owned", ...)]` above) performs no
+// validation at all -- no `build_fn(validate = ...)`, confirmed by
+// reading this file -- so a real caller can construct `hours: 200`
+// and it builds successfully. Narrowing this impl to `hours <= 23`
+// etc. would silently exclude real, constructible values from every
+// future proof that generates this type via `kani::any`, which could
+// let some other proof pass vacuously rather than because the
+// property actually holds. Callers that only care about the bounded
+// case state that themselves via `#[kani::requires]` (as `amenable_
+// ext::utc_offset_descriptor_to_fixed_offset`'s own contract already
+// does) -- the same division of labor `requires`/`ensures` already
+// draw everywhere else, not something this impl should pre-empt.
+#[cfg(kani)]
+impl kani::Arbitrary for UtcOffsetDescriptor {
+    fn any() -> Self {
+        Self {
+            sign: kani::any(),
+            hours: kani::any(),
+            minutes: kani::any(),
+            seconds: kani::any(),
+            relationship: kani::any(),
+        }
+    }
+}
+
 /// A descriptor for the UTC reference time scale.
 #[derive(
     Debug,

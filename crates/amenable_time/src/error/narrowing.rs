@@ -14,8 +14,10 @@ pub struct DurationDayOverflowSource {
     source: std::num::TryFromIntError,
     days: u64,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -24,8 +26,6 @@ impl DurationDayOverflowSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: std::num::TryFromIntError, days: u64) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -34,7 +34,9 @@ impl DurationDayOverflowSource {
         Self {
             source,
             days,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -53,8 +55,10 @@ pub struct EpochSecondsEndpointsReversedSource {
     #[error(ignore)]
     end: i64,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -64,8 +68,6 @@ impl EpochSecondsEndpointsReversedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(start, end)))]
     pub fn new(start: i64, end: i64) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -74,7 +76,9 @@ impl EpochSecondsEndpointsReversedSource {
         Self {
             start,
             end,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }

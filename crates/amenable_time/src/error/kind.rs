@@ -5,17 +5,17 @@ use derive_getters::Getters;
 use derive_more::{Display, Error};
 
 use super::{
-    AmbiguousLocalTimestampSource, CalendarComponentsPresentSource, ComponentOutOfRangeSource,
-    DurationBuilderFailedSource, DurationDayOverflowSource, EndpointHasNoTemporalValueSource,
+    CalendarComponentsPresentSource, ComponentOutOfRangeSource, DurationBuilderFailedSource,
+    DurationDayOverflowSource, EndpointHasNoTemporalValueSource,
     EpochSecondsEndpointsReversedSource, FixedOffsetOutOfRangeSource, InvalidCalendarDateSource,
     InvalidIsoWeekdaySource, InvalidLocalTimeSource, InvalidOrdinalDateSource,
     InvalidWeekDateSource, IxdtfTimestampBuilderFailedSource, LeapSecondNotRepresentableSource,
     LocalDateTimeBuilderFailedSource, LocalTimeBuilderFailedSource,
     LossyConversionRequiresAuthoritySource, NamedTimeZoneBuilderFailedSource,
-    NamedZoneInconsistencySource, NanosecondOutOfRangeSource, NoUniqueLocalMappingSource,
-    NonDigitFractionByteSource, OffsetDateTimeBuilderFailedSource, ParseIntRejectedSource,
-    ParseRejectedSource, RecurringIntervalBuilderFailedSource, UnsupportedSource,
-    UtcOffsetBuilderFailedSource, ZonedDateTimeBuilderFailedSource,
+    NanosecondOutOfRangeSource, NoUniqueLocalMappingSource, NonDigitFractionByteSource,
+    OffsetDateTimeBuilderFailedSource, ParseIntRejectedSource, ParseRejectedSource,
+    RecurringIntervalBuilderFailedSource, UnsupportedSource, UtcOffsetBuilderFailedSource,
+    ZonedDateTimeBuilderFailedSource,
 };
 #[cfg(feature = "chrono")]
 use super::{NonPositiveDeltaSource, OffsetDiscoveryRangeReversedSource};
@@ -92,12 +92,6 @@ pub enum TemporalErrorKind {
     /// The operation would require explicit authority for a lossy conversion.
     #[display("{_0}")]
     LossyConversionRequiresAuthority(LossyConversionRequiresAuthoritySource),
-    /// A local timestamp is ambiguous at a zone transition.
-    #[display("{_0}")]
-    AmbiguousLocalTimestamp(AmbiguousLocalTimestampSource),
-    /// A named-zone annotation is inconsistent with the represented instant.
-    #[display("{_0}")]
-    NamedZoneInconsistency(NamedZoneInconsistencySource),
     /// A `UtcOffsetDescriptorBuilder::build` call failed validation.
     #[display("{_0}")]
     UtcOffsetBuilderFailed(UtcOffsetBuilderFailedSource),
@@ -198,8 +192,17 @@ pub enum TemporalErrorKind {
 }
 
 /// Temporal trait-layer error with call-site location.
+///
+/// `line`/`file` are debugging surface only -- nothing in this
+/// codebase matches on them -- and dropped entirely under `cfg(kani)`
+/// rather than emptied: a `String`-typed field reachable through
+/// `Box<TemporalErrorKind>` costs CBMC the same whether its value is
+/// empty or not (confirmed, `gallery::boxed_error_variant_count`'s own
+/// `Box<String>` rung), so the field itself, not just its content,
+/// has to go.
 #[derive(Debug, Display, Error, Getters)]
-#[display("{kind} at {file}:{line}")]
+#[cfg_attr(not(kani), display("{kind} at {file}:{line}"))]
+#[cfg_attr(kani, display("{kind}"))]
 pub struct TemporalError {
     /// The specific error kind, boxed to keep `TemporalError` itself
     /// small regardless of how large any one `TemporalErrorKind`
@@ -207,8 +210,10 @@ pub struct TemporalError {
     #[error(source)]
     kind: Box<TemporalErrorKind>,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -217,8 +222,6 @@ impl TemporalError {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(kind)))]
     pub fn new(kind: TemporalErrorKind) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -226,7 +229,9 @@ impl TemporalError {
         };
         Self {
             kind: Box::new(kind),
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }

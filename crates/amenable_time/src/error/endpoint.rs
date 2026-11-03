@@ -41,8 +41,10 @@ pub struct EndpointHasNoTemporalValueSource {
     #[error(ignore)]
     endpoint: DeclaredEndpoint,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -52,8 +54,6 @@ impl EndpointHasNoTemporalValueSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(endpoint)))]
     pub fn new(endpoint: DeclaredEndpoint) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -61,7 +61,9 @@ impl EndpointHasNoTemporalValueSource {
         };
         Self {
             endpoint,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -75,8 +77,10 @@ pub struct NonDigitFractionByteSource {
     #[error(ignore)]
     byte: u8,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -86,14 +90,18 @@ impl NonDigitFractionByteSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(byte: u8) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { byte, line, file }
+        Self {
+            byte,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -111,8 +119,10 @@ pub struct CalendarComponentsPresentSource {
     #[error(ignore)]
     months: u32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -122,8 +132,6 @@ impl CalendarComponentsPresentSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(years: u32, months: u32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -132,7 +140,9 @@ impl CalendarComponentsPresentSource {
         Self {
             years,
             months,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -160,8 +170,10 @@ pub struct LeapSecondNotRepresentableSource {
     #[error(ignore)]
     nanosecond: u32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -171,8 +183,6 @@ impl LeapSecondNotRepresentableSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(nanosecond: u32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -180,7 +190,9 @@ impl LeapSecondNotRepresentableSource {
         };
         Self {
             nanosecond,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }

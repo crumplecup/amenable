@@ -25,8 +25,10 @@ pub struct ComponentOutOfRangeSource {
     #[error(ignore)]
     value: u32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -36,8 +38,6 @@ impl ComponentOutOfRangeSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(component)))]
     pub fn new(component: TemporalComponent, value: u32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -46,7 +46,9 @@ impl ComponentOutOfRangeSource {
         Self {
             component,
             value,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -61,8 +63,10 @@ pub struct InvalidIsoWeekdaySource {
     #[error(ignore)]
     number: u8,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -72,14 +76,18 @@ impl InvalidIsoWeekdaySource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(number: u8) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { number, line, file }
+        Self {
+            number,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -96,8 +104,10 @@ pub struct InvalidCalendarDateSource {
     #[error(ignore)]
     descriptor: CalendarDateDescriptor,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -107,8 +117,6 @@ impl InvalidCalendarDateSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
     pub fn new(descriptor: CalendarDateDescriptor) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -116,7 +124,9 @@ impl InvalidCalendarDateSource {
         };
         Self {
             descriptor,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -133,8 +143,10 @@ pub struct InvalidOrdinalDateSource {
     #[error(ignore)]
     descriptor: OrdinalDateDescriptor,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -144,8 +156,6 @@ impl InvalidOrdinalDateSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
     pub fn new(descriptor: OrdinalDateDescriptor) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -153,7 +163,9 @@ impl InvalidOrdinalDateSource {
         };
         Self {
             descriptor,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -170,8 +182,10 @@ pub struct InvalidWeekDateSource {
     #[error(ignore)]
     descriptor: WeekDateDescriptor,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -181,8 +195,6 @@ impl InvalidWeekDateSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(descriptor)))]
     pub fn new(descriptor: WeekDateDescriptor) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -190,7 +202,9 @@ impl InvalidWeekDateSource {
         };
         Self {
             descriptor,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -208,8 +222,10 @@ pub struct NanosecondOutOfRangeSource {
     #[error(ignore)]
     nanos: i64,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -219,14 +235,18 @@ impl NanosecondOutOfRangeSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(nanos: i64) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { nanos, line, file }
+        Self {
+            nanos,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -248,8 +268,10 @@ pub struct InvalidLocalTimeSource {
     #[error(ignore)]
     nanos: u32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -258,8 +280,6 @@ impl InvalidLocalTimeSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(hour: u8, minute: u8, second: u8, nanos: u32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -270,7 +290,9 @@ impl InvalidLocalTimeSource {
             minute,
             second,
             nanos,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -296,8 +318,10 @@ pub struct FixedOffsetOutOfRangeSource {
     #[error(ignore)]
     magnitude: i32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -307,8 +331,6 @@ impl FixedOffsetOutOfRangeSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new(magnitude: i32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -316,7 +338,9 @@ impl FixedOffsetOutOfRangeSource {
         };
         Self {
             magnitude,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -336,8 +360,10 @@ impl FixedOffsetOutOfRangeSource {
 #[display("local date-time has no unique mapping under this offset")]
 pub struct NoUniqueLocalMappingSource {
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -347,14 +373,17 @@ impl NoUniqueLocalMappingSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug"))]
     pub fn new() -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { line, file }
+        Self {
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 

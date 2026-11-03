@@ -22,8 +22,10 @@ use crate::{
 pub struct UtcOffsetBuilderFailedSource {
     source: UtcOffsetDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -33,14 +35,18 @@ impl UtcOffsetBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: UtcOffsetDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -51,8 +57,10 @@ impl UtcOffsetBuilderFailedSource {
 pub struct LocalTimeBuilderFailedSource {
     source: LocalTimeDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -62,14 +70,18 @@ impl LocalTimeBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: LocalTimeDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -80,8 +92,10 @@ impl LocalTimeBuilderFailedSource {
 pub struct LocalDateTimeBuilderFailedSource {
     source: LocalDateTimeDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -91,14 +105,18 @@ impl LocalDateTimeBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: LocalDateTimeDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -109,8 +127,10 @@ impl LocalDateTimeBuilderFailedSource {
 pub struct OffsetDateTimeBuilderFailedSource {
     source: OffsetDateTimeDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -120,14 +140,18 @@ impl OffsetDateTimeBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: OffsetDateTimeDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -138,8 +162,10 @@ impl OffsetDateTimeBuilderFailedSource {
 pub struct NamedTimeZoneBuilderFailedSource {
     source: NamedTimeZoneDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -149,14 +175,18 @@ impl NamedTimeZoneBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: NamedTimeZoneDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -167,8 +197,10 @@ impl NamedTimeZoneBuilderFailedSource {
 pub struct ZonedDateTimeBuilderFailedSource {
     source: ZonedDateTimeDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -178,14 +210,18 @@ impl ZonedDateTimeBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: ZonedDateTimeDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -196,8 +232,10 @@ impl ZonedDateTimeBuilderFailedSource {
 pub struct DurationBuilderFailedSource {
     source: DurationDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -207,14 +245,18 @@ impl DurationBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: DurationDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -225,8 +267,10 @@ impl DurationBuilderFailedSource {
 pub struct IxdtfTimestampBuilderFailedSource {
     source: IxdtfTimestampDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -236,14 +280,18 @@ impl IxdtfTimestampBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: IxdtfTimestampDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -254,8 +302,10 @@ impl IxdtfTimestampBuilderFailedSource {
 pub struct RecurringIntervalBuilderFailedSource {
     source: RecurringIntervalDescriptorBuilderError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -265,13 +315,17 @@ impl RecurringIntervalBuilderFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: RecurringIntervalDescriptorBuilderError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        Self {
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }

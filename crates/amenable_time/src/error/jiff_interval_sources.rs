@@ -10,12 +10,24 @@ use derive_more::{Display, Error};
 /// A `jiff::Span` could not be constructed from a duration descriptor's
 /// real components, preserving the real `jiff::Error` as `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("duration component out of jiff::Span's representable range: {source}")]
+#[cfg_attr(
+    not(kani),
+    display("duration component out of jiff::Span's representable range: {source}")
+)]
+#[cfg_attr(kani, display("duration component out of jiff::Span's representable range"))]
 pub struct JiffSpanConstructionFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -25,14 +37,21 @@ impl JiffSpanConstructionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -40,12 +59,24 @@ impl JiffSpanConstructionFailedSource {
 /// under a given offset or zone, preserving the real `jiff::Error` as
 /// `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("could not pin the offset date-time to a fixed instant: {source}")]
+#[cfg_attr(
+    not(kani),
+    display("could not pin the offset date-time to a fixed instant: {source}")
+)]
+#[cfg_attr(kani, display("could not pin the offset date-time to a fixed instant"))]
 pub struct JiffInstantPinFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -55,14 +86,21 @@ impl JiffInstantPinFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -78,8 +116,10 @@ pub struct IntervalEndpointsReversedSource {
     #[error(ignore)]
     end: jiff::Timestamp,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -89,8 +129,6 @@ impl IntervalEndpointsReversedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(start, end)))]
     pub fn new(start: jiff::Timestamp, end: jiff::Timestamp) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -99,7 +137,9 @@ impl IntervalEndpointsReversedSource {
         Self {
             start,
             end,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -108,13 +148,27 @@ impl IntervalEndpointsReversedSource {
 /// A jiff IANA zone identifier failed to resolve, preserving the real
 /// `jiff::Error` as `source` alongside the rejected identifier.
 #[derive(Debug, Display, Error, Getters)]
-#[display("could not resolve IANA time zone {identifier:?}: {source}")]
+#[cfg_attr(not(kani), display("could not resolve IANA time zone {identifier:?}: {source}"))]
+#[cfg_attr(kani, display("could not resolve IANA time zone"))]
 pub struct JiffNamedZoneResolutionFailedSource {
+    /// The real jiff resolution failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
+    /// The attempted-but-invalid zone identifier. Dropped entirely
+    /// under `cfg(kani)`: it's exactly the text that failed to
+    /// resolve, so there is no closed set to type it as, and nothing
+    /// in this codebase reads it under Kani.
+    #[cfg(not(kani))]
     identifier: String,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -124,17 +178,25 @@ impl JiffNamedZoneResolutionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source, identifier)))]
     pub fn new(source: jiff::Error, identifier: impl Into<String>) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
+        #[cfg(not(kani))]
+        let identifier = identifier.into();
+        #[cfg(kani)]
+        let _ = identifier;
+        #[cfg(kani)]
+        let _ = &source;
         Self {
+            #[cfg(not(kani))]
             source,
-            identifier: identifier.into(),
+            #[cfg(not(kani))]
+            identifier,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -146,19 +208,32 @@ impl JiffNamedZoneResolutionFailedSource {
 /// the real jiff values that describe the mismatch are the native
 /// payload instead of a hand-written description of them.
 #[derive(Debug, Display, Error, Getters)]
-#[display(
-    "offset {offset:?} is not one of the real offsets {zone}'s own rules produce for local time {local}"
+#[cfg_attr(
+    not(kani),
+    display(
+        "offset {offset:?} is not one of the real offsets {zone}'s own rules produce for local time {local}"
+    )
+)]
+#[cfg_attr(
+    kani,
+    display("offset {offset:?} is not one of the real offsets this zone's own rules produce for local time {local}")
 )]
 pub struct JiffOffsetInconsistentWithNamedZoneSource {
     #[error(ignore)]
     offset: jiff::tz::Offset,
     #[error(ignore)]
     local: jiff::civil::DateTime,
+    /// The real, already-resolved zone's own IANA name. Dropped
+    /// entirely under `cfg(kani)`, same reason the chrono-tz sibling
+    /// (`OffsetInconsistentWithNamedZoneSource`) is.
     #[error(ignore)]
+    #[cfg(not(kani))]
     zone: String,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -172,18 +247,23 @@ impl JiffOffsetInconsistentWithNamedZoneSource {
         local: jiff::civil::DateTime,
         zone: impl Into<String>,
     ) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
+        #[cfg(not(kani))]
+        let zone = zone.into();
+        #[cfg(kani)]
+        let _ = zone;
         Self {
             offset,
             local,
-            zone: zone.into(),
+            #[cfg(not(kani))]
+            zone,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -206,8 +286,10 @@ pub struct LosslessPrecisionAdjustmentRejectedSource {
     #[error(ignore)]
     original_nanos: i32,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -217,8 +299,6 @@ impl LosslessPrecisionAdjustmentRejectedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(digits, original_nanos)))]
     pub fn new(digits: u8, original_nanos: i32) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -227,7 +307,9 @@ impl LosslessPrecisionAdjustmentRejectedSource {
         Self {
             digits,
             original_nanos,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -236,12 +318,24 @@ impl LosslessPrecisionAdjustmentRejectedSource {
 /// A `jiff::civil::DateTime` could not be rebuilt from its own `.with()`
 /// builder, preserving the real `jiff::Error` as `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("could not rebuild the precision-adjusted local time: {source}")]
+#[cfg_attr(
+    not(kani),
+    display("could not rebuild the precision-adjusted local time: {source}")
+)]
+#[cfg_attr(kani, display("could not rebuild the precision-adjusted local time"))]
 pub struct JiffDateTimeConstructionFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -251,13 +345,20 @@ impl JiffDateTimeConstructionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }

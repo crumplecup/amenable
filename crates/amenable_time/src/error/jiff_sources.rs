@@ -5,21 +5,33 @@
 use derive_getters::Getters;
 use derive_more::{Display, Error};
 
+use super::parsing::ParseProfile;
+
 /// Input text was rejected by jiff's own real parser for a requested
 /// profile, preserving the real `jiff::Error` as `source` rather than
 /// stringifying it -- jiff's own error *is* the genuine cause, so
 /// wrapping it natively is normalizing, not the stringifying antipattern
 /// `InvalidDescriptorSource` used to commit.
 #[derive(Debug, Display, Error, Getters)]
-#[display("parse rejected under {profile}: {source}")]
+#[cfg_attr(not(kani), display("parse rejected under {profile}: {source}"))]
+#[cfg_attr(kani, display("parse rejected under {profile}"))]
 pub struct JiffParseRejectedSource {
     /// The serialization profile the input was checked against.
     #[error(ignore)]
-    profile: String,
+    profile: ParseProfile,
+    /// The real jiff parse failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly (`gallery::
+    /// temporal_error_construction::check_bare_jiff_error_leaf`) that
+    /// a bare `jiff::Error` value, with no wrapping type at all, times
+    /// out under Kani on its own -- nothing in this codebase reads it
+    /// under Kani either.
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -28,18 +40,21 @@ impl JiffParseRejectedSource {
     /// location.
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(profile, source)))]
-    pub fn new(profile: impl Into<String>, source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
+    pub fn new(profile: ParseProfile, source: jiff::Error) -> Self {
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
+        #[cfg(kani)]
+        let _ = &source;
         Self {
-            profile: profile.into(),
+            profile,
+            #[cfg(not(kani))]
             source,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -133,8 +148,10 @@ pub struct ComponentNarrowingFailedSource {
     value: i64,
     source: std::num::TryFromIntError,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -144,8 +161,6 @@ impl ComponentNarrowingFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(component, source)))]
     pub fn new(component: NarrowingComponent, value: i64, source: std::num::TryFromIntError) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
@@ -155,7 +170,9 @@ impl ComponentNarrowingFailedSource {
             component,
             value,
             source,
+            #[cfg(not(kani))]
             line,
+            #[cfg(not(kani))]
             file,
         }
     }
@@ -164,12 +181,21 @@ impl ComponentNarrowingFailedSource {
 /// A `jiff::tz::Offset` could not be constructed from a raw seconds
 /// value, preserving the real `jiff::Error` as `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("offset out of jiff::tz::Offset's representable range: {source}")]
+#[cfg_attr(not(kani), display("offset out of jiff::tz::Offset's representable range: {source}"))]
+#[cfg_attr(kani, display("offset out of jiff::tz::Offset's representable range"))]
 pub struct JiffOffsetConstructionFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -179,14 +205,21 @@ impl JiffOffsetConstructionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
@@ -195,12 +228,21 @@ impl JiffOffsetConstructionFailedSource {
 /// cross-representations), preserving the real `jiff::Error` as
 /// `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("date out of jiff::civil::Date's representable range: {source}")]
+#[cfg_attr(not(kani), display("date out of jiff::civil::Date's representable range: {source}"))]
+#[cfg_attr(kani, display("date out of jiff::civil::Date's representable range"))]
 pub struct JiffDateConstructionFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -210,26 +252,42 @@ impl JiffDateConstructionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 
 /// A `jiff::civil::Time` could not be constructed from its real
 /// components, preserving the real `jiff::Error` as `source`.
 #[derive(Debug, Display, Error, Getters)]
-#[display("local time out of jiff::civil::Time's representable range: {source}")]
+#[cfg_attr(not(kani), display("local time out of jiff::civil::Time's representable range: {source}"))]
+#[cfg_attr(kani, display("local time out of jiff::civil::Time's representable range"))]
 pub struct JiffTimeConstructionFailedSource {
+    /// The real jiff construction failure. Dropped entirely under
+    /// `cfg(kani)`: confirmed directly that a bare `jiff::Error`
+    /// value, with no wrapping type at all, times out under Kani on
+    /// its own (`gallery::temporal_error_construction::
+    /// check_bare_jiff_error_leaf`).
+    #[cfg(not(kani))]
     source: jiff::Error,
     /// Source line of the call site that produced this error.
+    #[cfg(not(kani))]
     line: u32,
     /// Source file of the call site that produced this error.
+    #[cfg(not(kani))]
     file: String,
 }
 
@@ -239,14 +297,21 @@ impl JiffTimeConstructionFailedSource {
     #[track_caller]
     #[cfg_attr(not(kani), tracing::instrument(level = "debug", skip(source)))]
     pub fn new(source: jiff::Error) -> Self {
-        #[cfg(kani)]
-        let (line, file) = (0, String::new());
         #[cfg(not(kani))]
         let (line, file) = {
             let loc = std::panic::Location::caller();
             (loc.line(), loc.file().to_string())
         };
-        Self { source, line, file }
+        #[cfg(kani)]
+        let _ = &source;
+        Self {
+            #[cfg(not(kani))]
+            source,
+            #[cfg(not(kani))]
+            line,
+            #[cfg(not(kani))]
+            file,
+        }
     }
 }
 

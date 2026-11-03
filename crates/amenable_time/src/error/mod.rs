@@ -10,7 +10,7 @@
 //!
 //! Ported from `elicit_temporal::error`. `ParseRejectedSource` names
 //! the serialization profile as a `String` for now; it takes the real
-//! `SerializationProfile` descriptor once that lands (plan Phase 2).
+//! `ParseProfile` descriptor once that lands (plan Phase 2).
 //!
 //! Split by domain, matching the real precedent in
 //! `amenable::error::sources::{internal,io,numeric,time}`: `parsing`/
@@ -50,10 +50,7 @@ pub use builders::{
     RecurringIntervalBuilderFailedSource, UtcOffsetBuilderFailedSource,
     ZonedDateTimeBuilderFailedSource,
 };
-pub use capability::{
-    AmbiguousLocalTimestampSource, LossyConversionRequiresAuthoritySource,
-    NamedZoneInconsistencySource, UnsupportedDetail, UnsupportedSource,
-};
+pub use capability::{LossyConversionRequiresAuthoritySource, UnsupportedDetail, UnsupportedSource};
 pub use endpoint::{
     CalendarComponentsPresentSource, DeclaredEndpoint, EndpointHasNoTemporalValueSource,
     LeapSecondNotRepresentableSource, NonDigitFractionByteSource,
@@ -61,7 +58,7 @@ pub use endpoint::{
 pub use kind::{TemporalError, TemporalErrorKind, TemporalResult};
 pub use unsupported_case::UnsupportedCase;
 pub use narrowing::{DurationDayOverflowSource, EpochSecondsEndpointsReversedSource};
-pub use parsing::{ParseIntRejectedSource, ParseRejectedSource};
+pub use parsing::{ParseIntRejectedSource, ParseProfile, ParseRejectedSource, ParseRejectionReason};
 pub use validation::{
     ComponentOutOfRangeSource, FixedOffsetOutOfRangeSource, InvalidCalendarDateSource,
     InvalidIsoWeekdaySource, InvalidLocalTimeSource, InvalidOrdinalDateSource,

@@ -302,18 +302,17 @@ pub use contracts::{
 };
 pub use coverage::{TemporalCoverage, TemporalCoverageRow};
 pub use error::{
-    AmbiguousLocalTimestampSource, CalendarComponentsPresentSource, ComponentOutOfRangeSource,
-    DeclaredEndpoint, DurationBuilderFailedSource, DurationDayOverflowSource,
-    EndpointHasNoTemporalValueSource, EpochSecondsEndpointsReversedSource,
-    FixedOffsetOutOfRangeSource, InvalidCalendarDateSource,
+    CalendarComponentsPresentSource, ComponentOutOfRangeSource, DeclaredEndpoint,
+    DurationBuilderFailedSource, DurationDayOverflowSource, EndpointHasNoTemporalValueSource,
+    EpochSecondsEndpointsReversedSource, FixedOffsetOutOfRangeSource, InvalidCalendarDateSource,
     InvalidIsoWeekdaySource, InvalidLocalTimeSource, InvalidOrdinalDateSource,
     InvalidWeekDateSource, IxdtfTimestampBuilderFailedSource,
     LeapSecondNotRepresentableSource, LocalDateTimeBuilderFailedSource,
     LocalTimeBuilderFailedSource, LossyConversionRequiresAuthoritySource,
-    NamedTimeZoneBuilderFailedSource, NamedZoneInconsistencySource, NanosecondOutOfRangeSource,
+    NamedTimeZoneBuilderFailedSource, NanosecondOutOfRangeSource,
     NoUniqueLocalMappingSource, NonDigitFractionByteSource, OffsetDateTimeBuilderFailedSource,
     ParseIntRejectedSource, ParseRejectedSource, RecurringIntervalBuilderFailedSource,
-    TemporalError, TemporalErrorKind,
+    ParseProfile, ParseRejectionReason, TemporalError, TemporalErrorKind,
     TemporalResult, UnsupportedCase, UnsupportedDetail, UnsupportedSource,
     UtcOffsetBuilderFailedSource, ZonedDateTimeBuilderFailedSource,
 };
